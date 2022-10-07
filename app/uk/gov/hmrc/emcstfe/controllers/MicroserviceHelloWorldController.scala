@@ -1,3 +1,8 @@
+/*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ */
+
 package uk.gov.hmrc.emcstfe.controllers
 
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
