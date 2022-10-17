@@ -5,11 +5,12 @@
 
 package uk.gov.hmrc.emcstfe.config
 
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
 
 @Singleton
-class AppConfig @Inject()(config: Configuration) {
+class AppConfig @Inject()(servicesConfig :ServicesConfig) {
 
-  val appName: String = config.get[String]("appName")
+  def stubUrl: String = s"${servicesConfig.baseUrl("emcs-tfe-chris-stub")}/emcs-tfe-chris-stub"
 }
