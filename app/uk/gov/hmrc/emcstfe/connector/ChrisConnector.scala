@@ -63,8 +63,8 @@ class ChrisConnector @Inject()(val http: HttpClient,
         |      </MetaData>
         |      <OperationRequest>
         |        <Parameters>
-        |          <Parameter Name="ExciseRegistrationNumber">GBWK000467014</Parameter>
-        |          <Parameter Name="ARC">18GB00000000000226081</Parameter>
+        |          <Parameter Name="ExciseRegistrationNumber">GBWK240176600</Parameter>
+        |          <Parameter Name="ARC">16GB00000000000192223</Parameter>
         |        </Parameters>
         |        <ReturnData>
         |          <Data Name="schema" />
