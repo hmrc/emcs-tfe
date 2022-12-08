@@ -10,7 +10,8 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AppConfig @Inject()(servicesConfig :ServicesConfig) {
+class AppConfig @Inject()(servicesConfig: ServicesConfig) {
 
   def stubUrl: String = servicesConfig.baseUrl("emcs-tfe-chris-stub")
+  def chrisUrl: String = servicesConfig.baseUrl("chris")
 }
