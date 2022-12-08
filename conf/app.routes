@@ -1,3 +1,5 @@
 # microservice specific routes
 
 GET        /hello-world             uk.gov.hmrc.emcstfe.controllers.MicroserviceHelloWorldController.hello
+
+GET        /test-only/chris           uk.gov.hmrc.emcstfe.controllers.TestingHittingChrisController.handleGet
