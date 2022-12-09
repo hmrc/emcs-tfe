@@ -7,7 +7,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfe.connector.{ChrisConnector, ChrisStubConnector}
+import uk.gov.hmrc.emcstfe.connector.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.response.HelloWorldResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
