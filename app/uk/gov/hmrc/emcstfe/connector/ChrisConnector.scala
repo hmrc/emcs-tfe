@@ -90,7 +90,10 @@ class ChrisConnector @Inject()(val http: HttpClient,
               case Success(value) => value
             }
           case status =>
-            logger.warn(s"Unexpected status from emcs-tfe-chris-stub: $status")
+            logger.error(
+              s"""Unexpected status from chris: $status
+                 |Unexpected response from chris: ${response.body}
+                 |""".stripMargin)
             Left("Unexpected downstream response status")
         }
     }
