@@ -19,6 +19,8 @@ class ChrisStubConnector @Inject()(val http: HttpClient,
                                    val config: AppConfig
                                  ) extends BaseConnector {
 
+  override def appConfig: AppConfig = config
+
   override lazy val logger: Logger = Logger(this.getClass)
   lazy val url: String = s"${config.stubUrl}/hello-world"
 

@@ -8,8 +8,7 @@ package uk.gov.hmrc.emcstfe.connector
 import play.api.Logger
 import play.api.http.Status._
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.models.response.HelloWorldResponse
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,16 +16,12 @@ import scala.util.{Failure, Success, Try}
 import scala.xml.Elem
 
 @Singleton
-class ChrisConnector @Inject()(val http: HttpClient,
-                               val config: AppConfig
+class ChrisConnector @Inject()(val http: HttpClient)(
+                               implicit config: AppConfig
                               ) extends BaseConnector {
 
+  override def appConfig: AppConfig = config
   override lazy val logger: Logger = Logger(this.getClass)
-
-  def chrisHeaders(action: String): Seq[(String, String)] = Seq(
-    ("Accept", "application/soap+xml"),
-    ("Content-Type", s"""application/soap+xml; charset=UTF-8; action="$action"""")
-  )
 
   def getMovementHistoryEvents()(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Elem]] = {
     lazy val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
@@ -43,8 +38,6 @@ class ChrisConnector @Inject()(val http: HttpClient,
       Host: localhost:9090
       Connection: Keep-Alive
   */
-
-    lazy val headers: Seq[(String, String)] = chrisHeaders("http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementHistoryEvents")
 
     lazy val requestBody =
       """
@@ -75,7 +68,15 @@ class ChrisConnector @Inject()(val http: HttpClient,
         |</soapenv:Envelope>
         |""".stripMargin
 
-    http.POSTString[HttpResponse](url, requestBody, headers).map {
+    logger.info(
+      s"""
+         |Making call to ChRIS from emcs-tfe
+         |----------------------------------
+         |URL: $url
+         |Body: $requestBody
+         |""".stripMargin)
+
+    postString(http, url, requestBody, "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementHistoryEvents") {
       response =>
         response.status match {
           case OK =>
