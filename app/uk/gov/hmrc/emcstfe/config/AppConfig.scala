@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  */
 
@@ -12,5 +12,5 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class AppConfig @Inject()(servicesConfig :ServicesConfig) {
 
-  def stubUrl: String = s"${servicesConfig.baseUrl("emcs-tfe-chris-stub")}/emcs-tfe-chris-stub"
+  def stubUrl: String = servicesConfig.baseUrl("emcs-tfe-chris-stub")
 }
