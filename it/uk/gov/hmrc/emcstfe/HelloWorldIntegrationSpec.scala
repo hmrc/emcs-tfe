@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  */
 
@@ -20,7 +20,7 @@ class HelloWorldIntegrationSpec extends IntegrationBaseSpec {
     def setupStubs(): StubMapping
 
     def uri: String = "/hello-world"
-    def referenceDataStubUri: String = s"/emcs-tfe-chris-stub/hello-world"
+    def downstreamUri: String = s"/hello-world"
 
     def request(): WSRequest = {
       setupStubs()
@@ -40,7 +40,7 @@ class HelloWorldIntegrationSpec extends IntegrationBaseSpec {
              |""".stripMargin
         )
         override def setupStubs(): StubMapping = {
-          DownstreamStub.onSuccess(DownstreamStub.GET, referenceDataStubUri, Status.OK, referenceDataResponseBody)
+          DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, Status.OK, referenceDataResponseBody)
         }
 
         val response: WSResponse = await(request().get())
@@ -60,7 +60,7 @@ class HelloWorldIntegrationSpec extends IntegrationBaseSpec {
         )
 
         override def setupStubs(): StubMapping = {
-          DownstreamStub.onSuccess(DownstreamStub.GET, referenceDataStubUri, Status.OK, referenceDataResponseBody)
+          DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, Status.OK, referenceDataResponseBody)
         }
 
         val response: WSResponse = await(request().get())
@@ -72,7 +72,7 @@ class HelloWorldIntegrationSpec extends IntegrationBaseSpec {
         val referenceDataResponseBody: Elem = <message>test message</message>
 
         override def setupStubs(): StubMapping = {
-          DownstreamStub.onSuccess(DownstreamStub.GET, referenceDataStubUri, Status.OK, referenceDataResponseBody)
+          DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, Status.OK, referenceDataResponseBody)
         }
 
         val response: WSResponse = await(request().get())
@@ -90,7 +90,7 @@ class HelloWorldIntegrationSpec extends IntegrationBaseSpec {
         )
 
         override def setupStubs(): StubMapping = {
-          DownstreamStub.onSuccess(DownstreamStub.GET, referenceDataStubUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
+          DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
         }
 
         val response: WSResponse = await(request().get())
