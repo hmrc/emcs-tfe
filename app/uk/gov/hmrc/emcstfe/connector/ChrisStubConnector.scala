@@ -22,7 +22,7 @@ class ChrisStubConnector @Inject()(val http: HttpClient,
   override lazy val logger: Logger = Logger(this.getClass)
   lazy val url: String = s"${config.stubUrl}/hello-world"
 
-  def getMessage()(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, HelloWorldResponse]] = {
+  def hello()(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, HelloWorldResponse]] = {
     http.GET[HttpResponse](url).map {
       response =>
         response.status match {

@@ -18,7 +18,7 @@ trait MockChrisStubConnector extends MockFactory  {
 
   object MockConnector {
     def getMessage(): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[String, HelloWorldResponse]]] = {
-      (mockConnector.getMessage()(_: HeaderCarrier, _: ExecutionContext))
+      (mockConnector.hello()(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *)
     }
   }

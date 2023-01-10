@@ -28,14 +28,14 @@ class ChrisStubConnectorSpec extends UnitSpec with Status with MimeTypes with He
     MockedAppConfig.referenceDataBaseUrl.returns(baseUrl)
   }
 
-  "getMessage" should {
+  "hello" should {
     "return a Right" when {
       "downstream call is successful" in new Test {
         val response: HttpResponse = HttpResponse(status = Status.OK, json = Json.toJson(HelloWorldResponse("test message")), headers = Map.empty)
 
         MockHttpClient.get(s"$baseUrl/hello-world").returns(Future.successful(response))
 
-        await(connector.getMessage()) shouldBe Right(HelloWorldResponse("test message"))
+        await(connector.hello()) shouldBe Right(HelloWorldResponse("test message"))
       }
     }
     "return a Left" when {
@@ -51,14 +51,14 @@ class ChrisStubConnectorSpec extends UnitSpec with Status with MimeTypes with He
 
         MockHttpClient.get(s"$baseUrl/hello-world").returns(Future.successful(response))
 
-        await(connector.getMessage()) shouldBe Left("JSON validation error")
+        await(connector.hello()) shouldBe Left("JSON validation error")
       }
       "downstream call is unsuccessful" in new Test {
         val response: HttpResponse = HttpResponse(status = Status.INTERNAL_SERVER_ERROR, json = Json.toJson(HelloWorldResponse("test message")), headers = Map.empty)
 
         MockHttpClient.get(s"$baseUrl/hello-world").returns(Future.successful(response))
 
-        await(connector.getMessage()) shouldBe Left("Unexpected downstream response status")
+        await(connector.hello()) shouldBe Left("Unexpected downstream response status")
       }
     }
   }

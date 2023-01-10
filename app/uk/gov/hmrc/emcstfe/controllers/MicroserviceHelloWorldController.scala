@@ -19,7 +19,7 @@ class MicroserviceHelloWorldController @Inject()(cc: ControllerComponents, conne
     extends BackendController(cc) {
 
   def hello(): Action[AnyContent] = Action.async { implicit request =>
-    connector.getMessage().map {
+    connector.hello().map {
       case Left(value) => InternalServerError(Json.toJson(HelloWorldResponse(value)))
       case Right(value) => Ok(Json.toJson(HelloWorldResponse(value.message)))
     }
