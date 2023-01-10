@@ -13,8 +13,7 @@ trait MockAppConfig extends MockFactory {
   val mockAppConfig: AppConfig = mock[AppConfig]
 
   object MockedAppConfig {
-    // MTD ID Lookup Config
-    def referenceDataBaseUrl: CallHandler[String] = ((() => mockAppConfig.stubUrl): () => String).expects()
+    def chrisUrl: CallHandler[String] = ((() => mockAppConfig.chrisUrl): () => String).expects()
   }
 
 }

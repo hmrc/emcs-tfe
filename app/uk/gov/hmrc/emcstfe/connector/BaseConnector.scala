@@ -7,13 +7,12 @@ package uk.gov.hmrc.emcstfe.connector
 
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
+import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 import scala.util.{Success, Try}
 
-trait BaseConnector {
-
-  lazy val logger: Logger = Logger(this.getClass)
+trait BaseConnector extends Logging {
 
   implicit val httpReads: HttpReads[HttpResponse] = (method: String, url: String, response: HttpResponse) => response
 

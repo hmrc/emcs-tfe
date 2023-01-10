@@ -12,5 +12,5 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class AppConfig @Inject()(servicesConfig :ServicesConfig) {
 
-  def stubUrl: String = servicesConfig.baseUrl("emcs-tfe-chris-stub")
+  def chrisUrl: String = servicesConfig.baseUrl("chris")
 }
