@@ -13,7 +13,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
-import scala.xml.Elem
+import scala.xml.{Elem, XML}
 
 @Singleton
 class ChrisConnector @Inject()(val http: HttpClient)(
@@ -79,8 +79,9 @@ class ChrisConnector @Inject()(val http: HttpClient)(
         response.status match {
           case OK =>
             Try {
-              val responseBody = scala.xml.XML.loadString(response.body)
-              val cdata = scala.xml.XML.loadString((responseBody \\ "OperationResponse" \ "Results" \ "Result").text)
+              val responseBody = XML.loadString(response.body)
+              logger.debug(response.body)
+              val cdata = XML.loadString((responseBody \\ "OperationResponse" \ "Results" \ "Result").text)
               Right(cdata)
             } match {
               case Failure(exception) =>
