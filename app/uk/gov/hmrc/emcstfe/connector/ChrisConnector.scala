@@ -80,7 +80,7 @@ class ChrisConnector @Inject()(val http: HttpClient)(
           case OK =>
             Try {
               val responseBody = XML.loadString(response.body)
-              logger.debug(response.body)
+              logger.info(response.body)
               val cdata = XML.loadString((responseBody \\ "OperationResponse" \ "Results" \ "Result").text)
               Right(cdata)
             } match {
