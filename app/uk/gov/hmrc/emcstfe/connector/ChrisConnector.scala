@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  */
 
@@ -40,8 +40,7 @@ class ChrisConnector @Inject()(val http: HttpClient)(
   */
 
     lazy val requestBody =
-      """
-        |<?xml version='1.0' encoding='UTF-8'?>
+      """<?xml version='1.0' encoding='UTF-8'?>
         |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
         |  <soapenv:Header>
         |    <VersionNo>2.1</VersionNo>
@@ -65,8 +64,7 @@ class ChrisConnector @Inject()(val http: HttpClient)(
         |      </OperationRequest>
         |    </Control>
         |  </soapenv:Body>
-        |</soapenv:Envelope>
-        |""".stripMargin
+        |</soapenv:Envelope>""".stripMargin
 
     logger.info(
       s"""
