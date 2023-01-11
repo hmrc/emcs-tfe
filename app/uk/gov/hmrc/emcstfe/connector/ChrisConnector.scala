@@ -48,7 +48,7 @@ class ChrisConnector @Inject()(val http: HttpClient)(
         |  <soapenv:Body>
         |    <Control xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
         |      <MetaData>
-        |        <MessageId>48682c6c-a30d-484e-8b44-cc3ab3964dc6</MessageId>
+        |        <MessageId>bf150184-9234-4895-b302-ae89067df29e</MessageId>
         |        <Source>emcs_tfe</Source>
         |        <Identity>portal</Identity>
         |        <Partner>UK</Partner>
