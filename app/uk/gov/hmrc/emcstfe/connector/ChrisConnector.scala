@@ -27,7 +27,7 @@ class ChrisConnector @Inject()(val http: HttpClient)(
     lazy val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     lazy val requestBody =
-      """<?xml version='1.0' encoding='UTF-8'?>
+      s"""<?xml version='1.0' encoding='UTF-8'?>
         |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
         |  <soapenv:Header>
         |    <VersionNo>2.1</VersionNo>
@@ -35,7 +35,7 @@ class ChrisConnector @Inject()(val http: HttpClient)(
         |  <soapenv:Body>
         |    <Control xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
         |      <MetaData>
-        |        <MessageId>bf150184-9234-4895-b302-ae89067df29e</MessageId>
+        |        <MessageId>${java.util.UUID.randomUUID.toString}</MessageId>
         |        <Source>emcs_tfe</Source>
         |        <Identity>portal</Identity>
         |        <Partner>UK</Partner>
