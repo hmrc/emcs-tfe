@@ -26,19 +26,6 @@ class ChrisConnector @Inject()(val http: HttpClient)(
   def getMovementHistoryEvents()(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Elem]] = {
     lazy val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
 
-    /*
-      * POST /ChRISOSB/EMCS/EMCSApplicationService/2 HTTP/1.1
-      Accept-Encoding: gzip
-      X-Request-ID: govuk-tax-9194b27d-d992-47ee-b71a-6871aee196da
-      X-Session-ID: session-711df0e3-3fe2-4e3c-abd8-bdbeb9e3554f
-      User-Agent: emcs
-      Accept: application/soap+xml
-      Content-Type: application/soap+xml; charset=UTF-8; action="http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementHistoryEvents"
-      Content-Length: 782
-      Host: localhost:9090
-      Connection: Keep-Alive
-  */
-
     lazy val requestBody =
       """<?xml version='1.0' encoding='UTF-8'?>
         |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -64,7 +51,7 @@ class ChrisConnector @Inject()(val http: HttpClient)(
         |      </OperationRequest>
         |    </Control>
         |  </soapenv:Body>
-        |</soapenv:Envelope>""".stripMargin
+        |</soapenv:Envelope>""".stripMargin.trim
 
     logger.info(
       s"""
@@ -80,7 +67,6 @@ class ChrisConnector @Inject()(val http: HttpClient)(
           case OK =>
             Try {
               val responseBody = XML.loadString(response.body)
-              logger.info(response.body)
               val cdata = XML.loadString((responseBody \\ "OperationResponse" \ "Results" \ "Result").text)
               Right(cdata)
             } match {
