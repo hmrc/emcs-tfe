@@ -13,14 +13,10 @@ import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.models.response.HelloWorldResponse
 import uk.gov.hmrc.emcstfe.support.UnitSpec
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class MicroserviceHelloWorldControllerSpec extends UnitSpec with MockChrisConnector {
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   private val fakeRequest = FakeRequest("GET", "/hello-world")
   private val controller = new MicroserviceHelloWorldController(Helpers.stubControllerComponents(), mockConnector)

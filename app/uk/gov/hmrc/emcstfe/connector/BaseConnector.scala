@@ -5,7 +5,6 @@
 
 package uk.gov.hmrc.emcstfe.connector
 
-import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}

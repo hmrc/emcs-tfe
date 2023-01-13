@@ -5,13 +5,15 @@
 
 package uk.gov.hmrc.emcstfe.mocks.connectors
 
-import org.scalamock.handlers.CallHandler2
+import org.scalamock.handlers.{CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.connector.ChrisConnector
+import uk.gov.hmrc.emcstfe.models.request.GetMessageRequest
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, HelloWorldResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.xml.NodeSeq
 
 trait MockChrisConnector extends MockFactory  {
   lazy val mockConnector: ChrisConnector = mock[ChrisConnector]
@@ -20,6 +22,10 @@ trait MockChrisConnector extends MockFactory  {
     def hello(): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, HelloWorldResponse]]] = {
       (mockConnector.hello()(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *)
+    }
+    def getMessage(): CallHandler3[GetMessageRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, NodeSeq]]] = {
+      (mockConnector.getMessage(_: GetMessageRequest)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *)
     }
   }
 }

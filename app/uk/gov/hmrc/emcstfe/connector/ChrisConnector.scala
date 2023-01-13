@@ -5,7 +5,6 @@
 
 package uk.gov.hmrc.emcstfe.connector
 
-import play.api.Logger
 import play.api.http.Status._
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.request.GetMessageRequest
@@ -16,7 +15,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
-import scala.xml.{Elem, XML}
+import scala.xml.{NodeSeq, XML}
 
 @Singleton
 class ChrisConnector @Inject()(val http: HttpClient,
@@ -42,7 +41,7 @@ class ChrisConnector @Inject()(val http: HttpClient,
     }
   }
 
-  def getMessage(request: GetMessageRequest)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Elem]] = {
+  def getMessage(request: GetMessageRequest)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
     val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     http.POSTString(url, request.requestBody)

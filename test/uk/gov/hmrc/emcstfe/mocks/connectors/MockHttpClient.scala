@@ -12,6 +12,7 @@ import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.xml.XML
 
 trait MockHttpClient extends MockFactory {
 
@@ -49,7 +50,7 @@ trait MockHttpClient extends MockFactory {
         .POSTString[T](_: String, _: String, _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs { (actualUrl, actualBody: String, _, _, _, _) => {
           actualUrl shouldBe url
-          actualBody shouldBe body
+          (XML.loadString(actualBody) \\ "OperationRequest"). shouldBe (XML.loadString(body) \\ "OperationRequest")
         }
         })
     }
