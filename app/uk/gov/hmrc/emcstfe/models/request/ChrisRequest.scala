@@ -13,4 +13,6 @@ trait ChrisRequest {
   def arc: String
 
   def action: String
+
+  def uuid: String = java.util.UUID.randomUUID().toString
 }

@@ -9,7 +9,7 @@ import uk.gov.hmrc.emcstfe.utils.{Logging, SoapUtils}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class GetMessageService @Inject()(connector: ChrisConnector) extends Logging {
@@ -21,6 +21,7 @@ class GetMessageService @Inject()(connector: ChrisConnector) extends Logging {
             SoapUtils.extractFromSoap(xml) match {
               case Failure(exception) =>
                 logger.warn("Error extracting response body from SOAP wrapper", exception)
+                (xml \\ "Errors" \ "Error").foreach(error => logger.warn(error.text))
                 Left(SoapExtractionError)
               case Success(value) => ???
             }
