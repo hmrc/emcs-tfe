@@ -9,8 +9,8 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.XML
 
-class GetMessageRequestSpec extends UnitSpec {
-  val request = GetMessageRequest("My ERN", "My ARC")
+class GetMovementRequestSpec extends UnitSpec {
+  val request = GetMovementRequest("My ERN", "My ARC")
 
   "requestBody" should {
     "generate the correct request XML" in {

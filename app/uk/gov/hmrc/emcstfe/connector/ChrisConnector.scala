@@ -7,7 +7,7 @@ package uk.gov.hmrc.emcstfe.connector
 
 import play.api.http.Status._
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.models.request.GetMessageRequest
+import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, HelloWorldResponse}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
@@ -43,7 +43,7 @@ class ChrisConnector @Inject()(val http: HttpClient,
     }
   }
 
-  def getMessage(request: GetMessageRequest)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
+  def getMovement(request: GetMovementRequest)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
     val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     postString(http, url, request.requestBody, request.action) {

@@ -5,17 +5,17 @@
 
 package uk.gov.hmrc.emcstfe.utils
 
-import uk.gov.hmrc.emcstfe.fixtures.GetMessageFixture
+import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.util.{Failure, Success}
 import scala.xml.XML
 
-class SoapUtilsSpec extends UnitSpec with GetMessageFixture {
+class SoapUtilsSpec extends UnitSpec with GetMovementFixture {
   "extractFromSoap" should {
     "return a Success" when {
       "there is CDATA containing XML at the correct path" in {
-        SoapUtils.extractFromSoap(XML.loadString(getMessageSoapWrapper)) shouldBe a[Success[_]]
+        SoapUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper)) shouldBe a[Success[_]]
       }
     }
     "return a Failure" when {
@@ -42,7 +42,7 @@ class SoapUtilsSpec extends UnitSpec with GetMessageFixture {
              |			<con:OperationResponse>
              |				<con:Results>
              |					<con:MyResult Name="">
-             |						<![CDATA[$getMessageResponseBody]]>
+             |						<![CDATA[$getMovementResponseBody]]>
              |					</con:MyResult>
              |				</con:Results>
              |			</con:OperationResponse>

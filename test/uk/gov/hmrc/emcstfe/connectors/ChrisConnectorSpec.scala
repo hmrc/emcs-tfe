@@ -10,7 +10,7 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.connector.ChrisConnector
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
-import uk.gov.hmrc.emcstfe.models.request.GetMessageRequest
+import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.HelloWorldResponse
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -67,17 +67,17 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     }
   }
 
-  "getMessage" should {
-    val getMessageRequest = GetMessageRequest("", "")
+  "getMovement" should {
+    val getMovementRequest = GetMovementRequest("", "")
     "return a Right" when {
       "downstream call is successful" in new Test {
         val successXml: Elem = <Message>Success!</Message>
 
         val response: HttpResponse = HttpResponse(status = Status.OK, body = successXml.toString(), headers = Map.empty)
 
-        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMessageRequest.requestBody).returns(Future.successful(response))
+        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
 
-        await(connector.getMessage(getMessageRequest)) shouldBe Right(successXml)
+        await(connector.getMovement(getMovementRequest)) shouldBe Right(successXml)
       }
     }
     "return a Left" when {
@@ -85,16 +85,16 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response: HttpResponse = HttpResponse(status = Status.OK, body = Json.obj().toString(), headers = Map.empty)
 
-        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMessageRequest.requestBody).returns(Future.successful(response))
+        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
 
-        await(connector.getMessage(getMessageRequest)) shouldBe Left(XmlValidationError)
+        await(connector.getMovement(getMovementRequest)) shouldBe Left(XmlValidationError)
       }
       "downstream call is unsuccessful" in new Test {
         val response: HttpResponse = HttpResponse(status = Status.INTERNAL_SERVER_ERROR, body = "", headers = Map.empty)
 
-        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMessageRequest.requestBody).returns(Future.successful(response))
+        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
 
-        await(connector.getMessage(getMessageRequest)) shouldBe Left(UnexpectedDownstreamResponseError)
+        await(connector.getMovement(getMovementRequest)) shouldBe Left(UnexpectedDownstreamResponseError)
       }
     }
   }

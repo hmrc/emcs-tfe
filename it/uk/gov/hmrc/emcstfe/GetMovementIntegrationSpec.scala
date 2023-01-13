@@ -9,14 +9,14 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import uk.gov.hmrc.emcstfe.fixtures.GetMessageFixture
+import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.DownstreamStub
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import scala.xml.XML
 
-class GetMessageIntegrationSpec extends IntegrationBaseSpec with GetMessageFixture {
+class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
   private trait Test {
     def setupStubs(): StubMapping
@@ -24,7 +24,7 @@ class GetMessageIntegrationSpec extends IntegrationBaseSpec with GetMessageFixtu
     val exciseRegistrationNumber: String = "MyERN"
     val arc: String = "MyARC"
 
-    def uri: String = s"/get-message/$exciseRegistrationNumber/$arc"
+    def uri: String = s"/get-movement/$exciseRegistrationNumber/$arc"
     def downstreamUri: String = s"/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     def request(): WSRequest = {
@@ -37,7 +37,7 @@ class GetMessageIntegrationSpec extends IntegrationBaseSpec with GetMessageFixtu
     "return a success" when {
       "all downstream calls are successful" in new Test {
         override def setupStubs(): StubMapping = {
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(getMessageSoapWrapper))
+          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(getMovementSoapWrapper))
         }
 
         val response: WSResponse = await(request().get())

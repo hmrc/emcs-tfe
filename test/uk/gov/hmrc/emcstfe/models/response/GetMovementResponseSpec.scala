@@ -6,13 +6,13 @@
 package uk.gov.hmrc.emcstfe.models.response
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.fixtures.GetMessageFixture
+import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.{Days, Hours}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.XML
 
-class GetMessageResponseSpec extends UnitSpec with GetMessageFixture {
+class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
   "writes" should {
     "write a model to JSON" in {
       Json.toJson(model) shouldBe jsonResponse
@@ -21,11 +21,11 @@ class GetMessageResponseSpec extends UnitSpec with GetMessageFixture {
 
   "fromXml" should {
     "convert a full XML response into a model" in {
-      GetMessageResponse.fromXml(XML.loadString(getMessageResponseBody)) shouldBe model
+      GetMovementResponse.fromXml(XML.loadString(getMovementResponseBody)) shouldBe model
     }
 
     "handle duplicate CnCodes" in {
-      GetMessageResponse.fromXml(XML.loadString(
+      GetMovementResponse.fromXml(XML.loadString(
         // There are three CnCode values here but only two unique ones
         """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
           |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
@@ -161,7 +161,7 @@ class GetMessageResponseSpec extends UnitSpec with GetMessageFixture {
     }
 
     "handle hours and days" in {
-      val modelWithHours = GetMessageResponse.fromXml(XML.loadString(
+      val modelWithHours = GetMovementResponse.fromXml(XML.loadString(
         """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
           |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
           |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -296,7 +296,7 @@ class GetMessageResponseSpec extends UnitSpec with GetMessageFixture {
 
       modelWithHours shouldBe model.copy(journeyTime = Hours("20"))
 
-      val modelWithDays = GetMessageResponse.fromXml(XML.loadString(
+      val modelWithDays = GetMovementResponse.fromXml(XML.loadString(
         """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
           |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
           |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

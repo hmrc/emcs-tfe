@@ -5,7 +5,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-case class GetMessageRequest(exciseRegistrationNumber: String, arc: String) extends ChrisRequest {
+case class GetMovementRequest(exciseRegistrationNumber: String, arc: String) extends ChrisRequest {
   override def requestBody: String =
     s"""<?xml version='1.0' encoding='UTF-8'?>
       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">

@@ -1,5 +1,5 @@
 # microservice specific routes
 
-GET        /hello-world                                       uk.gov.hmrc.emcstfe.controllers.MicroserviceHelloWorldController.hello
+GET        /hello-world                                        uk.gov.hmrc.emcstfe.controllers.MicroserviceHelloWorldController.hello
 
-GET        /get-message/:exciseRegistrationNumber/:arc        uk.gov.hmrc.emcstfe.controllers.GetMessageController.getMessage(exciseRegistrationNumber, arc)
+GET        /get-movement/:exciseRegistrationNumber/:arc        uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(exciseRegistrationNumber, arc)

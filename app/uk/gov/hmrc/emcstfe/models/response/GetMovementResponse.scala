@@ -11,7 +11,7 @@ import uk.gov.hmrc.emcstfe.models.common.JourneyTime
 
 import scala.xml.NodeSeq
 
-case class GetMessageResponse(
+case class GetMovementResponse(
                                localReferenceNumber: String,
                                eadStatus: String,
                                consignorName: String,
@@ -20,8 +20,8 @@ case class GetMessageResponse(
                                numberOfItems: Int
                              )
 
-object GetMessageResponse {
-  def fromXml(xml: NodeSeq): GetMessageResponse = {
+object GetMovementResponse {
+  def fromXml(xml: NodeSeq): GetMovementResponse = {
     val localReferenceNumber: String = (xml \\ "MovementDataResponse" \\ "movementView" \\ "currentMovement" \\ "IE801" \\ "Body" \\ "EADContainer" \\ "Ead" \\ "LocalReferenceNumber").text
     val eadStatus: String = (xml \\ "MovementDataResponse" \\ "movementView" \\ "currentMovement" \\ "status").text
     val consignorName: String = (xml \\ "MovementDataResponse" \\ "movementView" \\ "currentMovement" \\ "IE801" \\ "Body" \\ "EADContainer" \\ "ConsignorTrader" \\ "TraderName").text
@@ -37,7 +37,7 @@ object GetMessageResponse {
       }
     }
     val numberOfItems: Int = (xml \\ "MovementDataResponse" \\ "movementView" \\ "currentMovement" \\ "IE801" \\ "Body" \\ "EADContainer" \\ "BodyEad" \\ "CnCode").map(_.text).distinct.length
-    GetMessageResponse(
+    GetMovementResponse(
       localReferenceNumber = localReferenceNumber,
       eadStatus = eadStatus,
       consignorName = consignorName,
@@ -47,5 +47,5 @@ object GetMessageResponse {
     )
   }
 
-  implicit val writes: OWrites[GetMessageResponse] = Json.writes
+  implicit val writes: OWrites[GetMovementResponse] = Json.writes
 }

@@ -7,10 +7,10 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.Days
-import uk.gov.hmrc.emcstfe.models.response.GetMessageResponse
+import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse
 
-trait GetMessageFixture {
-  lazy val getMessageResponseBody: String = """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
+trait GetMovementFixture {
+  lazy val getMovementResponseBody: String = """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
                                               |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
                                               |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                                               |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
@@ -285,7 +285,7 @@ trait GetMessageFixture {
                                               |	</mov:movementView>
                                               |</MovementDataResponse>""".stripMargin
 
-  lazy val getMessageSoapWrapper: String = s"""<tns:Envelope
+  lazy val getMovementSoapWrapper: String = s"""<tns:Envelope
                                               |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                               |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
                                               |	<tns:Body>
@@ -306,7 +306,7 @@ trait GetMessageFixture {
                                               |			<con:OperationResponse>
                                               |				<con:Results>
                                               |					<con:Result Name="">
-                                              |						<![CDATA[$getMessageResponseBody]]>
+                                              |						<![CDATA[$getMovementResponseBody]]>
                                               |					</con:Result>
                                               |				</con:Results>
                                               |			</con:OperationResponse>
@@ -314,7 +314,7 @@ trait GetMessageFixture {
                                               |	</tns:Body>
                                               |</tns:Envelope>""".stripMargin
   
-  lazy val model: GetMessageResponse = GetMessageResponse(
+  lazy val model: GetMovementResponse = GetMovementResponse(
     localReferenceNumber = "EN", eadStatus = "Accepted", consignorName = "Current 801 Consignor", dateOfDispatch = "2008-11-20", journeyTime = Days("20"), numberOfItems = 2
   )
 
