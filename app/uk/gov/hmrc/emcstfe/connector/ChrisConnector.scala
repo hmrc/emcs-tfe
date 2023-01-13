@@ -22,6 +22,8 @@ class ChrisConnector @Inject()(val http: HttpClient,
                                val config: AppConfig
                                   ) extends BaseConnector {
 
+  override def appConfig: AppConfig = config
+
   def hello()(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, HelloWorldResponse]] = {
     val url: String = s"${config.chrisUrl}/hello-world"
 
@@ -44,8 +46,7 @@ class ChrisConnector @Inject()(val http: HttpClient,
   def getMessage(request: GetMessageRequest)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
     val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
 
-    http.POSTString(url, request.requestBody)
-      .map {
+    postString(http, url, request.requestBody, request.action) {
         response =>
           response.status match {
             case OK => Try(XML.loadString(response.body)) match {

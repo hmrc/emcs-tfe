@@ -29,6 +29,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
     val baseUrl: String = "http://test-BaseUrl"
     MockedAppConfig.chrisUrl.returns(baseUrl)
+    MockedAppConfig.chrisHeaders.returns(Seq()).anyNumberOfTimes()
   }
 
   "hello" should {
