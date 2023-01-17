@@ -15,14 +15,14 @@ class GetMovementListResponseSpec extends UnitSpec with GetMovementListFixture {
 
   "writes" should {
     "write a model to JSON" in {
-      Json.toJson(getMovementListModel) shouldBe getMovementListJson
+      Json.toJson(getMovementListResponse) shouldBe getMovementListJson
     }
   }
 
   ".apply(xml: NodeSeq)" should {
 
     "convert a full XML response into a model" in {
-      GetMovementListResponse(XML.loadString(getMovementListXMLResponseBody)) shouldBe getMovementListModel
+      GetMovementListResponse(XML.loadString(getMovementListXMLResponseBody)) shouldBe getMovementListResponse
     }
   }
 }

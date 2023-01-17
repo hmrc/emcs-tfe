@@ -318,7 +318,7 @@ trait GetMovementFixture {
     localReferenceNumber = "EN", eadStatus = "Accepted", consignorName = "Current 801 Consignor", dateOfDispatch = "2008-11-20", journeyTime = Days("20"), numberOfItems = 2
   )
 
-  lazy val jsonResponse: JsValue = Json.parse(
+  lazy val getMovementJson: JsValue = Json.parse(
     """{
       |  "localReferenceNumber": "EN",
       |  "eadStatus": "Accepted",

@@ -56,7 +56,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
           .postChrisSOAPRequest(getMovementListRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementListSoapWrapper))))
 
-        await(service.getMovementList(getMovementListRequest)) shouldBe Right(getMovementListModel)
+        await(service.getMovementList(getMovementListRequest)) shouldBe Right(getMovementListResponse)
       }
     }
     "return a Left" when {

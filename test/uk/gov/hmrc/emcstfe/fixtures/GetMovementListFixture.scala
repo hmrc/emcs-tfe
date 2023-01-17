@@ -102,7 +102,7 @@ trait GetMovementListFixture {
     "consignorLanguageCode" -> "en"
   )
 
-  lazy val getMovementListModel: GetMovementListResponse = GetMovementListResponse(Seq(movement1, movement2))
+  lazy val getMovementListResponse: GetMovementListResponse = GetMovementListResponse(Seq(movement1, movement2))
 
   lazy val getMovementListJson: JsValue = Json.obj(
     "movements" -> Json.arr(

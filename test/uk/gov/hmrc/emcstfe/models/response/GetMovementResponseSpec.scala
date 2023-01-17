@@ -15,7 +15,7 @@ import scala.xml.XML
 class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
   "writes" should {
     "write a model to JSON" in {
-      Json.toJson(getMovementResponse) shouldBe jsonResponse
+      Json.toJson(getMovementResponse) shouldBe getMovementJson
     }
   }
 
