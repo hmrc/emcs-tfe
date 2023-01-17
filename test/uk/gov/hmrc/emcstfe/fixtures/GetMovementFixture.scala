@@ -314,7 +314,7 @@ trait GetMovementFixture {
                                               |	</tns:Body>
                                               |</tns:Envelope>""".stripMargin
   
-  lazy val model: GetMovementResponse = GetMovementResponse(
+  lazy val getMovementResponse: GetMovementResponse = GetMovementResponse(
     localReferenceNumber = "EN", eadStatus = "Accepted", consignorName = "Current 801 Consignor", dateOfDispatch = "2008-11-20", journeyTime = Days("20"), numberOfItems = 2
   )
 

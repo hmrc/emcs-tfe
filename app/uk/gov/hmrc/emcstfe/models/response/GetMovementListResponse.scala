@@ -13,6 +13,8 @@ import scala.xml.NodeSeq
 case class GetMovementListResponse(movements: Seq[GetMovementListItem])
 
 object GetMovementListResponse {
+
+  implicit val asT: NodeSeq => GetMovementListResponse = apply
   def apply(xml: NodeSeq): GetMovementListResponse = {
 
     val movements = xml \\ "MovementListDataResponse" \\ "Movement"

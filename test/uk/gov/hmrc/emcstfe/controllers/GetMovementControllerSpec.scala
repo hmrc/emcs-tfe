@@ -29,7 +29,7 @@ class GetMovementControllerSpec extends UnitSpec with MockGetMovementService wit
     "return 200" when {
       "service returns a Right" in {
 
-        MockService.getMovement().returns(Future.successful(Right(model)))
+        MockService.getMovement().returns(Future.successful(Right(getMovementResponse)))
 
         val result = controller.getMovement(exciseRegistrationNumber, arc)(fakeRequest)
 

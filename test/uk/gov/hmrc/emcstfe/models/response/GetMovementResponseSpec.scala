@@ -15,17 +15,17 @@ import scala.xml.XML
 class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
   "writes" should {
     "write a model to JSON" in {
-      Json.toJson(model) shouldBe jsonResponse
+      Json.toJson(getMovementResponse) shouldBe jsonResponse
     }
   }
 
   "fromXml" should {
     "convert a full XML response into a model" in {
-      GetMovementResponse.fromXml(XML.loadString(getMovementResponseBody)) shouldBe model
+      GetMovementResponse.apply(XML.loadString(getMovementResponseBody)) shouldBe getMovementResponse
     }
 
     "handle duplicate CnCodes" in {
-      GetMovementResponse.fromXml(XML.loadString(
+      GetMovementResponse.apply(XML.loadString(
         // There are three CnCode values here but only two unique ones
         """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
           |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
@@ -157,11 +157,11 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
           |			</body:IE801>
           |		</mov:currentMovement>
           |	</mov:movementView>
-          |</MovementDataResponse>""".stripMargin)) shouldBe model
+          |</MovementDataResponse>""".stripMargin)) shouldBe getMovementResponse
     }
 
     "handle hours and days" in {
-      val modelWithHours = GetMovementResponse.fromXml(XML.loadString(
+      val modelWithHours = GetMovementResponse.apply(XML.loadString(
         """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
           |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
           |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -294,9 +294,9 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
           |	</mov:movementView>
           |</MovementDataResponse>""".stripMargin))
 
-      modelWithHours shouldBe model.copy(journeyTime = Hours("20"))
+      modelWithHours shouldBe getMovementResponse.copy(journeyTime = Hours("20"))
 
-      val modelWithDays = GetMovementResponse.fromXml(XML.loadString(
+      val modelWithDays = GetMovementResponse.apply(XML.loadString(
         """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
           |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
           |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -429,7 +429,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
           |	</mov:movementView>
           |</MovementDataResponse>""".stripMargin))
 
-      modelWithDays shouldBe model.copy(journeyTime = Days("20"))
+      modelWithDays shouldBe getMovementResponse.copy(journeyTime = Days("20"))
     }
   }
 }

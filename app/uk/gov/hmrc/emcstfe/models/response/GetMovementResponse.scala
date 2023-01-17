@@ -21,7 +21,7 @@ case class GetMovementResponse(
                              )
 
 object GetMovementResponse {
-  def fromXml(xml: NodeSeq): GetMovementResponse = {
+  def apply(xml: NodeSeq): GetMovementResponse = {
     val currentMovement = (xml \\ "MovementDataResponse" \\ "movementView" \\ "currentMovement")
     val eadContainer = (currentMovement \\ "IE801" \\ "Body" \\ "EADContainer")
 

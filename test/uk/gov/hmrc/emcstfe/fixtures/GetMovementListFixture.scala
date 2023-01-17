@@ -33,7 +33,7 @@ trait GetMovementListFixture {
                                                    |	<CountOfMovementsAvailable>2</CountOfMovementsAvailable>
                                                    |</MovementListDataResponse>""".stripMargin
 
-  lazy val getMovementSoapWrapper: String = s"""<tns:Envelope
+  lazy val getMovementListSoapWrapper: String = s"""<tns:Envelope
                                                |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                                |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
                                                |	<tns:Body>
