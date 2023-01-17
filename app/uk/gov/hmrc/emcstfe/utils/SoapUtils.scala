@@ -17,14 +17,15 @@ object SoapUtils extends Logging {
     XML.loadString(cdata)
   }
 
-  def parseResponseXMLAsEitherT[T](implicit f: NodeSeq => T): Either[ErrorResponse, NodeSeq] => Either[ErrorResponse, T] = _.flatMap { xml =>
-    SoapUtils.extractFromSoap(xml) match {
-      case Failure(exception) =>
-        logger.warn("Error extracting response body from SOAP wrapper", exception)
-        (xml \\ "Errors" \\ "Error").foreach(error => logger.warn(error.text))
-        Left(SoapExtractionError)
-      case Success(value) => Right(f(value))
+  def parseResponseXMLAsEitherT[T](asT: NodeSeq => T): Either[ErrorResponse, NodeSeq] => Either[ErrorResponse, T] =
+    _.flatMap { xml =>
+      SoapUtils.extractFromSoap(xml) match {
+        case Failure(exception) =>
+          logger.warn("Error extracting response body from SOAP wrapper", exception)
+          (xml \\ "Errors" \\ "Error").foreach(error => logger.warn(error.text))
+          Left(SoapExtractionError)
+        case Success(value) => Right(asT(value))
+      }
     }
-  }
 
 }

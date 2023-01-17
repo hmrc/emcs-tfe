@@ -48,7 +48,14 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
     "return an error" when {
       "downstream call returns unexpected XML" in new Test {
         override def setupStubs(): StubMapping = {
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, <Message>Success!</Message>)
+          DownstreamStub.onSuccess(
+            DownstreamStub.POST,
+            downstreamUri,
+            Status.OK,
+            <Errors>
+              <Error>Something went wrong</Error>
+            </Errors>
+          )
         }
 
         val response: WSResponse = await(request().get())

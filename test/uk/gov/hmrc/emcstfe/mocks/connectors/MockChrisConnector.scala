@@ -8,7 +8,7 @@ package uk.gov.hmrc.emcstfe.mocks.connectors
 import org.scalamock.handlers.{CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
-import uk.gov.hmrc.emcstfe.models.request.{ChrisRequest, GetMovementRequest}
+import uk.gov.hmrc.emcstfe.models.request.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, HelloWorldResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
