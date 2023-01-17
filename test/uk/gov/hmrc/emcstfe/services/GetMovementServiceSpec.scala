@@ -24,7 +24,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
         MockConnector
-          .getMovement()
+          .postChrisSOAPRequest(request)
           .returns(Future.successful(Right(XML.loadString(getMovementSoapWrapper))))
 
         await(service.getMovement(request)) shouldBe Right(model)
@@ -33,14 +33,14 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
         MockConnector
-          .getMovement()
+          .postChrisSOAPRequest(request)
           .returns(Future.successful(Left(XmlValidationError)))
 
         await(service.getMovement(request)) shouldBe Left(XmlValidationError)
       }
       "connector call response cannot be extracted" in new Test {
         MockConnector
-          .getMovement()
+          .postChrisSOAPRequest(request)
           .returns(Future.successful(Right(<Message>Success!</Message>)))
 
         await(service.getMovement(request)) shouldBe Left(SoapExtractionError)

@@ -6,7 +6,7 @@
 package uk.gov.hmrc.emcstfe.services
 
 import com.google.inject.{Inject, Singleton}
-import uk.gov.hmrc.emcstfe.connector.ChrisConnector
+import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.SoapExtractionError
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementResponse}
@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
 @Singleton
 class GetMovementService @Inject()(connector: ChrisConnector) extends Logging {
   def getMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
-    connector.getMovement(getMovementRequest).map {
+    connector.postChrisSOAPRequest(getMovementRequest).map {
       response => {
         response.flatMap {
           xml =>
