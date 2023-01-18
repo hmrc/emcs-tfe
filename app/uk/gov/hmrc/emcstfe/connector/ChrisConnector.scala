@@ -14,8 +14,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
-import scala.xml.{NodeSeq, XML}
+import scala.xml.NodeSeq
 
 @Singleton
 class ChrisConnector @Inject()(val http: HttpClient,
@@ -46,20 +45,7 @@ class ChrisConnector @Inject()(val http: HttpClient,
   def getMovement(request: GetMovementRequest)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
     val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
 
-    postString(http, url, request.requestBody, request.action) {
-        response =>
-          response.status match {
-            case OK => Try(XML.loadString(response.body)) match {
-              case Failure(exception) =>
-                logger.warn("Unable to read response body as XML", exception)
-                Left(XmlValidationError)
-              case Success(value) => Right(value)
-            }
-            case status =>
-              logger.warn(s"Unexpected status from emcs-tfe-chris-stub: $status")
-              Left(UnexpectedDownstreamResponseError)
-          }
-      }
+    postString(http, url, request.requestBody, request.action)
   }
 
 }

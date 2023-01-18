@@ -5,19 +5,37 @@
 
 package uk.gov.hmrc.emcstfe.connector
 
+import play.api.http.Status.OK
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
+import scala.xml.{NodeSeq, XML}
 
 trait BaseConnector extends Logging {
 
   def appConfig: AppConfig
 
-  implicit val httpReads: HttpReads[HttpResponse] = (method: String, url: String, response: HttpResponse) => response
+  implicit val httpResponseReads: HttpReads[HttpResponse] = (_: String, _: String, response: HttpResponse) => response
+
+  implicit val chrisReads: HttpReads[Either[ErrorResponse, NodeSeq]] = (_: String, _: String, response: HttpResponse) => {
+    response.status match {
+      case OK => Try(XML.loadString(response.body)) match {
+        case Failure(exception) =>
+          logger.warn("Unable to read response body as XML", exception)
+          Left(XmlValidationError)
+        case Success(value) => Right(value)
+      }
+      case status =>
+        logger.warn(s"Unexpected status from chris: $status")
+        Left(UnexpectedDownstreamResponseError)
+    }
+  }
 
   implicit class KnownJsonResponse(response: HttpResponse) {
 
@@ -48,11 +66,11 @@ trait BaseConnector extends Logging {
     hc.copy(extraHeaders = hc.extraHeaders ++ hc.headers(appConfig.chrisHeaders) ++ extraHeaders)
   }
 
-  def postString[A, B](http: HttpClient, uri: String, body: String, action: String)(resFn: HttpResponse => Either[A, B])(implicit ec: ExecutionContext,
-                                                                                                                         hc: HeaderCarrier): Future[Either[A, B]] = {
+  def postString(http: HttpClient, uri: String, body: String, action: String)(implicit ec: ExecutionContext,
+                                                                              hc: HeaderCarrier): Future[Either[ErrorResponse, NodeSeq]] = {
 
-    def doPostString(implicit hc: HeaderCarrier): Future[Either[A, B]] =
-      http.POSTString[HttpResponse](uri, body, chrisHeaders(action)).map(resFn)
+    def doPostString(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, NodeSeq]] =
+      http.POSTString[Either[ErrorResponse, NodeSeq]](uri, body, chrisHeaders(action))(chrisReads, hc, ec)
 
     doPostString(chrisHeaderCarrier(chrisHeaders(action)))
   }

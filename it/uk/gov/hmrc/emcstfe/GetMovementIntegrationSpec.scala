@@ -24,7 +24,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
     val exciseRegistrationNumber: String = "MyERN"
     val arc: String = "MyARC"
 
-    def uri: String = s"/get-movement/$exciseRegistrationNumber/$arc"
+    def uri: String = s"/movement/$exciseRegistrationNumber/$arc"
     def downstreamUri: String = s"/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     def request(): WSRequest = {

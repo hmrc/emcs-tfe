@@ -7,7 +7,7 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import play.api.libs.json.{Json, OWrites}
 
-trait ErrorResponse {
+sealed trait ErrorResponse {
   val message: String
 }
 
@@ -18,19 +18,19 @@ object ErrorResponse {
   implicit def genericWrites[T <: ErrorResponse]: OWrites[T] =
     writes.contramap[T](c => c: ErrorResponse)
 
-  object UnexpectedDownstreamResponseError extends ErrorResponse {
+  case object UnexpectedDownstreamResponseError extends ErrorResponse {
     val message = "Unexpected downstream response status"
   }
 
-  object JsonValidationError extends ErrorResponse {
+  case object JsonValidationError extends ErrorResponse {
     val message = "JSON validation error"
   }
 
-  object XmlValidationError extends ErrorResponse {
+  case object XmlValidationError extends ErrorResponse {
     val message = "XML validation error"
   }
 
-  object SoapExtractionError extends ErrorResponse {
+  case object SoapExtractionError extends ErrorResponse {
     val message = "Error extracting response body from SOAP wrapper"
   }
 

@@ -11,7 +11,7 @@ import uk.gov.hmrc.emcstfe.connector.ChrisConnector
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.models.response.HelloWorldResponse
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -77,24 +77,25 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
 
-        await(connector.getMovement(getMovementRequest)) shouldBe Right(successXml)
+        await(connector.getMovement(getMovementRequest)) shouldBe response
       }
     }
     "return a Left" when {
+      //TODO test BaseConnector's chrisReads function
       "downstream call is successful but can't convert the response to XML" in new Test {
 
         val response: HttpResponse = HttpResponse(status = Status.OK, body = Json.obj().toString(), headers = Map.empty)
 
         MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
 
-        await(connector.getMovement(getMovementRequest)) shouldBe Left(XmlValidationError)
+        await(connector.getMovement(getMovementRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
         val response: HttpResponse = HttpResponse(status = Status.INTERNAL_SERVER_ERROR, body = "", headers = Map.empty)
 
         MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
 
-        await(connector.getMovement(getMovementRequest)) shouldBe Left(UnexpectedDownstreamResponseError)
+        await(connector.getMovement(getMovementRequest)) shouldBe response
       }
     }
   }

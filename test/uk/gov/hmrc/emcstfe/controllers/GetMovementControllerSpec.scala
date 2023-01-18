@@ -18,14 +18,14 @@ import scala.concurrent.Future
 
 class GetMovementControllerSpec extends UnitSpec with MockGetMovementService with GetMovementFixture {
 
-  private val fakeRequest = FakeRequest("GET", "/get-movement/:exciseRegistrationNumber/:arc")
+  private val fakeRequest = FakeRequest("GET", "/movement/:exciseRegistrationNumber/:arc")
   private val controller = new GetMovementController(Helpers.stubControllerComponents(), mockService)
 
   private val exciseRegistrationNumber = "My ERN"
   private val arc = "My ARC"
 
 
-  "GET /get-movement/:exciseRegistrationNumber/:arc" should {
+  "GET /movement/:exciseRegistrationNumber/:arc" should {
     "return 200" when {
       "service returns a Right" in {
 
