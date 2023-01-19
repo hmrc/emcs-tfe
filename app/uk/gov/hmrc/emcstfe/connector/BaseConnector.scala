@@ -72,7 +72,7 @@ trait BaseConnector extends Logging {
     def doPostString(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, NodeSeq]] =
       http.POSTString[Either[ErrorResponse, NodeSeq]](uri, body, chrisHeaders(action))(chrisReads, hc, ec)
 
-    doPostString(chrisHeaderCarrier(chrisHeaders(action)))
+    doPostString(chrisHeaderCarrier(Seq()))
   }
 
 }
