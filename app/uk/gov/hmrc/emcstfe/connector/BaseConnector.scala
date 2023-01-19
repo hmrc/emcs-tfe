@@ -68,7 +68,7 @@ trait BaseConnector extends Logging {
 
     val headerCarrier = hc.copy(extraHeaders = hc.extraHeaders ++ hc.headers(appConfig.chrisHeaders))
 
-    http.POSTString[Either[ErrorResponse, NodeSeq]](uri, body, chrisHeaders(action))(chrisReads, headerCarrier, ec)
+    doPostString(chrisHeaderCarrier(Seq()))
   }
 
 }
