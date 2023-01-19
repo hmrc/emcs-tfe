@@ -9,17 +9,14 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisStubConnector
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.models.response.HelloWorldResponse
 import uk.gov.hmrc.emcstfe.support.UnitSpec
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class MicroserviceHelloWorldControllerSpec extends UnitSpec with MockChrisStubConnector {
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+class MicroserviceHelloWorldControllerSpec extends UnitSpec with MockChrisConnector {
 
   private val fakeRequest = FakeRequest("GET", "/hello-world")
   private val controller = new MicroserviceHelloWorldController(Helpers.stubControllerComponents(), mockConnector)
@@ -29,7 +26,7 @@ class MicroserviceHelloWorldControllerSpec extends UnitSpec with MockChrisStubCo
     "return 200" when {
       "service returns a Right" in {
 
-        MockConnector.getMessage().returns(Future.successful(Right(HelloWorldResponse("Success from emcs-tfe-chris-stub"))))
+        MockConnector.hello().returns(Future.successful(Right(HelloWorldResponse("Success from emcs-tfe-chris-stub"))))
 
         val result = controller.hello()(fakeRequest)
 
@@ -40,7 +37,7 @@ class MicroserviceHelloWorldControllerSpec extends UnitSpec with MockChrisStubCo
     "return 500" when {
       "service returns a Left" in {
 
-        MockConnector.getMessage().returns(Future.successful(Left("connection Time out")))
+        MockConnector.hello().returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
         val result = controller.hello()(fakeRequest)
 
