@@ -75,7 +75,15 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response: HttpResponse = HttpResponse(status = Status.OK, body = successXml.toString(), headers = Map.empty)
 
-        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
+          body = getMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}"""
+          )
+        )
+          .returns(Future.successful(response))
 
         await(connector.getMovement(getMovementRequest)) shouldBe response
       }
@@ -86,14 +94,28 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response: HttpResponse = HttpResponse(status = Status.OK, body = Json.obj().toString(), headers = Map.empty)
 
-        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
+          body = getMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}"""
+          )
+        ).returns(Future.successful(response))
 
         await(connector.getMovement(getMovementRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
         val response: HttpResponse = HttpResponse(status = Status.INTERNAL_SERVER_ERROR, body = "", headers = Map.empty)
 
-        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(response))
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
+          body = getMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}"""
+          )
+        ).returns(Future.successful(response))
 
         await(connector.getMovement(getMovementRequest)) shouldBe response
       }
