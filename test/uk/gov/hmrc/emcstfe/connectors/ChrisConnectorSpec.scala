@@ -73,8 +73,6 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       "downstream call is successful" in new Test {
         val successXml: Elem = <Message>Success!</Message>
 
-        MockHttpClient.postString(s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2", getMovementRequest.requestBody).returns(Future.successful(Right(successXml)))
-
         MockHttpClient.postString(
           url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
           body = getMovementRequest.requestBody,
