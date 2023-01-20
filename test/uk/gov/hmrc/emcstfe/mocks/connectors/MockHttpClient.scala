@@ -45,11 +45,13 @@ trait MockHttpClient extends MockFactory {
 
 
     def postString[T](url: String,
-                   body: String): CallHandler[Future[T]] = {
+                      body: String,
+                      headers: Seq[(String,String)] = Seq()): CallHandler[Future[T]] = {
       (mockHttpClient
         .POSTString[T](_: String, _: String, _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
-        .expects(assertArgs { (actualUrl, actualBody: String, _, _, _, _) => {
+        .expects(assertArgs { (actualUrl, actualBody, actualHeaders, _, _, _) => {
           actualUrl shouldBe url
+          actualHeaders shouldBe headers
           (XML.loadString(actualBody) \\ "OperationRequest"). shouldBe (XML.loadString(body) \\ "OperationRequest")
         }
         })

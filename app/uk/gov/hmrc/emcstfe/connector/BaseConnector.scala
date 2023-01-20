@@ -5,6 +5,7 @@
 
 package uk.gov.hmrc.emcstfe.connector
 
+import play.api.http.HeaderNames
 import play.api.http.Status.OK
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import uk.gov.hmrc.emcstfe.config.AppConfig
@@ -58,21 +59,16 @@ trait BaseConnector extends Logging {
   }
 
   private def chrisHeaders(action: String): Seq[(String, String)] = Seq(
-    ("Accept", "application/soap+xml"),
-    ("Content-Type", s"""application/soap+xml; charset=UTF-8; action="$action"""")
+    HeaderNames.ACCEPT -> "application/soap+xml",
+    HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action"""
   )
-
-  private def chrisHeaderCarrier(extraHeaders: Seq[(String, String)])(implicit hc: HeaderCarrier): HeaderCarrier = {
-    hc.copy(extraHeaders = hc.extraHeaders ++ hc.headers(appConfig.chrisHeaders) ++ extraHeaders)
-  }
 
   def postString(http: HttpClient, uri: String, body: String, action: String)(implicit ec: ExecutionContext,
                                                                               hc: HeaderCarrier): Future[Either[ErrorResponse, NodeSeq]] = {
 
-    def doPostString(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, NodeSeq]] =
-      http.POSTString[Either[ErrorResponse, NodeSeq]](uri, body, chrisHeaders(action))(chrisReads, hc, ec)
+    val headerCarrier = hc.copy(extraHeaders = hc.extraHeaders ++ hc.headers(appConfig.chrisHeaders))
 
-    doPostString(chrisHeaderCarrier(chrisHeaders(action)))
+    http.POSTString[Either[ErrorResponse, NodeSeq]](uri, body, chrisHeaders(action))(chrisReads, headerCarrier, ec)
   }
 
 }
