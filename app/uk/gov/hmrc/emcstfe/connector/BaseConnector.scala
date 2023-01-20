@@ -60,7 +60,7 @@ trait BaseConnector extends Logging {
 
   private def chrisHeaders(action: String): Seq[(String, String)] = Seq(
     HeaderNames.ACCEPT -> "application/soap+xml",
-    HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action"""
+    HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action""""
   )
 
   def postString(http: HttpClient, uri: String, body: String, action: String)(implicit ec: ExecutionContext,

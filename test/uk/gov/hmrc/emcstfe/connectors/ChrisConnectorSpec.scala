@@ -80,7 +80,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
           body = getMovementRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}"""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}""""
           )
         )
           .returns(Future.successful(response))
@@ -99,7 +99,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
           body = getMovementRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}"""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}""""
           )
         ).returns(Future.successful(response))
 
@@ -113,7 +113,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
           body = getMovementRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}"""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}""""
           )
         ).returns(Future.successful(response))
 
