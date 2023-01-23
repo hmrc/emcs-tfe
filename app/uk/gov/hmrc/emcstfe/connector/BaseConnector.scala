@@ -25,6 +25,7 @@ trait BaseConnector extends Logging {
   implicit val httpResponseReads: HttpReads[HttpResponse] = (_: String, _: String, response: HttpResponse) => response
 
   implicit val chrisReads: HttpReads[Either[ErrorResponse, NodeSeq]] = (_: String, _: String, response: HttpResponse) => {
+    logger.debug(s"[BaseConnector][chrisReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
     response.status match {
       case OK => Try(XML.loadString(response.body)) match {
         case Failure(exception) =>
