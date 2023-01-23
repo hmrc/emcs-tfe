@@ -22,7 +22,7 @@ case class GetMovementResponse(
 
 object GetMovementResponse {
   def apply(xml: NodeSeq): GetMovementResponse = {
-    val currentMovement = xml \\ "MovementDataResponse" \\ "movementView" \\ "currentMovement"
+    val currentMovement = xml \\ "currentMovement"
     val EADESADContainer = currentMovement \\ "IE801" \\ "Body" \\ "EADESADContainer"
 
     val localReferenceNumber: String = (EADESADContainer \\ "EadEsad" \\ "LocalReferenceNumber").text
