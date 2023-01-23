@@ -17,7 +17,7 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
 
-class GetMovementControllerSpec extends UnitSpec with MockGetMovementService with GetMovementFixture with GetMovementListFixture {
+class GetMovementControllerSpec extends UnitSpec with MockGetMovementService with GetMovementFixture {
 
   private val fakeRequest = FakeRequest("GET", "/movement/:exciseRegistrationNumber/:arc")
   private val controller = new GetMovementController(Helpers.stubControllerComponents(), mockService)
@@ -25,7 +25,6 @@ class GetMovementControllerSpec extends UnitSpec with MockGetMovementService wit
   private val exciseRegistrationNumber = "My ERN"
   private val arc = "My ARC"
   private val getMovementRequest = GetMovementRequest(exciseRegistrationNumber, arc)
-  private val getMovementListRequest = GetMovementListRequest(exciseRegistrationNumber)
 
 
   "GET /movement/:exciseRegistrationNumber/:arc" should {
@@ -46,31 +45,6 @@ class GetMovementControllerSpec extends UnitSpec with MockGetMovementService wit
         MockService.getMovement(getMovementRequest).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
         val result = controller.getMovement(exciseRegistrationNumber, arc)(fakeRequest)
-
-        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
-      }
-    }
-  }
-
-  "GET /movements/:exciseRegistrationNumber" should {
-    "return 200" when {
-      "service returns a Right" in {
-
-        MockService.getMovementList(getMovementListRequest).returns(Future.successful(Right(getMovementListResponse)))
-
-        val result = controller.getMovementList(exciseRegistrationNumber)(fakeRequest)
-
-        status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe getMovementListJson
-      }
-    }
-    "return 500" when {
-      "service returns a Left" in {
-
-        MockService.getMovementList(getMovementListRequest).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
-
-        val result = controller.getMovementList(exciseRegistrationNumber)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
