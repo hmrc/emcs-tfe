@@ -11,7 +11,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
 import uk.gov.hmrc.emcstfe.mocks.services.MockGetMovementListService
-import uk.gov.hmrc.emcstfe.models.request.GetMovementListRequest
+import uk.gov.hmrc.emcstfe.models.request.{GetMovementListRequest, GetMovementListSearchOptions}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -23,7 +23,8 @@ class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListSer
   private val controller = new GetMovementListController(Helpers.stubControllerComponents(), mockService)
 
   private val exciseRegistrationNumber = "My ERN"
-  private val getMovementListRequest = GetMovementListRequest(exciseRegistrationNumber)
+  private val searchOptions = GetMovementListSearchOptions()
+  private val getMovementListRequest = GetMovementListRequest(exciseRegistrationNumber, searchOptions)
 
   "GET /movements/:exciseRegistrationNumber" should {
     "return 200" when {
@@ -31,7 +32,7 @@ class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListSer
 
         MockService.getMovementList(getMovementListRequest).returns(Future.successful(Right(getMovementListResponse)))
 
-        val result = controller.getMovementList(exciseRegistrationNumber)(fakeRequest)
+        val result = controller.getMovementList(exciseRegistrationNumber, searchOptions)(fakeRequest)
 
         status(result) shouldBe Status.OK
         contentAsJson(result) shouldBe getMovementListJson
@@ -42,7 +43,7 @@ class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListSer
 
         MockService.getMovementList(getMovementListRequest).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-        val result = controller.getMovementList(exciseRegistrationNumber)(fakeRequest)
+        val result = controller.getMovementList(exciseRegistrationNumber, searchOptions)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)

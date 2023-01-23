@@ -7,7 +7,7 @@ package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
-import uk.gov.hmrc.emcstfe.models.request.GetMovementListRequest
+import uk.gov.hmrc.emcstfe.models.request.{GetMovementListRequest, GetMovementListSearchOptions}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -16,7 +16,7 @@ import scala.xml.XML
 
 class GetMovementListServiceSpec extends UnitSpec with GetMovementListFixture {
   trait Test extends MockChrisConnector {
-    val getMovementListRequest: GetMovementListRequest = GetMovementListRequest(exciseRegistrationNumber = "My ERN")
+    val getMovementListRequest: GetMovementListRequest = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions())
     val service: GetMovementListService = new GetMovementListService(mockConnector)
   }
 

@@ -9,9 +9,9 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, GetMovementListFixture}
+import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.services.MockGetMovementService
-import uk.gov.hmrc.emcstfe.models.request.{GetMovementListRequest, GetMovementRequest}
+import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 

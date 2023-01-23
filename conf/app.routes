@@ -2,5 +2,5 @@
 
 GET        /hello-world                                        uk.gov.hmrc.emcstfe.controllers.MicroserviceHelloWorldController.hello
 
-GET        /movements/:exciseRegistrationNumber                uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(exciseRegistrationNumber)
+GET        /movements/:exciseRegistrationNumber                uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(exciseRegistrationNumber, search: GetMovementListSearchOptions)
 GET        /movement/:exciseRegistrationNumber/:arc            uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(exciseRegistrationNumber, arc)

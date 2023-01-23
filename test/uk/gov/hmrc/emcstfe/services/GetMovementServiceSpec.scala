@@ -5,9 +5,9 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, GetMovementListFixture}
+import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
-import uk.gov.hmrc.emcstfe.models.request.{GetMovementListRequest, GetMovementRequest}
+import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 

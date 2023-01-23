@@ -5,7 +5,8 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-case class GetMovementListRequest(exciseRegistrationNumber: String) extends ChrisRequest {
+case class GetMovementListRequest(exciseRegistrationNumber: String,
+                                  searchOptions: GetMovementListSearchOptions) extends ChrisRequest {
   override def requestBody: String =
     s"""<?xml version='1.0' encoding='UTF-8'?>
       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -23,6 +24,11 @@ case class GetMovementListRequest(exciseRegistrationNumber: String) extends Chri
       |      <OperationRequest>
       |        <Parameters>
       |          <Parameter Name="ExciseRegistrationNumber">$exciseRegistrationNumber</Parameter>
+      |          <Parameter Name="TraderRole">${searchOptions.traderRole}</Parameter>
+      |          <Parameter Name="SortField">${searchOptions.sortField}</Parameter>
+      |          <Parameter Name="SortOrder">${searchOptions.sortOrder}</Parameter>
+      |          <Parameter Name="StartPosition">${searchOptions.startPosition}</Parameter>
+      |          <Parameter Name="MaxNoToReturn">${searchOptions.maxRows}</Parameter>
       |        </Parameters>
       |        <ReturnData>
       |          <Data Name="schema" />
