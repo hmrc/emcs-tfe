@@ -8,19 +8,19 @@ package uk.gov.hmrc.emcstfe.fixtures
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementListItem, GetMovementListResponse}
 
-import java.time.Instant
+import java.time.LocalDateTime
 
 trait GetMovementListFixture {
   lazy val getMovementListXMLResponseBody: String = """<MovementListDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementListData/3" xmlns:ns1="http://hmrc/emcs/tfe/data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                                                    |	<Movement>
                                                    |		<Arc>18GB00000000000232361</Arc>
-                                                   |		<DateOfDispatch>2009-01-26T14:11:00.943Z</DateOfDispatch>
+                                                   |		<DateOfDispatch>2009-01-26T14:11:00</DateOfDispatch>
                                                    |		<MovementStatus>Accepted</MovementStatus>
                                                    |		<OtherTraderID>ABCD1234</OtherTraderID>
                                                    |	</Movement>
                                                    |	<Movement>
                                                    |		<Arc>GBTR000000EMCS1000040</Arc>
-                                                   |		<DateOfDispatch>2009-01-26T14:12:00.943Z</DateOfDispatch>
+                                                   |		<DateOfDispatch>2009-01-26T14:12:00</DateOfDispatch>
                                                    |		<MovementStatus>Accepted</MovementStatus>
                                                    |		<OtherTraderID>ABCD1234</OtherTraderID>
                                                    |	</Movement>
@@ -58,28 +58,28 @@ trait GetMovementListFixture {
 
   lazy val movement1 = GetMovementListItem(
     arc = "18GB00000000000232361",
-    dateOfDispatch = Instant.parse("2009-01-26T14:11:00.943Z"),
+    dateOfDispatch = LocalDateTime.parse("2009-01-26T14:11:00"),
     movementStatus = "Accepted",
     otherTraderID = "ABCD1234"
   )
 
   lazy val movement1Json = Json.obj(
     "arc" -> "18GB00000000000232361",
-    "dateOfDispatch" -> Instant.parse("2009-01-26T14:11:00.943Z"),
+    "dateOfDispatch" -> LocalDateTime.parse("2009-01-26T14:11:00"),
     "movementStatus" -> "Accepted",
     "otherTraderID" -> "ABCD1234"
   )
 
   lazy val movement2 = GetMovementListItem(
     arc = "GBTR000000EMCS1000040",
-    dateOfDispatch = Instant.parse("2009-01-26T14:12:00.943Z"),
+    dateOfDispatch = LocalDateTime.parse("2009-01-26T14:12:00"),
     movementStatus = "Accepted",
     otherTraderID = "ABCD1234"
   )
 
   lazy val movement2Json = Json.obj(
     "arc" -> "GBTR000000EMCS1000040",
-    "dateOfDispatch" -> "2009-01-26T14:12:00.943Z",
+    "dateOfDispatch" -> "2009-01-26T14:12:00",
     "movementStatus" -> "Accepted",
     "otherTraderID" -> "ABCD1234"
   )

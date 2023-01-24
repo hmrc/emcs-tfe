@@ -7,7 +7,8 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import play.api.libs.json.{Json, Writes}
 
-import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, LocalDateTime}
 import scala.xml.NodeSeq
 
 case class GetMovementListResponse(movements: Seq[GetMovementListItem], count: Int)
@@ -22,7 +23,7 @@ object GetMovementListResponse {
       movements.map { movement =>
         GetMovementListItem(
           (movement \\ "Arc").text,
-          Instant.parse((movement \\ "DateOfDispatch").text),
+          LocalDateTime.parse((movement \\ "DateOfDispatch").text),
           (movement \\ "MovementStatus").text,
           (movement \\ "OtherTraderID").text
         )
