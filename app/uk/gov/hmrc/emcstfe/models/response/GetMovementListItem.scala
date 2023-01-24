@@ -10,12 +10,9 @@ import play.api.libs.json.{Json, Writes}
 import java.time.Instant
 
 case class GetMovementListItem(arc: String,
-                               sequenceNumber: Int,
-                               consignorName: String,
                                dateOfDispatch: Instant,
                                movementStatus: String,
-                               destinationId: String,
-                               consignorLanguageCode: String)
+                               otherTraderID: String)
 
 object GetMovementListItem {
 

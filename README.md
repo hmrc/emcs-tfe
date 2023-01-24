@@ -33,21 +33,15 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
   "movements": [
     {
       "arc": "GBTR000000EMCS1000040",
-      "sequenceNumber": 1,
-      "consignorName": "Mr Consignor 801",
       "dateOfDispatch": "2009-01-26T14:12:00.943Z",
       "movementStatus": "Accepted",
-      "destinationId": "ABC1234567831",
-      "consignorLanguageCode": "en"
+      "otherTraderID": "ABCD1234"
     },
     {
       "arc": "GBTR000000EMCS1000044",
-      "sequenceNumber": 1,
-      "consignorName": "Mr Consignor 802",
       "dateOfDispatch": "2009-01-26T14:15:00.943Z",
       "movementStatus": "Accepted",
-      "destinationId": "ABC1234567831",
-      "consignorLanguageCode": "en"
+      "otherTraderID": "ABCD1234"
     }
   ]
 }

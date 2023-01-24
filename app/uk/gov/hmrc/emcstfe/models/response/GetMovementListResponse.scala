@@ -10,26 +10,24 @@ import play.api.libs.json.{Json, Writes}
 import java.time.Instant
 import scala.xml.NodeSeq
 
-case class GetMovementListResponse(movements: Seq[GetMovementListItem])
+case class GetMovementListResponse(movements: Seq[GetMovementListItem], count: Int)
 
 object GetMovementListResponse {
 
   def apply(xml: NodeSeq): GetMovementListResponse = {
 
-    val movements = xml \\ "MovementListDataResponse" \\ "Movement"
+    val movements = xml \\ "Movement"
 
     GetMovementListResponse(
       movements.map { movement =>
         GetMovementListItem(
           (movement \\ "Arc").text,
-          (movement \\ "SequenceNumber").text.toInt,
-          (movement \\ "ConsignorName").text,
           Instant.parse((movement \\ "DateOfDispatch").text),
           (movement \\ "MovementStatus").text,
-          (movement \\ "DestinationId").text,
-          (movement \\ "ConsignorLanguageCode").text
+          (movement \\ "OtherTraderID").text
         )
-      }
+      },
+      (xml \\ "CountOfMovementsAvailable").text.toInt
     )
   }
 
