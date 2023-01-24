@@ -33,7 +33,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
     }
   }
 
-  "Calling the get message endpoint" should {
+  "Calling the get movement endpoint" should {
     "return a success" when {
       "all downstream calls are successful" in new Test {
         override def setupStubs(): StubMapping = {
