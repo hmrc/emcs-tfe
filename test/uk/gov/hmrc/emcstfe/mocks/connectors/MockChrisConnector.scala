@@ -7,8 +7,8 @@ package uk.gov.hmrc.emcstfe.mocks.connectors
 
 import org.scalamock.handlers.{CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.emcstfe.connector.ChrisConnector
-import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
+import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.models.request.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, HelloWorldResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -23,9 +23,9 @@ trait MockChrisConnector extends MockFactory  {
       (mockConnector.hello()(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *)
     }
-    def getMovement(): CallHandler3[GetMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, NodeSeq]]] = {
-      (mockConnector.getMovement(_: GetMovementRequest)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *)
+    def postChrisSOAPRequest(chrisRequest: ChrisRequest): CallHandler3[ChrisRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, NodeSeq]]] = {
+      (mockConnector.postChrisSOAPRequest(_: ChrisRequest)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(chrisRequest, *, *)
     }
   }
 }

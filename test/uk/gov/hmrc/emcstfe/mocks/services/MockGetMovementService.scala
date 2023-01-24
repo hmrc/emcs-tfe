@@ -18,9 +18,9 @@ trait MockGetMovementService extends MockFactory  {
   lazy val mockService: GetMovementService = mock[GetMovementService]
 
   object MockService {
-    def getMovement(): CallHandler3[GetMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, GetMovementResponse]]] = {
+    def getMovement(getMovementRequest: GetMovementRequest): CallHandler3[GetMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, GetMovementResponse]]] = {
       (mockService.getMovement(_: GetMovementRequest)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *)
+        .expects(getMovementRequest, *, *)
     }
   }
 }

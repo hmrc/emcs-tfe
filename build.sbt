@@ -13,6 +13,7 @@ lazy val microservice = Project("emcs-tfe", file("."))
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
+    routesImport += "uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions"
   )
   .settings(publishingSettings: _*)
   .configs(ItTest)
