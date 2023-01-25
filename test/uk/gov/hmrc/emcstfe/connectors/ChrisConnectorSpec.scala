@@ -18,7 +18,6 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.xml.Elem
 
 class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with GetMovementFixture {
 

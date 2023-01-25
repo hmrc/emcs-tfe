@@ -5,7 +5,7 @@
 
 package uk.gov.hmrc.emcstfe.connectors.httpParsers
 
-import com.lucidchart.open.xtract.EmptyError
+import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess, PartialParseSuccess, __}
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
@@ -103,6 +103,30 @@ class ChrisXMLHttpParserSpec extends UnitSpec with GetMovementFixture {
         val result = TestParser.rawXMLHttpReads[GetMovementResponse].read("POST", "/chris/foo/bar", response)
 
         result shouldBe Left(UnexpectedDownstreamResponseError)
+      }
+    }
+  }
+
+  ".handleParseResult" must {
+
+    "return Right(model)" when {
+
+      "XML parsing is successful" in {
+
+        TestParser.handleParseResult(ParseSuccess("Success")) shouldBe Right("Success")
+      }
+    }
+
+    "return Left(XmlParseError)" when {
+
+      "XML parsing fails" in {
+        val error = EmptyError(__ \ "tagName")
+        TestParser.handleParseResult(ParseFailure(error)) shouldBe Left(XmlParseError(Seq(error)))
+      }
+
+      "XML parsing partially fails" in {
+        val error = EmptyError(__ \ "tagName")
+        TestParser.handleParseResult(PartialParseSuccess("PartialData", Seq(error))) shouldBe Left(XmlParseError(Seq(error)))
       }
     }
   }

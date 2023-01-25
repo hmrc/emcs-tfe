@@ -12,7 +12,6 @@ import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, X
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
-import scala.xml.XML
 
 class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
   trait Test extends MockChrisConnector {

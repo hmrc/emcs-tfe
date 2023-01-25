@@ -9,7 +9,7 @@ import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.SoapExtractionError
 
 import scala.util.{Failure, Right, Success, Try}
-import scala.xml.{Elem, NodeSeq, XML}
+import scala.xml.{NodeSeq, XML}
 
 object SoapUtils extends Logging {
   def extractFromSoap(xml: NodeSeq): Either[ErrorResponse, NodeSeq] = Try {

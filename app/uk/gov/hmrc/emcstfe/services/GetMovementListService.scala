@@ -9,7 +9,7 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.GetMovementListRequest
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementListResponse}
-import uk.gov.hmrc.emcstfe.utils.{Logging, SoapUtils}
+import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
