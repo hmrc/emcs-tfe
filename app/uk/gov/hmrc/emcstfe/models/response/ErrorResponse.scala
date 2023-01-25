@@ -5,6 +5,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
+import com.lucidchart.open.xtract.ParseError
 import play.api.libs.json.{Json, OWrites}
 
 sealed trait ErrorResponse {
@@ -28,6 +29,10 @@ object ErrorResponse {
 
   case object XmlValidationError extends ErrorResponse {
     val message = "XML validation error"
+  }
+
+  case class XmlParseError(errors: Seq[ParseError]) extends ErrorResponse {
+    val message = s"XML failed to parse, with the following errors:\n - ${errors.mkString("\n - ")}"
   }
 
   case object SoapExtractionError extends ErrorResponse {

@@ -5,32 +5,19 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import com.lucidchart.open.xtract.XmlReader.strictReadSeq
+import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, Writes}
-
-import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDateTime}
-import scala.xml.NodeSeq
 
 case class GetMovementListResponse(movements: Seq[GetMovementListItem], count: Int)
 
 object GetMovementListResponse {
 
-  def apply(xml: NodeSeq): GetMovementListResponse = {
-
-    val movements = xml \\ "Movement"
-
-    GetMovementListResponse(
-      movements.map { movement =>
-        GetMovementListItem(
-          (movement \\ "Arc").text,
-          LocalDateTime.parse((movement \\ "DateOfDispatch").text),
-          (movement \\ "MovementStatus").text,
-          (movement \\ "OtherTraderID").text
-        )
-      },
-      (xml \\ "CountOfMovementsAvailable").text.toInt
-    )
-  }
+  implicit val xmlReader: XmlReader[GetMovementListResponse] = (
+    (__ \ "Movement").read[Seq[GetMovementListItem]](strictReadSeq),
+    (__ \ "CountOfMovementsAvailable").read[Int]
+  ).mapN(GetMovementListResponse.apply)
 
   implicit val writes: Writes[GetMovementListResponse] = Json.writes
 }

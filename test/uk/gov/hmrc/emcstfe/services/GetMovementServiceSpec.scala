@@ -25,7 +25,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
       "connector call is successful and XML is the correct format" in new Test {
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
-          .returns(Future.successful(Right(XML.loadString(getMovementSoapWrapper))))
+          .returns(Future.successful(Right(getMovementResponse)))
 
         await(service.getMovement(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -41,7 +41,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
       "connector call response cannot be extracted" in new Test {
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
-          .returns(Future.successful(Right(<Message>Success!</Message>)))
+          .returns(Future.successful(Left(SoapExtractionError)))
 
         await(service.getMovement(getMovementRequest)) shouldBe Left(SoapExtractionError)
       }

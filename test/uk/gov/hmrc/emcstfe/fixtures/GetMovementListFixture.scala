@@ -9,8 +9,15 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementListItem, GetMovementListResponse}
 
 import java.time.LocalDateTime
+import scala.xml.Elem
 
 trait GetMovementListFixture {
+
+  lazy val noMovements: Elem =
+    <MovementListDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementListData/3" xmlns:ns1="http://hmrc/emcs/tfe/data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <CountOfMovementsAvailable>0</CountOfMovementsAvailable>
+    </MovementListDataResponse>
+
   lazy val getMovementListXMLResponseBody: String = """<MovementListDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementListData/3" xmlns:ns1="http://hmrc/emcs/tfe/data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                                                    |	<Movement>
                                                    |		<Arc>18GB00000000000232361</Arc>
@@ -62,6 +69,14 @@ trait GetMovementListFixture {
     movementStatus = "Accepted",
     otherTraderID = "ABCD1234"
   )
+
+  lazy val movement1XML: Elem =
+    <Movement>
+      <Arc>18GB00000000000232361</Arc>
+      <DateOfDispatch>2009-01-26T14:11:00</DateOfDispatch>
+      <MovementStatus>Accepted</MovementStatus>
+      <OtherTraderID>ABCD1234</OtherTraderID>
+    </Movement>
 
   lazy val movement1Json = Json.obj(
     "arc" -> "18GB00000000000232361",

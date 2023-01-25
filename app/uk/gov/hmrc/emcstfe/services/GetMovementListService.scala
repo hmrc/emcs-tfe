@@ -19,7 +19,5 @@ class GetMovementListService @Inject()(connector: ChrisConnector) extends Loggin
 
   def getMovementList(getMovementListRequest: GetMovementListRequest)
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementListResponse]] =
-    connector.postChrisSOAPRequest(getMovementListRequest).map {
-      SoapUtils.parseResponseXMLAsEitherT[GetMovementListResponse](GetMovementListResponse.apply)
-    }
+    connector.postChrisSOAPRequest[GetMovementListResponse](getMovementListRequest)
 }

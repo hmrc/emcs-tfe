@@ -1,19 +1,25 @@
-import play.core.PlayVersion
-import play.sbt.PlayImport._
-import sbt.Keys.libraryDependencies
 import sbt._
 
 object AppDependencies {
 
-  val boostrapVersion = "7.12.0"
+  val playSuffix        = s"-play-28"
+
+  val boostrapVersion   =  "7.12.0"
+  val xtractVersion     =  "2.2.1"
+  val hmrcMongoVersion  =  "0.74.0"
+  val scalamockVersion  =  "5.2.0"
+  val catsCoreVersion   =  "2.3.1"
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "bootstrap-backend-play-28" % boostrapVersion,
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % "0.74.0"
+    "uk.gov.hmrc"       %% s"bootstrap-backend$playSuffix"  % boostrapVersion,
+    "uk.gov.hmrc.mongo" %% s"hmrc-mongo$playSuffix"         % hmrcMongoVersion,
+    "com.lucidchart"    %%  "xtract"                        % xtractVersion,
+    "org.typelevel"     %%  "cats-core"                     % catsCoreVersion
   )
 
   val test = Seq(
-    "uk.gov.hmrc" %% "bootstrap-test-play-28" % boostrapVersion % "test, it",
-    "org.scalamock" %% "scalamock" % "5.2.0" % "test, it"
+    "uk.gov.hmrc"       %% s"bootstrap-test$playSuffix"     % boostrapVersion   % "test, it",
+    "org.scalamock"     %%  "scalamock"                     % scalamockVersion  % "test, it",
+    "com.lucidchart"    %%  "xtract-testing"                % xtractVersion     % "test, it"
   )
 }
