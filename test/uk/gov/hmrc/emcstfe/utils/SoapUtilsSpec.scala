@@ -6,16 +6,16 @@
 package uk.gov.hmrc.emcstfe.utils
 
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.SoapExtractionError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-import scala.util.{Failure, Success}
 import scala.xml.XML
 
 class SoapUtilsSpec extends UnitSpec with GetMovementFixture {
   "extractFromSoap" should {
     "return a Success" when {
       "there is CDATA containing XML at the correct path" in {
-        SoapUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper)) shouldBe a[Success[_]]
+        SoapUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper)) shouldBe Right(XML.loadString(getMovementResponseBody))
       }
     }
     "return a Failure" when {
@@ -48,7 +48,7 @@ class SoapUtilsSpec extends UnitSpec with GetMovementFixture {
              |			</con:OperationResponse>
              |		</con:Control>
              |	</tns:Body>
-             |</tns:Envelope>""".stripMargin)) shouldBe a[Failure[_]]
+             |</tns:Envelope>""".stripMargin)) shouldBe Left(SoapExtractionError)
       }
       "there is CDATA that doesn't contain XML" in {
         SoapUtils.extractFromSoap(XML.loadString(
@@ -79,7 +79,7 @@ class SoapUtilsSpec extends UnitSpec with GetMovementFixture {
              |			</con:OperationResponse>
              |		</con:Control>
              |	</tns:Body>
-             |</tns:Envelope>""".stripMargin)) shouldBe a[Failure[_]]
+             |</tns:Envelope>""".stripMargin)) shouldBe Left(SoapExtractionError)
       }
       "there is no CDATA" in {
         SoapUtils.extractFromSoap(XML.loadString(
@@ -110,7 +110,7 @@ class SoapUtilsSpec extends UnitSpec with GetMovementFixture {
              |			</con:OperationResponse>
              |		</con:Control>
              |	</tns:Body>
-             |</tns:Envelope>""".stripMargin)) shouldBe a[Failure[_]]
+             |</tns:Envelope>""".stripMargin)) shouldBe Left(SoapExtractionError)
       }
     }
   }

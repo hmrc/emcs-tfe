@@ -5,9 +5,10 @@
 
 package uk.gov.hmrc.emcstfe.connectors
 
+import com.lucidchart.open.xtract.XmlReader
 import play.api.http.Status._
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.httpParsers.RawXMLHttpParser
+import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
 import uk.gov.hmrc.emcstfe.models.request.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, HelloWorldResponse}
@@ -15,12 +16,11 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.xml.NodeSeq
 
 @Singleton
 class ChrisConnector @Inject()(val http: HttpClient,
                                val config: AppConfig,
-                               xmlReads: RawXMLHttpParser
+                               chrisHttpParser: ChrisXMLHttpParser
                               ) extends BaseConnector {
 
   override def appConfig: AppConfig = config
@@ -47,8 +47,9 @@ class ChrisConnector @Inject()(val http: HttpClient,
     }
   }
 
-  def postChrisSOAPRequest(request: ChrisRequest)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
+  def postChrisSOAPRequest[A](request: ChrisRequest)
+                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
     val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
-    postString(http, url, request.requestBody, request.action)(ec, headerCarrier, xmlReads.rawXMLHttpReads)
+    postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads)
   }
 }

@@ -7,25 +7,25 @@ package uk.gov.hmrc.emcstfe.connectors
 
 import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.connectors.httpParsers.RawXMLHttpParser
+import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
+import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError, XmlValidationError}
-import uk.gov.hmrc.emcstfe.models.response.HelloWorldResponse
+import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, HelloWorldResponse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.xml.Elem
 
-class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient {
+class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with GetMovementFixture {
 
   trait Test {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-    val connector = new ChrisConnector(mockHttpClient, mockAppConfig, new RawXMLHttpParser)
+    val connector = new ChrisConnector(mockHttpClient, mockAppConfig, new ChrisXMLHttpParser)
 
     val baseUrl: String = "http://test-BaseUrl"
     MockedAppConfig.chrisUrl.returns(baseUrl)
@@ -71,7 +71,6 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     val getMovementRequest = GetMovementRequest("", "")
     "return a Right" when {
       "downstream call is successful" in new Test {
-        val successXml: Elem = <Message>Success!</Message>
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
@@ -81,9 +80,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
             HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}""""
           )
         )
-          .returns(Future.successful(Right(successXml)))
+          .returns(Future.successful(Right(getMovementResponse)))
 
-        await(connector.postChrisSOAPRequest(getMovementRequest)) shouldBe Right(successXml)
+        await(connector.postChrisSOAPRequest[GetMovementResponse](getMovementRequest)) shouldBe Right(getMovementResponse)
       }
     }
     "return a Left" when {
@@ -101,7 +100,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
           )
         ).returns(Future.successful(response))
 
-        await(connector.postChrisSOAPRequest(getMovementRequest)) shouldBe response
+        await(connector.postChrisSOAPRequest[GetMovementResponse](getMovementRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
@@ -115,7 +114,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
           )
         ).returns(Future.successful(response))
 
-        await(connector.postChrisSOAPRequest(getMovementRequest)) shouldBe response
+        await(connector.postChrisSOAPRequest[GetMovementResponse](getMovementRequest)) shouldBe response
       }
     }
   }

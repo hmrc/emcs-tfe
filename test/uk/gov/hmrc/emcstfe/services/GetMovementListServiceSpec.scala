@@ -12,7 +12,6 @@ import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, X
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
-import scala.xml.XML
 
 class GetMovementListServiceSpec extends UnitSpec with GetMovementListFixture {
   trait Test extends MockChrisConnector {
@@ -25,7 +24,7 @@ class GetMovementListServiceSpec extends UnitSpec with GetMovementListFixture {
       "connector call is successful and XML is the correct format" in new Test {
         MockConnector
           .postChrisSOAPRequest(getMovementListRequest)
-          .returns(Future.successful(Right(XML.loadString(getMovementListSoapWrapper))))
+          .returns(Future.successful(Right(getMovementListResponse)))
 
         await(service.getMovementList(getMovementListRequest)) shouldBe Right(getMovementListResponse)
       }
@@ -41,7 +40,7 @@ class GetMovementListServiceSpec extends UnitSpec with GetMovementListFixture {
       "connector call response cannot be extracted" in new Test {
         MockConnector
           .postChrisSOAPRequest(getMovementListRequest)
-          .returns(Future.successful(Right(<Message>Success!</Message>)))
+          .returns(Future.successful(Left(SoapExtractionError)))
 
         await(service.getMovementList(getMovementListRequest)) shouldBe Left(SoapExtractionError)
       }
