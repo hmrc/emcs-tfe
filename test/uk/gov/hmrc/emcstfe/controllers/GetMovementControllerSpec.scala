@@ -20,6 +20,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.emcstfe.controllers.predicates.FakeAuthAction
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.services.MockGetMovementService
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
@@ -28,10 +29,10 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
 
-class GetMovementControllerSpec extends UnitSpec with MockGetMovementService with GetMovementFixture {
+class GetMovementControllerSpec extends UnitSpec with MockGetMovementService with GetMovementFixture with FakeAuthAction {
 
   private val fakeRequest = FakeRequest("GET", "/movement/:exciseRegistrationNumber/:arc")
-  private val controller = new GetMovementController(Helpers.stubControllerComponents(), mockService)
+  private val controller = new GetMovementController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
   private val exciseRegistrationNumber = "My ERN"
   private val arc = "My ARC"
