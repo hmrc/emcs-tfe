@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.config
+package uk.gov.hmrc.emcstfe.fixtures
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.emcstfe.controllers.predicates.{AuthAction, AuthActionImpl}
+trait BaseFixtures {
 
-class Module extends AbstractModule {
+  val ern = "SomeErn"
+  val testCredId = "cred1234567891"
+  val testInternalId = "int1234567891"
 
-  override def configure(): Unit = {
-
-    bind(classOf[AppConfig]).asEagerSingleton()
-    bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
-  }
 }
