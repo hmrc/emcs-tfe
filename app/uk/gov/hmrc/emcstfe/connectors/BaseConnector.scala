@@ -35,7 +35,7 @@ trait BaseConnector extends Logging {
       Try(response.json) match {
         case Success(json: JsValue) => parseResult(json)
         case _ =>
-          logger.warn("[KnownJsonResponse][validateJson] No JSON was returned")
+          logger.warn("[validateJson] No JSON was returned")
           None
       }
     }
@@ -44,7 +44,7 @@ trait BaseConnector extends Logging {
 
       case JsSuccess(value, _) => Some(value)
       case JsError(error) =>
-        logger.warn(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
+        logger.warn(s"[validateJson] Unable to parse JSON: $error")
         None
     }
   }

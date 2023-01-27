@@ -48,11 +48,11 @@ class ChrisConnector @Inject()(val http: HttpClient,
           case OK => response.validateJson[HelloWorldResponse] match {
             case Some(valid) => Right(valid)
             case None =>
-              logger.warn(s"Bad JSON response from emcs-tfe-chris-stub")
+              logger.warn(s"[ChrisConnector] Bad JSON response from emcs-tfe-chris-stub")
               Left(JsonValidationError)
           }
           case status =>
-            logger.warn(s"Unexpected status from emcs-tfe-chris-stub: $status")
+            logger.warn(s"[ChrisConnector] Unexpected status from emcs-tfe-chris-stub: $status")
             Left(UnexpectedDownstreamResponseError)
         }
     }
