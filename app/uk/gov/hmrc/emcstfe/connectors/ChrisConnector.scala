@@ -63,4 +63,10 @@ class ChrisConnector @Inject()(val http: HttpClient,
     val url: String = s"${config.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
     postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads)
   }
+
+  def submitChrisSOAPRequest[A](request: ChrisRequest)
+                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
+    val url: String = s"${config.chrisUrl}/ChRIS/EMCS/SubmitDraftMovementPortal/3"
+    postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads)
+  }
 }
