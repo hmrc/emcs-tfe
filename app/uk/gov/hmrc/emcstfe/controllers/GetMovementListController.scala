@@ -33,9 +33,11 @@ class GetMovementListController @Inject()(cc: ControllerComponents,
                                          )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def getMovementList(exciseRegistrationNumber: String, searchOptions: GetMovementListSearchOptions): Action[AnyContent] = authAction.async { implicit request =>
-    service.getMovementList(GetMovementListRequest(exciseRegistrationNumber, searchOptions)).map {
-      case Left(value) => InternalServerError(Json.toJson(value))
-      case Right(value) => Ok(Json.toJson(value))
+    authAction.checkErnMatchesRequest(exciseRegistrationNumber) {
+      service.getMovementList(GetMovementListRequest(exciseRegistrationNumber, searchOptions)).map {
+        case Left(value) => InternalServerError(Json.toJson(value))
+        case Right(value) => Ok(Json.toJson(value))
+      }
     }
   }
 }

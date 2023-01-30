@@ -31,20 +31,19 @@ import scala.concurrent.Future
 
 class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListService with GetMovementListFixture with FakeAuthAction {
 
-  private val fakeRequest = FakeRequest("GET", "/movement/:exciseRegistrationNumber/:arc")
+  private val fakeRequest = FakeRequest("GET", "/movement/:ern/:arc")
   private val controller = new GetMovementListController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
-  private val exciseRegistrationNumber = "My ERN"
   private val searchOptions = GetMovementListSearchOptions()
-  private val getMovementListRequest = GetMovementListRequest(exciseRegistrationNumber, searchOptions)
+  private val getMovementListRequest = GetMovementListRequest(ern, searchOptions)
 
-  "GET /movements/:exciseRegistrationNumber" should {
+  "GET /movements/:ern" should {
     "return 200" when {
       "service returns a Right" in {
 
         MockService.getMovementList(getMovementListRequest).returns(Future.successful(Right(getMovementListResponse)))
 
-        val result = controller.getMovementList(exciseRegistrationNumber, searchOptions)(fakeRequest)
+        val result = controller.getMovementList(ern, searchOptions)(fakeRequest)
 
         status(result) shouldBe Status.OK
         contentAsJson(result) shouldBe getMovementListJson
@@ -55,7 +54,7 @@ class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListSer
 
         MockService.getMovementList(getMovementListRequest).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-        val result = controller.getMovementList(exciseRegistrationNumber, searchOptions)(fakeRequest)
+        val result = controller.getMovementList(ern, searchOptions)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)

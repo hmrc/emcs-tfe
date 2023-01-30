@@ -32,7 +32,13 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthAction extends ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest]
+trait AuthAction extends ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest] with Logging {
+  def checkErnMatchesRequest[A](ern: String)(block: => Future[Result])(implicit request: UserRequest[A]): Future[Result] =
+    if (ern == request.ern) block else {
+      logger.warn(s"User with ern: '${request.ern}' attempted to access ern: '$ern' which they are not authorised to view")
+      Future.successful(Forbidden)
+    }
+}
 
 @Singleton
 class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
@@ -90,10 +96,10 @@ class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
             Future.successful(Forbidden)
         }
       case Some(enrolment) if !enrolment.isActivated =>
-        logger.debug(s"[checkOrganisationEpayeEnrolment] ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found but not activated")
+        logger.debug(s"[checkOrganisationEMCSEnrolment] ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found but not activated")
         Future.successful(Forbidden)
       case _ =>
-        logger.debug(s"[checkOrganisationEpayeEnrolment] No ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found")
+        logger.debug(s"[checkOrganisationEMCSEnrolment] No ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found")
         Future.successful(Forbidden)
     }
 }

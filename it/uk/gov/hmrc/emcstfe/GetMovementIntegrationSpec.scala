@@ -32,10 +32,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
   private trait Test {
     def setupStubs(): StubMapping
 
-    val exciseRegistrationNumber: String = "MyERN"
-    val arc: String = "MyARC"
-
-    def uri: String = s"/movement/$exciseRegistrationNumber/$arc"
+    def uri: String = s"/movement/$ern/$arc"
     def downstreamUri: String = s"/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     def request(): WSRequest = {
@@ -60,6 +57,18 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
     }
 
     "user is unauthorised" must {
+
+      "return forbidden" when {
+        "the ERN requested does not match the ERN of the credential" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised("WrongERN")
+          }
+
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.FORBIDDEN
+        }
+      }
+
       "return a success" when {
         "all downstream calls are successful" in new Test {
           override def setupStubs(): StubMapping = {

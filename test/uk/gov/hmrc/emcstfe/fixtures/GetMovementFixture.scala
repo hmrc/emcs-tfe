@@ -20,7 +20,7 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.Days
 import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse
 
-trait GetMovementFixture {
+trait GetMovementFixture extends BaseFixtures {
   lazy val getMovementResponseBody: String = """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd" xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                                                |  <mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                                |    <mov:currentMovement>
