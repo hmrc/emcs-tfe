@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.models.response.{GetMovementListItem, GetMovementList
 import java.time.LocalDateTime
 import scala.xml.Elem
 
-trait GetMovementListFixture {
+trait GetMovementListFixture extends BaseFixtures {
 
   lazy val noMovements: Elem =
     <MovementListDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementListData/3" xmlns:ns1="http://hmrc/emcs/tfe/data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

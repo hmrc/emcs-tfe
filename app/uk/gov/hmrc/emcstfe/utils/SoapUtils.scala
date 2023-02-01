@@ -28,7 +28,7 @@ object SoapUtils extends Logging {
     XML.loadString(cdata)
   } match {
     case Failure(exception) =>
-      logger.warn("Error extracting response body from SOAP wrapper", exception)
+      logger.warn("[extractFromSoap] Error extracting response body from SOAP wrapper", exception)
       (xml \\ "Errors" \\ "Error").foreach(error => logger.warn(error.text))
       Left(SoapExtractionError)
     case Success(value) => Right(value)

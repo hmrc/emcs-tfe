@@ -16,14 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.config
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.emcstfe.controllers.predicates.{AuthAction, AuthActionImpl}
+object EnrolmentKeys {
 
-class Module extends AbstractModule {
+  val EMCS_ENROLMENT = "HMRC-EMCS-ORG"
+  val ERN = "ExciseNumber"
+  val ACTIVATED = "activated"
+  val INACTIVE = "inactive"
 
-  override def configure(): Unit = {
-
-    bind(classOf[AppConfig]).asEagerSingleton()
-    bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
-  }
 }

@@ -18,24 +18,23 @@ package uk.gov.hmrc.emcstfe.support
 
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.http.HeaderNames
+import play.api.http.Status.OK
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.emcstfe.stubs.DownstreamStub
 
 trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServerPerSuite
   with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  val mockHost: String = WireMockHelper.host
-  val mockPort: String = WireMockHelper.wireMockPort.toString
-
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
-  def servicesConfig: Map[String, String] = Map(
-    "microservice.services.chris.host" -> mockHost,
-    "microservice.services.chris.port" -> mockPort,
-    "auditing.consumer.baseUri.host" -> mockHost,
-    "auditing.consumer.baseUri.port" -> mockPort
+  def servicesConfig: Map[String, _] = Map(
+    "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
+    "microservice.services.chris.port" -> WireMockHelper.wireMockPort,
+    "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
@@ -46,6 +45,8 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
   override def beforeAll(): Unit = {
     super.beforeAll()
     startWireMock()
+    DownstreamStub.onSuccess(DownstreamStub.POST, "/write/audit", OK, Json.obj())
+    DownstreamStub.onSuccess(DownstreamStub.POST, "/write/audit/merged", OK, Json.obj())
   }
 
   override def afterAll(): Unit = {
@@ -53,7 +54,10 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     super.afterAll()
   }
 
-  def buildRequest(path: String): WSRequest = client.url(s"http://localhost:$port/emcs-tfe$path").withFollowRedirects(false)
+  def buildRequest(path: String): WSRequest = client
+    .url(s"http://localhost:$port/emcs-tfe$path")
+    .withHttpHeaders(HeaderNames.AUTHORIZATION -> "auth1234")
+    .withFollowRedirects(false)
 
   def document(response: WSResponse): JsValue = Json.parse(response.body)
 }
