@@ -46,4 +46,8 @@ object ErrorResponse {
     val message = "Error extracting response body from SOAP wrapper"
   }
 
+  case object MarkCreationError extends ErrorResponse {
+    val message = "Error creating an HMRC Mark with the supplied XML"
+  }
+
 }
