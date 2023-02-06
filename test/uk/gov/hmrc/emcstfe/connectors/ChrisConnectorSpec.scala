@@ -21,6 +21,7 @@ import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
+import uk.gov.hmrc.emcstfe.mocks.utils.MockSoapUtils
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse
@@ -29,13 +30,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with GetMovementFixture {
+class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with MockSoapUtils with GetMovementFixture {
 
   trait Test {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-    val connector = new ChrisConnector(mockHttpClient, mockAppConfig, new ChrisXMLHttpParser)
+    val connector = new ChrisConnector(mockHttpClient, mockAppConfig, new ChrisXMLHttpParser(mockSoapUtils))
 
     val baseUrl: String = "http://test-BaseUrl"
     MockedAppConfig.chrisUrl.returns(baseUrl)
