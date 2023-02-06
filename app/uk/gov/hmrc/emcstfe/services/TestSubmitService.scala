@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TestSubmitService @Inject()(connector: ChrisConnector) extends Logging {
-  case class TestRequest(exciseRegistrationNumber: String) extends ChrisRequest {
+  case class TestRequest(exciseRegistrationNumber: String, mark: String) extends ChrisRequest {
     override def requestBody: String =
       s"""<?xml version='1.0' encoding='UTF-8'?>
          |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -41,7 +41,7 @@ class TestSubmitService @Inject()(connector: ChrisConnector) extends Logging {
          |    </ns:Info>
          |    <Security
          |      xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-         |      <BinarySecurityToken ValueType="http://www.hmrc.gov.uk#MarkToken">qTnJfqdZdbPKHLskMKHAvGC6p04=</BinarySecurityToken>
+         |      <BinarySecurityToken ValueType="http://www.hmrc.gov.uk#MarkToken">$mark</BinarySecurityToken>
          |    </Security>
          |    <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
          |      <CredentialID>0000001284781216</CredentialID>
@@ -157,7 +157,7 @@ class TestSubmitService @Inject()(connector: ChrisConnector) extends Logging {
     override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
   }
   def submitMovement()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
-    val testRequest: TestRequest = TestRequest(exciseRegistrationNumber = "GBWK240176600")
+    val testRequest: TestRequest = TestRequest(exciseRegistrationNumber = "GBWK240176600", mark = "PsAfeyWqa1k865R7GuLZ5uQeDt8=")
     connector.submitChrisSOAPRequest[GetMovementResponse](testRequest)
   }
 }
