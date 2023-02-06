@@ -157,7 +157,7 @@ class TestSubmitService @Inject()(connector: ChrisConnector) extends Logging {
     override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
   }
   def submitMovement()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
-    val testRequest: TestRequest = TestRequest(exciseRegistrationNumber = "GBWK240176600", mark = "PsAfeyWqa1k865R7GuLZ5uQeDt8=")
+    val testRequest: TestRequest = TestRequest(exciseRegistrationNumber = "GBWK240176600", mark = "fHogtcD9DKtODokPH/GeTw5JbGg=")
     connector.submitChrisSOAPRequest[GetMovementResponse](testRequest)
   }
 }
