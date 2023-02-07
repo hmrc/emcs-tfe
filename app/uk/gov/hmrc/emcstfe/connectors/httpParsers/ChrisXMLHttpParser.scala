@@ -23,10 +23,12 @@ import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamRe
 import uk.gov.hmrc.emcstfe.utils.{Logging, SoapUtils}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
+import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 import scala.xml.XML
 
-class ChrisXMLHttpParser extends Logging {
+@Singleton
+class ChrisXMLHttpParser @Inject()(soapUtils: SoapUtils) extends Logging {
 
   def rawXMLHttpReads[A](implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
     logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
@@ -37,7 +39,7 @@ class ChrisXMLHttpParser extends Logging {
             logger.warn("[rawXMLHttpReads] Unable to read response body as XML", exception)
             Left(XmlValidationError)
           case Success(xml) =>
-            SoapUtils.extractFromSoap(xml) flatMap { xmlBody =>
+            soapUtils.extractFromSoap(xml) flatMap { xmlBody =>
               handleParseResult(XmlReader.of[A].read(xmlBody))
             }
         }

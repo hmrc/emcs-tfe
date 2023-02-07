@@ -50,4 +50,12 @@ object ErrorResponse {
     val message = "Error creating an HMRC Mark with the supplied XML"
   }
 
+  case object MarkPlacementError extends ErrorResponse {
+    val message = "Error placing an HMRC Mark into the supplied XML"
+  }
+
+  case object MinifyXmlError extends ErrorResponse {
+    val message = "Error minifying the supplied XML"
+  }
+
 }
