@@ -18,20 +18,35 @@ package uk.gov.hmrc.emcstfe.utils
 
 import com.sun.org.apache.xml.internal.security.Init
 import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MarkCreationError
 
 import java.security.MessageDigest
 import java.util.Base64
 import javax.inject.{Inject, Singleton}
+import scala.util.{Failure, Success, Try}
+import scala.xml.Elem
 
 @Singleton
 class HMRCMarkUtil @Inject()() extends Logging {
 
-  def createHmrcMark(xmlBytes: Array[Byte]): String = {
+  def createHmrcMark(xml: Elem): Either[ErrorResponse, String] = {
+    Try {
 
-    Init.init()
+      Init.init()
 
-    val c14n: Canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS)
-    val canonXmlBytes: Array[Byte] = c14n.canonicalize(xmlBytes)
-    Base64.getEncoder.encodeToString(MessageDigest.getInstance("SHA-1").digest(canonXmlBytes))
+      val c14n: Canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS)
+
+      val trimmedXml = scala.xml.Utility.trim((xml \ "Body").head)
+      val xmlBytes = trimmedXml.toString().getBytes()
+      val canonXmlBytes: Array[Byte] = c14n.canonicalize(xmlBytes)
+
+      Base64.getEncoder.encodeToString(MessageDigest.getInstance("SHA-1").digest(canonXmlBytes))
+    } match {
+      case Failure(exception) =>
+        logger.warn(exception.getMessage)
+        Left(MarkCreationError)
+      case Success(value) => Right(value)
+    }
   }
 }
