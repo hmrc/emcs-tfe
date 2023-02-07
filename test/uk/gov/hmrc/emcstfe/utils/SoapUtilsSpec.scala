@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.utils
 
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.utils.MockHMRCMarkUtil
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkCreationError, MarkPlacementError, MinifyXmlError, SoapExtractionError}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -134,20 +135,20 @@ class SoapUtilsSpec extends UnitSpec with GetMovementFixture with MockHMRCMarkUt
   "trimWhitespaceFromXml" should {
     "return minified XML" when {
       "provided XML it can minify" in new Test {
-        val inputXml = <Node1>
+        val inputXml: Elem = <Node1>
           <Node2>
             <Field1>123</Field1>
             <Field2>456</Field2>
           </Node2>
         </Node1>
-        val res = soapUtils.trimWhitespaceFromXml(inputXml)
+        val res: Either[ErrorResponse, NodeSeq] = soapUtils.trimWhitespaceFromXml(inputXml)
         res.map(_.toString()) shouldBe Right("""<Node1><Node2><Field1>123</Field1><Field2>456</Field2></Node2></Node1>""")
       }
     }
     "return an error" when {
       "provided XML it cannot minify" in new Test {
-        val inputXml = NodeSeq.Empty
-        val res = soapUtils.trimWhitespaceFromXml(inputXml)
+        val inputXml: NodeSeq = NodeSeq.Empty
+        val res: Either[ErrorResponse, NodeSeq] = soapUtils.trimWhitespaceFromXml(inputXml)
         res shouldBe Left(MinifyXmlError)
       }
     }
@@ -175,9 +176,9 @@ class SoapUtilsSpec extends UnitSpec with GetMovementFixture with MockHMRCMarkUt
             |  </soapenv:Body>
             |</soapenv:Envelope>""".stripMargin)
 
-        val outputXml: Elem = XML.loadString("""<?xml version='1.0' encoding='UTF-8'?><soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"><soapenv:Header><ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1"><Node1>Some stuff</Node1></ns:Info><Security xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><BinarySecurityToken ValueType="http://www.hmrc.gov.uk#MarkToken">my mark</BinarySecurityToken></Security><MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1"><CredentialID>0000001284781216</CredentialID><Identifier>GBWK001234569</Identifier></MetaData></soapenv:Header><soapenv:Body><Node2>Success!</Node2></soapenv:Body></soapenv:Envelope>""".stripMargin)
+        val outputXml: String = """<?xml version='1.0' encoding='UTF-8'?><soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"><soapenv:Header><ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1"><Node1>Some stuff</Node1></ns:Info><Security xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><BinarySecurityToken ValueType="http://www.hmrc.gov.uk#MarkToken">my mark</BinarySecurityToken></Security><MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1"><CredentialID>0000001284781216</CredentialID><Identifier>GBWK001234569</Identifier></MetaData></soapenv:Header><soapenv:Body><Node2>Success!</Node2></soapenv:Body></soapenv:Envelope>"""
 
-        val res = soapUtils.prepareXmlForSubmission(inputXml)
+        val res: Either[ErrorResponse, String] = soapUtils.prepareXmlForSubmission(inputXml)
 
         res shouldBe Right(outputXml)
       }
@@ -192,7 +193,7 @@ class SoapUtilsSpec extends UnitSpec with GetMovementFixture with MockHMRCMarkUt
       "provided XML doesn't have the correct node to add a mark to" in new Test {
         MockHMRCMarkUtil.createHmrcMark().returns(Right("my mark"))
 
-        val res = soapUtils.prepareXmlForSubmission(inputXml)
+        val res: Either[ErrorResponse, String] = soapUtils.prepareXmlForSubmission(inputXml)
 
         res shouldBe Left(MarkPlacementError)
       }
@@ -200,7 +201,7 @@ class SoapUtilsSpec extends UnitSpec with GetMovementFixture with MockHMRCMarkUt
       "the HMRC Mark Generator returns a Left" in new Test {
         MockHMRCMarkUtil.createHmrcMark().returns(Left(MarkCreationError))
 
-        val res = soapUtils.prepareXmlForSubmission(inputXml)
+        val res: Either[ErrorResponse, String] = soapUtils.prepareXmlForSubmission(inputXml)
 
         res shouldBe Left(MarkCreationError)
       }

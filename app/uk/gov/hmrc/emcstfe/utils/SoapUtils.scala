@@ -72,10 +72,12 @@ class SoapUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
     case Success(value) => Right(value)
   }
 
-  def prepareXmlForSubmission(xml: Elem): Either[ErrorResponse, NodeSeq] = for {
+  def prepareXmlForSubmission(xml: Elem): Either[ErrorResponse, String] = for {
     mark <- hmrcMarkUtil.createHmrcMark(xml)
     xmlWithMarkAdded <- addMarkToXml(xml, mark)
     trimmedXml <- trimWhitespaceFromXml(xmlWithMarkAdded)
-  } yield trimmedXml
+  } yield {
+    s"""<?xml version='1.0' encoding='UTF-8'?>${trimmedXml.toString()}"""
+  }
 }
 
