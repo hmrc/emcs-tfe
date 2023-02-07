@@ -23,10 +23,12 @@ import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MarkCreationError
 
 import java.security.MessageDigest
 import java.util.Base64
+import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 import scala.xml.Elem
 
-class HMRCMarkUtil extends Logging {
+@Singleton
+class HMRCMarkUtil @Inject()() extends Logging {
 
   def createHmrcMark(xml: Elem): Either[ErrorResponse, String] = {
     Try {
