@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.connectors.httpParsers
 
-import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess, PartialParseSuccess, __}
+import com.lucidchart.open.xtract._
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.utils.MockSoapUtils
@@ -45,7 +45,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
           val response = HttpResponse(OK, body = getMovementSoapWrapper, headers = Map.empty)
 
-          val result = TestParser.rawXMLHttpReads[GetMovementResponse].read("POST", "/chris/foo/bar", response)
+          val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Right(getMovementResponse)
         }
@@ -59,7 +59,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
           val response = HttpResponse(OK, body = notXmlBody, headers = Map.empty)
 
-          val result = TestParser.rawXMLHttpReads[GetMovementResponse].read("POST", "/chris/foo/bar", response)
+          val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Left(XmlValidationError)
         }
@@ -71,7 +71,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
           val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
 
-          val result = TestParser.rawXMLHttpReads[GetMovementResponse].read("POST", "/chris/foo/bar", response)
+          val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Left(SoapExtractionError)
         }
@@ -83,7 +83,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
           val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
 
-          val result = TestParser.rawXMLHttpReads[GetMovementResponse].read("POST", "/chris/foo/bar", response)
+          val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Left(XmlParseError(Seq(
             EmptyError(GetMovementResponse.localReferenceNumber),
@@ -102,7 +102,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
         val response = HttpResponse(INTERNAL_SERVER_ERROR, body = "Error Msg", headers = Map.empty)
 
-        val result = TestParser.rawXMLHttpReads[GetMovementResponse].read("POST", "/chris/foo/bar", response)
+        val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
         result shouldBe Left(UnexpectedDownstreamResponseError)
       }
