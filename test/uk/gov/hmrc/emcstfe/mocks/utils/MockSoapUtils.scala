@@ -30,5 +30,9 @@ trait MockSoapUtils extends MockFactory {
     def extractFromSoap(): CallHandler1[Elem, Either[ErrorResponse, NodeSeq]] =
       (mockSoapUtils.extractFromSoap(_: Elem))
         .expects(*)
+
+    def prepareXmlForSubmission(): CallHandler1[Elem, Either[ErrorResponse, String]] =
+      (mockSoapUtils.prepareXmlForSubmission(_: Elem))
+        .expects(*)
   }
 }

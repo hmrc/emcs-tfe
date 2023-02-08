@@ -1,4 +1,6 @@
 # microservice specific routes
 
-GET        /movements/:exciseRegistrationNumber                uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(exciseRegistrationNumber, search: GetMovementListSearchOptions)
-GET        /movement/:exciseRegistrationNumber/:arc            uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(exciseRegistrationNumber, arc)
+GET         /movements/:exciseRegistrationNumber            uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(exciseRegistrationNumber, search: GetMovementListSearchOptions)
+GET         /movement/:exciseRegistrationNumber/:arc        uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(exciseRegistrationNumber, arc)
+
+POST        /test-only/submit                               uk.gov.hmrc.emcstfe.controllers.SubmitDraftMovementController.submitDraftMovement()
