@@ -18,8 +18,8 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 trait BaseFixtures {
 
-  val ern = "SomeErn"
-  val arc: String = "ARC"
+  val testErn = "SomeErn"
+  val testArc: String = "ARC"
   val testCredId = "cred1234567891"
   val testInternalId = "int1234567891"
 
