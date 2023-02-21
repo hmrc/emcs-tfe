@@ -33,7 +33,7 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
   private trait Test {
     def setupStubs(): StubMapping
 
-    def uri: String = s"/movements/$ern"
+    def uri: String = s"/movements/$testErn"
     def downstreamUri: String = s"/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     def request(): WSRequest = {

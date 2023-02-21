@@ -32,7 +32,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
   private trait Test {
     def setupStubs(): StubMapping
 
-    def uri: String = s"/movement/$ern/$arc"
+    def uri: String = s"/movement/$testErn/$testArc"
     def downstreamUri: String = s"/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     def request(): WSRequest = {

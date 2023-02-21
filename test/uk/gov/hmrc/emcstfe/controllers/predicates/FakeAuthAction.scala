@@ -28,11 +28,15 @@ trait FakeAuthAction extends StubBodyParserFactory with BaseFixtures { _: UnitSp
 
   object FakeSuccessAuthAction extends AuthAction {
 
-    override implicit protected def executionContext: ExecutionContext = ec
+    override def apply(ern: String): ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest] =
+      new ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest] {
 
-    override def parser: BodyParser[AnyContent] = stubBodyParser()
+        override implicit protected def executionContext: ExecutionContext = ec
 
-    override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] =
-      block(UserRequest(request, ern, testInternalId, testCredId))
+        override def parser: BodyParser[AnyContent] = stubBodyParser()
+
+        override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] =
+          block(UserRequest(request, testErn, testInternalId, testCredId))
+      }
   }
 }

@@ -35,7 +35,7 @@ class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListSer
   private val controller = new GetMovementListController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
   private val searchOptions = GetMovementListSearchOptions()
-  private val getMovementListRequest = GetMovementListRequest(ern, searchOptions)
+  private val getMovementListRequest = GetMovementListRequest(testErn, searchOptions)
 
   "GET /movements/:ern" should {
     "return 200" when {
@@ -43,7 +43,7 @@ class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListSer
 
         MockService.getMovementList(getMovementListRequest).returns(Future.successful(Right(getMovementListResponse)))
 
-        val result = controller.getMovementList(ern, searchOptions)(fakeRequest)
+        val result = controller.getMovementList(testErn, searchOptions)(fakeRequest)
 
         status(result) shouldBe Status.OK
         contentAsJson(result) shouldBe getMovementListJson
@@ -54,7 +54,7 @@ class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListSer
 
         MockService.getMovementList(getMovementListRequest).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-        val result = controller.getMovementList(ern, searchOptions)(fakeRequest)
+        val result = controller.getMovementList(testErn, searchOptions)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
