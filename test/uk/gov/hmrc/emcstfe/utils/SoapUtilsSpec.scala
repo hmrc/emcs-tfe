@@ -176,7 +176,9 @@ class SoapUtilsSpec extends UnitSpec with GetMovementFixture with MockHMRCMarkUt
             |  </soapenv:Body>
             |</soapenv:Envelope>""".stripMargin)
 
-        val outputXml: String = """<?xml version='1.0' encoding='UTF-8'?><soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"><soapenv:Header><ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1"><Node1>Some stuff</Node1></ns:Info><Security xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><BinarySecurityToken ValueType="http://www.hmrc.gov.uk#MarkToken">my mark</BinarySecurityToken></Security><MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1"><CredentialID>0000001284781216</CredentialID><Identifier>GBWK001234569</Identifier></MetaData></soapenv:Header><soapenv:Body><Node2>Success!</Node2></soapenv:Body></soapenv:Envelope>"""
+        val outputXml: String =
+          """<?xml version='1.0' encoding='UTF-8'?>
+            |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"><soapenv:Header><ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1"><Node1>Some stuff</Node1></ns:Info><Security xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><BinarySecurityToken ValueType="http://www.hmrc.gov.uk#MarkToken">my mark</BinarySecurityToken></Security><MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1"><CredentialID>0000001284781216</CredentialID><Identifier>GBWK001234569</Identifier></MetaData></soapenv:Header><soapenv:Body><Node2>Success!</Node2></soapenv:Body></soapenv:Envelope>""".stripMargin
 
         val res: Either[ErrorResponse, String] = soapUtils.prepareXmlForSubmission(inputXml)
 
