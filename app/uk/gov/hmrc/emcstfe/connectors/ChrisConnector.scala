@@ -46,7 +46,12 @@ class ChrisConnector @Inject()(val http: HttpClient,
     val url: String = s"${appConfig.chrisUrl}/ChRIS/EMCS/SubmitDraftMovementPortal/3"
     soapUtils.prepareXmlForSubmission(XML.loadString(request.requestBody)) match {
       case Left(errorResponse) => Future.successful(Left(errorResponse))
-      case Right(preparedXml) => postString(http, url, preparedXml, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(shouldExtractFromSoap = false))
+      case Right(preparedXml) =>
+
+        logger.debug(s"[submitDraftMovementChrisSOAPRequest] Sending to URL: $url")
+        logger.debug(s"[submitDraftMovementChrisSOAPRequest] Sending body: $preparedXml")
+
+        postString(http, url, preparedXml, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(shouldExtractFromSoap = false))
     }
   }
 }
