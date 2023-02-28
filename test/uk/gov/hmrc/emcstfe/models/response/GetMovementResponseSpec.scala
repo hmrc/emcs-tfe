@@ -44,9 +44,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
 
         GetMovementResponse.xmlReader.read(XML.loadString(
           // There are three CnCode values here but only two unique ones
-          """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
-            |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
-            |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          """
             |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
             |		xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
             |		<mov:currentMovement>
@@ -173,15 +171,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>
-            |</MovementDataResponse>""".stripMargin)) shouldBe ParseSuccess(getMovementResponse)
+            |	</mov:movementView>""".stripMargin)) shouldBe ParseSuccess(getMovementResponse)
       }
 
       "handle hours and days" in {
         val modelWithHours = GetMovementResponse.xmlReader.read(XML.loadString(
-          """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
-            |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
-            |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          """
             |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
             |		xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
             |		<mov:currentMovement>
@@ -308,15 +303,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>
-            |</MovementDataResponse>""".stripMargin))
+            |	</mov:movementView>""".stripMargin))
 
         modelWithHours shouldBe ParseSuccess(getMovementResponse.copy(journeyTime = Hours("20")))
 
         val modelWithDays = GetMovementResponse.xmlReader.read(XML.loadString(
-          """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
-            |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
-            |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          """
             |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
             |		xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
             |		<mov:currentMovement>
@@ -443,8 +435,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>
-            |</MovementDataResponse>""".stripMargin))
+            |	</mov:movementView>""".stripMargin))
 
         modelWithDays shouldBe ParseSuccess(getMovementResponse.copy(journeyTime = Days("20")))
       }
@@ -455,9 +446,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
       "missing status" in {
 
         val noStatusXML = XML.loadString(
-          """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
-            |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
-            |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          """
             |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
             |		xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
             |		<mov:currentMovement>
@@ -583,8 +572,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>
-            |</MovementDataResponse>""".stripMargin)
+            |	</mov:movementView>""".stripMargin)
 
         GetMovementResponse.xmlReader.read(noStatusXML) shouldBe ParseFailure(EmptyError(GetMovementResponse.eadStatus))
       }
@@ -592,9 +580,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
       "missing LRN" in {
 
         val noLrnXML = XML.loadString(
-          """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
-            |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
-            |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          """
             |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
             |		xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
             |		<mov:currentMovement>
@@ -720,8 +706,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>
-            |</MovementDataResponse>""".stripMargin)
+            |	</mov:movementView>""".stripMargin)
 
         GetMovementResponse.xmlReader.read(noLrnXML) shouldBe ParseFailure(EmptyError(GetMovementResponse.localReferenceNumber))
       }
@@ -729,9 +714,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
       "missing consignorName" in {
 
         val noConsignorXML = XML.loadString(
-          """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
-            |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
-            |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          """
             |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
             |		xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
             |		<mov:currentMovement>
@@ -856,8 +839,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>
-            |</MovementDataResponse>""".stripMargin)
+            |	</mov:movementView>""".stripMargin)
 
         GetMovementResponse.xmlReader.read(noConsignorXML) shouldBe ParseFailure(EmptyError(GetMovementResponse.consignorName))
       }
@@ -865,9 +847,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
       "missing dateOfDispatch" in {
 
         val noDateOfDispatchXML = XML.loadString(
-          """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
-            |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
-            |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          """
             |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
             |		xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
             |		<mov:currentMovement>
@@ -992,8 +972,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>
-            |</MovementDataResponse>""".stripMargin)
+            |	</mov:movementView>""".stripMargin)
 
         GetMovementResponse.xmlReader.read(noDateOfDispatchXML) shouldBe ParseFailure(EmptyError(GetMovementResponse.dateOfDispatch))
       }
@@ -1001,9 +980,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
       "missing journeyTime" in {
 
         val noJourneyTimeXML = XML.loadString(
-          """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd"
-            |	xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3"
-            |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          """
             |	<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd"
             |		xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
             |		<mov:currentMovement>
@@ -1128,8 +1105,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>
-            |</MovementDataResponse>""".stripMargin)
+            |	</mov:movementView>""".stripMargin)
 
         GetMovementResponse.xmlReader.read(noJourneyTimeXML) shouldBe ParseFailure(JourneyTimeParseFailure("Could not parse JourneyTime, received: ''"))
       }
