@@ -21,8 +21,7 @@ import uk.gov.hmrc.emcstfe.models.common.JourneyTime.Days
 import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse
 
 trait GetMovementFixture extends BaseFixtures {
-  lazy val getMovementResponseBody: String = """<MovementDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3 MovementData.xsd" xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementData/3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                                               |  <mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
+  lazy val getMovementResponseBody: String = """<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                                |    <mov:currentMovement>
                                                |      <mov:status>Accepted</mov:status>
                                                |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
@@ -426,8 +425,7 @@ trait GetMovementFixture extends BaseFixtures {
                                                |        </body:Body>
                                                |      </body:IE837>
                                                |    </mov:eventHistory>
-                                               |  </mov:movementView>
-                                               |</MovementDataResponse>""".stripMargin
+                                               |  </mov:movementView>""".stripMargin
 
   lazy val getMovementSoapWrapper: String = s"""<tns:Envelope
                                               |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
