@@ -77,7 +77,8 @@ class SoapUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
     xmlWithMarkAdded <- addMarkToXml(xml, mark)
     trimmedXml <- trimWhitespaceFromXml(xmlWithMarkAdded)
   } yield {
-    s"""<?xml version='1.0' encoding='UTF-8'?>${trimmedXml.toString()}"""
+    s"""<?xml version='1.0' encoding='UTF-8'?>
+       |${trimmedXml.toString()}""".stripMargin
   }
 }
 

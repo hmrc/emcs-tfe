@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.connectors.httpParsers
 
-import com.lucidchart.open.xtract.{ParseFailure, ParseResult, ParseSuccess, PartialParseSuccess, XmlReader}
+import com.lucidchart.open.xtract._
 import play.api.http.Status.OK
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
@@ -30,7 +30,7 @@ import scala.xml.XML
 @Singleton
 class ChrisXMLHttpParser @Inject()(soapUtils: SoapUtils) extends Logging {
 
-  def rawXMLHttpReads[A](implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
+  def rawXMLHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
     logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
     response.status match {
       case OK =>
@@ -39,9 +39,11 @@ class ChrisXMLHttpParser @Inject()(soapUtils: SoapUtils) extends Logging {
             logger.warn("[rawXMLHttpReads] Unable to read response body as XML", exception)
             Left(XmlValidationError)
           case Success(xml) =>
-            soapUtils.extractFromSoap(xml) flatMap { xmlBody =>
-              handleParseResult(XmlReader.of[A].read(xmlBody))
-            }
+            if(shouldExtractFromSoap) {
+              soapUtils.extractFromSoap(xml) flatMap { xmlBody =>
+                handleParseResult(XmlReader.of[A].read(xmlBody))
+              }
+            } else handleParseResult(XmlReader.of[A].read(xml))
         }
       case status =>
         logger.warn(s"[rawXMLHttpReads] Unexpected status from chris: $status")

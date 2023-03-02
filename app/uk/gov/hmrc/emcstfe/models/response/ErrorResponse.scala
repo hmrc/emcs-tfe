@@ -58,4 +58,8 @@ object ErrorResponse {
     val message = "Error minifying the supplied XML"
   }
 
+  case object NoLrnError extends ErrorResponse {
+    val message = "Error extracting LRN from the supplied XML"
+  }
+
 }
