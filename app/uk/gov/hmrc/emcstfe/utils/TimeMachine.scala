@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.config
+package uk.gov.hmrc.emcstfe.utils
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.emcstfe.controllers.predicates.{AuthAction, AuthActionImpl}
-import uk.gov.hmrc.emcstfe.utils.{TimeMachine, TimeMachineImpl}
+import java.time.{Instant, LocalDateTime, ZoneId}
+import javax.inject.Inject
 
-class Module extends AbstractModule {
+trait TimeMachine {
+  def now(): LocalDateTime
+  def instant(): Instant
+}
 
-  override def configure(): Unit = {
-
-    bind(classOf[AppConfig]).asEagerSingleton()
-    bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
-    bind(classOf[TimeMachine]).to(classOf[TimeMachineImpl])
-  }
+class TimeMachineImpl @Inject()() extends TimeMachine {
+  override def now(): LocalDateTime = LocalDateTime.now(ZoneId.of("UTC"))
+  override def instant(): Instant = Instant.now()
 }

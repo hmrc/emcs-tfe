@@ -16,16 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.config
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.emcstfe.controllers.predicates.{AuthAction, AuthActionImpl}
-import uk.gov.hmrc.emcstfe.utils.{TimeMachine, TimeMachineImpl}
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class Module extends AbstractModule {
+import scala.concurrent.duration.Duration
 
-  override def configure(): Unit = {
+class AppConfigSpec extends UnitSpec {
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-    bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
-    bind(classOf[TimeMachine]).to(classOf[TimeMachineImpl])
+  lazy val appConfig = app.injector.instanceOf[AppConfig]
+
+  "AppConfig" must {
+
+    "have a TTL for ReportAReceipt UserAnswers" in {
+      //note: In app-config-base this will be set to the actual TTL for Environments including Production
+      appConfig.reportReceiptUserAnswersTTL() shouldBe Duration("15minutes")
+    }
   }
+
 }
