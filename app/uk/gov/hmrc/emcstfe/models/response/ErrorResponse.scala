@@ -62,4 +62,8 @@ object ErrorResponse {
     val message = "Error extracting LRN from the supplied XML"
   }
 
+  case class MongoError(msg: String) extends ErrorResponse {
+    val message = s"Error from Mongo with message: $msg"
+  }
+
 }
