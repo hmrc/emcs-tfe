@@ -43,14 +43,14 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     .configure(servicesConfig)
     .build()
 
-  override def beforeAll(): Unit = {
+  override protected def beforeAll(): Unit = {
     super.beforeAll()
     startWireMock()
     DownstreamStub.onSuccess(DownstreamStub.POST, "/write/audit", OK, Json.obj())
     DownstreamStub.onSuccess(DownstreamStub.POST, "/write/audit/merged", OK, Json.obj())
   }
 
-  override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     stopWireMock()
     super.afterAll()
   }
