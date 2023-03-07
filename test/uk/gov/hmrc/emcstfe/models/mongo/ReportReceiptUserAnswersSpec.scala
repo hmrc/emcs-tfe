@@ -22,10 +22,11 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class ReportReceiptUserAnswersSpec extends UnitSpec with BaseFixtures {
 
-  val instant = Instant.now()
+  val instant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
   val userAnswersModel = ReportReceiptUserAnswers(
     internalId = testInternalId,
