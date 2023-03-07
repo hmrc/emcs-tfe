@@ -29,10 +29,11 @@ import uk.gov.hmrc.emcstfe.stubs.AuthStub
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class ReportReceiptUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
-  val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now())
+  val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   def uri: String = s"/user-answers/report-receipt/$testErn/$testArc"
 

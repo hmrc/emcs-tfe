@@ -27,6 +27,7 @@ import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import scala.concurrent.Future
 
 class ReportReceiptUserAnswersControllerSpec extends UnitSpec with MockReportReceiptUserAnswersService with FakeAuthAction {
@@ -38,7 +39,7 @@ class ReportReceiptUserAnswersControllerSpec extends UnitSpec with MockReportRec
     FakeSuccessAuthAction
   )
 
-  val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now)
+  val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   "GET /user-answers/report-receipt/:ern/:arc" should {
     s"return $OK (OK)" when {
