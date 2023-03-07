@@ -16,15 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.controllers
 
-import models.ErrorResponseModel
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.predicates.AuthAction
 import uk.gov.hmrc.emcstfe.models.mongo.ReportReceiptUserAnswers
-import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.repositories.ReportReceiptUserAnswersRepository
-import uk.gov.hmrc.emcstfe.services.{GetMovementService, ReportReceiptUserAnswersService}
+import uk.gov.hmrc.emcstfe.services.ReportReceiptUserAnswersService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
@@ -37,14 +33,14 @@ class ReportReceiptUserAnswersController @Inject()(cc: ControllerComponents,
                                                   )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def get(ern: String, arc: String): Action[AnyContent] = authAction(ern).async { implicit request =>
-      userAnswersRepo.get(request.internalId, ern, arc) map {
-        case Right(Some(answers)) => Ok(Json.toJson(answers))
-        case Right(None) => NoContent
-        case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
-      }
+    userAnswersRepo.get(request.internalId, ern, arc) map {
+      case Right(Some(answers)) => Ok(Json.toJson(answers))
+      case Right(None) => NoContent
+      case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
     }
+  }
 
-  def set(ern: String): Action[JsValue] = authAction(ern).async(parse.json) { implicit request =>
+  def set(ern: String, arc: String): Action[JsValue] = authAction(ern).async(parse.json) { implicit request =>
     withJsonBody[ReportReceiptUserAnswers] { answers =>
       userAnswersRepo.set(answers) map {
         case Right(answers) => Ok(Json.toJson(answers))
@@ -53,12 +49,10 @@ class ReportReceiptUserAnswersController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def clear(ern: String): Action[JsValue] = authAction(ern).async(parse.json) { implicit request =>
-    withJsonBody[ReportReceiptUserAnswers] { answers =>
-      userAnswersRepo.clear(answers) map {
-        case Right(answers) => Ok(Json.toJson(answers))
-        case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
-      }
+  def clear(ern: String, arc: String): Action[AnyContent] = authAction(ern).async { implicit request =>
+    userAnswersRepo.clear(request.internalId, ern, arc) map {
+      case Right(_) => NoContent
+      case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
     }
   }
 }
