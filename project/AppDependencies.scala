@@ -9,18 +9,23 @@ object AppDependencies {
   val hmrcMongoVersion  =  "0.74.0"
   val scalamockVersion  =  "5.2.0"
   val catsCoreVersion   =  "2.3.1"
+  val scalatestVersion  =  "3.2.15"
+  val flexmarkVersion   =  "0.62.2"
 
   val compile = Seq(
-    "uk.gov.hmrc"       %% s"bootstrap-backend$playSuffix"  % boostrapVersion,
-    "uk.gov.hmrc.mongo" %% s"hmrc-mongo$playSuffix"         % hmrcMongoVersion,
-    "com.lucidchart"    %%  "xtract"                        % xtractVersion,
-    "org.typelevel"     %%  "cats-core"                     % catsCoreVersion
+    "uk.gov.hmrc"           %% s"bootstrap-backend$playSuffix"  % boostrapVersion,
+    "uk.gov.hmrc.mongo"     %% s"hmrc-mongo$playSuffix"         % hmrcMongoVersion,
+    "com.lucidchart"        %%  "xtract"                        % xtractVersion,
+    "org.typelevel"         %%  "cats-core"                     % catsCoreVersion
   )
 
   val test = Seq(
-    "uk.gov.hmrc"       %% s"bootstrap-test$playSuffix"     % boostrapVersion   % "test, it",
-    "org.scalamock"     %%  "scalamock"                     % scalamockVersion  % "test, it",
-    "com.lucidchart"    %%  "xtract-testing"                % xtractVersion     % "test, it",
-    "uk.gov.hmrc.mongo" %% s"hmrc-mongo-test$playSuffix"    % hmrcMongoVersion  % "it"
+    "uk.gov.hmrc"           %% s"bootstrap-test$playSuffix"     % boostrapVersion         % "test, it",
+    "org.scalamock"         %%  "scalamock"                     % scalamockVersion        % "test, it",
+    "com.lucidchart"        %%  "xtract-testing"                % xtractVersion           % "test, it",
+    "org.scalatest"         %%  "scalatest"                     % scalatestVersion        % "test, it",
+    "org.scalatestplus"     %%  "mockito-4-6"                   % s"$scalatestVersion.0"  % "test",
+    "com.vladsch.flexmark"  %   "flexmark-all"                  % flexmarkVersion         % "test",
+    "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-test$playSuffix"    % hmrcMongoVersion        % "it"
   )
 }
