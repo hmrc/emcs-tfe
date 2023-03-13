@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple6Semigroupal
+import cats.implicits.catsSyntaxTuple7Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OWrites}
@@ -28,6 +28,7 @@ case class GetMovementResponse(
                                consignorName: String,
                                dateOfDispatch: String,
                                journeyTime: JourneyTime,
+                               items: Seq[MovementItem],
                                numberOfItems: Int
                              )
 
@@ -40,6 +41,7 @@ object GetMovementResponse {
   val consignorName: XPath = EADESADContainer \ "ConsignorTrader" \ "TraderName"
   val dateOfDispatch: XPath = EADESADContainer \ "EadEsad" \ "DateOfDispatch"
   val journeyTime: XPath = EADESADContainer \ "HeaderEadEsad" \ "JourneyTime"
+  val items: XPath = EADESADContainer \ "BodyEadEsad"
   val numberOfItems: XPath = EADESADContainer \\ "BodyEadEsad" \\ "CnCode"
 
   implicit val xmlReader: XmlReader[GetMovementResponse] = (
@@ -48,7 +50,8 @@ object GetMovementResponse {
     consignorName.read[String],
     dateOfDispatch.read[String],
     journeyTime.read[JourneyTime],
-    numberOfItems.read[Seq[String]](strictReadSeq).map(_.distinct.length)
+    items.read[Seq[MovementItem]](strictReadSeq),
+    numberOfItems.read[Seq[String]](strictReadSeq).map(_.length)
   ).mapN(GetMovementResponse.apply)
 
   implicit val writes: OWrites[GetMovementResponse] = Json.writes

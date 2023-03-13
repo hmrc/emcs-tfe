@@ -142,10 +142,11 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -154,12 +155,13 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
+            |							<body:BodyRecordUniqueReference>3</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -171,7 +173,19 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |				</body:Body>
             |			</body:IE801>
             |		</mov:currentMovement>
-            |	</mov:movementView>""".stripMargin)) shouldBe ParseSuccess(getMovementResponse)
+            |	</mov:movementView>""".stripMargin)) shouldBe
+          ParseSuccess(getMovementResponse.copy(
+            items = getMovementResponse.items :+ MovementItem(
+              itemUniqueReference = 3,
+              productCode = "W300",
+              cnCode = "27111901",
+              quantity = BigDecimal(501),
+              grossMass = BigDecimal(901),
+              netMass = BigDecimal(475),
+              alcoholicStrength = Some(12.7)
+            ),
+            numberOfItems = 3
+          ))
       }
 
       "handle hours and days" in {
@@ -274,24 +288,11 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
-            |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-            |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-            |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-            |							<body:SizeOfProducer>20000</body:SizeOfProducer>
-            |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-            |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-            |						</body:BodyEadEsad>
-            |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-            |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
-            |							<body:Quantity>501</body:Quantity>
-            |							<body:GrossMass>901</body:GrossMass>
-            |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -406,24 +407,11 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
-            |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-            |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-            |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-            |							<body:SizeOfProducer>20000</body:SizeOfProducer>
-            |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-            |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-            |						</body:BodyEadEsad>
-            |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-            |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
-            |							<body:Quantity>501</body:Quantity>
-            |							<body:GrossMass>901</body:GrossMass>
-            |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -543,24 +531,11 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
-            |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-            |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-            |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-            |							<body:SizeOfProducer>20000</body:SizeOfProducer>
-            |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-            |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-            |						</body:BodyEadEsad>
-            |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-            |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
-            |							<body:Quantity>501</body:Quantity>
-            |							<body:GrossMass>901</body:GrossMass>
-            |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -677,24 +652,11 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
-            |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-            |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-            |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-            |							<body:SizeOfProducer>20000</body:SizeOfProducer>
-            |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-            |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-            |						</body:BodyEadEsad>
-            |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-            |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
-            |							<body:Quantity>501</body:Quantity>
-            |							<body:GrossMass>901</body:GrossMass>
-            |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -810,24 +772,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
-            |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-            |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-            |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-            |							<body:SizeOfProducer>20000</body:SizeOfProducer>
-            |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-            |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-            |						</body:BodyEadEsad>
-            |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-            |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
-            |							<body:Quantity>501</body:Quantity>
-            |							<body:GrossMass>901</body:GrossMass>
-            |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -943,24 +893,11 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
-            |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-            |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-            |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-            |							<body:SizeOfProducer>20000</body:SizeOfProducer>
-            |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-            |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-            |						</body:BodyEadEsad>
-            |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-            |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
-            |							<body:Quantity>501</body:Quantity>
-            |							<body:GrossMass>901</body:GrossMass>
-            |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -1076,7 +1013,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
@@ -1090,7 +1027,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
             |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>22041019</body:CnCode>
+            |							<body:CnCode>27111901</body:CnCode>
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>

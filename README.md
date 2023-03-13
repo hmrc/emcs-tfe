@@ -6,9 +6,9 @@
 ### Movements
 
 <details>
-<summary>Return a list of all movements for an exciseRegistrationNumber supplied
+<summary>Return a list of all movements for an ERN
 
-**`GET`** /movements/:exciseRegistrationNumber</summary>
+**`GET`** /movements/:ern</summary>
 
 ### Query string search parameters
 
@@ -22,7 +22,7 @@
 
 E.g. to search for the first 15 movements by Consignor ordered by DateReceived ascending, the call would be:
 
-`/movements/:exciseRegistrationNumber?search.traderRole=Consignor&search.sortOrder=A&search.maxRows=15`
+`/movements/:ern?search.traderRole=Consignor&search.sortOrder=A&search.maxRows=15`
 
 ### Responses
 
@@ -46,6 +46,58 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
       "otherTraderID": "ABCD1234"
     }
   ]
+}
+```
+
+**Status**: 500 (ISE)
+
+**Body**:
+
+```json
+{
+  "message": "JSON validation error"
+}
+```
+</details>
+
+<details>
+<summary>Return movement details for a ERN and ARC
+
+**`GET`** /movement/:ern/:arc</summary>
+
+### Responses
+
+**Status**: 200 (OK)
+
+**Body**:
+
+```json
+{
+  "localReferenceNumber": "EN",
+  "eadStatus": "Accepted",
+  "consignorName": "Current 801 Consignor",
+  "dateOfDispatch": "2008-11-20",
+  "journeyTime": "20 days",
+  "items": [
+    {
+      "itemUniqueReference": 1,
+      "productCode": "W200",
+      "cnCode": "22041011",
+      "quantity": 500,
+      "grossMass": 900,
+      "netMass": 375
+    },
+    {
+      "itemUniqueReference": 2,
+      "productCode": "W300",
+      "cnCode": "27111901",
+      "quantity": 501,
+      "grossMass": 901,
+      "netMass": 475,
+      "alcoholicStrength": 12.7
+    }
+  ],
+  "numberOfItems": 2
 }
 ```
 

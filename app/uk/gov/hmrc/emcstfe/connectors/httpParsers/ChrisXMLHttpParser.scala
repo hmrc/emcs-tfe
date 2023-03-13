@@ -20,6 +20,7 @@ import com.lucidchart.open.xtract._
 import play.api.http.Status.OK
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse.EADESADContainer
 import uk.gov.hmrc.emcstfe.utils.{Logging, SoapUtils}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 

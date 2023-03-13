@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.Days
-import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse
+import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem}
 
 trait GetMovementFixture extends BaseFixtures {
   lazy val getMovementResponseBody: String = """<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
@@ -132,10 +132,11 @@ trait GetMovementFixture extends BaseFixtures {
                                                |            <body:BodyEadEsad>
                                                |              <body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
                                                |              <body:ExciseProductCode>W300</body:ExciseProductCode>
-                                               |              <body:CnCode>22041019</body:CnCode>
+                                               |              <body:CnCode>27111901</body:CnCode>
                                                |              <body:Quantity>501</body:Quantity>
                                                |              <body:GrossMass>901</body:GrossMass>
                                                |              <body:NetMass>475</body:NetMass>
+                                               |              <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
                                                |              <body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
                                                |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
                                                |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -293,6 +294,7 @@ trait GetMovementFixture extends BaseFixtures {
                                                |              <body:Quantity>501</body:Quantity>
                                                |              <body:GrossMass>901</body:GrossMass>
                                                |              <body:NetMass>475</body:NetMass>
+                                               |              <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
                                                |              <body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
                                                |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
                                                |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
@@ -428,46 +430,89 @@ trait GetMovementFixture extends BaseFixtures {
                                                |  </mov:movementView>""".stripMargin
 
   lazy val getMovementSoapWrapper: String = s"""<tns:Envelope
-                                              |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                              |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
-                                              |	<tns:Body>
-                                              |		<con:Control
-                                              |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
-                                              |			<con:MetaData>
-                                              |				<con:MessageId>String</con:MessageId>
-                                              |				<con:Source>String</con:Source>
-                                              |				<con:Identity>String</con:Identity>
-                                              |				<con:Partner>String</con:Partner>
-                                              |				<con:CorrelationId>String</con:CorrelationId>
-                                              |				<con:BusinessKey>String</con:BusinessKey>
-                                              |				<con:MessageDescriptor>String</con:MessageDescriptor>
-                                              |				<con:QualityOfService>String</con:QualityOfService>
-                                              |				<con:Destination>String</con:Destination>
-                                              |				<con:Priority>0</con:Priority>
-                                              |			</con:MetaData>
-                                              |			<con:OperationResponse>
-                                              |				<con:Results>
-                                              |					<con:Result Name="">
-                                              |						<![CDATA[$getMovementResponseBody]]>
-                                              |					</con:Result>
-                                              |				</con:Results>
-                                              |			</con:OperationResponse>
-                                              |		</con:Control>
-                                              |	</tns:Body>
-                                              |</tns:Envelope>""".stripMargin
-  
+                                               |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                               |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
+                                               |	<tns:Body>
+                                               |		<con:Control
+                                               |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+                                               |			<con:MetaData>
+                                               |				<con:MessageId>String</con:MessageId>
+                                               |				<con:Source>String</con:Source>
+                                               |				<con:Identity>String</con:Identity>
+                                               |				<con:Partner>String</con:Partner>
+                                               |				<con:CorrelationId>String</con:CorrelationId>
+                                               |				<con:BusinessKey>String</con:BusinessKey>
+                                               |				<con:MessageDescriptor>String</con:MessageDescriptor>
+                                               |				<con:QualityOfService>String</con:QualityOfService>
+                                               |				<con:Destination>String</con:Destination>
+                                               |				<con:Priority>0</con:Priority>
+                                               |			</con:MetaData>
+                                               |			<con:OperationResponse>
+                                               |				<con:Results>
+                                               |					<con:Result Name="">
+                                               |						<![CDATA[$getMovementResponseBody]]>
+                                               |					</con:Result>
+                                               |				</con:Results>
+                                               |			</con:OperationResponse>
+                                               |		</con:Control>
+                                               |	</tns:Body>
+                                               |</tns:Envelope>""".stripMargin
+
   lazy val getMovementResponse: GetMovementResponse = GetMovementResponse(
-    localReferenceNumber = "EN", eadStatus = "Accepted", consignorName = "Current 801 Consignor", dateOfDispatch = "2008-11-20", journeyTime = Days("20"), numberOfItems = 2
+    localReferenceNumber = "EN",
+    eadStatus = "Accepted",
+    consignorName = "Current 801 Consignor",
+    dateOfDispatch = "2008-11-20",
+    journeyTime = Days("20"),
+    items = Seq(
+      MovementItem(
+        itemUniqueReference = 1,
+        productCode = "W200",
+        cnCode = "22041011",
+        quantity = BigDecimal(500),
+        grossMass = BigDecimal(900),
+        netMass = BigDecimal(375),
+        alcoholicStrength = None
+      ),
+      MovementItem(
+        itemUniqueReference = 2,
+        productCode = "W300",
+        cnCode = "27111901",
+        quantity = BigDecimal(501),
+        grossMass = BigDecimal(901),
+        netMass = BigDecimal(475),
+        alcoholicStrength = Some(BigDecimal(12.7))
+      )
+    ),
+    numberOfItems = 2
   )
 
-  lazy val getMovementJson: JsValue = Json.parse(
-    """{
-      |  "localReferenceNumber": "EN",
-      |  "eadStatus": "Accepted",
-      |  "consignorName": "Current 801 Consignor",
-      |  "dateOfDispatch": "2008-11-20",
-      |  "journeyTime": "20 days",
-      |  "numberOfItems": 2
-      |}""".stripMargin)
+  lazy val getMovementJson: JsValue = Json.obj(fields =
+    "localReferenceNumber" -> "EN",
+    "eadStatus" -> "Accepted",
+    "consignorName" -> "Current 801 Consignor",
+    "dateOfDispatch" -> "2008-11-20",
+    "journeyTime" -> "20 days",
+    "items" -> Json.arr(
+      Json.obj(fields =
+        "itemUniqueReference" -> 1,
+        "productCode" -> "W200",
+        "cnCode" -> "22041011",
+        "quantity" -> 500,
+        "grossMass" -> 900,
+        "netMass" -> 375
+      ),
+      Json.obj(fields =
+        "itemUniqueReference" -> 2,
+        "productCode" -> "W300",
+        "cnCode" -> "27111901",
+        "quantity" -> 501,
+        "grossMass" -> 901,
+        "netMass" -> 475,
+        "alcoholicStrength" -> 12.7
+      )
+    ),
+    "numberOfItems" -> 2
+  )
 
 }
