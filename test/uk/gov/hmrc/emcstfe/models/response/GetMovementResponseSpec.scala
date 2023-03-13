@@ -138,6 +138,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
@@ -153,6 +159,18 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>HG</body:KindOfPackages>
+            |                <body:NumberOfPackages>7</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>3</body:BodyRecordUniqueReference>
@@ -168,6 +186,18 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>150</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>CR</body:KindOfPackages>
+            |                <body:NumberOfPackages>10</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |					</body:EADESADContainer>
             |				</body:Body>
@@ -182,7 +212,11 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
               quantity = BigDecimal(501),
               grossMass = BigDecimal(901),
               netMass = BigDecimal(475),
-              alcoholicStrength = Some(12.7)
+              alcoholicStrength = Some(12.7),
+              packaging = Seq(
+                Packaging("BO", 150),
+                Packaging("CR", 10)
+              )
             ),
             numberOfItems = 3
           ))
@@ -284,6 +318,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
@@ -299,6 +339,18 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>HG</body:KindOfPackages>
+            |                <body:NumberOfPackages>7</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |					</body:EADESADContainer>
             |				</body:Body>
@@ -403,6 +455,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
@@ -418,6 +476,18 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>HG</body:KindOfPackages>
+            |                <body:NumberOfPackages>7</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |					</body:EADESADContainer>
             |				</body:Body>
@@ -527,6 +597,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
@@ -542,6 +618,18 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>HG</body:KindOfPackages>
+            |                <body:NumberOfPackages>7</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |					</body:EADESADContainer>
             |				</body:Body>
@@ -648,6 +736,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
@@ -663,6 +757,18 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>HG</body:KindOfPackages>
+            |                <body:NumberOfPackages>7</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |					</body:EADESADContainer>
             |				</body:Body>
@@ -768,6 +874,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
@@ -777,13 +889,24 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
             |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
-            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>HG</body:KindOfPackages>
+            |                <body:NumberOfPackages>7</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |					</body:EADESADContainer>
             |				</body:Body>
@@ -889,6 +1012,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
@@ -904,6 +1033,18 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>HG</body:KindOfPackages>
+            |                <body:NumberOfPackages>7</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |					</body:EADESADContainer>
             |				</body:Body>
@@ -1009,6 +1150,12 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |						<body:BodyEadEsad>
             |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
@@ -1017,26 +1164,25 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:Quantity>501</body:Quantity>
             |							<body:GrossMass>901</body:GrossMass>
             |							<body:NetMass>475</body:NetMass>
+            |             <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
             |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
             |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
             |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
             |							<body:SizeOfProducer>20000</body:SizeOfProducer>
             |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-            |						</body:BodyEadEsad>
-            |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-            |							<body:ExciseProductCode>W300</body:ExciseProductCode>
-            |							<body:CnCode>27111901</body:CnCode>
-            |							<body:Quantity>501</body:Quantity>
-            |							<body:GrossMass>901</body:GrossMass>
-            |							<body:NetMass>475</body:NetMass>
-            |							<body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-            |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-            |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-            |							<body:SizeOfProducer>20000</body:SizeOfProducer>
-            |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-            |							<body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+            |             <body:Package>
+            |                <body:KindOfPackages>BO</body:KindOfPackages>
+            |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+            |              </body:Package>
+            |              <body:Package>
+            |                <body:KindOfPackages>HG</body:KindOfPackages>
+            |                <body:NumberOfPackages>7</body:NumberOfPackages>
+            |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+            |                <body:SealInformation language="en">Cork</body:SealInformation>
+            |              </body:Package>
             |						</body:BodyEadEsad>
             |					</body:EADESADContainer>
             |				</body:Body>

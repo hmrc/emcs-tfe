@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple7Semigroupal
+import cats.implicits.catsSyntaxTuple8Semigroupal
+import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OWrites}
 
@@ -26,7 +27,8 @@ case class MovementItem(itemUniqueReference: Int,
                         quantity: BigDecimal,
                         grossMass: BigDecimal,
                         netMass: BigDecimal,
-                        alcoholicStrength: Option[BigDecimal])
+                        alcoholicStrength: Option[BigDecimal],
+                        packaging: Seq[Packaging])
 object MovementItem {
 
   implicit val xmlReader: XmlReader[MovementItem] = (
@@ -37,6 +39,7 @@ object MovementItem {
     (__ \ "GrossMass").read[String].map(BigDecimal(_)),
     (__ \ "NetMass").read[String].map(BigDecimal(_)),
     (__ \ "AlcoholicStrengthByVolumeInPercentage").read[String].map(BigDecimal(_)).optional,
+    (__ \ "Package").read[Seq[Packaging]](strictReadSeq)
   ).mapN(MovementItem.apply)
 
   implicit val writes: OWrites[MovementItem] = Json.writes

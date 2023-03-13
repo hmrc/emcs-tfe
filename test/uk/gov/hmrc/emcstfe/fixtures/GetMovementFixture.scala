@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.Days
-import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem}
+import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging}
 
 trait GetMovementFixture extends BaseFixtures {
   lazy val getMovementResponseBody: String = """<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
@@ -472,7 +472,13 @@ trait GetMovementFixture extends BaseFixtures {
         quantity = BigDecimal(500),
         grossMass = BigDecimal(900),
         netMass = BigDecimal(375),
-        alcoholicStrength = None
+        alcoholicStrength = None,
+        Seq(
+          Packaging(
+            typeOfPackage = "BO",
+            quantity = 125
+          )
+        )
       ),
       MovementItem(
         itemUniqueReference = 2,
@@ -481,7 +487,17 @@ trait GetMovementFixture extends BaseFixtures {
         quantity = BigDecimal(501),
         grossMass = BigDecimal(901),
         netMass = BigDecimal(475),
-        alcoholicStrength = Some(BigDecimal(12.7))
+        alcoholicStrength = Some(BigDecimal(12.7)),
+        Seq(
+          Packaging(
+            typeOfPackage = "BO",
+            quantity = 125
+          ),
+          Packaging(
+            typeOfPackage = "HG",
+            quantity = 7
+          )
+        )
       )
     ),
     numberOfItems = 2
@@ -500,7 +516,13 @@ trait GetMovementFixture extends BaseFixtures {
         "cnCode" -> "22041011",
         "quantity" -> 500,
         "grossMass" -> 900,
-        "netMass" -> 375
+        "netMass" -> 375,
+        "packaging" -> Json.arr(
+          Json.obj(fields =
+            "typeOfPackage" -> "BO",
+            "quantity" -> 125
+          )
+        )
       ),
       Json.obj(fields =
         "itemUniqueReference" -> 2,
@@ -509,7 +531,17 @@ trait GetMovementFixture extends BaseFixtures {
         "quantity" -> 501,
         "grossMass" -> 901,
         "netMass" -> 475,
-        "alcoholicStrength" -> 12.7
+        "alcoholicStrength" -> 12.7,
+        "packaging" -> Json.arr(
+          Json.obj(fields =
+            "typeOfPackage" -> "BO",
+            "quantity" -> 125
+          ),
+          Json.obj(fields =
+            "typeOfPackage" -> "HG",
+            "quantity" -> 7
+          )
+        )
       )
     ),
     "numberOfItems" -> 2
