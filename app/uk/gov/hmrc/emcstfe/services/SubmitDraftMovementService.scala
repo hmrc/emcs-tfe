@@ -30,10 +30,9 @@ import scala.xml.XML
 @Singleton
 class SubmitDraftMovementService @Inject()(connector: ChrisConnector) extends Logging {
   def submitDraftMovement(submitDraftMovementRequest: SubmitDraftMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, SubmitDraftMovementResponse]] = {
-    val extractedLrn: Either[ErrorResponse, String] = extractLrn(submitDraftMovementRequest.requestBody)
-    extractedLrn match {
-      case Left(value) => Future.successful(Left(value))
-      case Right(lrn) =>
+    extractLrn(submitDraftMovementRequest.requestBody) match {
+      case None => Future.successful(Left(NoLrnError))
+      case Some(lrn) =>
         connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)
           .map(
             connectorResponse => connectorResponse.map(
@@ -44,12 +43,6 @@ class SubmitDraftMovementService @Inject()(connector: ChrisConnector) extends Lo
 
   }
 
-  private def extractLrn(requestBody: String): Either[ErrorResponse, String] = {
-    val lrnO = (XML.loadString(requestBody) \\ "LocalReferenceNumber").headOption.map(_.text)
-
-    lrnO match {
-      case Some(value) => Right(value)
-      case None => Left(NoLrnError)
-    }
-  }
+  private def extractLrn(requestBody: String): Option[String] =
+    (XML.loadString(requestBody) \\ "LocalReferenceNumber").headOption.map(_.text)
 }

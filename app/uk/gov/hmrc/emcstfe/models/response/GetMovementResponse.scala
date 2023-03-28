@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.response
 import cats.implicits.catsSyntaxTuple7Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime
 
 case class GetMovementResponse(
@@ -27,7 +27,7 @@ case class GetMovementResponse(
                                eadStatus: String,
                                consignorName: String,
                                dateOfDispatch: String,
-                               journeyTime: JourneyTime,
+                               journeyTime: String,
                                items: Seq[MovementItem],
                                numberOfItems: Int
                              )
@@ -49,10 +49,10 @@ object GetMovementResponse {
     eadStatus.read[String],
     consignorName.read[String],
     dateOfDispatch.read[String],
-    journeyTime.read[JourneyTime],
+    journeyTime.read[JourneyTime].map(_.toString),
     items.read[Seq[MovementItem]](strictReadSeq),
     numberOfItems.read[Seq[String]](strictReadSeq).map(_.length)
   ).mapN(GetMovementResponse.apply)
 
-  implicit val writes: OWrites[GetMovementResponse] = Json.writes
+  implicit val format: OFormat[GetMovementResponse] = Json.format
 }

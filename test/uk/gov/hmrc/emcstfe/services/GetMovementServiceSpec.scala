@@ -16,18 +16,26 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
+import uk.gov.hmrc.emcstfe.mocks.repository.MockGetMovementRepository
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MongoError, SoapExtractionError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
 
 class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
-  trait Test extends MockChrisConnector {
-    val getMovementRequest: GetMovementRequest = GetMovementRequest(exciseRegistrationNumber = "My ERN", arc = "My ARC")
-    val service: GetMovementService = new GetMovementService(mockConnector)
+  trait Test extends MockChrisConnector with MockGetMovementRepository {
+    lazy val getMovementRequest: GetMovementRequest = GetMovementRequest(exciseRegistrationNumber = testErn, arc = testArc)
+    lazy val service: GetMovementService = new GetMovementService(
+      mockConnector,
+      mockRepo
+    )
+
+    lazy implicit val userRequest: UserRequest[_] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
   }
 
   "getMovement" should {
@@ -36,6 +44,8 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Right(getMovementResponse)))
+
+        MockGetMovementRepository.set().thenReturn(Future.successful(Right(true)))
 
         await(service.getMovement(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -54,6 +64,24 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
           .returns(Future.successful(Left(SoapExtractionError)))
 
         await(service.getMovement(getMovementRequest)) shouldBe Left(SoapExtractionError)
+      }
+      "repository returns a Left" in new Test {
+        MockConnector
+          .postChrisSOAPRequest(getMovementRequest)
+          .returns(Future.successful(Right(getMovementResponse)))
+
+        MockGetMovementRepository.set().thenReturn(Future.successful(Left(MongoError("Some error"))))
+
+        await(service.getMovement(getMovementRequest)) shouldBe Left(MongoError("Some error"))
+      }
+      "repository returns a failed future" in new Test {
+        MockConnector
+          .postChrisSOAPRequest(getMovementRequest)
+          .returns(Future.successful(Right(getMovementResponse)))
+
+        MockGetMovementRepository.set().thenReturn(Future.failed(new Exception("Some error")))
+
+        await(service.getMovement(getMovementRequest)) shouldBe Left(MongoError("Some error"))
       }
     }
   }

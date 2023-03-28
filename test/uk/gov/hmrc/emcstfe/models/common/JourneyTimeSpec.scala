@@ -64,4 +64,14 @@ class JourneyTimeSpec extends UnitSpec {
       }
     }
   }
+
+  "toString" should {
+    "return the correct value for Hours" in {
+      Hours("20").toString shouldBe "20 hours"
+    }
+
+    "return the correct value for Days" in {
+      Days("20").toString shouldBe "20 days"
+    }
+  }
 }

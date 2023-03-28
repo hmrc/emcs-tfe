@@ -17,7 +17,6 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.common.JourneyTime.Days
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging}
 
 trait GetMovementFixture extends BaseFixtures {
@@ -463,7 +462,7 @@ trait GetMovementFixture extends BaseFixtures {
     eadStatus = "Accepted",
     consignorName = "Current 801 Consignor",
     dateOfDispatch = "2008-11-20",
-    journeyTime = Days("20"),
+    journeyTime = "20 days",
     items = Seq(
       MovementItem(
         itemUniqueReference = 1,

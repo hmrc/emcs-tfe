@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.utils
+package uk.gov.hmrc.emcstfe
 
-import java.time.Instant
-import javax.inject.Inject
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 
-trait TimeMachine {
-  def instant(): Instant
-}
-
-class TimeMachineImpl @Inject()() extends TimeMachine {
-  override def instant(): Instant = Instant.now()
+package object services {
+  private[services] def recovery[A]: PartialFunction[Throwable, Either[ErrorResponse, A]] = {
+    case e: Throwable => Left(MongoError(e.getMessage))
+  }
 }
