@@ -108,28 +108,4 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
       }
     }
   }
-
-  ".handleParseResult" must {
-
-    "return Right(model)" when {
-
-      "XML parsing is successful" in {
-
-        TestParser.handleParseResult(ParseSuccess("Success")) shouldBe Right("Success")
-      }
-    }
-
-    "return Left(XmlParseError)" when {
-
-      "XML parsing fails" in {
-        val error = EmptyError(__ \ "tagName")
-        TestParser.handleParseResult(ParseFailure(error)) shouldBe Left(XmlParseError(Seq(error)))
-      }
-
-      "XML parsing partially fails" in {
-        val error = EmptyError(__ \ "tagName")
-        TestParser.handleParseResult(PartialParseSuccess("PartialData", Seq(error))) shouldBe Left(XmlParseError(Seq(error)))
-      }
-    }
-  }
 }

@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-case class GetMovementListRequest(exciseRegistrationNumber: String,
-                                  searchOptions: GetMovementListSearchOptions) extends ChrisRequest {
+case class GetMovementIfChangedRequest(exciseRegistrationNumber: String, arc: String) extends ChrisRequest {
   override def requestBody: String =
     s"""<?xml version='1.0' encoding='UTF-8'?>
       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -35,11 +34,7 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
       |      <OperationRequest>
       |        <Parameters>
       |          <Parameter Name="ExciseRegistrationNumber">$exciseRegistrationNumber</Parameter>
-      |          <Parameter Name="TraderRole">${searchOptions.traderRole}</Parameter>
-      |          <Parameter Name="SortField">${searchOptions.sortField}</Parameter>
-      |          <Parameter Name="SortOrder">${searchOptions.sortOrder}</Parameter>
-      |          <Parameter Name="StartPosition">${searchOptions.startPosition}</Parameter>
-      |          <Parameter Name="MaxNoToReturn">${searchOptions.maxRows}</Parameter>
+      |          <Parameter Name="ARC">$arc</Parameter>
       |        </Parameters>
       |        <ReturnData>
       |          <Data Name="schema" />
@@ -49,7 +44,7 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
       |  </soapenv:Body>
       |</soapenv:Envelope>""".stripMargin
 
-  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementList"
+  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementIfChanged"
 
-  override def shouldExtractFromSoap: Boolean = true
+  override def shouldExtractFromSoap: Boolean = false
 }

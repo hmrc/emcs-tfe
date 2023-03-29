@@ -25,16 +25,29 @@ import scala.xml.{Elem, Node, NodeSeq, XML}
 
 @Singleton
 class SoapUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
-  def extractFromSoap(xml: Elem): Either[ErrorResponse, NodeSeq] = Try {
-    val cdata = (xml \\ "OperationResponse" \\ "Results" \\ "Result").text
-    XML.loadString(cdata)
-  } match {
-    case Failure(exception) =>
-      logger.warn("[extractFromSoap] Error extracting response body from SOAP wrapper", exception)
-      (xml \\ "Errors" \\ "Error").foreach(error => logger.warn(error.text))
-      Left(SoapExtractionError)
-    case Success(value) => Right(value)
+
+  def extractFromSoap(xmlString: String, nodeToExtractFrom: String): Either[ErrorResponse, NodeSeq] = {
+    Try {
+      val xml: Elem = XML.loadString(xmlString)
+      val cdata = (xml \\ nodeToExtractFrom).text
+      XML.loadString(cdata)
+    } match {
+      case Failure(exception) =>
+        logger.warn("[extractFromSoap] Error extracting response body from SOAP wrapper", exception)
+        Left(SoapExtractionError)
+      case Success(value) => Right(value)
+    }
   }
+  def extractFromSoap(xml: Elem): Either[ErrorResponse, NodeSeq] = Try {
+      val cdata = (xml \\ "OperationResponse" \\ "Results" \\ "Result").text
+      XML.loadString(cdata)
+    } match {
+      case Failure(exception) =>
+        logger.warn("[extractFromSoap] Error extracting response body from SOAP wrapper", exception)
+        (xml \\ "Errors" \\ "Error").foreach(error => logger.warn(error.text))
+        Left(SoapExtractionError)
+      case Success(value) => Right(value)
+    }
 
   private def addMarkToXml(xml: NodeSeq, mark: String): Either[ErrorResponse, NodeSeq] = {
 

@@ -19,7 +19,8 @@ package uk.gov.hmrc.emcstfe.connectors.httpParsers
 import com.lucidchart.open.xtract._
 import play.api.http.Status.OK
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
 import uk.gov.hmrc.emcstfe.utils.{Logging, SoapUtils}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
@@ -49,16 +50,6 @@ class ChrisXMLHttpParser @Inject()(soapUtils: SoapUtils) extends Logging {
         logger.warn(s"[rawXMLHttpReads] Unexpected status from chris: $status")
         Left(UnexpectedDownstreamResponseError)
     }
-  }
-
-  private[httpParsers] def handleParseResult[A]: ParseResult[A] => Either[ErrorResponse, A] = {
-    case ParseSuccess(model) => Right(model)
-    case ParseFailure(errors) =>
-      logger.warn(s"[handleParseResult] XML Response from ChRIS could not be parsed to model. Errors: \n\n - ${errors.mkString("\n - ")}")
-      Left(XmlParseError(errors))
-    case PartialParseSuccess(_, errors) =>
-      logger.warn(s"[handleParseResult] PartialParseSuccess - XML Response from ChRIS could not be fully parsed to model. Errors: \n\n - ${errors.mkString("\n - ")}")
-      Left(XmlParseError(errors))
   }
 
 }

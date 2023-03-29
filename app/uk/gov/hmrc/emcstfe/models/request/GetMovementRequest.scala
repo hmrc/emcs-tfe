@@ -45,4 +45,6 @@ case class GetMovementRequest(exciseRegistrationNumber: String, arc: String) ext
       |</soapenv:Envelope>""".stripMargin
 
   override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement"
+
+  override def shouldExtractFromSoap: Boolean = true
 }

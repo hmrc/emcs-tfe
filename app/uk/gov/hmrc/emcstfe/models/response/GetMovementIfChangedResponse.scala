@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request
+package uk.gov.hmrc.emcstfe.models.response
 
-case class SubmitDraftMovementRequest(exciseRegistrationNumber: String = "", arc: String = "", requestBody: String) extends ChrisRequest {
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
+import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 
-  override def shouldExtractFromSoap: Boolean = false
+case class GetMovementIfChangedResponse(result: String)
+
+object GetMovementIfChangedResponse {
+
+  private val operationResponse: XPath = __ \\ "OperationResponse"
+  private[response] val results: XPath = operationResponse \\ "Results"
+
+  implicit val xmlReader: XmlReader[GetMovementIfChangedResponse] = results.read[String].map(GetMovementIfChangedResponse(_))
 }
