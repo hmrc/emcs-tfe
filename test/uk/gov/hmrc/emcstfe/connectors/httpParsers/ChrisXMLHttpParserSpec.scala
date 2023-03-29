@@ -40,7 +40,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
         "it contains valid XML" in {
 
-          MockSoapUtils.extractFromSoap()
+          MockSoapUtils.extractFromSoap(ElemType())
             .returns(Right(XML.loadString(getMovementResponseBody)))
 
           val response = HttpResponse(OK, body = getMovementSoapWrapper, headers = Map.empty)
@@ -66,7 +66,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
         "extractFromSoap returns a Left" in {
 
-          MockSoapUtils.extractFromSoap()
+          MockSoapUtils.extractFromSoap(ElemType())
             .returns(Left(SoapExtractionError))
 
           val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
@@ -78,7 +78,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
         "extractFromSoap returns a Right but the result can't be parsed to the Model expected" in {
 
-          MockSoapUtils.extractFromSoap()
+          MockSoapUtils.extractFromSoap(ElemType())
             .returns(Right(XML.loadString(invalidXmlBody)))
 
           val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)

@@ -24,10 +24,12 @@ import uk.gov.hmrc.emcstfe.mocks.utils.MockSoapUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MongoError, SoapExtractionError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MongoError, SoapExtractionError, UnexpectedDownstreamResponseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.GetMovementIfChangedResponse
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
+import scala.xml.XML
 
 class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
   trait Test extends MockChrisConnector with MockGetMovementRepository with MockSoapUtils {
@@ -61,31 +63,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
 
         MockConnector
           .postChrisSOAPRequest(getMovementIfChangedRequest)
-          .returns(Future.successful(Right(
-            s"""<tns:Envelope
-               |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
-               |	<tns:Body>
-               |		<con:Control
-               |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
-               |			<con:MetaData>
-               |				<con:MessageId>String</con:MessageId>
-               |				<con:Source>String</con:Source>
-               |				<con:Identity>String</con:Identity>
-               |				<con:Partner>String</con:Partner>
-               |				<con:CorrelationId>String</con:CorrelationId>
-               |				<con:BusinessKey>String</con:BusinessKey>
-               |				<con:MessageDescriptor>String</con:MessageDescriptor>
-               |				<con:QualityOfService>String</con:QualityOfService>
-               |				<con:Destination>String</con:Destination>
-               |				<con:Priority>0</con:Priority>
-               |			</con:MetaData>
-               |			<con:OperationResponse>
-               |				<con:Results/>
-               |			</con:OperationResponse>
-               |		</con:Control>
-               |	</tns:Body>
-               |</tns:Envelope>""".stripMargin)))
+          .returns(Future.successful(Right(GetMovementIfChangedResponse(""))))
 
         await(service.getMovement(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -95,16 +73,15 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
 
         MockConnector
           .postChrisSOAPRequest(getMovementIfChangedRequest)
-          .returns(Future.successful(Right(getMovementSoapWrapper)))
+          .returns(Future.successful(Right(GetMovementIfChangedResponse(
+            s"""
+              |<con:Result Name="">
+              |		<![CDATA[$getMovementResponseBody]]>
+              |</con:Result>
+              |""".stripMargin
+          ))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(Right(true)))
-
-        await(service.getMovement(getMovementRequest)) shouldBe Right(getMovementResponse)
-      }
-      "connector call is successful and XML is the correct format" in new Test {
-        MockConnector
-          .postChrisSOAPRequest(getMovementRequest)
-          .returns(Future.successful(Right(getMovementResponse)))
+        MockSoapUtils.extractFromSoap(StringType()).returns(Right(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().thenReturn(Future.successful(Right(true)))
 
@@ -112,21 +89,26 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
       }
     }
     "return a Left" when {
-      "connector call is unsuccessful" in new Test {
+      "GetMovement call is unsuccessful" in new Test {
+        MockGetMovementRepository.get(testErn, testArc).thenReturn(Future.successful(None))
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Left(XmlValidationError)))
 
         await(service.getMovement(getMovementRequest)) shouldBe Left(XmlValidationError)
       }
-      "connector call response cannot be extracted" in new Test {
+      "GetMovement call response cannot be extracted" in new Test {
+        MockGetMovementRepository.get(testErn, testArc).thenReturn(Future.successful(None))
+
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Left(SoapExtractionError)))
 
         await(service.getMovement(getMovementRequest)) shouldBe Left(SoapExtractionError)
       }
-      "repository returns a Left" in new Test {
+      "repository.set returns a Left" in new Test {
+        MockGetMovementRepository.get(testErn, testArc).thenReturn(Future.successful(None))
+
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Right(getMovementResponse)))
@@ -135,7 +117,9 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
 
         await(service.getMovement(getMovementRequest)) shouldBe Left(MongoError("Some error"))
       }
-      "repository returns a failed future" in new Test {
+      "repository.set returns a failed future" in new Test {
+        MockGetMovementRepository.get(testErn, testArc).thenReturn(Future.successful(None))
+
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Right(getMovementResponse)))
@@ -143,6 +127,74 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
         MockGetMovementRepository.set().thenReturn(Future.failed(new Exception("Some error")))
 
         await(service.getMovement(getMovementRequest)) shouldBe Left(MongoError("Some error"))
+      }
+    }
+  }
+
+  "storeAndReturn" should {
+    "return a Right" when {
+      "repository returns a success" in new Test {
+        MockGetMovementRepository.set().thenReturn(Future.successful(Right(true)))
+
+        await(service.storeAndReturn(Right(getMovementResponse))(getMovementRequest)) shouldBe Right(getMovementResponse)
+      }
+    }
+    "return a Left" when {
+      "repository returns a Left" in new Test {
+        MockGetMovementRepository.set().thenReturn(Future.successful(Left(MongoError("Some error"))))
+
+        await(service.storeAndReturn(Right(getMovementResponse))(getMovementRequest)) shouldBe Left(MongoError("Some error"))
+      }
+      "repository returns a failed future" in new Test {
+        MockGetMovementRepository.set().thenReturn(Future.failed(new Exception("Some error")))
+
+        await(service.storeAndReturn(Right(getMovementResponse))(getMovementRequest)) shouldBe Left(MongoError("Some error"))
+      }
+      "chrisResponse is a Left" in new Test {
+        await(service.storeAndReturn(Left(UnexpectedDownstreamResponseError))(getMovementRequest)) shouldBe Left(UnexpectedDownstreamResponseError)
+      }
+    }
+  }
+
+  "getNewMovement" should {
+    "return a Right" when {
+      "connector call is successful and repository call is successful" in new Test {
+        MockConnector
+          .postChrisSOAPRequest(getMovementRequest)
+          .returns(Future.successful(Right(getMovementResponse)))
+
+        MockGetMovementRepository.set().thenReturn(Future.successful(Right(true)))
+
+        await(service.getNewMovement(getMovementRequest)) shouldBe Right(getMovementResponse)
+      }
+    }
+  }
+
+  "getMovementIfChanged" should {
+    "return a Right" when {
+      "downstream call is successful but response model is empty" in new Test {
+        MockConnector
+          .postChrisSOAPRequest(getMovementIfChangedRequest)
+          .returns(Future.successful(Right(GetMovementIfChangedResponse(""))))
+
+        await(service.getMovementIfChanged(getMovementRequest, GetMovementMongoResponse(testInternalId, testErn, testArc, getMovementResponse))) shouldBe Right(getMovementResponse)
+      }
+      "downstream call is successful and response model is not empty" in new Test {
+        MockConnector
+          .postChrisSOAPRequest(getMovementIfChangedRequest)
+          .returns(Future.successful(Right(GetMovementIfChangedResponse(
+            s"""
+               |<con:Result Name="">
+               |		<![CDATA[$getMovementResponseBody]]>
+               |</con:Result>
+               |""".stripMargin
+          ))))
+
+        MockSoapUtils.extractFromSoap(StringType()).returns(Right(XML.loadString(getMovementResponseBody)))
+
+        MockGetMovementRepository.set().thenReturn(Future.successful(Right(true)))
+
+        await(service.getMovementIfChanged(getMovementRequest, GetMovementMongoResponse(testInternalId, testErn, testArc, getMovementResponse))) shouldBe Right(getMovementResponse)
       }
     }
   }

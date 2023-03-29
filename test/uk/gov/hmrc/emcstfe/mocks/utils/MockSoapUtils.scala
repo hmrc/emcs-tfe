@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.mocks.utils
 
-import org.scalamock.handlers.CallHandler1
+import org.scalamock.handlers.{CallHandler1, CallHandler2}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.utils.SoapUtils
@@ -26,10 +26,18 @@ import scala.xml.{Elem, NodeSeq}
 trait MockSoapUtils extends MockFactory {
   lazy val mockSoapUtils: SoapUtils = mock[SoapUtils]
 
+  sealed trait ExtractFromSoapType
+  case class ElemType() extends ExtractFromSoapType
+  case class StringType() extends ExtractFromSoapType
+
   object MockSoapUtils {
-    def extractFromSoap(): CallHandler1[Elem, Either[ErrorResponse, NodeSeq]] =
+    def extractFromSoap(t: ElemType): CallHandler1[Elem, Either[ErrorResponse, NodeSeq]] =
       (mockSoapUtils.extractFromSoap(_: Elem))
         .expects(*)
+
+    def extractFromSoap(t: StringType): CallHandler2[String, String, Either[ErrorResponse, NodeSeq]] =
+      (mockSoapUtils.extractFromSoap(_: String, _: String))
+        .expects(*, *)
 
     def prepareXmlForSubmission(): CallHandler1[Elem, Either[ErrorResponse, String]] =
       (mockSoapUtils.prepareXmlForSubmission(_: Elem))

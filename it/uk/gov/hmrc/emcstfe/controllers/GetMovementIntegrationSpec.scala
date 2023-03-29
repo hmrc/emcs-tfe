@@ -17,11 +17,13 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.http.Status
+import com.lucidchart.open.xtract.EmptyError
+import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
+import uk.gov.hmrc.emcstfe.models.response.GetMovementIfChangedResponse
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
@@ -33,7 +35,13 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
     def setupStubs(): StubMapping
 
     def uri: String = s"/movement/$testErn/$testArc"
+
     def downstreamUri: String = s"/ChRISOSB/EMCS/EMCSApplicationService/2"
+
+    def generateHeaders(action: String) = Map(HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action"""")
+
+    def getMovementIfChangedHeaders: Map[String, String] = generateHeaders("http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementIfChanged")
+    def getMovementHeaders: Map[String, String] = generateHeaders("http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement")
 
     def request(): WSRequest = {
       setupStubs()
@@ -68,12 +76,26 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
           response.status shouldBe Status.FORBIDDEN
         }
       }
+    }
+
+    "user is authorized" must {
 
       "return a success" when {
-        "all downstream calls are successful" in new Test {
+        "no movement exists in mongo so GetMovement is called" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(getMovementSoapWrapper))
+            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, XML.loadString(getMovementSoapWrapper))
+          }
+
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.OK
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe getMovementJson
+        }
+        "a movement exists in mongo so GetMovementIfChanged is called" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementIfChangedHeaders, Status.OK, XML.loadString(getMovementSoapWrapper))
           }
 
           val response: WSResponse = await(request().get())
@@ -86,20 +108,20 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
         "downstream call returns unexpected XML" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, <Message>Success!</Message>)
+            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, <Message>Success!</Message>)
           }
 
           val response: WSResponse = await(request().get())
           response.status shouldBe Status.INTERNAL_SERVER_ERROR
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(SoapExtractionError)
+          response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(GetMovementIfChangedResponse.results))))
         }
         "downstream call returns something other than XML" in new Test {
           val referenceDataResponseBody: JsValue = Json.obj("message" -> "Success!")
 
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, referenceDataResponseBody)
+            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, referenceDataResponseBody)
           }
 
           val response: WSResponse = await(request().get())
@@ -118,7 +140,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
 
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
+            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
           }
 
           val response: WSResponse = await(request().get())

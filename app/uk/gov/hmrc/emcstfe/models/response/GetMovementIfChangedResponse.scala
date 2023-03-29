@@ -23,7 +23,7 @@ case class GetMovementIfChangedResponse(result: String)
 object GetMovementIfChangedResponse {
 
   private val operationResponse: XPath = __ \\ "OperationResponse"
-  private[response] val results: XPath = operationResponse \\ "Results"
+   val results: XPath = operationResponse \\ "Results"
 
   implicit val xmlReader: XmlReader[GetMovementIfChangedResponse] = results.read[String].map(GetMovementIfChangedResponse(_))
 }

@@ -40,8 +40,12 @@ class GetMovementService @Inject()(
                                   ) extends Logging {
   def getMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(request.internalId, request.ern, getMovementRequest.arc).flatMap {
-      case Some(value) => getMovementIfChanged(getMovementRequest, value)
-      case None => getNewMovement(getMovementRequest)
+      case Some(value) =>
+        logger.info("[getMovement] Matching movement found, calling GetMovementIfChanged")
+        getMovementIfChanged(getMovementRequest, value)
+      case None =>
+        logger.info("[getMovement] No matching movement found, calling GetMovement")
+        getNewMovement(getMovementRequest)
     }
   }
 
@@ -53,12 +57,13 @@ class GetMovementService @Inject()(
           getMovementIfChangedResponse =>
             if (getMovementIfChangedResponse.result.trim.isEmpty) {
               // if Results is empty, return `value`
-              val res: Future[Either[ErrorResponse, GetMovementResponse]] = Future.successful(Right(repositoryResult.data))
-              res
+              logger.info("[getMovementIfChanged] No change to movement, returning movement from mongo")
+              Future.successful(Right(repositoryResult.data))
             } else {
               // if Results is not empty:
               //  - store new results
               //  - return new results
+              logger.info("[getMovementIfChanged] Change to movement found, updating and returning new movement")
               val newResult: Either[ErrorResponse, GetMovementResponse] = soapUtils.extractFromSoap(getMovementIfChangedResponse.result, "Result").flatMap {
                 xml => handleParseResult(XmlReader.of[GetMovementResponse].read(xml))
               }
@@ -79,15 +84,16 @@ class GetMovementService @Inject()(
   }
 
   private[services] def storeAndReturn(chrisResponse: Either[ErrorResponse, GetMovementResponse])(getMovementRequest: GetMovementRequest)(implicit ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
-    val getMovementMongoResponse: Either[ErrorResponse, GetMovementMongoResponse] = chrisResponse.map {
-      GetMovementMongoResponse(request.internalId, request.ern, getMovementRequest.arc, _)
-    }
 
     val responseAfterStoringInMongo: EitherT[Future, ErrorResponse, GetMovementResponse] = {
       for {
-        getMovementMongoResponseRight <- EitherT.fromEither[Future](getMovementMongoResponse)
-        _ <- EitherT(repository.set(getMovementMongoResponseRight).recover(recovery))
         res <- EitherT.fromEither[Future](chrisResponse)
+
+        getMovementMongoResponse = chrisResponse.map(GetMovementMongoResponse(request.internalId, request.ern, getMovementRequest.arc, _))
+
+        getMovementMongoResponseRight <- EitherT.fromEither[Future](getMovementMongoResponse)
+
+        _ <- EitherT(repository.set(getMovementMongoResponseRight).recover(recovery))
       } yield {
         res
       }

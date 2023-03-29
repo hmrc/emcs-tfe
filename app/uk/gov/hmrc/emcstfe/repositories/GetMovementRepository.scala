@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
+import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.utils.TimeMachine
+import uk.gov.hmrc.emcstfe.utils.{Logging, TimeMachine}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -59,7 +60,7 @@ class GetMovementRepository @Inject()(
       )
     ),
     replaceIndexes = true // TODO check if this deleted data on startup or not
-  ) {
+  ) with Logging {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
@@ -106,4 +107,9 @@ class GetMovementRepository @Inject()(
       .deleteOne(by(internalId, ern, arc))
       .toFuture()
       .map(_ => true)
+
+  if(appConfig.clearMovementMongoOnStart()) {
+    logger.info("Clearing movements on app startup")
+    collection.deleteMany(BsonDocument()).toFuture().map(_ => logger.info("Clearing movements succeeded"))
+  }
 }
