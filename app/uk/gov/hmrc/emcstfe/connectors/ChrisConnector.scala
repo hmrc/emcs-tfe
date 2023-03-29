@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
 import uk.gov.hmrc.emcstfe.models.request.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.utils.SoapUtils
+import uk.gov.hmrc.emcstfe.utils.XmlUtils
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.{Inject, Singleton}
@@ -32,7 +32,7 @@ import scala.xml.XML
 class ChrisConnector @Inject()(val http: HttpClient,
                                override val appConfig: AppConfig,
                                chrisHttpParser: ChrisXMLHttpParser,
-                               soapUtils: SoapUtils
+                               soapUtils: XmlUtils
                               ) extends BaseConnector {
 
   def postChrisSOAPRequest[A](request: ChrisRequest)

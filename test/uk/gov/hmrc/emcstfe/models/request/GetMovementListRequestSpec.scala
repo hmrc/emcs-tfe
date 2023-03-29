@@ -47,4 +47,10 @@ class GetMovementListRequestSpec extends UnitSpec {
       request.action shouldBe "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementList"
     }
   }
+
+  "shouldExtractFromSoap" should {
+    "be correct" in {
+      request.shouldExtractFromSoap shouldBe true
+    }
+  }
 }

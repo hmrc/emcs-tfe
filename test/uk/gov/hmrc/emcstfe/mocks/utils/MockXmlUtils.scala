@@ -16,28 +16,24 @@
 
 package uk.gov.hmrc.emcstfe.mocks.utils
 
-import org.scalamock.handlers.{CallHandler1, CallHandler2}
+import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.utils.SoapUtils
+import uk.gov.hmrc.emcstfe.utils.XmlUtils
 
 import scala.xml.{Elem, NodeSeq}
 
-trait MockSoapUtils extends MockFactory {
-  lazy val mockSoapUtils: SoapUtils = mock[SoapUtils]
-
-  sealed trait ExtractFromSoapType
-  case class ElemType() extends ExtractFromSoapType
-  case class StringType() extends ExtractFromSoapType
+trait MockXmlUtils extends MockFactory {
+  lazy val mockSoapUtils: XmlUtils = mock[XmlUtils]
 
   object MockSoapUtils {
-    def extractFromSoap(t: ElemType): CallHandler1[Elem, Either[ErrorResponse, NodeSeq]] =
+    def extractFromSoap(e: Elem): CallHandler1[Elem, Either[ErrorResponse, NodeSeq]] =
       (mockSoapUtils.extractFromSoap(_: Elem))
-        .expects(*)
+        .expects(e)
 
-    def extractFromSoap(t: StringType): CallHandler2[String, String, Either[ErrorResponse, NodeSeq]] =
-      (mockSoapUtils.extractFromSoap(_: String, _: String))
-        .expects(*, *)
+    def readXml(s: String): CallHandler1[String, Either[ErrorResponse, NodeSeq]] =
+      (mockSoapUtils.readXml(_: String))
+        .expects(s)
 
     def prepareXmlForSubmission(): CallHandler1[Elem, Either[ErrorResponse, String]] =
       (mockSoapUtils.prepareXmlForSubmission(_: Elem))

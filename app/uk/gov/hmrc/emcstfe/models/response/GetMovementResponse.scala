@@ -34,7 +34,7 @@ case class GetMovementResponse(
 
 object GetMovementResponse {
 
-  val currentMovement: XPath = __ \ "currentMovement"
+  val currentMovement: XPath = __ \\ "currentMovement"
   val eadStatus: XPath = currentMovement \ "status"
   val EADESADContainer: XPath = currentMovement \ "IE801" \ "Body" \ "EADESADContainer"
   val localReferenceNumber: XPath = EADESADContainer \ "EadEsad" \ "LocalReferenceNumber"

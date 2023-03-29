@@ -30,6 +30,4 @@ class AppConfig @Inject()(servicesConfig :ServicesConfig, configuration: Configu
 
   def reportReceiptUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.reportReceiptUserAnswers.TTL"))
   def getMovementTTL(): Duration = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
-
-  def clearMovementMongoOnStart(): Boolean = configuration.getOptional[Boolean]("mongodb.getMovement.clearMongoOnStart").getOrElse(false)
 }

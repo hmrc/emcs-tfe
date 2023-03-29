@@ -21,7 +21,7 @@ import play.api.http.Status.OK
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
-import uk.gov.hmrc.emcstfe.utils.{Logging, SoapUtils}
+import uk.gov.hmrc.emcstfe.utils.{Logging, XmlUtils}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 import javax.inject.{Inject, Singleton}
@@ -29,7 +29,7 @@ import scala.util.{Failure, Success, Try}
 import scala.xml.XML
 
 @Singleton
-class ChrisXMLHttpParser @Inject()(soapUtils: SoapUtils) extends Logging {
+class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
 
   def rawXMLHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
     logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")

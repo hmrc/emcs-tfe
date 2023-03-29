@@ -17,24 +17,22 @@
 package uk.gov.hmrc.emcstfe.utils
 
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, MinifyXmlError, SoapExtractionError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MarkPlacementError, MinifyXmlError, SoapExtractionError, XmlParseError}
 
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Right, Success, Try}
 import scala.xml.{Elem, Node, NodeSeq, XML}
 
 @Singleton
-class SoapUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
+class XmlUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
 
-  def extractFromSoap(xmlString: String, nodeToExtractFrom: String): Either[ErrorResponse, NodeSeq] = {
+  def readXml(xmlString: String): Either[ErrorResponse, NodeSeq] = {
     Try {
-      val xml: Elem = XML.loadString(xmlString)
-      val cdata = (xml \\ nodeToExtractFrom).text
-      XML.loadString(cdata)
+      XML.loadString(xmlString)
     } match {
       case Failure(exception) =>
-        logger.warn("[extractFromSoap] Error extracting response body from SOAP wrapper", exception)
-        Left(SoapExtractionError)
+        logger.warn("[readXml] Error converting String to NodeSeq", exception)
+        Left(XmlParseError(Seq(GenericParseError(exception.getMessage))))
       case Success(value) => Right(value)
     }
   }

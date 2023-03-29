@@ -27,7 +27,7 @@ import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovem
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementIfChangedResponse, GetMovementResponse}
 import uk.gov.hmrc.emcstfe.repositories.GetMovementRepository
 import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
-import uk.gov.hmrc.emcstfe.utils.{Logging, SoapUtils}
+import uk.gov.hmrc.emcstfe.utils.{Logging, XmlUtils}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class GetMovementService @Inject()(
                                     connector: ChrisConnector,
                                     repository: GetMovementRepository,
-                                    soapUtils: SoapUtils
+                                    soapUtils: XmlUtils
                                   ) extends Logging {
   def getMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(request.internalId, request.ern, getMovementRequest.arc).flatMap {
@@ -64,7 +64,7 @@ class GetMovementService @Inject()(
               //  - store new results
               //  - return new results
               logger.info("[getMovementIfChanged] Change to movement found, updating and returning new movement")
-              val newResult: Either[ErrorResponse, GetMovementResponse] = soapUtils.extractFromSoap(getMovementIfChangedResponse.result, "Result").flatMap {
+              val newResult: Either[ErrorResponse, GetMovementResponse] = soapUtils.readXml(getMovementIfChangedResponse.result).flatMap {
                 xml => handleParseResult(XmlReader.of[GetMovementResponse].read(xml))
               }
 

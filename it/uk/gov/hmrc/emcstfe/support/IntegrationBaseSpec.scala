@@ -35,8 +35,7 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
     "microservice.services.chris.port" -> WireMockHelper.wireMockPort,
     "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort,
-    "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
-    "mongodb.getMovement.clearMongoOnStart" -> true
+    "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes"
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

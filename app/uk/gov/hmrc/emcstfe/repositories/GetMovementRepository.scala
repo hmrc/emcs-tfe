@@ -108,8 +108,11 @@ class GetMovementRepository @Inject()(
       .toFuture()
       .map(_ => true)
 
-  if(appConfig.clearMovementMongoOnStart()) {
-    logger.info("Clearing movements on app startup")
-    collection.deleteMany(BsonDocument()).toFuture().map(_ => logger.info("Clearing movements succeeded"))
+  def removeAll(): Future[Unit] = {
+    logger.info("Clearing all movements")
+    collection
+      .deleteMany(BsonDocument())
+      .toFuture()
+      .map(_ => logger.info("Clearing all movements succeeded"))
   }
 }

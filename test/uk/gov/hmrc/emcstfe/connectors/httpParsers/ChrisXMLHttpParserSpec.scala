@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.connectors.httpParsers
 import com.lucidchart.open.xtract._
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
-import uk.gov.hmrc.emcstfe.mocks.utils.MockSoapUtils
+import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse
@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.HttpResponse
 
 import scala.xml.XML
 
-class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovementFixture {
+class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovementFixture {
 
   object TestParser extends ChrisXMLHttpParser(mockSoapUtils)
 
@@ -40,7 +40,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
         "it contains valid XML" in {
 
-          MockSoapUtils.extractFromSoap(ElemType())
+          MockSoapUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper))
             .returns(Right(XML.loadString(getMovementResponseBody)))
 
           val response = HttpResponse(OK, body = getMovementSoapWrapper, headers = Map.empty)
@@ -66,7 +66,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
         "extractFromSoap returns a Left" in {
 
-          MockSoapUtils.extractFromSoap(ElemType())
+          MockSoapUtils.extractFromSoap(XML.loadString(invalidXmlBody))
             .returns(Left(SoapExtractionError))
 
           val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
@@ -78,7 +78,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockSoapUtils with GetMovemen
 
         "extractFromSoap returns a Right but the result can't be parsed to the Model expected" in {
 
-          MockSoapUtils.extractFromSoap(ElemType())
+          MockSoapUtils.extractFromSoap(XML.loadString(invalidXmlBody))
             .returns(Right(XML.loadString(invalidXmlBody)))
 
           val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)

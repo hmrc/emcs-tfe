@@ -20,8 +20,8 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.XML
 
-class GetMovementRequestSpec extends UnitSpec {
-  val request = GetMovementRequest("My ERN", "My ARC")
+class GetMovementIfChangedRequestSpec extends UnitSpec {
+  val request = GetMovementIfChangedRequest("My ERN", "My ARC")
 
   "requestBody" should {
     "generate the correct request XML" in {
@@ -38,13 +38,13 @@ class GetMovementRequestSpec extends UnitSpec {
 
   "action" should {
     "be correct" in {
-      request.action shouldBe "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement"
+      request.action shouldBe "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementIfChanged"
     }
   }
 
   "shouldExtractFromSoap" should {
     "be correct" in {
-      request.shouldExtractFromSoap shouldBe true
+      request.shouldExtractFromSoap shouldBe false
     }
   }
 }

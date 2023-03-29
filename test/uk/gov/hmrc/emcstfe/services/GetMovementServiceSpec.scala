@@ -20,7 +20,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.mocks.repository.MockGetMovementRepository
-import uk.gov.hmrc.emcstfe.mocks.utils.MockSoapUtils
+import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
@@ -32,7 +32,7 @@ import scala.concurrent.Future
 import scala.xml.XML
 
 class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
-  trait Test extends MockChrisConnector with MockGetMovementRepository with MockSoapUtils {
+  trait Test extends MockChrisConnector with MockGetMovementRepository with MockXmlUtils {
     lazy val getMovementRequest: GetMovementRequest = GetMovementRequest(exciseRegistrationNumber = testErn, arc = testArc)
     lazy val getMovementIfChangedRequest: GetMovementIfChangedRequest = GetMovementIfChangedRequest(exciseRegistrationNumber = testErn, arc = testArc)
 
@@ -71,17 +71,18 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
 
         MockGetMovementRepository.get(testErn, testArc).thenReturn(Future.successful(Some(GetMovementMongoResponse(testInternalId, testErn, testArc, getMovementResponse))))
 
+        private val chrisXmlString =
+          s"""
+             |<con:Result Name="">
+             |		<![CDATA[$getMovementResponseBody]]>
+             |</con:Result>
+             |""".stripMargin
+
         MockConnector
           .postChrisSOAPRequest(getMovementIfChangedRequest)
-          .returns(Future.successful(Right(GetMovementIfChangedResponse(
-            s"""
-              |<con:Result Name="">
-              |		<![CDATA[$getMovementResponseBody]]>
-              |</con:Result>
-              |""".stripMargin
-          ))))
+          .returns(Future.successful(Right(GetMovementIfChangedResponse(chrisXmlString))))
 
-        MockSoapUtils.extractFromSoap(StringType()).returns(Right(XML.loadString(getMovementResponseBody)))
+        MockSoapUtils.readXml(chrisXmlString).returns(Right(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().thenReturn(Future.successful(Right(true)))
 
@@ -180,17 +181,19 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture {
         await(service.getMovementIfChanged(getMovementRequest, GetMovementMongoResponse(testInternalId, testErn, testArc, getMovementResponse))) shouldBe Right(getMovementResponse)
       }
       "downstream call is successful and response model is not empty" in new Test {
+
+        private val chrisXmlString =
+          s"""
+             |<con:Result Name="">
+             |		<![CDATA[$getMovementResponseBody]]>
+             |</con:Result>
+             |""".stripMargin
+
         MockConnector
           .postChrisSOAPRequest(getMovementIfChangedRequest)
-          .returns(Future.successful(Right(GetMovementIfChangedResponse(
-            s"""
-               |<con:Result Name="">
-               |		<![CDATA[$getMovementResponseBody]]>
-               |</con:Result>
-               |""".stripMargin
-          ))))
+          .returns(Future.successful(Right(GetMovementIfChangedResponse(chrisXmlString))))
 
-        MockSoapUtils.extractFromSoap(StringType()).returns(Right(XML.loadString(getMovementResponseBody)))
+        MockSoapUtils.readXml(chrisXmlString).returns(Right(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().thenReturn(Future.successful(Right(true)))
 
