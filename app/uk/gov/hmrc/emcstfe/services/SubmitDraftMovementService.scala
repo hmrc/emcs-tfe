@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.NoLrnError
@@ -24,6 +23,7 @@ import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, SubmitDraftMovementRe
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.XML
 

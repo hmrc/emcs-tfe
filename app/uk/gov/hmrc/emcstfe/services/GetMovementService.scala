@@ -18,7 +18,6 @@ package uk.gov.hmrc.emcstfe.services
 
 import cats.data.EitherT
 import cats.implicits._
-import com.google.inject.{Inject, Singleton}
 import com.lucidchart.open.xtract.XmlReader
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
@@ -30,6 +29,7 @@ import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
 import uk.gov.hmrc.emcstfe.utils.{Logging, XmlUtils}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

@@ -12,14 +12,14 @@ object AppDependencies {
   val scalatestVersion  =  "3.2.15"
   val flexmarkVersion   =  "0.62.2"
 
-  val compile = Seq(
+  val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"           %% s"bootstrap-backend$playSuffix"  % boostrapVersion,
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo$playSuffix"         % hmrcMongoVersion,
     "com.lucidchart"        %%  "xtract"                        % xtractVersion,
     "org.typelevel"         %%  "cats-core"                     % catsCoreVersion
   )
 
-  val test = Seq(
+  val test: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"           %% s"bootstrap-test$playSuffix"     % boostrapVersion         % "test, it",
     "org.scalamock"         %%  "scalamock"                     % scalamockVersion        % "test, it",
     "com.lucidchart"        %%  "xtract-testing"                % xtractVersion           % "test, it",
@@ -27,5 +27,9 @@ object AppDependencies {
     "org.scalatestplus"     %%  "mockito-4-6"                   % s"$scalatestVersion.0"  % "test",
     "com.vladsch.flexmark"  %   "flexmark-all"                  % flexmarkVersion         % "test",
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-test$playSuffix"    % hmrcMongoVersion        % "it"
+  )
+
+  val overrides: Seq[ModuleID] = Seq(
+    "com.google.inject" %   "guice" % "5.1.0"
   )
 }
