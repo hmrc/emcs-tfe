@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.xml.XML
+import scala.xml.{NodeSeq, XML}
 
 @Singleton
 class ChrisConnector @Inject()(val http: HttpClient,
@@ -35,8 +35,14 @@ class ChrisConnector @Inject()(val http: HttpClient,
                                soapUtils: XmlUtils
                               ) extends BaseConnector {
 
-  def postChrisSOAPRequest[A](request: ChrisRequest)
+  def postChrisSOAPRequestAndExtractToModel[A](request: ChrisRequest)
                              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
+    val url: String = s"${appConfig.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
+    postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(shouldExtractFromSoap = request.shouldExtractFromSoap))
+  }
+
+  def postChrisSOAPRequest(request: ChrisRequest)
+                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
     val url: String = s"${appConfig.chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
     postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(shouldExtractFromSoap = request.shouldExtractFromSoap))
   }
@@ -51,7 +57,7 @@ class ChrisConnector @Inject()(val http: HttpClient,
         logger.debug(s"[submitDraftMovementChrisSOAPRequest] Sending to URL: $url")
         logger.debug(s"[submitDraftMovementChrisSOAPRequest] Sending body: $preparedXml")
 
-        postString(http, url, preparedXml, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(shouldExtractFromSoap = false))
+        postString(http, url, preparedXml, request.action)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(shouldExtractFromSoap = false))
     }
   }
 }

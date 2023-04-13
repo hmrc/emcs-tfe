@@ -26,12 +26,12 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
-import scala.xml.XML
+import scala.xml.{NodeSeq, XML}
 
 @Singleton
 class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
 
-  def rawXMLHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
+  def modelFromXmlHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
     logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
     response.status match {
       case OK =>
@@ -45,6 +45,25 @@ class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
                 handleParseResult(XmlReader.of[A].read(xmlBody))
               }
             } else handleParseResult(XmlReader.of[A].read(xml))
+        }
+      case status =>
+        logger.warn(s"[rawXMLHttpReads] Unexpected status from chris: $status")
+        Left(UnexpectedDownstreamResponseError)
+    }
+  }
+
+  def rawXMLHttpReads(shouldExtractFromSoap: Boolean): HttpReads[Either[ErrorResponse, NodeSeq]] = (_: String, _: String, response: HttpResponse) => {
+    logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
+    response.status match {
+      case OK =>
+        Try(XML.loadString(response.body)) match {
+          case Failure(exception) =>
+            logger.warn("[rawXMLHttpReads] Unable to read response body as XML", exception)
+            Left(XmlValidationError)
+          case Success(xml) =>
+            if(shouldExtractFromSoap) {
+              soapUtils.extractFromSoap(xml)
+            } else Right(xml.map(a => a))
         }
       case status =>
         logger.warn(s"[rawXMLHttpReads] Unexpected status from chris: $status")

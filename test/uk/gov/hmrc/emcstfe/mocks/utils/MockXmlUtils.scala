@@ -24,19 +24,23 @@ import uk.gov.hmrc.emcstfe.utils.XmlUtils
 import scala.xml.{Elem, NodeSeq}
 
 trait MockXmlUtils extends MockFactory {
-  lazy val mockSoapUtils: XmlUtils = mock[XmlUtils]
+  lazy val mockXmlUtils: XmlUtils = mock[XmlUtils]
 
-  object MockSoapUtils {
+  object MockXmlUtils {
     def extractFromSoap(e: Elem): CallHandler1[Elem, Either[ErrorResponse, NodeSeq]] =
-      (mockSoapUtils.extractFromSoap(_: Elem))
+      (mockXmlUtils.extractFromSoap(_: Elem))
         .expects(e)
 
-    def readXml(s: String): CallHandler1[String, Either[ErrorResponse, NodeSeq]] =
-      (mockSoapUtils.readXml(_: String))
-        .expects(s)
+    def readXml(): CallHandler1[String, Either[ErrorResponse, NodeSeq]] =
+      (mockXmlUtils.readXml(_: String))
+        .expects(*)
 
     def prepareXmlForSubmission(): CallHandler1[Elem, Either[ErrorResponse, String]] =
-      (mockSoapUtils.prepareXmlForSubmission(_: Elem))
+      (mockXmlUtils.prepareXmlForSubmission(_: Elem))
+        .expects(*)
+
+    def trimWhitespaceFromXml(): CallHandler1[Elem, Either[ErrorResponse, NodeSeq]] =
+      (mockXmlUtils.trimWhitespaceFromXml(_: Elem))
         .expects(*)
   }
 }

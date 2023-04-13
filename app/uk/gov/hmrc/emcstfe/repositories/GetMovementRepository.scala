@@ -59,7 +59,7 @@ class GetMovementRepository @Inject()(
         IndexOptions().name("uniqueIdx")
       )
     ),
-    replaceIndexes = true // TODO check if this deleted data on startup or not
+    replaceIndexes = true
   ) with Logging {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat

@@ -30,9 +30,9 @@ import scala.xml.XML
 
 class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovementFixture {
 
-  object TestParser extends ChrisXMLHttpParser(mockSoapUtils)
+  object TestParser extends ChrisXMLHttpParser(mockXmlUtils)
 
-  ".rawXMLHttpReads" when {
+  ".modelFromXmlHttpReads" when {
 
     s"an OK ($OK) response is received" must {
 
@@ -40,12 +40,12 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovement
 
         "it contains valid XML" in {
 
-          MockSoapUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper))
+          MockXmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper))
             .returns(Right(XML.loadString(getMovementResponseBody)))
 
           val response = HttpResponse(OK, body = getMovementSoapWrapper, headers = Map.empty)
 
-          val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+          val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Right(getMovementResponse)
         }
@@ -59,31 +59,31 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovement
 
           val response = HttpResponse(OK, body = notXmlBody, headers = Map.empty)
 
-          val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+          val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Left(XmlValidationError)
         }
 
         "extractFromSoap returns a Left" in {
 
-          MockSoapUtils.extractFromSoap(XML.loadString(invalidXmlBody))
+          MockXmlUtils.extractFromSoap(XML.loadString(invalidXmlBody))
             .returns(Left(SoapExtractionError))
 
           val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
 
-          val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+          val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Left(SoapExtractionError)
         }
 
         "extractFromSoap returns a Right but the result can't be parsed to the Model expected" in {
 
-          MockSoapUtils.extractFromSoap(XML.loadString(invalidXmlBody))
+          MockXmlUtils.extractFromSoap(XML.loadString(invalidXmlBody))
             .returns(Right(XML.loadString(invalidXmlBody)))
 
           val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
 
-          val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+          val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Left(XmlParseError(Seq(
             EmptyError(GetMovementResponse.localReferenceNumber),
@@ -102,7 +102,66 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovement
 
         val response = HttpResponse(INTERNAL_SERVER_ERROR, body = "Error Msg", headers = Map.empty)
 
-        val result = TestParser.rawXMLHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+        val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+        result shouldBe Left(UnexpectedDownstreamResponseError)
+      }
+    }
+  }
+
+  ".rawXMLHttpReads" when {
+
+    s"an OK ($OK) response is received" must {
+
+      "return a Right" when {
+
+        "it contains valid XML" in {
+
+          MockXmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper))
+            .returns(Right(XML.loadString(getMovementResponseBody)))
+
+          val response = HttpResponse(OK, body = getMovementSoapWrapper, headers = Map.empty)
+
+          val result = TestParser.rawXMLHttpReads(shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+          result shouldBe Right(XML.loadString(getMovementResponseBody))
+        }
+      }
+
+      "return a Left" when {
+        val notXmlBody = "notValidXML"
+        val invalidXmlBody = "<Message></Message>"
+
+        "body is not XML" in {
+
+          val response = HttpResponse(OK, body = notXmlBody, headers = Map.empty)
+
+          val result = TestParser.rawXMLHttpReads(shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+          result shouldBe Left(XmlValidationError)
+        }
+
+        "extractFromSoap returns a Left" in {
+
+          MockXmlUtils.extractFromSoap(XML.loadString(invalidXmlBody))
+            .returns(Left(SoapExtractionError))
+
+          val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
+
+          val result = TestParser.rawXMLHttpReads(shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+          result shouldBe Left(SoapExtractionError)
+        }
+      }
+    }
+
+    s"Any other Http status is received. E.g. INTERNAL_SERVER_ERROR ($INTERNAL_SERVER_ERROR)" must {
+
+      "return Left(UnexpectedDownstreamResponseError)" in {
+
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, body = "Error Msg", headers = Map.empty)
+
+        val result = TestParser.rawXMLHttpReads(shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
         result shouldBe Left(UnexpectedDownstreamResponseError)
       }

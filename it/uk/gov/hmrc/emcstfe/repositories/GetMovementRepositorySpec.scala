@@ -20,6 +20,7 @@ import org.mongodb.scala.model.Filters
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import play.api.libs.json.JsString
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
@@ -42,7 +43,7 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = GetMovementMongoResponse(testInternalId, testErn, testArc, getMovementResponse, Instant.ofEpochSecond(1))
+  private val userAnswers = GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[AppConfig]
   (() => mockAppConfig.getMovementTTL(): Duration)

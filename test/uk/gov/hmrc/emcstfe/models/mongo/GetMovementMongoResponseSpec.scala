@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.mongo
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -32,7 +32,7 @@ class GetMovementMongoResponseSpec extends UnitSpec with GetMovementFixture {
     internalId = testInternalId,
     ern = testErn,
     arc = testArc,
-    data = getMovementResponse,
+    data = JsString(getMovementResponseBody),
     lastUpdated = instant
   )
 
@@ -40,7 +40,7 @@ class GetMovementMongoResponseSpec extends UnitSpec with GetMovementFixture {
     "internalId" -> testInternalId,
     "ern" -> testErn,
     "arc" -> testArc,
-    "data" -> getMovementJson,
+    "data" -> getMovementResponseBody,
     "lastUpdated" -> Json.toJson(instant)(MongoJavatimeFormats.instantWrites)
   )
 

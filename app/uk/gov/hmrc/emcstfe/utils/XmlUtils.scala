@@ -74,7 +74,7 @@ class XmlUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
     if ((xml \\ "Envelope" \ "Header" \ "Info").isEmpty) Left(MarkPlacementError) else Right(recurse(xml))
   }
 
-  private[utils] def trimWhitespaceFromXml(xml: NodeSeq): Either[ErrorResponse, NodeSeq] = Try {
+  def trimWhitespaceFromXml(xml: NodeSeq): Either[ErrorResponse, NodeSeq] = Try {
     scala.xml.Utility.trim(xml.head)
   } match {
     case Failure(exception) =>

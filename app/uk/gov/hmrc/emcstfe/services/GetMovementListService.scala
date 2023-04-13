@@ -30,5 +30,5 @@ class GetMovementListService @Inject()(connector: ChrisConnector) extends Loggin
 
   def getMovementList(getMovementListRequest: GetMovementListRequest)
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementListResponse]] =
-    connector.postChrisSOAPRequest[GetMovementListResponse](getMovementListRequest)
+    connector.postChrisSOAPRequestAndExtractToModel[GetMovementListResponse](getMovementListRequest)
 }
