@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.services
 import cats.data.EitherT
 import cats.implicits._
 import com.lucidchart.open.xtract.XmlReader
-import play.api.libs.json.JsString
+import play.api.libs.json.{JsString, JsValue}
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
@@ -42,11 +42,15 @@ class GetMovementService @Inject()(
                                     repository: GetMovementRepository,
                                     xmlUtils: XmlUtils
                                   ) extends Logging {
-  def getMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(request.internalId, request.ern, getMovementRequest.arc).flatMap {
       case Some(value) =>
         logger.info("[getMovement] Matching movement found, calling GetMovementIfChanged")
-        getMovementIfChanged(getMovementRequest, value)
+        if(forceFetchNew) {
+          getMovementIfChanged(getMovementRequest, value)
+        } else {
+          Future.successful(generateGetMovementResponse(value.data))
+        }
       case None =>
         logger.info("[getMovement] No matching movement found, calling GetMovement")
         getNewMovement(getMovementRequest)
@@ -70,14 +74,7 @@ class GetMovementService @Inject()(
             if (getMovementIfChangedResponse.result.trim.isEmpty) {
               // if Results is empty, return `value`
               logger.info("[getMovementIfChanged] No change to movement, returning movement from mongo")
-              val model: Either[ErrorResponse, GetMovementResponse] = Try {
-                XML.loadString(repositoryResult.data.as[String])
-              } match {
-                case Failure(e) =>
-                  Left(XmlParseError(Seq(GenericParseError(e.getMessage))))
-                case Success(value) =>
-                  handleParseResult(XmlReader.of[GetMovementResponse].read(value))
-              }
+              val model: Either[ErrorResponse, GetMovementResponse] = generateGetMovementResponse(repositoryResult.data)
 
               Future.successful(model)
             } else {
@@ -91,6 +88,15 @@ class GetMovementService @Inject()(
             }
         }.sequence.map(_.flatten)
     }
+  }
+
+  private[services] def generateGetMovementResponse(data: JsValue): Either[ErrorResponse, GetMovementResponse] = Try {
+    XML.loadString(data.as[String])
+  } match {
+    case Failure(e) =>
+      Left(XmlParseError(Seq(GenericParseError(e.getMessage))))
+    case Success(value) =>
+      handleParseResult(XmlReader.of[GetMovementResponse].read(value))
   }
 
   private[services] def getNewMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {

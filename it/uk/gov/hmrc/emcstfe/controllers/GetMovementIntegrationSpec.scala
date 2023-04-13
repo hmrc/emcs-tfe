@@ -50,9 +50,11 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
     def getMovementIfChangedHeaders: Map[String, String] = generateHeaders("http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementIfChanged")
     def getMovementHeaders: Map[String, String] = generateHeaders("http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement")
 
+    def forceFetchNew: Boolean
+
     def request(): WSRequest = {
       setupStubs()
-      buildRequest(uri)
+      buildRequest(uri).withQueryStringParameters("forceFetchNew" -> forceFetchNew.toString)
     }
   }
 
@@ -60,6 +62,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
 
     "user is unauthorised" must {
       "return Forbidden" in new Test {
+        override def forceFetchNew: Boolean = true
 
         override def setupStubs(): StubMapping = {
           AuthStub.unauthorised()
@@ -75,6 +78,8 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
 
       "return forbidden" when {
         "the ERN requested does not match the ERN of the credential" in new Test {
+          override def forceFetchNew: Boolean = true
+
           override def setupStubs(): StubMapping = {
             AuthStub.authorised("WrongERN")
           }
@@ -85,115 +90,212 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
       }
     }
 
-    "user is authorized" must {
+    "user is authorized" when {
 
-      "return a success" when {
-        "no movement exists in mongo so GetMovement is called" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, XML.loadString(getMovementSoapWrapper))
+      "forceFetchNew = true" must {
+        "return a success" when {
+          "no movement exists in mongo so GetMovement is called" in new Test {
+            override def forceFetchNew: Boolean = true
+
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, XML.loadString(getMovementSoapWrapper))
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getMovementJson
           }
+          "a movement exists in mongo so GetMovementIfChanged is called, but the GetMovementIfChanged call returns no differences" in new Test {
+            override def forceFetchNew: Boolean = true
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.OK
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe getMovementJson
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementIfChangedHeaders, Status.OK, XML.loadString(
+                s"""<tns:Envelope
+                   |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
+                   |	<tns:Body>
+                   |		<con:Control
+                   |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+                   |			<con:MetaData>
+                   |				<con:MessageId>String</con:MessageId>
+                   |				<con:Source>String</con:Source>
+                   |				<con:Identity>String</con:Identity>
+                   |				<con:Partner>String</con:Partner>
+                   |				<con:CorrelationId>String</con:CorrelationId>
+                   |				<con:BusinessKey>String</con:BusinessKey>
+                   |				<con:MessageDescriptor>String</con:MessageDescriptor>
+                   |				<con:QualityOfService>String</con:QualityOfService>
+                   |				<con:Destination>String</con:Destination>
+                   |				<con:Priority>0</con:Priority>
+                   |			</con:MetaData>
+                   |			<con:OperationResponse>
+                   |				<con:Results/>
+                   |			</con:OperationResponse>
+                   |		</con:Control>
+                   |	</tns:Body>
+                   |</tns:Envelope>""".stripMargin))
+            }
+
+            await(repository.set(GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody))))
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getMovementJson
+          }
+          "a movement exists in mongo so GetMovementIfChanged is called, and the GetMovementIfChanged call returns differences" in new Test {
+            override def forceFetchNew: Boolean = true
+
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementIfChangedHeaders, Status.OK, XML.loadString(getMovementIfChangedWithChangeSoapWrapper))
+            }
+
+            await(repository.set(GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementIfChangedResponseBody))))
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(getMovementIfChangedResponse)
+          }
         }
-        "a movement exists in mongo so GetMovementIfChanged is called, but the GetMovementIfChanged call returns no differences" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementIfChangedHeaders, Status.OK, XML.loadString(
-              s"""<tns:Envelope
-                 |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
-                 |	<tns:Body>
-                 |		<con:Control
-                 |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
-                 |			<con:MetaData>
-                 |				<con:MessageId>String</con:MessageId>
-                 |				<con:Source>String</con:Source>
-                 |				<con:Identity>String</con:Identity>
-                 |				<con:Partner>String</con:Partner>
-                 |				<con:CorrelationId>String</con:CorrelationId>
-                 |				<con:BusinessKey>String</con:BusinessKey>
-                 |				<con:MessageDescriptor>String</con:MessageDescriptor>
-                 |				<con:QualityOfService>String</con:QualityOfService>
-                 |				<con:Destination>String</con:Destination>
-                 |				<con:Priority>0</con:Priority>
-                 |			</con:MetaData>
-                 |			<con:OperationResponse>
-                 |				<con:Results/>
-                 |			</con:OperationResponse>
-                 |		</con:Control>
-                 |	</tns:Body>
-                 |</tns:Envelope>""".stripMargin))
+        "return an error" when {
+          "downstream call returns unexpected XML" in new Test {
+            override def forceFetchNew: Boolean = true
+
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, <Message>Success!</Message>)
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(SoapExtractionError)
           }
+          "downstream call returns something other than XML" in new Test {
+            override def forceFetchNew: Boolean = true
 
-          await(repository.set(GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody))))
+            val referenceDataResponseBody: JsValue = Json.obj("message" -> "Success!")
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.OK
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe getMovementJson
-        }
-        "a movement exists in mongo so GetMovementIfChanged is called, and the GetMovementIfChanged call returns differences" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, referenceDataResponseBody)
+            }
 
-            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementIfChangedHeaders, Status.OK, XML.loadString(getMovementIfChangedWithChangeSoapWrapper))
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(XmlValidationError)
           }
+          "downstream call returns a non-200 HTTP response" in new Test {
+            override def forceFetchNew: Boolean = true
 
-          await(repository.set(GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementIfChangedResponseBody))))
+            val referenceDataResponseBody: JsValue = Json.parse(
+              s"""
+                 |{
+                 |   "message": "test message"
+                 |}
+                 |""".stripMargin
+            )
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.OK
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe  Json.toJson(getMovementIfChangedResponse)
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
+          }
         }
       }
-      "return an error" when {
-        "downstream call returns unexpected XML" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, <Message>Success!</Message>)
-          }
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(SoapExtractionError)
+      "forceFetchNew = false" must {
+        "return a success" when {
+          "no movement exists in mongo so GetMovement is called" in new Test {
+            override def forceFetchNew: Boolean = false
+
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, XML.loadString(getMovementSoapWrapper))
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getMovementJson
+          }
+          "a movement exists in mongo so the data from Mongo is returned without any calls downstream" in new Test {
+            override def forceFetchNew: Boolean = false
+
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+            }
+
+            await(repository.set(GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody))))
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getMovementJson
+          }
         }
-        "downstream call returns something other than XML" in new Test {
-          val referenceDataResponseBody: JsValue = Json.obj("message" -> "Success!")
+        "return an error" when {
+          "downstream call returns unexpected XML" in new Test {
+            override def forceFetchNew: Boolean = false
 
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, referenceDataResponseBody)
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, <Message>Success!</Message>)
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(SoapExtractionError)
           }
+          "downstream call returns something other than XML" in new Test {
+            override def forceFetchNew: Boolean = false
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(XmlValidationError)
-        }
-        "downstream call returns a non-200 HTTP response" in new Test {
-          val referenceDataResponseBody: JsValue = Json.parse(
-            s"""
-               |{
-               |   "message": "test message"
-               |}
-               |""".stripMargin
-          )
+            val referenceDataResponseBody: JsValue = Json.obj("message" -> "Success!")
 
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, referenceDataResponseBody)
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(XmlValidationError)
           }
+          "downstream call returns a non-200 HTTP response" in new Test {
+            override def forceFetchNew: Boolean = false
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
+            val referenceDataResponseBody: JsValue = Json.parse(
+              s"""
+                 |{
+                 |   "message": "test message"
+                 |}
+                 |""".stripMargin
+            )
+
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
+          }
         }
       }
     }
