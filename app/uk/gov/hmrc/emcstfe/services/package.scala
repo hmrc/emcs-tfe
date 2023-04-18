@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request
+package uk.gov.hmrc.emcstfe
 
-case class SubmitDraftMovementRequest(exciseRegistrationNumber: String = "", arc: String = "", requestBody: String) extends ChrisRequest {
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 
-  override def shouldExtractFromSoap: Boolean = false
+package object services {
+  private[services] def recovery[A]: PartialFunction[Throwable, Either[ErrorResponse, A]] = {
+    case e: Throwable => Left(MongoError(e.getMessage))
+  }
 }

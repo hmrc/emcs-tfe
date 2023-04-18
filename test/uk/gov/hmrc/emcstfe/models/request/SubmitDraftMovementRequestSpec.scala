@@ -26,4 +26,10 @@ class SubmitDraftMovementRequestSpec extends UnitSpec {
       request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
     }
   }
+
+  "shouldExtractFromSoap" should {
+    "be correct" in {
+      request.shouldExtractFromSoap shouldBe false
+    }
+  }
 }

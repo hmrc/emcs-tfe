@@ -17,24 +17,35 @@
 package uk.gov.hmrc.emcstfe.utils
 
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, MinifyXmlError, SoapExtractionError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MarkPlacementError, MinifyXmlError, SoapExtractionError, XmlParseError}
 
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Right, Success, Try}
 import scala.xml.{Elem, Node, NodeSeq, XML}
 
 @Singleton
-class SoapUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
-  def extractFromSoap(xml: Elem): Either[ErrorResponse, NodeSeq] = Try {
-    val cdata = (xml \\ "OperationResponse" \\ "Results" \\ "Result").text
-    XML.loadString(cdata)
-  } match {
-    case Failure(exception) =>
-      logger.warn("[extractFromSoap] Error extracting response body from SOAP wrapper", exception)
-      (xml \\ "Errors" \\ "Error").foreach(error => logger.warn(error.text))
-      Left(SoapExtractionError)
-    case Success(value) => Right(value)
+class XmlUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
+
+  def readXml(xmlString: String): Either[ErrorResponse, NodeSeq] = {
+    Try {
+      XML.loadString(xmlString)
+    } match {
+      case Failure(exception) =>
+        logger.warn("[readXml] Error converting String to NodeSeq", exception)
+        Left(XmlParseError(Seq(GenericParseError(exception.getMessage))))
+      case Success(value) => Right(value)
+    }
   }
+  def extractFromSoap(xml: Elem): Either[ErrorResponse, NodeSeq] = Try {
+      val cdata = (xml \\ "OperationResponse" \\ "Results" \\ "Result").text
+      XML.loadString(cdata)
+    } match {
+      case Failure(exception) =>
+        logger.warn("[extractFromSoap] Error extracting response body from SOAP wrapper", exception)
+        (xml \\ "Errors" \\ "Error").foreach(error => logger.warn(error.text))
+        Left(SoapExtractionError)
+      case Success(value) => Right(value)
+    }
 
   private def addMarkToXml(xml: NodeSeq, mark: String): Either[ErrorResponse, NodeSeq] = {
 
@@ -63,7 +74,7 @@ class SoapUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
     if ((xml \\ "Envelope" \ "Header" \ "Info").isEmpty) Left(MarkPlacementError) else Right(recurse(xml))
   }
 
-  private[utils] def trimWhitespaceFromXml(xml: NodeSeq): Either[ErrorResponse, NodeSeq] = Try {
+  def trimWhitespaceFromXml(xml: NodeSeq): Either[ErrorResponse, NodeSeq] = Try {
     scala.xml.Utility.trim(xml.head)
   } match {
     case Failure(exception) =>

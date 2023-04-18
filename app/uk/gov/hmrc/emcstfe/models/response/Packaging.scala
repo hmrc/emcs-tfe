@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat}
 
 case class Packaging(typeOfPackage: String,
                      quantity: BigDecimal)
@@ -29,5 +29,5 @@ object Packaging {
     (__ \ "NumberOfPackages").read[String].map(BigDecimal(_))
   ).mapN(Packaging.apply)
 
-  implicit val writes: OWrites[Packaging] = Json.writes
+  implicit val format: OFormat[Packaging] = Json.format
 }

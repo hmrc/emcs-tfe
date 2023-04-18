@@ -18,18 +18,13 @@ package uk.gov.hmrc.emcstfe.utils
 
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.Instant
 
 class TimeMachineSpec extends UnitSpec {
 
   lazy val tardis = app.injector.instanceOf[TimeMachine]
 
   "TimeMachine" must {
-
-    "return now() as LDT now (allow +- 1 second grace for test execution)" in {
-      tardis.now().toEpochSecond(ZoneOffset.UTC) shouldBe (LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) +- 1)
-    }
-
     "return instant() as Instant now (allow +- 1 second grace for test execution)" in {
       tardis.instant().toEpochMilli shouldBe (Instant.now().toEpochMilli +- 1000)
     }

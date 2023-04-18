@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.GetMovementListRequest
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementListResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -30,5 +30,5 @@ class GetMovementListService @Inject()(connector: ChrisConnector) extends Loggin
 
   def getMovementList(getMovementListRequest: GetMovementListRequest)
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementListResponse]] =
-    connector.postChrisSOAPRequest[GetMovementListResponse](getMovementListRequest)
+    connector.postChrisSOAPRequestAndExtractToModel[GetMovementListResponse](getMovementListRequest)
 }

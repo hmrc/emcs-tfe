@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.emcstfe.models.mongo.ReportReceiptUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 import uk.gov.hmrc.emcstfe.repositories.ReportReceiptUserAnswersRepository
 import uk.gov.hmrc.emcstfe.utils.Logging
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -36,8 +35,4 @@ class ReportReceiptUserAnswersService @Inject()(repo: ReportReceiptUserAnswersRe
 
   def clear(internalId: String, ern: String, arc: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
     repo.clear(internalId: String, ern: String, arc: String).map(Right(_)).recover(recovery)
-
-  private def recovery[A]: PartialFunction[Throwable, Either[ErrorResponse, A]] = {
-    case e: Throwable => Left(MongoError(e.getMessage))
-  }
 }

@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.response
 import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess}
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
-import uk.gov.hmrc.emcstfe.models.common.JourneyTime.{Days, Hours, JourneyTimeParseFailure}
+import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.XML
@@ -358,7 +358,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |		</mov:currentMovement>
             |	</mov:movementView>""".stripMargin))
 
-        modelWithHours shouldBe ParseSuccess(getMovementResponse.copy(journeyTime = Hours("20")))
+        modelWithHours shouldBe ParseSuccess(getMovementResponse.copy(journeyTime = "20 hours"))
 
         val modelWithDays = GetMovementResponse.xmlReader.read(XML.loadString(
           """
@@ -495,7 +495,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |		</mov:currentMovement>
             |	</mov:movementView>""".stripMargin))
 
-        modelWithDays shouldBe ParseSuccess(getMovementResponse.copy(journeyTime = Days("20")))
+        modelWithDays shouldBe ParseSuccess(getMovementResponse.copy(journeyTime = "20 days"))
       }
     }
 

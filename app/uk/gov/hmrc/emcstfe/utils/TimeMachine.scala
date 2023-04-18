@@ -16,15 +16,13 @@
 
 package uk.gov.hmrc.emcstfe.utils
 
-import java.time.{Instant, LocalDateTime, ZoneId}
+import java.time.Instant
 import javax.inject.Inject
 
 trait TimeMachine {
-  def now(): LocalDateTime
   def instant(): Instant
 }
 
 class TimeMachineImpl @Inject()() extends TimeMachine {
-  override def now(): LocalDateTime = LocalDateTime.now(ZoneId.of("UTC"))
   override def instant(): Instant = Instant.now()
 }

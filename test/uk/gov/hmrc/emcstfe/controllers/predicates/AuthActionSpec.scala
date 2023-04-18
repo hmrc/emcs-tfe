@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.emcstfe.controllers.predicates
 
-import com.google.inject.Inject
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
@@ -30,6 +29,7 @@ import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthActionSpec extends UnitSpec with BaseFixtures {

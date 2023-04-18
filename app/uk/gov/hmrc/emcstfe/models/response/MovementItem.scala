@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.response
 import cats.implicits.catsSyntaxTuple8Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat}
 
 case class MovementItem(itemUniqueReference: Int,
                         productCode: String,
@@ -42,5 +42,5 @@ object MovementItem {
     (__ \ "Package").read[Seq[Packaging]](strictReadSeq)
   ).mapN(MovementItem.apply)
 
-  implicit val writes: OWrites[MovementItem] = Json.writes
+  implicit val format: OFormat[MovementItem] = Json.format
 }

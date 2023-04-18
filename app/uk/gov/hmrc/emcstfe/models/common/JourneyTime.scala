@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import com.lucidchart.open.xtract.{ParseError, ParseFailure, ParseSuccess, XmlReader}
-import play.api.libs.json.{JsString, Writes}
+import play.api.libs.json._
 
 import scala.xml.NodeSeq
 

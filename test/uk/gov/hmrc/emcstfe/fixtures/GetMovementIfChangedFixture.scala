@@ -16,13 +16,34 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging}
 
-trait GetMovementFixture extends BaseFixtures {
-  lazy val getMovementResponseBody: String = """<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
+trait GetMovementIfChangedFixture extends BaseFixtures {
+  lazy val getMovementIfChangedNoChangeSoapWrapper: String = """<tns:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
+                                                               |  <tns:Body>
+                                                               |    <con:Control xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+                                                               |      <con:MetaData>
+                                                               |        <con:MessageId>String</con:MessageId>
+                                                               |        <con:Source>String</con:Source>
+                                                               |        <con:Identity>String</con:Identity>
+                                                               |        <con:Partner>String</con:Partner>
+                                                               |        <con:CorrelationId>String</con:CorrelationId>
+                                                               |        <con:BusinessKey>String</con:BusinessKey>
+                                                               |        <con:MessageDescriptor>String</con:MessageDescriptor>
+                                                               |        <con:QualityOfService>String</con:QualityOfService>
+                                                               |        <con:Destination>String</con:Destination>
+                                                               |        <con:Priority>0</con:Priority>
+                                                               |      </con:MetaData>
+                                                               |      <con:OperationResponse>
+                                                               |        <con:Results/>
+                                                               |      </con:OperationResponse>
+                                                               |    </con:Control>
+                                                               |  </tns:Body>
+                                                               |</tns:Envelope>""".stripMargin
+
+  lazy val getMovementIfChangedResponseBody: String = """<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                                |    <mov:currentMovement>
-                                               |      <mov:status>Accepted</mov:status>
+                                               |      <mov:status>Beans</mov:status>
                                                |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
                                                |      <body:IE801 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE801:V3.01">
                                                |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
@@ -428,7 +449,7 @@ trait GetMovementFixture extends BaseFixtures {
                                                |    </mov:eventHistory>
                                                |  </mov:movementView>""".stripMargin
 
-  lazy val getMovementSoapWrapper: String = s"""<tns:Envelope
+  lazy val getMovementIfChangedWithChangeSoapWrapper: String = s"""<tns:Envelope
                                                |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                                |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
                                                |	<tns:Body>
@@ -449,7 +470,7 @@ trait GetMovementFixture extends BaseFixtures {
                                                |			<con:OperationResponse>
                                                |				<con:Results>
                                                |					<con:Result Name="">
-                                               |						<![CDATA[$getMovementResponseBody]]>
+                                               |						<![CDATA[$getMovementIfChangedResponseBody]]>
                                                |					</con:Result>
                                                |				</con:Results>
                                                |			</con:OperationResponse>
@@ -457,9 +478,9 @@ trait GetMovementFixture extends BaseFixtures {
                                                |	</tns:Body>
                                                |</tns:Envelope>""".stripMargin
 
-  lazy val getMovementResponse: GetMovementResponse = GetMovementResponse(
+  lazy val getMovementIfChangedResponse: GetMovementResponse = GetMovementResponse(
     localReferenceNumber = "EN",
-    eadStatus = "Accepted",
+    eadStatus = "Beans",
     consignorName = "Current 801 Consignor",
     dateOfDispatch = "2008-11-20",
     journeyTime = "20 days",
@@ -500,50 +521,6 @@ trait GetMovementFixture extends BaseFixtures {
       )
     ),
     numberOfItems = 2
-  )
-
-  lazy val getMovementJson: JsValue = Json.obj(fields =
-    "localReferenceNumber" -> "EN",
-    "eadStatus" -> "Accepted",
-    "consignorName" -> "Current 801 Consignor",
-    "dateOfDispatch" -> "2008-11-20",
-    "journeyTime" -> "20 days",
-    "items" -> Json.arr(
-      Json.obj(fields =
-        "itemUniqueReference" -> 1,
-        "productCode" -> "W200",
-        "cnCode" -> "22041011",
-        "quantity" -> 500,
-        "grossMass" -> 900,
-        "netMass" -> 375,
-        "packaging" -> Json.arr(
-          Json.obj(fields =
-            "typeOfPackage" -> "BO",
-            "quantity" -> 125
-          )
-        )
-      ),
-      Json.obj(fields =
-        "itemUniqueReference" -> 2,
-        "productCode" -> "W300",
-        "cnCode" -> "27111901",
-        "quantity" -> 501,
-        "grossMass" -> 901,
-        "netMass" -> 475,
-        "alcoholicStrength" -> 12.7,
-        "packaging" -> Json.arr(
-          Json.obj(fields =
-            "typeOfPackage" -> "BO",
-            "quantity" -> 125
-          ),
-          Json.obj(fields =
-            "typeOfPackage" -> "HG",
-            "quantity" -> 7
-          )
-        )
-      )
-    ),
-    "numberOfItems" -> 2
   )
 
 }

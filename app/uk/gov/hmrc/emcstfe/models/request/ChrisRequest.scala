@@ -24,4 +24,6 @@ trait ChrisRequest {
   def action: String
 
   def uuid: String = java.util.UUID.randomUUID().toString
+
+  def shouldExtractFromSoap: Boolean
 }

@@ -38,6 +38,8 @@ object ErrorResponse {
     val message = "XML validation error"
   }
 
+  case class GenericParseError(message: String) extends ParseError
+
   case class XmlParseError(errors: Seq[ParseError]) extends ErrorResponse {
     val message = s"XML failed to parse, with the following errors:\n - ${errors.mkString("\n - ")}"
   }

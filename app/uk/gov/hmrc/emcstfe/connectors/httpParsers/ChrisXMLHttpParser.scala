@@ -19,18 +19,19 @@ package uk.gov.hmrc.emcstfe.connectors.httpParsers
 import com.lucidchart.open.xtract._
 import play.api.http.Status.OK
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
-import uk.gov.hmrc.emcstfe.utils.{Logging, SoapUtils}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
+import uk.gov.hmrc.emcstfe.utils.{Logging, XmlUtils}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
-import scala.xml.XML
+import scala.xml.{NodeSeq, XML}
 
 @Singleton
-class ChrisXMLHttpParser @Inject()(soapUtils: SoapUtils) extends Logging {
+class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
 
-  def rawXMLHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
+  def modelFromXmlHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
     logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
     response.status match {
       case OK =>
@@ -51,14 +52,23 @@ class ChrisXMLHttpParser @Inject()(soapUtils: SoapUtils) extends Logging {
     }
   }
 
-  private[httpParsers] def handleParseResult[A]: ParseResult[A] => Either[ErrorResponse, A] = {
-    case ParseSuccess(model) => Right(model)
-    case ParseFailure(errors) =>
-      logger.warn(s"[handleParseResult] XML Response from ChRIS could not be parsed to model. Errors: \n\n - ${errors.mkString("\n - ")}")
-      Left(XmlParseError(errors))
-    case PartialParseSuccess(_, errors) =>
-      logger.warn(s"[handleParseResult] PartialParseSuccess - XML Response from ChRIS could not be fully parsed to model. Errors: \n\n - ${errors.mkString("\n - ")}")
-      Left(XmlParseError(errors))
+  def rawXMLHttpReads(shouldExtractFromSoap: Boolean): HttpReads[Either[ErrorResponse, NodeSeq]] = (_: String, _: String, response: HttpResponse) => {
+    logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
+    response.status match {
+      case OK =>
+        Try(XML.loadString(response.body)) match {
+          case Failure(exception) =>
+            logger.warn("[rawXMLHttpReads] Unable to read response body as XML", exception)
+            Left(XmlValidationError)
+          case Success(xml) =>
+            if(shouldExtractFromSoap) {
+              soapUtils.extractFromSoap(xml)
+            } else Right(xml.map(a => a))
+        }
+      case status =>
+        logger.warn(s"[rawXMLHttpReads] Unexpected status from chris: $status")
+        Left(UnexpectedDownstreamResponseError)
+    }
   }
 
 }

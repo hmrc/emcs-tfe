@@ -20,10 +20,10 @@ import org.mongodb.scala.model.Filters
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import play.api.libs.json.Json
+import play.api.libs.json.JsString
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfe.models.mongo.ReportReceiptUserAnswers
+import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
+import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
@@ -32,26 +32,26 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.duration.Duration
 
-class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
-    with DefaultPlayMongoRepositorySupport[ReportReceiptUserAnswers]
+class GetMovementRepositorySpec extends IntegrationBaseSpec
+    with DefaultPlayMongoRepositorySupport[GetMovementMongoResponse]
     with MockFactory
     with OptionValues
     with IntegrationPatience
     with ScalaFutures
-    with BaseFixtures {
+    with GetMovementFixture {
 
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswers = GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[AppConfig]
-  (() => mockAppConfig.reportReceiptUserAnswersTTL(): Duration)
+  (() => mockAppConfig.getMovementTTL(): Duration)
     .expects()
     .returns(Duration("1seconds"))
     .anyNumberOfTimes()
 
-  protected override val repository = new ReportReceiptUserAnswersRepository(
+  protected override val repository = new GetMovementRepository(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
     time           = timeMachine
@@ -72,7 +72,7 @@ class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
         )
       ).futureValue.headOption.value
 
-      setResult shouldBe true
+      setResult shouldBe Right(true)
       updatedRecord shouldBe expectedResult
     }
   }
