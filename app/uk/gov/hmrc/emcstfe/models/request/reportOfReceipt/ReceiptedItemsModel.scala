@@ -44,13 +44,13 @@ case class ReceiptedItemsModel(eadBodyUniqueReference: Int,
       <BodyRecordUniqueReference>
         {eadBodyUniqueReference}
       </BodyRecordUniqueReference>
-      {shortageExcessIndicator.map(x => <IndicatorOfShortageOrExcess>{x}</IndicatorOfShortageOrExcess>)}
-      {shortageExcessAmount.map(x => <ObservedShortageOrExcess>{x}</ObservedShortageOrExcess>)}
+      {shortageExcessIndicator.map(x => <IndicatorOfShortageOrExcess>{x}</IndicatorOfShortageOrExcess>).getOrElse(NodeSeq.Empty)}
+      {shortageExcessAmount.map(x => <ObservedShortageOrExcess>{x}</ObservedShortageOrExcess>).getOrElse(NodeSeq.Empty)}
       <ExciseProductCode>
         {productCode}
       </ExciseProductCode>
-      {refusedAmount.map(x => <RefusedQuantity>{x}</RefusedQuantity>)}
-      {NodeSeq.fromSeq(unsatisfactoryReasons.map(_.toXml))}
+      {refusedAmount.map(x => <RefusedQuantity>{x}</RefusedQuantity>).getOrElse(NodeSeq.Empty)}
+      {unsatisfactoryReasons.map(_.toXml)}
     </BodyReportOfReceiptExport>
 }
 

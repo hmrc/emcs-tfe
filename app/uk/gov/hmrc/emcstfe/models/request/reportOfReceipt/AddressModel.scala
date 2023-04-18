@@ -18,10 +18,22 @@ package uk.gov.hmrc.emcstfe.models.request.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
 
+import scala.xml.NodeSeq
+
 case class AddressModel(streetNumber: Option[String],
                         street: Option[String],
                         postcode: Option[String],
-                        city: Option[String])
+                        city: Option[String]) {
+
+  def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
+    {street.map(x => <StreetName>{x}</StreetName>)},
+    {streetNumber.map(x => <StreetNumber>{x}</StreetNumber>)},
+    {postcode.map(x => <Postcode>{x}</Postcode>)},
+    {city.map(x => <City>{x}</City>)}
+  ).flatten)
+
+
+}
 
 object AddressModel {
   implicit val fmt: Format[AddressModel] = Json.format

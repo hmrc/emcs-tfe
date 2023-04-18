@@ -16,34 +16,34 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import uk.gov.hmrc.emcstfe.models.request.reportOfReceipt.TraderModel
+import uk.gov.hmrc.emcstfe.models.request.reportOfReceipt.AddressModel
 
 import scala.xml.NodeSeq
 
-trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
+trait AddressModelFixtures extends BaseFixtures {
 
-  val maxTraderModel = TraderModel(
-    traderId = Some("id"),
-    traderName = Some("name"),
-    address = Some(maxAddressModel),
-    eoriNumber = Some("eori")
+  val maxAddressModel = AddressModel(
+    streetNumber = Some("number"),
+    street = Some("street"),
+    postcode = Some("postcode"),
+    city = Some("city")
   )
 
-  val maxTraderModelXML =
+  val maxAddressModelXML =
     NodeSeq.fromSeq(Seq(
-      Seq(<Traderid>id</Traderid>),
-      Seq(<TraderName>name</TraderName>),
-      maxAddressModelXML,
-      Seq(<EoriNumber>eori</EoriNumber>)
-    ).flatten)
+      <StreetName>street</StreetName>,
+      <StreetNumber>number</StreetNumber>,
+      <Postcode>postcode</Postcode>,
+      <City>city</City>
+    ))
 
-  val minTraderModel = TraderModel(
-    traderId = None,
-    traderName = None,
-    address = Some(minAddressModel),
-    eoriNumber = None
+  val minAddressModel = AddressModel(
+    streetNumber = None,
+    street = None,
+    postcode = None,
+    city = None
   )
 
-  val minTraderModelXML = NodeSeq.Empty
+  val minAddressModelXML = NodeSeq.Empty
 
 }

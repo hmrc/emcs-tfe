@@ -25,15 +25,14 @@ case class TraderModel(traderId: Option[String],
                        address: Option[AddressModel],
                        eoriNumber: Option[String]) {
 
+  val nonEmpty = traderId.nonEmpty || traderName.nonEmpty || address.nonEmpty || eoriNumber.nonEmpty
+
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
-    {traderId.map(x => <Traderid>{x}</Traderid>)},
-    {traderName.map(x => <TraderName>{x}</TraderName>)},
-    {address.flatMap(_.street.map(x => <StreetName>{x}</StreetName>))},
-    {address.flatMap(_.streetNumber.map(x => <StreetNumber>{x}</StreetNumber>))},
-    {address.flatMap(_.postcode.map(x => <Postcode>{x}</Postcode>))},
-    {address.flatMap(_.city.map(x => <City>{x}</City>))},
-    {eoriNumber.map(x => <EoriNumber>{x}</EoriNumber>)},
-  ).flatten)
+    traderId.map(x => Seq(<Traderid>{x}</Traderid>)),
+    traderName.map(x => Seq(<TraderName>{x}</TraderName>)),
+    address.map(_.toXml.theSeq),
+    eoriNumber.map(x => Seq(<EoriNumber>{x}</EoriNumber>))
+  ).flatten.flatten)
 }
 
 object TraderModel {

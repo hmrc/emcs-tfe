@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request.reportOfReceipt
+package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement._
+import uk.gov.hmrc.emcstfe.models.request.reportOfReceipt.UnsatisfactoryModel
 
-import scala.xml.NodeSeq
+trait UnsatisfactoryModelFixtures extends BaseFixtures {
 
-case class UnsatisfactoryModel(reason: WrongWithMovement,
-                               additionalInformation: Option[String]) {
-
-  private val reasonMapping = reason match {
+  val reasonMapping: WrongWithMovement => Int = {
     case Other => 0
     case Excess => 1
     case Shortage => 2
@@ -33,15 +30,24 @@ case class UnsatisfactoryModel(reason: WrongWithMovement,
     case BrokenSeals => 4
   }
 
-  val toXml =
+  def maxUnsatisfactoryModel(reason: WrongWithMovement) = UnsatisfactoryModel(reason, Some("info"))
+
+  def maxUnsatisfactoryModelXML(reason: WrongWithMovement) =
+      <UnsatisfactoryReason>
+        <UnsatisfactoryReasonCode>
+          {reasonMapping(reason)}
+        </UnsatisfactoryReasonCode>
+        <ComplementaryInformation language="en">
+          info
+        </ComplementaryInformation>
+      </UnsatisfactoryReason>
+
+  def minUnsatisfactoryModel(reason: WrongWithMovement) = UnsatisfactoryModel(reason, None)
+
+  def minUnsatisfactoryModelXML(reason: WrongWithMovement) =
     <UnsatisfactoryReason>
       <UnsatisfactoryReasonCode>
-        {reasonMapping}
+        {reasonMapping(reason)}
       </UnsatisfactoryReasonCode>
-      {additionalInformation.map(x => <ComplementaryInformation language="en">{x}</ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
     </UnsatisfactoryReason>
-}
-
-object UnsatisfactoryModel {
-  implicit val fmt: Format[UnsatisfactoryModel] = Json.format
 }

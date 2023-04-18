@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.request.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement
+import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
 
 import java.time.{Instant, LocalDate}
 import scala.xml.{Elem, NodeSeq}
@@ -32,23 +33,27 @@ case class SubmitReportOfReceiptRequest(arc: String,
                                         individualItems: Seq[ReceiptedItemsModel],
                                         otherInformation: Option[String]) {
 
-  private val globalConclusion = acceptMovement match {
-    case AcceptMovement.Satisfactory => 1
-    case AcceptMovement.Unsatisfactory => 2
-    case AcceptMovement.Refused => 3
-    case AcceptMovement.PartiallyRefused => 4
+  val creationTimestamp = Instant.now()
+
+  val globalConclusion = acceptMovement match {
+    case Satisfactory => 1
+    case Unsatisfactory => 2
+    case Refused => 3
+    case PartiallyRefused => 4
   }
 
   def toXml: Elem =
     <AcceptedOrRejectedReportOfReceiptExport>
       <Attributes>
         <DateAndTimeOfValidationOfReportOfReceiptExport>
-          {Instant.now().toString}
+          {creationTimestamp.toString}
         </DateAndTimeOfValidationOfReportOfReceiptExport>
       </Attributes>
-      <ConsigneeTrader language="en">
-        {consigneeTrader.toXml}
-      </ConsigneeTrader>
+      {if(consigneeTrader.nonEmpty) {
+        <ConsigneeTrader language="en">
+          {consigneeTrader.toXml}
+        </ConsigneeTrader>
+      }}
       <ExciseMovement>
         <AdministrativeReferenceCode>
           {arc}
@@ -57,9 +62,11 @@ case class SubmitReportOfReceiptRequest(arc: String,
           {sequenceNumber}
         </SequenceNumber>
       </ExciseMovement>
-      <DeliveryPlaceTrader language="en">
-        {deliveryPlaceTrader.toXml}
-      </DeliveryPlaceTrader>
+      {if (deliveryPlaceTrader.nonEmpty) {
+        <DeliveryPlaceTrader language="en">
+          {deliveryPlaceTrader.toXml}
+        </DeliveryPlaceTrader>
+      }}
       <DestinationOffice>
         <ReferenceNumber>
           {destinationOffice}
@@ -72,9 +79,9 @@ case class SubmitReportOfReceiptRequest(arc: String,
         <GlobalConclusionOfReceipt>
           {globalConclusion}
         </GlobalConclusionOfReceipt>
-        {otherInformation.map(x => <ComplementaryInformation language="en">{x}</ComplementaryInformation>)}
+        {otherInformation.map(x => <ComplementaryInformation language="en">{x}</ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
       </ReportOfReceiptExport>
-      {NodeSeq.fromSeq(individualItems.map(_.toXml))}
+      {individualItems.map(_.toXml)}
     </AcceptedOrRejectedReportOfReceiptExport>
 }
 
