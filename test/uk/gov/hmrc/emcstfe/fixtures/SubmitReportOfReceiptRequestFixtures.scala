@@ -136,7 +136,7 @@ trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
           {arrivalDate.toString}
         </DateOfArrivalOfExciseProducts>
         <GlobalConclusionOfReceipt>
-          {maxSubmitReportOfReceiptRequest.globalConclusion}
+          {minSubmitReportOfReceiptRequest.globalConclusion}
         </GlobalConclusionOfReceipt>
       </ReportOfReceiptExport>
     </AcceptedOrRejectedReportOfReceiptExport>

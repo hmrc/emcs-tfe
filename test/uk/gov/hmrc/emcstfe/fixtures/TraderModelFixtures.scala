@@ -40,7 +40,7 @@ trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
   val minTraderModel = TraderModel(
     traderId = None,
     traderName = None,
-    address = Some(minAddressModel),
+    address = None,
     eoriNumber = None
   )
 
