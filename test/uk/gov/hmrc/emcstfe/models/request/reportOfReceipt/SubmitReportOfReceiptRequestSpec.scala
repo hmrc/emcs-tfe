@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.request.reportOfReceipt
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptRequestFixtures
+import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
@@ -25,6 +26,13 @@ import scala.xml.Utility.trim
 class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfReceiptRequestFixtures {
 
   "SubmitReportOfReceiptRequest" must {
+
+    "have the correct values for the global conclusion" in {
+      maxSubmitReportOfReceiptRequest.copy(acceptMovement = Satisfactory).globalConclusion shouldBe 1
+      maxSubmitReportOfReceiptRequest.copy(acceptMovement = Unsatisfactory).globalConclusion shouldBe 2
+      maxSubmitReportOfReceiptRequest.copy(acceptMovement = Refused).globalConclusion shouldBe 3
+      maxSubmitReportOfReceiptRequest.copy(acceptMovement = PartiallyRefused).globalConclusion shouldBe 4
+    }
 
     "for the maximum number of fields" must {
 

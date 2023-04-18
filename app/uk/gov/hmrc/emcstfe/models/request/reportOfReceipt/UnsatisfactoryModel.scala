@@ -25,7 +25,7 @@ import scala.xml.NodeSeq
 case class UnsatisfactoryModel(reason: WrongWithMovement,
                                additionalInformation: Option[String]) {
 
-  private val reasonMapping = reason match {
+  val reasonMapping = reason match {
     case Other => 0
     case Excess => 1
     case Shortage => 2

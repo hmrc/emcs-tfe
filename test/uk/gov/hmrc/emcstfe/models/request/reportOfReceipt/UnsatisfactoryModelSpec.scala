@@ -30,6 +30,10 @@ class UnsatisfactoryModelSpec extends UnitSpec with UnsatisfactoryModelFixtures 
 
       s"for reason '$reason'" must {
 
+        "have the correct reasonMapping to an Int" in {
+          maxUnsatisfactoryModel(reason).reasonMapping shouldBe reasonMapping(reason)
+        }
+
         "for the maximum number of fields" must {
 
           "be possible to serialise and de-serialise to/from JSON" in {
