@@ -29,5 +29,8 @@ class AppConfig @Inject()(servicesConfig :ServicesConfig, configuration: Configu
   def chrisHeaders: Seq[String] = configuration.get[Seq[String]]("microservice.services.chris.environmentHeaders")
 
   def reportReceiptUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.reportReceiptUserAnswers.TTL"))
+  def reportReceiptUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.reportReceiptUserAnswers.replaceIndexes")
+
   def getMovementTTL(): Duration = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
+  def getMovementReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.getMovement.replaceIndexes")
 }
