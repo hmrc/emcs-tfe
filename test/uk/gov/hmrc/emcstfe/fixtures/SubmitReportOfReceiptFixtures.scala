@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
 import java.time.LocalDate
 
-trait SubmitReportOfReceiptModelFixtures extends BaseFixtures
+trait SubmitReportOfReceiptFixtures extends BaseFixtures
   with TraderModelFixtures
   with ReceiptedItemsModelFixtures {
 

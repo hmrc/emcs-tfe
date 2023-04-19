@@ -24,12 +24,10 @@ import play.api.libs.json.{Json, OWrites}
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
-case class SubmitDraftMovementResponse(
-                                        receipt: String,
-                                        lrn: Option[String] = None
-                                      )
+case class ChRISSuccessResponse(receipt: String,
+                                lrn: Option[String] = None)
 
-object SubmitDraftMovementResponse {
+object ChRISSuccessResponse {
 
   private[response] def digestValueToReceipt(dv: String): String = {
     val decodedValue: Array[Byte] = Base64.getDecoder().decode(dv.getBytes(StandardCharsets.UTF_8))
@@ -39,11 +37,11 @@ object SubmitDraftMovementResponse {
 
   val digestValue: XPath = __ \\ "Envelope" \ "Body" \ "HMRCSOAPResponse" \ "SuccessResponse" \ "IRmarkReceipt" \ "Signature" \ "SignedInfo" \ "Reference" \ "DigestValue"
 
-  implicit val xmlReader: XmlReader[SubmitDraftMovementResponse] =
+  implicit val xmlReader: XmlReader[ChRISSuccessResponse] =
     (
       digestValue.read[String].map(digestValueToReceipt),
       digestValue.read[String].map(_ => None) // can't think of a way to Reads.pure with xtract. TODO: investigate
-    ).mapN(SubmitDraftMovementResponse.apply)
+    ).mapN(ChRISSuccessResponse.apply)
 
-  implicit val writes: OWrites[SubmitDraftMovementResponse] = Json.writes
+  implicit val writes: OWrites[ChRISSuccessResponse] = Json.writes
 }

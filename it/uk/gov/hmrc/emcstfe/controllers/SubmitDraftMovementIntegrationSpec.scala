@@ -23,7 +23,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitDraftMovementFixture
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
-import uk.gov.hmrc.emcstfe.models.response.SubmitDraftMovementResponse
+import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
@@ -54,7 +54,7 @@ class SubmitDraftMovementIntegrationSpec extends IntegrationBaseSpec with Submit
         val response: WSResponse = await(request().post(submitDraftMovementRequestBody))
         response.status shouldBe Status.OK
         response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe submitDraftMovementJson
+        response.json shouldBe chrisSuccessJson
       }
     }
     "return an error" when {
@@ -67,7 +67,7 @@ class SubmitDraftMovementIntegrationSpec extends IntegrationBaseSpec with Submit
         val response: WSResponse = await(request().post(submitDraftMovementRequestBody))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(SubmitDraftMovementResponse.digestValue), EmptyError(SubmitDraftMovementResponse.digestValue))))
+        response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(ChRISSuccessResponse.digestValue), EmptyError(ChRISSuccessResponse.digestValue))))
       }
       "downstream call returns something other than XML" in new Test {
         val responseBody: JsValue = Json.obj("message" -> "Success!")

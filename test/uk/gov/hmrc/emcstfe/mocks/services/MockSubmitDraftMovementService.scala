@@ -20,7 +20,7 @@ import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, SubmitDraftMovementResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, ChRISSuccessResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitDraftMovementService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -31,7 +31,7 @@ trait MockSubmitDraftMovementService extends MockFactory  {
   lazy val mockService: SubmitDraftMovementService = mock[SubmitDraftMovementService]
 
   object MockService extends Matchers {
-    def submitDraftMovement(submitDraftMovementRequest: SubmitDraftMovementRequest): CallHandler3[SubmitDraftMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, SubmitDraftMovementResponse]]] = {
+    def submitDraftMovement(submitDraftMovementRequest: SubmitDraftMovementRequest): CallHandler3[SubmitDraftMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, ChRISSuccessResponse]]] = {
       (mockService.submitDraftMovement(_: SubmitDraftMovementRequest)(_: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs {
           (actualSubmitDraftMovementRequest: SubmitDraftMovementRequest, _, _) => {

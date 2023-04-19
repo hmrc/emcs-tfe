@@ -35,9 +35,9 @@ class SubmitDraftMovementServiceSpec extends UnitSpec with SubmitDraftMovementFi
       "connector call is successful and XML is the correct format" in new Test {
         MockConnector
           .submitDraftMovementChrisSOAPRequest(submitDraftMovementRequest)
-          .returns(Future.successful(Right(submitDraftMovementResponse)))
+          .returns(Future.successful(Right(chrisSuccessResponse)))
 
-        await(service.submitDraftMovement(submitDraftMovementRequest)) shouldBe Right(submitDraftMovementResponse)
+        await(service.submitDraftMovement(submitDraftMovementRequest)) shouldBe Right(chrisSuccessResponse)
       }
     }
     "return a Left" when {

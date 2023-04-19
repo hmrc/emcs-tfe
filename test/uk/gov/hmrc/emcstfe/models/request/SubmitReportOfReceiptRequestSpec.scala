@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptModelFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfReceiptModelFixtures {
+class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfReceiptFixtures {
 
   val request = SubmitReportOfReceiptRequest(exciseRegistrationNumber = "ERN", maxSubmitReportOfReceiptModel)
 

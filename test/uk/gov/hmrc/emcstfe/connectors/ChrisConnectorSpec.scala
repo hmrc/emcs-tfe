@@ -18,19 +18,20 @@ package uk.gov.hmrc.emcstfe.connectors
 
 import play.api.http.{HeaderNames, MimeTypes, Status}
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
-import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitDraftMovementFixture}
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitDraftMovementFixture, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
-import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitDraftMovementRequest}
+import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitDraftMovementRequest, SubmitReportOfReceiptRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, UnexpectedDownstreamResponseError, XmlValidationError}
-import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, SubmitDraftMovementResponse}
+import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, ChRISSuccessResponse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with MockXmlUtils with GetMovementFixture with SubmitDraftMovementFixture {
+class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with MockXmlUtils
+  with GetMovementFixture with SubmitDraftMovementFixture with SubmitReportOfReceiptFixtures {
 
   trait Test {
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -158,12 +159,12 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
             HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
           )
         )
-          .returns(Future.successful(Right(submitDraftMovementResponse)))
+          .returns(Future.successful(Right(chrisSuccessResponse)))
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe Right(submitDraftMovementResponse)
+        await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe Right(chrisSuccessResponse)
       }
     }
     "return a Left" when {
@@ -183,7 +184,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
@@ -200,7 +201,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe response
       }
       "cannot prepare XML for submission" in new Test {
         val response = Left(MarkPlacementError)
@@ -209,30 +210,32 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         MockXmlUtils.prepareXmlForSubmission()
           .returns(response)
 
-        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe response
       }
     }
   }
 
   "submitReportOfReceiptChrisSOAPRequest" should {
-    val submitDraftMovementRequest = SubmitDraftMovementRequest("", "", submitDraftMovementRequestBody)
+
+    val submitReportOfReceiptRequest = SubmitReportOfReceiptRequest("ERN", maxSubmitReportOfReceiptModel)
+
     "return a Right" when {
       "downstream call is successful" in new Test {
 
         MockHttpClient.postString(
-          url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
-          body = submitDraftMovementRequest.requestBody,
+          url = s"$baseUrl/ChRIS/EMCS/SubmitReportofReceiptPortal/4",
+          body = submitReportOfReceiptRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitReportOfReceiptRequest.action}""""
           )
         )
-          .returns(Future.successful(Right(submitDraftMovementResponse)))
+          .returns(Future.successful(Right(chrisSuccessResponse)))
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe Right(submitDraftMovementResponse)
+        await(connector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](submitReportOfReceiptRequest)) shouldBe Right(chrisSuccessResponse)
       }
     }
     "return a Left" when {
@@ -241,44 +244,44 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         val response = Left(XmlValidationError)
 
         MockHttpClient.postString(
-          url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
-          body = submitDraftMovementRequest.requestBody,
+          url = s"$baseUrl/ChRIS/EMCS/SubmitReportofReceiptPortal/4",
+          body = submitReportOfReceiptRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitReportOfReceiptRequest.action}""""
           )
         ).returns(Future.successful(response))
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
 
         MockHttpClient.postString(
-          url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
-          body = submitDraftMovementRequest.requestBody,
+          url = s"$baseUrl/ChRIS/EMCS/SubmitReportofReceiptPortal/4",
+          body = submitReportOfReceiptRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitReportOfReceiptRequest.action}""""
           )
         ).returns(Future.successful(response))
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
       }
       "cannot prepare XML for submission" in new Test {
-        val response = Left(MarkPlacementError)
 
+        val response = Left(MarkPlacementError)
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(response)
 
-        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
       }
     }
   }

@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.services
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.NoLrnError
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, SubmitDraftMovementResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, ChRISSuccessResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -29,11 +29,11 @@ import scala.xml.XML
 
 @Singleton
 class SubmitDraftMovementService @Inject()(connector: ChrisConnector) extends Logging {
-  def submitDraftMovement(submitDraftMovementRequest: SubmitDraftMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, SubmitDraftMovementResponse]] = {
+  def submitDraftMovement(submitDraftMovementRequest: SubmitDraftMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ChRISSuccessResponse]] = {
     extractLrn(submitDraftMovementRequest.requestBody) match {
       case None => Future.successful(Left(NoLrnError))
       case Some(lrn) =>
-        connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)
+        connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)
           .map(
             connectorResponse => connectorResponse.map(
               submitDraftMovementResponse => submitDraftMovementResponse.copy(lrn = Some(lrn))

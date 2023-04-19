@@ -17,13 +17,13 @@
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptModelFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
 
-class SubmitReportOfReceiptModelSpec extends UnitSpec with SubmitReportOfReceiptModelFixtures {
+class SubmitReportOfReceiptModelSpec extends UnitSpec with SubmitReportOfReceiptFixtures {
 
   "SubmitReportOfReceiptModel" must {
 

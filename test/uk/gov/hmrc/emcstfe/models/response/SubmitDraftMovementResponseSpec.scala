@@ -27,7 +27,7 @@ class SubmitDraftMovementResponseSpec extends UnitSpec with SubmitDraftMovementF
 
   "writes" should {
     "write a model to JSON" in {
-      Json.toJson(submitDraftMovementResponse) shouldBe submitDraftMovementJson
+      Json.toJson(chrisSuccessResponse) shouldBe chrisSuccessJson
     }
   }
 
@@ -36,7 +36,7 @@ class SubmitDraftMovementResponseSpec extends UnitSpec with SubmitDraftMovementF
     "successfully read a movement" when {
 
       "all fields are valid" in {
-        SubmitDraftMovementResponse.xmlReader.read(XML.loadString(submitDraftMovementResponseBody)) shouldBe ParseSuccess(submitDraftMovementResponse.copy(lrn = None))
+        ChRISSuccessResponse.xmlReader.read(XML.loadString(submitDraftMovementResponseBody)) shouldBe ParseSuccess(chrisSuccessResponse.copy(lrn = None))
       }
     }
 
@@ -65,7 +65,7 @@ class SubmitDraftMovementResponseSpec extends UnitSpec with SubmitDraftMovementF
             |  </soap:Body>
             |</soap:Envelope>""".stripMargin)
 
-        SubmitDraftMovementResponse.xmlReader.read(noDigestValueXML) shouldBe ParseFailure(Seq(EmptyError(SubmitDraftMovementResponse.digestValue), EmptyError(SubmitDraftMovementResponse.digestValue)))
+        ChRISSuccessResponse.xmlReader.read(noDigestValueXML) shouldBe ParseFailure(Seq(EmptyError(ChRISSuccessResponse.digestValue), EmptyError(ChRISSuccessResponse.digestValue)))
       }
 
       "DigestValue is in the wrong place" in {
@@ -90,14 +90,14 @@ class SubmitDraftMovementResponseSpec extends UnitSpec with SubmitDraftMovementF
             |  </soap:Body>
             |</soap:Envelope>""".stripMargin)
 
-        SubmitDraftMovementResponse.xmlReader.read(noDigestValueXML) shouldBe ParseFailure(Seq(EmptyError(SubmitDraftMovementResponse.digestValue), EmptyError(SubmitDraftMovementResponse.digestValue)))
+        ChRISSuccessResponse.xmlReader.read(noDigestValueXML) shouldBe ParseFailure(Seq(EmptyError(ChRISSuccessResponse.digestValue), EmptyError(ChRISSuccessResponse.digestValue)))
       }
     }
   }
 
   "digestValueToReceipt" should {
     "correctly convert a digestValue to receipt value" in {
-      SubmitDraftMovementResponse.digestValueToReceipt("KWrqNXggsCEMgbOr3wiozyfrdU0=") shouldBe "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN"
+      ChRISSuccessResponse.digestValueToReceipt("KWrqNXggsCEMgbOr3wiozyfrdU0=") shouldBe "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN"
     }
   }
 }

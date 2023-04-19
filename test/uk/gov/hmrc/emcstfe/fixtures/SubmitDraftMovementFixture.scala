@@ -16,10 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.response.SubmitDraftMovementResponse
-
-trait SubmitDraftMovementFixture extends BaseFixtures {
+trait SubmitDraftMovementFixture extends BaseFixtures with ChRISResponsesFixture {
   lazy val submitDraftMovementRequestBody: String = """<?xml version="1.0" encoding="UTF-8"?>
                                                       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
                                                       |    <soapenv:Header>
@@ -58,16 +55,4 @@ trait SubmitDraftMovementFixture extends BaseFixtures {
                                                        |    </ns:HMRCSOAPResponse>
                                                        |  </soap:Body>
                                                        |</soap:Envelope>""".stripMargin
-  
-  lazy val submitDraftMovementResponse: SubmitDraftMovementResponse = SubmitDraftMovementResponse(
-    receipt = "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
-    lrn = Some("EN")
-  )
-
-  lazy val submitDraftMovementJson: JsValue = Json.parse(
-    """{
-      |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
-      |    "lrn": "EN"
-      |}""".stripMargin)
-
 }
