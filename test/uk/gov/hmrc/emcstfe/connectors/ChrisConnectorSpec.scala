@@ -213,4 +213,73 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
     }
   }
+
+  "submitReportOfReceiptChrisSOAPRequest" should {
+    val submitDraftMovementRequest = SubmitDraftMovementRequest("", "", submitDraftMovementRequestBody)
+    "return a Right" when {
+      "downstream call is successful" in new Test {
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
+          body = submitDraftMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+          )
+        )
+          .returns(Future.successful(Right(submitDraftMovementResponse)))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe Right(submitDraftMovementResponse)
+      }
+    }
+    "return a Left" when {
+      "downstream call is successful but can't convert the response to XML" in new Test {
+
+        val response = Left(XmlValidationError)
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
+          body = submitDraftMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+          )
+        ).returns(Future.successful(response))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+      }
+      "downstream call is unsuccessful" in new Test {
+        val response = Left(UnexpectedDownstreamResponseError)
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
+          body = submitDraftMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+          )
+        ).returns(Future.successful(response))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+      }
+      "cannot prepare XML for submission" in new Test {
+        val response = Left(MarkPlacementError)
+
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(response)
+
+        await(connector.submitDraftMovementChrisSOAPRequest[SubmitDraftMovementResponse](submitDraftMovementRequest)) shouldBe response
+      }
+    }
+  }
 }
