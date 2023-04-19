@@ -50,6 +50,10 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
     .expects()
     .returns(Duration("1seconds"))
     .anyNumberOfTimes()
+  (() => mockAppConfig.getMovementReplaceIndexes(): Boolean)
+    .expects()
+    .returns(true)
+    .anyNumberOfTimes()
 
   protected override val repository = new GetMovementRepository(
     mongoComponent = mongoComponent,

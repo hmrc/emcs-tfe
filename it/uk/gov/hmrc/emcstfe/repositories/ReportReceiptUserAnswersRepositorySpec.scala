@@ -50,6 +50,10 @@ class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
     .expects()
     .returns(Duration("1seconds"))
     .anyNumberOfTimes()
+  (() => mockAppConfig.reportReceiptUserAnswersReplaceIndexes(): Boolean)
+    .expects()
+    .returns(true)
+    .anyNumberOfTimes()
 
   protected override val repository = new ReportReceiptUserAnswersRepository(
     mongoComponent = mongoComponent,

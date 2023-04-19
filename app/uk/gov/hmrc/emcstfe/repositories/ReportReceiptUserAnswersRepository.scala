@@ -56,7 +56,8 @@ class ReportReceiptUserAnswersRepository @Inject()(
         ),
         IndexOptions().name("uniqueIdx")
       )
-    )
+    ),
+    replaceIndexes = appConfig.reportReceiptUserAnswersReplaceIndexes()
   ) {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat

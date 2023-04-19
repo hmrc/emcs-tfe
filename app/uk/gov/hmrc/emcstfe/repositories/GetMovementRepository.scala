@@ -59,7 +59,7 @@ class GetMovementRepository @Inject()(
         IndexOptions().name("uniqueIdx")
       )
     ),
-    replaceIndexes = true
+    replaceIndexes = appConfig.getMovementReplaceIndexes()
   ) with Logging {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
