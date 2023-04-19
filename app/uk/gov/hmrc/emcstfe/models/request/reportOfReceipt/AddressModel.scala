@@ -26,10 +26,10 @@ case class AddressModel(streetNumber: Option[String],
                         city: Option[String]) {
 
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
-    {street.map(x => <StreetName>{x}</StreetName>)},
-    {streetNumber.map(x => <StreetNumber>{x}</StreetNumber>)},
-    {postcode.map(x => <Postcode>{x}</Postcode>)},
-    {city.map(x => <City>{x}</City>)}
+    {street.map(x => <urn:StreetName>{x}</urn:StreetName>)},
+    {streetNumber.map(x => <urn:StreetNumber>{x}</urn:StreetNumber>)},
+    {postcode.map(x => <urn:Postcode>{x}</urn:Postcode>)},
+    {city.map(x => <urn:City>{x}</urn:City>)}
   ).flatten)
 
 

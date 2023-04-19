@@ -40,18 +40,18 @@ case class ReceiptedItemsModel(eadBodyUniqueReference: Int,
   }
 
   def toXml =
-    <BodyReportOfReceiptExport>
-      <BodyRecordUniqueReference>
+    <urn:BodyReportOfReceiptExport>
+      <urn:BodyRecordUniqueReference>
         {eadBodyUniqueReference}
-      </BodyRecordUniqueReference>
-      {shortageExcessIndicator.map(x => <IndicatorOfShortageOrExcess>{x}</IndicatorOfShortageOrExcess>).getOrElse(NodeSeq.Empty)}
-      {shortageExcessAmount.map(x => <ObservedShortageOrExcess>{x}</ObservedShortageOrExcess>).getOrElse(NodeSeq.Empty)}
-      <ExciseProductCode>
+      </urn:BodyRecordUniqueReference>
+      {shortageExcessIndicator.map(x => <urn:IndicatorOfShortageOrExcess>{x}</urn:IndicatorOfShortageOrExcess>).getOrElse(NodeSeq.Empty)}
+      {shortageExcessAmount.map(x => <urn:ObservedShortageOrExcess>{x}</urn:ObservedShortageOrExcess>).getOrElse(NodeSeq.Empty)}
+      <urn:ExciseProductCode>
         {productCode}
-      </ExciseProductCode>
-      {refusedAmount.map(x => <RefusedQuantity>{x}</RefusedQuantity>).getOrElse(NodeSeq.Empty)}
+      </urn:ExciseProductCode>
+      {refusedAmount.map(x => <urn:RefusedQuantity>{x}</urn:RefusedQuantity>).getOrElse(NodeSeq.Empty)}
       {unsatisfactoryReasons.map(_.toXml)}
-    </BodyReportOfReceiptExport>
+    </urn:BodyReportOfReceiptExport>
 }
 
 object ReceiptedItemsModel {

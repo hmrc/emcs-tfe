@@ -34,12 +34,12 @@ case class UnsatisfactoryModel(reason: WrongWithMovement,
   }
 
   val toXml =
-    <UnsatisfactoryReason>
-      <UnsatisfactoryReasonCode>
+    <urn:UnsatisfactoryReason>
+      <urn:UnsatisfactoryReasonCode>
         {reasonMapping}
-      </UnsatisfactoryReasonCode>
-      {additionalInformation.map(x => <ComplementaryInformation language="en">{x}</ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
-    </UnsatisfactoryReason>
+      </urn:UnsatisfactoryReasonCode>
+      {additionalInformation.map(x => <urn:ComplementaryInformation language="en">{x}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+    </urn:UnsatisfactoryReason>
 }
 
 object UnsatisfactoryModel {

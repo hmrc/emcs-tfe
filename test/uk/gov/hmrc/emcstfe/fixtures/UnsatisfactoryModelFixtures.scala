@@ -33,21 +33,21 @@ trait UnsatisfactoryModelFixtures extends BaseFixtures {
   def maxUnsatisfactoryModel(reason: WrongWithMovement) = UnsatisfactoryModel(reason, Some("info"))
 
   def maxUnsatisfactoryModelXML(reason: WrongWithMovement) =
-      <UnsatisfactoryReason>
-        <UnsatisfactoryReasonCode>
+      <urn:UnsatisfactoryReason>
+        <urn:UnsatisfactoryReasonCode>
           {reasonMapping(reason)}
-        </UnsatisfactoryReasonCode>
-        <ComplementaryInformation language="en">
+        </urn:UnsatisfactoryReasonCode>
+        <urn:ComplementaryInformation language="en">
           info
-        </ComplementaryInformation>
-      </UnsatisfactoryReason>
+        </urn:ComplementaryInformation>
+      </urn:UnsatisfactoryReason>
 
   def minUnsatisfactoryModel(reason: WrongWithMovement) = UnsatisfactoryModel(reason, None)
 
   def minUnsatisfactoryModelXML(reason: WrongWithMovement) =
-    <UnsatisfactoryReason>
-      <UnsatisfactoryReasonCode>
+    <urn:UnsatisfactoryReason>
+      <urn:UnsatisfactoryReasonCode>
         {reasonMapping(reason)}
-      </UnsatisfactoryReasonCode>
-    </UnsatisfactoryReason>
+      </urn:UnsatisfactoryReasonCode>
+    </urn:UnsatisfactoryReason>
 }

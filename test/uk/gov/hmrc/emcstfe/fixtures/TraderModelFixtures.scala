@@ -31,10 +31,10 @@ trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
 
   val maxTraderModelXML =
     NodeSeq.fromSeq(Seq(
-      Seq(<Traderid>id</Traderid>),
-      Seq(<TraderName>name</TraderName>),
+      Seq(<urn:Traderid>id</urn:Traderid>),
+      Seq(<urn:TraderName>name</urn:TraderName>),
       maxAddressModelXML,
-      Seq(<EoriNumber>eori</EoriNumber>)
+      Seq(<urn:EoriNumber>eori</urn:EoriNumber>)
     ).flatten)
 
   val minTraderModel = TraderModel(

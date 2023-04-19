@@ -28,10 +28,10 @@ case class TraderModel(traderId: Option[String],
   val nonEmpty = traderId.nonEmpty || traderName.nonEmpty || address.nonEmpty || eoriNumber.nonEmpty
 
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
-    traderId.map(x => Seq(<Traderid>{x}</Traderid>)),
-    traderName.map(x => Seq(<TraderName>{x}</TraderName>)),
+    traderId.map(x => Seq(<urn:Traderid>{x}</urn:Traderid>)),
+    traderName.map(x => Seq(<urn:TraderName>{x}</urn:TraderName>)),
     address.map(_.toXml.theSeq),
-    eoriNumber.map(x => Seq(<EoriNumber>{x}</EoriNumber>))
+    eoriNumber.map(x => Seq(<urn:EoriNumber>{x}</urn:EoriNumber>))
   ).flatten.flatten)
 }
 

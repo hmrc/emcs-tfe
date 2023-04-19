@@ -45,60 +45,60 @@ trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
   )
 
   val maxSubmitReportOfReceiptRequestXML =
-    <AcceptedOrRejectedReportOfReceiptExport>
-      <Attributes>
-        <DateAndTimeOfValidationOfReportOfReceiptExport>
+    <urn:AcceptedOrRejectedReportOfReceiptExport>
+      <urn:Attributes>
+        <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
           {maxSubmitReportOfReceiptRequest.creationTimestamp.toString}
-        </DateAndTimeOfValidationOfReportOfReceiptExport>
-      </Attributes>
-      <ConsigneeTrader language="en">
-        <Traderid>id</Traderid>
-        <TraderName>name</TraderName>
-        <StreetName>street</StreetName>
-        <StreetNumber>number</StreetNumber>
-        <Postcode>postcode</Postcode>
-        <City>city</City>
-        <EoriNumber>eori</EoriNumber>
-      </ConsigneeTrader>
-      <ExciseMovement>
-        <AdministrativeReferenceCode>{testArc}</AdministrativeReferenceCode>
-        <SequenceNumber>1</SequenceNumber>
-      </ExciseMovement>
-      <DeliveryPlaceTrader language="en">
-        <Traderid>id</Traderid>
-        <TraderName>name</TraderName>
-        <StreetName>street</StreetName>
-        <StreetNumber>number</StreetNumber>
-        <Postcode>postcode</Postcode>
-        <City>city</City>
-      </DeliveryPlaceTrader>
-      <DestinationOffice>
-        <ReferenceNumber>{destinationOfficeId}</ReferenceNumber>
-      </DestinationOffice>
-      <ReportOfReceiptExport>
-        <DateOfArrivalOfExciseProducts>{arrivalDate.toString}</DateOfArrivalOfExciseProducts>
-        <GlobalConclusionOfReceipt>{maxSubmitReportOfReceiptRequest.globalConclusion}</GlobalConclusionOfReceipt>
-        <ComplementaryInformation language="en">
+        </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+      </urn:Attributes>
+      <urn:ConsigneeTrader language="en">
+        <urn:Traderid>id</urn:Traderid>
+        <urn:TraderName>name</urn:TraderName>
+        <urn:StreetName>street</urn:StreetName>
+        <urn:StreetNumber>number</urn:StreetNumber>
+        <urn:Postcode>postcode</urn:Postcode>
+        <urn:City>city</urn:City>
+        <urn:EoriNumber>eori</urn:EoriNumber>
+      </urn:ConsigneeTrader>
+      <urn:ExciseMovement>
+        <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>
+        <urn:SequenceNumber>1</urn:SequenceNumber>
+      </urn:ExciseMovement>
+      <urn:DeliveryPlaceTrader language="en">
+        <urn:Traderid>id</urn:Traderid>
+        <urn:TraderName>name</urn:TraderName>
+        <urn:StreetName>street</urn:StreetName>
+        <urn:StreetNumber>number</urn:StreetNumber>
+        <urn:Postcode>postcode</urn:Postcode>
+        <urn:City>city</urn:City>
+      </urn:DeliveryPlaceTrader>
+      <urn:DestinationOffice>
+        <urn:ReferenceNumber>{destinationOfficeId}</urn:ReferenceNumber>
+      </urn:DestinationOffice>
+      <urn:ReportOfReceiptExport>
+        <urn:DateOfArrivalOfExciseProducts>{arrivalDate.toString}</urn:DateOfArrivalOfExciseProducts>
+        <urn:GlobalConclusionOfReceipt>{maxSubmitReportOfReceiptRequest.globalConclusion}</urn:GlobalConclusionOfReceipt>
+        <urn:ComplementaryInformation language="en">
           other
-        </ComplementaryInformation>
-      </ReportOfReceiptExport>
-      <BodyReportOfReceiptExport>
-        <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
-        <IndicatorOfShortageOrExcess>E</IndicatorOfShortageOrExcess>
-        <ObservedShortageOrExcess>12.145</ObservedShortageOrExcess>
-        <ExciseProductCode>W300</ExciseProductCode>
-        <RefusedQuantity>10</RefusedQuantity>
+        </urn:ComplementaryInformation>
+      </urn:ReportOfReceiptExport>
+      <urn:BodyReportOfReceiptExport>
+        <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
+        <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
+        <urn:ObservedShortageOrExcess>12.145</urn:ObservedShortageOrExcess>
+        <urn:ExciseProductCode>W300</urn:ExciseProductCode>
+        <urn:RefusedQuantity>10</urn:RefusedQuantity>
         {maxUnsatisfactoryModelXML(Excess)}
-      </BodyReportOfReceiptExport>
-      <BodyReportOfReceiptExport>
-        <BodyRecordUniqueReference>2</BodyRecordUniqueReference>
-        <IndicatorOfShortageOrExcess>E</IndicatorOfShortageOrExcess>
-        <ObservedShortageOrExcess>12.145</ObservedShortageOrExcess>
-        <ExciseProductCode>W300</ExciseProductCode>
-        <RefusedQuantity>10</RefusedQuantity>
+      </urn:BodyReportOfReceiptExport>
+      <urn:BodyReportOfReceiptExport>
+        <urn:BodyRecordUniqueReference>2</urn:BodyRecordUniqueReference>
+        <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
+        <urn:ObservedShortageOrExcess>12.145</urn:ObservedShortageOrExcess>
+        <urn:ExciseProductCode>W300</urn:ExciseProductCode>
+        <urn:RefusedQuantity>10</urn:RefusedQuantity>
         {maxUnsatisfactoryModelXML(Excess)}
-      </BodyReportOfReceiptExport>
-    </AcceptedOrRejectedReportOfReceiptExport>
+      </urn:BodyReportOfReceiptExport>
+    </urn:AcceptedOrRejectedReportOfReceiptExport>
 
 
   val minSubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(
@@ -114,31 +114,31 @@ trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
   )
 
   val minSubmitReportOfReceiptRequestXML =
-    <AcceptedOrRejectedReportOfReceiptExport>
-      <Attributes>
-        <DateAndTimeOfValidationOfReportOfReceiptExport>
+    <urn:AcceptedOrRejectedReportOfReceiptExport>
+      <urn:Attributes>
+        <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
           {minSubmitReportOfReceiptRequest.creationTimestamp.toString}
-        </DateAndTimeOfValidationOfReportOfReceiptExport>
-      </Attributes>
-      <ExciseMovement>
-        <AdministrativeReferenceCode>
+        </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+      </urn:Attributes>
+      <urn:ExciseMovement>
+        <urn:AdministrativeReferenceCode>
           {testArc}
-        </AdministrativeReferenceCode>
-        <SequenceNumber>1</SequenceNumber>
-      </ExciseMovement>
-      <DestinationOffice>
-        <ReferenceNumber>
+        </urn:AdministrativeReferenceCode>
+        <urn:SequenceNumber>1</urn:SequenceNumber>
+      </urn:ExciseMovement>
+      <urn:DestinationOffice>
+        <urn:ReferenceNumber>
           {destinationOfficeId}
-        </ReferenceNumber>
-      </DestinationOffice>
-      <ReportOfReceiptExport>
-        <DateOfArrivalOfExciseProducts>
+        </urn:ReferenceNumber>
+      </urn:DestinationOffice>
+      <urn:ReportOfReceiptExport>
+        <urn:DateOfArrivalOfExciseProducts>
           {arrivalDate.toString}
-        </DateOfArrivalOfExciseProducts>
-        <GlobalConclusionOfReceipt>
+        </urn:DateOfArrivalOfExciseProducts>
+        <urn:GlobalConclusionOfReceipt>
           {minSubmitReportOfReceiptRequest.globalConclusion}
-        </GlobalConclusionOfReceipt>
-      </ReportOfReceiptExport>
-    </AcceptedOrRejectedReportOfReceiptExport>
+        </urn:GlobalConclusionOfReceipt>
+      </urn:ReportOfReceiptExport>
+    </urn:AcceptedOrRejectedReportOfReceiptExport>
 
 }

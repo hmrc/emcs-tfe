@@ -43,46 +43,46 @@ case class SubmitReportOfReceiptRequest(arc: String,
   }
 
   def toXml: Elem =
-    <AcceptedOrRejectedReportOfReceiptExport>
-      <Attributes>
-        <DateAndTimeOfValidationOfReportOfReceiptExport>
+    <urn:AcceptedOrRejectedReportOfReceiptExport>
+      <urn:Attributes>
+        <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
           {creationTimestamp.toString}
-        </DateAndTimeOfValidationOfReportOfReceiptExport>
-      </Attributes>
+        </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+      </urn:Attributes>
       {if(consigneeTrader.nonEmpty) {
-        <ConsigneeTrader language="en">
+        <urn:ConsigneeTrader language="en">
           {consigneeTrader.toXml}
-        </ConsigneeTrader>
+        </urn:ConsigneeTrader>
       }}
-      <ExciseMovement>
-        <AdministrativeReferenceCode>
+      <urn:ExciseMovement>
+        <urn:AdministrativeReferenceCode>
           {arc}
-        </AdministrativeReferenceCode>
-        <SequenceNumber>
+        </urn:AdministrativeReferenceCode>
+        <urn:SequenceNumber>
           {sequenceNumber}
-        </SequenceNumber>
-      </ExciseMovement>
+        </urn:SequenceNumber>
+      </urn:ExciseMovement>
       {if (deliveryPlaceTrader.nonEmpty) {
-        <DeliveryPlaceTrader language="en">
+        <urn:DeliveryPlaceTrader language="en">
           {deliveryPlaceTrader.toXml}
-        </DeliveryPlaceTrader>
+        </urn:DeliveryPlaceTrader>
       }}
-      <DestinationOffice>
-        <ReferenceNumber>
+      <urn:DestinationOffice>
+        <urn:ReferenceNumber>
           {destinationOffice}
-        </ReferenceNumber>
-      </DestinationOffice>
-      <ReportOfReceiptExport>
-        <DateOfArrivalOfExciseProducts>
+        </urn:ReferenceNumber>
+      </urn:DestinationOffice>
+      <urn:ReportOfReceiptExport>
+        <urn:DateOfArrivalOfExciseProducts>
           {dateOfArrival.toString}
-        </DateOfArrivalOfExciseProducts>
-        <GlobalConclusionOfReceipt>
+        </urn:DateOfArrivalOfExciseProducts>
+        <urn:GlobalConclusionOfReceipt>
           {globalConclusion}
-        </GlobalConclusionOfReceipt>
-        {otherInformation.map(x => <ComplementaryInformation language="en">{x}</ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
-      </ReportOfReceiptExport>
+        </urn:GlobalConclusionOfReceipt>
+        {otherInformation.map(x => <urn:ComplementaryInformation language="en">{x}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+      </urn:ReportOfReceiptExport>
       {individualItems.map(_.toXml)}
-    </AcceptedOrRejectedReportOfReceiptExport>
+    </urn:AcceptedOrRejectedReportOfReceiptExport>
 }
 
 object SubmitReportOfReceiptRequest {

@@ -31,14 +31,14 @@ trait ReceiptedItemsModelFixtures extends BaseFixtures with UnsatisfactoryModelF
   )
 
   val excessReceiptedItemsModelXML =
-    <BodyReportOfReceiptExport>
-      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
-      <IndicatorOfShortageOrExcess>E</IndicatorOfShortageOrExcess>
-      <ObservedShortageOrExcess>12.145</ObservedShortageOrExcess>
-      <ExciseProductCode>W300</ExciseProductCode>
-      <RefusedQuantity>10</RefusedQuantity>
+    <urn:BodyReportOfReceiptExport>
+      <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
+      <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
+      <urn:ObservedShortageOrExcess>12.145</urn:ObservedShortageOrExcess>
+      <urn:ExciseProductCode>W300</urn:ExciseProductCode>
+      <urn:RefusedQuantity>10</urn:RefusedQuantity>
       {maxUnsatisfactoryModelXML(Excess)}
-    </BodyReportOfReceiptExport>
+    </urn:BodyReportOfReceiptExport>
 
   val shortageReceiptedItemsModel = ReceiptedItemsModel(
     eadBodyUniqueReference = 1,
@@ -55,17 +55,17 @@ trait ReceiptedItemsModelFixtures extends BaseFixtures with UnsatisfactoryModelF
   )
 
   val shortageReceiptedItemsModelXML =
-    <BodyReportOfReceiptExport>
-      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
-      <IndicatorOfShortageOrExcess>S</IndicatorOfShortageOrExcess>
-      <ObservedShortageOrExcess>12.145</ObservedShortageOrExcess>
-      <ExciseProductCode>W300</ExciseProductCode>
-      <RefusedQuantity>10</RefusedQuantity>
+    <urn:BodyReportOfReceiptExport>
+      <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
+      <urn:IndicatorOfShortageOrExcess>S</urn:IndicatorOfShortageOrExcess>
+      <urn:ObservedShortageOrExcess>12.145</urn:ObservedShortageOrExcess>
+      <urn:ExciseProductCode>W300</urn:ExciseProductCode>
+      <urn:RefusedQuantity>10</urn:RefusedQuantity>
       {maxUnsatisfactoryModelXML(Excess)}
       {maxUnsatisfactoryModelXML(BrokenSeals)}
       {maxUnsatisfactoryModelXML(Other)}
       {maxUnsatisfactoryModelXML(Damaged)}
-    </BodyReportOfReceiptExport>
+    </urn:BodyReportOfReceiptExport>
 
   val minReceiptedItemsModel = ReceiptedItemsModel(
     eadBodyUniqueReference = 1,
@@ -79,9 +79,9 @@ trait ReceiptedItemsModelFixtures extends BaseFixtures with UnsatisfactoryModelF
   )
 
   val minReceiptedItemsModelXML =
-    <BodyReportOfReceiptExport>
-      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
-      <ExciseProductCode>W300</ExciseProductCode>
+    <urn:BodyReportOfReceiptExport>
+      <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
+      <urn:ExciseProductCode>W300</urn:ExciseProductCode>
       {minUnsatisfactoryModelXML(Damaged)}
-    </BodyReportOfReceiptExport>
+    </urn:BodyReportOfReceiptExport>
 }

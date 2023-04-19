@@ -31,10 +31,10 @@ trait AddressModelFixtures extends BaseFixtures {
 
   val maxAddressModelXML =
     NodeSeq.fromSeq(Seq(
-      <StreetName>street</StreetName>,
-      <StreetNumber>number</StreetNumber>,
-      <Postcode>postcode</Postcode>,
-      <City>city</City>
+      <urn:StreetName>street</urn:StreetName>,
+      <urn:StreetNumber>number</urn:StreetNumber>,
+      <urn:Postcode>postcode</urn:Postcode>,
+      <urn:City>city</urn:City>
     ))
 
   val minAddressModel = AddressModel(
