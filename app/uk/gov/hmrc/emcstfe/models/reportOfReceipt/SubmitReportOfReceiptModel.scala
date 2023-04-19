@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request.reportOfReceipt
+package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement
@@ -23,7 +23,7 @@ import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
 import java.time.{Instant, LocalDate}
 import scala.xml.{Elem, NodeSeq}
 
-case class SubmitReportOfReceiptRequest(arc: String,
+case class SubmitReportOfReceiptModel(arc: String,
                                         sequenceNumber: Int,
                                         consigneeTrader: TraderModel,
                                         deliveryPlaceTrader: TraderModel,
@@ -85,6 +85,6 @@ case class SubmitReportOfReceiptRequest(arc: String,
     </urn:AcceptedOrRejectedReportOfReceiptExport>
 }
 
-object SubmitReportOfReceiptRequest {
-  implicit val fmt: Format[SubmitReportOfReceiptRequest] = Json.format
+object SubmitReportOfReceiptModel {
+  implicit val fmt: Format[SubmitReportOfReceiptModel] = Json.format
 }

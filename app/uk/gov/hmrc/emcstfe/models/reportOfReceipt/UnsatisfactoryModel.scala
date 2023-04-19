@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request.reportOfReceipt
+package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement

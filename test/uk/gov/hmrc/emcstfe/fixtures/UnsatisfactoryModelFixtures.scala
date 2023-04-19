@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement._
-import uk.gov.hmrc.emcstfe.models.request.reportOfReceipt.UnsatisfactoryModel
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.UnsatisfactoryModel
 
 trait UnsatisfactoryModelFixtures extends BaseFixtures {
 

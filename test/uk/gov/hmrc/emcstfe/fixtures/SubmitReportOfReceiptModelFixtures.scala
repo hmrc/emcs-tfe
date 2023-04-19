@@ -18,18 +18,18 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{PartiallyRefused, Satisfactory}
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.Excess
-import uk.gov.hmrc.emcstfe.models.request.reportOfReceipt.SubmitReportOfReceiptRequest
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
 import java.time.LocalDate
 
-trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
+trait SubmitReportOfReceiptModelFixtures extends BaseFixtures
   with TraderModelFixtures
   with ReceiptedItemsModelFixtures {
 
   val arrivalDate = LocalDate.now()
   val destinationOfficeId = "GB000434"
 
-  val maxSubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(
+  val maxSubmitReportOfReceiptModel = SubmitReportOfReceiptModel(
     arc = testArc,
     sequenceNumber = 1,
     consigneeTrader = maxTraderModel,
@@ -44,11 +44,11 @@ trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
     otherInformation = Some("other")
   )
 
-  val maxSubmitReportOfReceiptRequestXML =
+  val maxSubmitReportOfReceiptModelXML =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes>
         <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-          {maxSubmitReportOfReceiptRequest.creationTimestamp.toString}
+          {maxSubmitReportOfReceiptModel.creationTimestamp.toString}
         </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
       </urn:Attributes>
       <urn:ConsigneeTrader language="en">
@@ -77,7 +77,7 @@ trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
       </urn:DestinationOffice>
       <urn:ReportOfReceiptExport>
         <urn:DateOfArrivalOfExciseProducts>{arrivalDate.toString}</urn:DateOfArrivalOfExciseProducts>
-        <urn:GlobalConclusionOfReceipt>{maxSubmitReportOfReceiptRequest.globalConclusion}</urn:GlobalConclusionOfReceipt>
+        <urn:GlobalConclusionOfReceipt>{maxSubmitReportOfReceiptModel.globalConclusion}</urn:GlobalConclusionOfReceipt>
         <urn:ComplementaryInformation language="en">
           other
         </urn:ComplementaryInformation>
@@ -101,7 +101,7 @@ trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
     </urn:AcceptedOrRejectedReportOfReceiptExport>
 
 
-  val minSubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(
+  val minSubmitReportOfReceiptModel = SubmitReportOfReceiptModel(
     arc = testArc,
     sequenceNumber = 1,
     consigneeTrader = minTraderModel,
@@ -113,11 +113,11 @@ trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
     otherInformation = None
   )
 
-  val minSubmitReportOfReceiptRequestXML =
+  val minSubmitReportOfReceiptModelXML =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes>
         <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-          {minSubmitReportOfReceiptRequest.creationTimestamp.toString}
+          {minSubmitReportOfReceiptModel.creationTimestamp.toString}
         </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
       </urn:Attributes>
       <urn:ExciseMovement>
@@ -136,7 +136,7 @@ trait SubmitReportOfReceiptRequestFixtures extends BaseFixtures
           {arrivalDate.toString}
         </urn:DateOfArrivalOfExciseProducts>
         <urn:GlobalConclusionOfReceipt>
-          {minSubmitReportOfReceiptRequest.globalConclusion}
+          {minSubmitReportOfReceiptModel.globalConclusion}
         </urn:GlobalConclusionOfReceipt>
       </urn:ReportOfReceiptExport>
     </urn:AcceptedOrRejectedReportOfReceiptExport>

@@ -17,11 +17,11 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement._
-import uk.gov.hmrc.emcstfe.models.request.reportOfReceipt.ReceiptedItemsModel
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 trait ReceiptedItemsModelFixtures extends BaseFixtures with UnsatisfactoryModelFixtures {
 
-  val excessReceiptedItemsModel = ReceiptedItemsModel(
+  val excessReceiptedItemsModel = reportOfReceipt.ReceiptedItemsModel(
     eadBodyUniqueReference = 1,
     productCode = "W300",
     excessAmount = Some(12.145),
@@ -40,7 +40,7 @@ trait ReceiptedItemsModelFixtures extends BaseFixtures with UnsatisfactoryModelF
       {maxUnsatisfactoryModelXML(Excess)}
     </urn:BodyReportOfReceiptExport>
 
-  val shortageReceiptedItemsModel = ReceiptedItemsModel(
+  val shortageReceiptedItemsModel = reportOfReceipt.ReceiptedItemsModel(
     eadBodyUniqueReference = 1,
     productCode = "W300",
     excessAmount = None,
@@ -67,7 +67,7 @@ trait ReceiptedItemsModelFixtures extends BaseFixtures with UnsatisfactoryModelF
       {maxUnsatisfactoryModelXML(Damaged)}
     </urn:BodyReportOfReceiptExport>
 
-  val minReceiptedItemsModel = ReceiptedItemsModel(
+  val minReceiptedItemsModel = reportOfReceipt.ReceiptedItemsModel(
     eadBodyUniqueReference = 1,
     productCode = "W300",
     excessAmount = None,
