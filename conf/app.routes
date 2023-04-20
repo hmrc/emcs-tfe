@@ -1,7 +1,9 @@
 # microservice specific routes
 
-GET         /movements/:exciseRegistrationNumber            uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(exciseRegistrationNumber, search: GetMovementListSearchOptions)
-GET         /movement/:exciseRegistrationNumber/:arc        uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(exciseRegistrationNumber, arc, forceFetchNew: Boolean)
+GET         /movements/:ern                                 uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(ern, search: GetMovementListSearchOptions)
+GET         /movement/:ern/:arc                             uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(ern, arc, forceFetchNew: Boolean)
+
+POST        /report-of-receipt/:ern/:arc                    uk.gov.hmrc.emcstfe.controllers.SubmitReportOfReceiptController.submit(ern, arc)
 
 GET         /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.get(ern, arc)
 PUT         /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.set(ern, arc)
