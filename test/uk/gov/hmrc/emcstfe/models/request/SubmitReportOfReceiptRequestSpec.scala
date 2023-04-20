@@ -33,10 +33,10 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
       val expectedSoapRequest =
         <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
           <soapenv:Header>
-            <VersionNo>2.1</VersionNo>
+            <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1"/>
           </soapenv:Header>
           <soapenv:Body>
-            <urn:IE818>
+            <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
               <urn:Header>
                 <urn1:MessageSender>NDEA.GB</urn1:MessageSender>
                 <urn1:MessageRecipient>NDEA.GB</urn1:MessageRecipient>
