@@ -55,9 +55,9 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     super.afterAll()
   }
 
-  def buildRequest(path: String): WSRequest = client
+  def buildRequest(path: String, extraHeaders: (String, String)*): WSRequest = client
     .url(s"http://localhost:$port/emcs-tfe$path")
-    .withHttpHeaders(HeaderNames.AUTHORIZATION -> "auth1234")
+    .withHttpHeaders(Seq(HeaderNames.AUTHORIZATION -> "auth1234") ++ extraHeaders:_*)
     .withFollowRedirects(false)
 
   def document(response: WSResponse): JsValue = Json.parse(response.body)

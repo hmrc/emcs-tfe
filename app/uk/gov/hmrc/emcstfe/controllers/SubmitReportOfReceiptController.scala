@@ -21,6 +21,7 @@ import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.predicates.AuthAction
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.services.SubmitReportOfReceiptService
+import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
@@ -30,7 +31,7 @@ import scala.concurrent.ExecutionContext
 class SubmitReportOfReceiptController @Inject()(cc: ControllerComponents,
                                                 service: SubmitReportOfReceiptService,
                                                 authAction: AuthAction
-                                               )(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                               )(implicit ec: ExecutionContext) extends BackendController(cc) with Logging {
 
   def submit(ern: String, arc: String): Action[JsValue] = authAction(ern).async(parse.json) { implicit request =>
     withJsonBody[SubmitReportOfReceiptModel] { submission =>

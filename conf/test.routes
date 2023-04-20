@@ -1,1 +1,1 @@
-POST        /submit        uk.gov.hmrc.emcstfe.controllers.SubmitDraftMovementController.submitDraftMovement()
+POST        /submit        uk.gov.hmrc.emcstfe.controllers.testOnly.SubmitDraftMovementController.submitDraftMovement()

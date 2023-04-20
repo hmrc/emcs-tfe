@@ -36,7 +36,7 @@ class SubmitDraftMovementResponseSpec extends UnitSpec with SubmitDraftMovementF
     "successfully read a movement" when {
 
       "all fields are valid" in {
-        ChRISSuccessResponse.xmlReader.read(XML.loadString(submitDraftMovementResponseBody)) shouldBe ParseSuccess(chrisSuccessResponse.copy(lrn = None))
+        ChRISSuccessResponse.xmlReader.read(XML.loadString(chrisSuccessSOAPResponseBody)) shouldBe ParseSuccess(chrisSuccessResponse.copy(lrn = None))
       }
     }
 

@@ -21,6 +21,28 @@ import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 
 trait ChRISResponsesFixture {
 
+  lazy val chrisSuccessSOAPResponseBody: String =
+    """<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+      |  xmlns:ns="http://www.inlandrevenue.gov.uk/SOAP/Response/2">
+      |  <soap:Body>
+      |    <ns:HMRCSOAPResponse>
+      |      <SuccessResponse>
+      |        <IRmarkReceipt>
+      |          <dsig:Signature xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+      |            <dsig:SignedInfo>
+      |              <dsig:Reference>
+      |                <dsig:DigestValue>KWrqNXggsCEMgbOr3wiozyfrdU0=</dsig:DigestValue>
+      |              </dsig:Reference>
+      |            </dsig:SignedInfo>
+      |          </dsig:Signature>
+      |        </IRmarkReceipt>
+      |        <Message code="077001">Thank you for your submission</Message>
+      |        <AcceptedTime>2009-01-01T10:10:10.000</AcceptedTime>
+      |      </SuccessResponse>
+      |    </ns:HMRCSOAPResponse>
+      |  </soap:Body>
+      |</soap:Envelope>""".stripMargin
+
   lazy val chrisSuccessResponse: ChRISSuccessResponse = ChRISSuccessResponse(
     receipt = "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
     lrn = Some("EN")
@@ -30,6 +52,11 @@ trait ChRISResponsesFixture {
     """{
       |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
       |    "lrn": "EN"
+      |}""".stripMargin)
+
+  lazy val chrisSuccessJsonNoLRN: JsValue = Json.parse(
+    """{
+      |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN"
       |}""".stripMargin)
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.controllers
+package uk.gov.hmrc.emcstfe.controllers.testOnly
 
 import play.api.Play.materializer
 import play.api.http.Status

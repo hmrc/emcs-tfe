@@ -52,9 +52,12 @@ class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
 
         implicit val req = request
 
+
+
         authorised().retrieve(Retrievals.affinityGroup and Retrievals.allEnrolments and Retrievals.internalId and Retrievals.credentials) {
 
           case Some(Organisation) ~ enrolments ~ Some(internalId) ~ Some(credentials) =>
+            logger.debug("[invokeBlock] Checking for EMCS Enrolment")
             checkOrganisationEMCSEnrolment(ern, enrolments, internalId, credentials.providerId)(block)
 
           case Some(Organisation) ~ _ ~ None ~ _ =>
@@ -74,7 +77,8 @@ class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
             Future.successful(Unauthorized)
 
         } recover {
-          case _: NoActiveSession =>
+          case x: NoActiveSession =>
+            logger.debug(s"[invokeBlock] NoActiveSession Exception with reason: ${x.reason}")
             Unauthorized
           case x: AuthorisationException =>
             logger.debug(s"[invokeBlock] Authorisation Exception ${x.reason}")
