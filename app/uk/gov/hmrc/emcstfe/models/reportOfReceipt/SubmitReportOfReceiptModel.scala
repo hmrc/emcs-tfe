@@ -25,8 +25,8 @@ import scala.xml.{Elem, NodeSeq}
 
 case class SubmitReportOfReceiptModel(arc: String,
                                         sequenceNumber: Int,
-                                        consigneeTrader: TraderModel,
-                                        deliveryPlaceTrader: TraderModel,
+                                        consigneeTrader: Option[TraderModel],
+                                        deliveryPlaceTrader: Option[TraderModel],
                                         destinationOffice: String,
                                         dateOfArrival: LocalDate,
                                         acceptMovement: AcceptMovement,
@@ -49,11 +49,11 @@ case class SubmitReportOfReceiptModel(arc: String,
           {creationTimestamp.toString}
         </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
       </urn:Attributes>
-      {if(consigneeTrader.nonEmpty) {
+      {consigneeTrader.map { ct =>
         <urn:ConsigneeTrader language="en">
-          {consigneeTrader.toXml}
+          {ct.toXml}
         </urn:ConsigneeTrader>
-      }}
+      }.getOrElse(NodeSeq.Empty)}
       <urn:ExciseMovement>
         <urn:AdministrativeReferenceCode>
           {arc}
@@ -62,11 +62,11 @@ case class SubmitReportOfReceiptModel(arc: String,
           {sequenceNumber}
         </urn:SequenceNumber>
       </urn:ExciseMovement>
-      {if (deliveryPlaceTrader.nonEmpty) {
+      {deliveryPlaceTrader.map { dt =>
         <urn:DeliveryPlaceTrader language="en">
-          {deliveryPlaceTrader.toXml}
+          {dt.toXml}
         </urn:DeliveryPlaceTrader>
-      }}
+      }.getOrElse(NodeSeq.Empty)}
       <urn:DestinationOffice>
         <urn:ReferenceNumber>
           {destinationOffice}

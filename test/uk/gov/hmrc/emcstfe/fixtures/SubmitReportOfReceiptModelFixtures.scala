@@ -32,8 +32,8 @@ trait SubmitReportOfReceiptModelFixtures extends BaseFixtures
   val maxSubmitReportOfReceiptModel = SubmitReportOfReceiptModel(
     arc = testArc,
     sequenceNumber = 1,
-    consigneeTrader = maxTraderModel,
-    deliveryPlaceTrader = maxTraderModel.copy(eoriNumber = None),
+    consigneeTrader = Some(maxTraderModel),
+    deliveryPlaceTrader = Some(maxTraderModel.copy(eoriNumber = None)),
     destinationOffice = destinationOfficeId,
     dateOfArrival = arrivalDate,
     acceptMovement = PartiallyRefused,
@@ -104,8 +104,8 @@ trait SubmitReportOfReceiptModelFixtures extends BaseFixtures
   val minSubmitReportOfReceiptModel = SubmitReportOfReceiptModel(
     arc = testArc,
     sequenceNumber = 1,
-    consigneeTrader = minTraderModel,
-    deliveryPlaceTrader = minTraderModel,
+    consigneeTrader = None,
+    deliveryPlaceTrader = None,
     destinationOffice = destinationOfficeId,
     dateOfArrival = arrivalDate,
     acceptMovement = Satisfactory,
