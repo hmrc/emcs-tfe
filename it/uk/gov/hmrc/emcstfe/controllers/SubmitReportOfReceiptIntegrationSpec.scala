@@ -21,26 +21,26 @@ import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import uk.gov.hmrc.emcstfe.fixtures.SubmitDraftMovementFixture
+import uk.gov.hmrc.emcstfe.fixtures.{SubmitDraftMovementFixture, SubmitReportOfReceiptFixtures}
+import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
-import uk.gov.hmrc.emcstfe.models.response.SubmitDraftMovementResponse
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import scala.xml.XML
 
-class SubmitDraftMovementIntegrationSpec extends IntegrationBaseSpec with SubmitDraftMovementFixture {
+class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with SubmitReportOfReceiptFixtures {
 
   private trait Test {
     def setupStubs(): StubMapping
 
-    def uri: String = s"/test-only/submit"
+    def uri: String = s"/report-of-receipt/$testErn/$testArc"
 
-    def downstreamUri: String = s"/ChRIS/EMCS/SubmitDraftMovementPortal/3"
+    def downstreamUri: String = s"/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest(uri).withHttpHeaders("Content-Type" -> "application/xml")
+      buildRequest(uri, "Content-Type" -> "application/json")
     }
   }
 
@@ -48,13 +48,14 @@ class SubmitDraftMovementIntegrationSpec extends IntegrationBaseSpec with Submit
     "return a success" when {
       "all downstream calls are successful" in new Test {
         override def setupStubs(): StubMapping = {
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(submitDraftMovementResponseBody))
+          AuthStub.authorised()
+          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(chrisSuccessSOAPResponseBody))
         }
 
-        val response: WSResponse = await(request().post(submitDraftMovementRequestBody))
+        val response: WSResponse = await(request().post(Json.toJson(maxSubmitReportOfReceiptModel)))
         response.status shouldBe Status.OK
         response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe submitDraftMovementJson
+        response.json shouldBe chrisSuccessJsonNoLRN
       }
     }
     "return an error" when {
@@ -64,10 +65,10 @@ class SubmitDraftMovementIntegrationSpec extends IntegrationBaseSpec with Submit
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, <Message>Success!</Message>)
         }
 
-        val response: WSResponse = await(request().post(submitDraftMovementRequestBody))
+        val response: WSResponse = await(request().post(Json.toJson(maxSubmitReportOfReceiptModel)))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(SubmitDraftMovementResponse.digestValue), EmptyError(SubmitDraftMovementResponse.digestValue))))
+        response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(ChRISSuccessResponse.digestValue), EmptyError(ChRISSuccessResponse.digestValue))))
       }
       "downstream call returns something other than XML" in new Test {
         val responseBody: JsValue = Json.obj("message" -> "Success!")
@@ -77,7 +78,7 @@ class SubmitDraftMovementIntegrationSpec extends IntegrationBaseSpec with Submit
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, responseBody)
         }
 
-        val response: WSResponse = await(request().post(submitDraftMovementRequestBody))
+        val response: WSResponse = await(request().post(Json.toJson(maxSubmitReportOfReceiptModel)))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe Json.toJson(XmlValidationError)
@@ -96,7 +97,7 @@ class SubmitDraftMovementIntegrationSpec extends IntegrationBaseSpec with Submit
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
         }
 
-        val response: WSResponse = await(request().post(submitDraftMovementRequestBody))
+        val response: WSResponse = await(request().post(Json.toJson(maxSubmitReportOfReceiptModel)))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)

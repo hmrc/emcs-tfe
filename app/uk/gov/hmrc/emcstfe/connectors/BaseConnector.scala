@@ -37,6 +37,8 @@ trait BaseConnector extends Logging {
 
     val headerCarrier = hc.copy(extraHeaders = hc.extraHeaders ++ hc.headers(appConfig.chrisHeaders))
 
+    logger.debug(s"[postString] POST to $uri being made with body:\n\n$body")
+
     http.POSTString[Either[A,B]](uri, body, chrisHeaders(action))(rds, headerCarrier, ec)
   }
 }

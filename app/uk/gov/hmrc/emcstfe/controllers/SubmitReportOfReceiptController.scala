@@ -16,27 +16,29 @@
 
 package uk.gov.hmrc.emcstfe.controllers
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.predicates.AuthAction
-import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
-import uk.gov.hmrc.emcstfe.services.SubmitDraftMovementService
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
+import uk.gov.hmrc.emcstfe.services.SubmitReportOfReceiptService
+import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import scala.xml.NodeSeq
 
 @Singleton()
-class SubmitDraftMovementController @Inject()(cc: ControllerComponents,
-                                              service: SubmitDraftMovementService,
-                                              authAction: AuthAction
-                                             )(implicit ec: ExecutionContext) extends BackendController(cc) {
+class SubmitReportOfReceiptController @Inject()(cc: ControllerComponents,
+                                                service: SubmitReportOfReceiptService,
+                                                authAction: AuthAction
+                                               )(implicit ec: ExecutionContext) extends BackendController(cc) with Logging {
 
-  def submitDraftMovement(): Action[NodeSeq] = Action.async(parse.xml) { implicit request =>
-    service.submitDraftMovement(SubmitDraftMovementRequest(requestBody = request.body.toString())).map {
-      case Left(value) => InternalServerError(Json.toJson(value))
-      case Right(value) => Ok(Json.toJson(value))
+  def submit(ern: String, arc: String): Action[JsValue] = authAction(ern).async(parse.json) { implicit request =>
+    withJsonBody[SubmitReportOfReceiptModel] { submission =>
+      service.submit(ern, submission).map {
+        case Left(value) => InternalServerError(Json.toJson(value))
+        case Right(value) => Ok(Json.toJson(value))
+      }
     }
   }
 }

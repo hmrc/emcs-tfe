@@ -26,38 +26,18 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 ### Responses
 
+#### Success Response(s)
+
 **Status**: 200 (OK) 
 
-**Body**:
+**Body**: [GetMovementListResponse Model](app/uk/gov/hmrc/emcstfe/models/response/GetMovementListResponse.scala)
 
-```json
-{
-  "movements": [
-    {
-      "arc": "GBTR000000EMCS1000040",
-      "dateOfDispatch": "2009-01-26T14:12:00",
-      "movementStatus": "Accepted",
-      "otherTraderID": "ABCD1234"
-    },
-    {
-      "arc": "GBTR000000EMCS1000044",
-      "dateOfDispatch": "2009-01-26T14:15:00",
-      "movementStatus": "Accepted",
-      "otherTraderID": "ABCD1234"
-    }
-  ]
-}
-```
+#### Error Response(s)
 
 **Status**: 500 (ISE)
 
-**Body**:
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
 
-```json
-{
-  "message": "JSON validation error"
-}
-```
 </details>
 
 <details>
@@ -67,50 +47,48 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 ### Responses
 
+#### Success Response(s)
+
 **Status**: 200 (OK)
 
-**Body**:
+**Body**: [GetMovementResponse Model](app/uk/gov/hmrc/emcstfe/models/response/GetMovementResponse.scala)
 
-```json
-{
-  "localReferenceNumber": "EN",
-  "eadStatus": "Accepted",
-  "consignorName": "Current 801 Consignor",
-  "dateOfDispatch": "2008-11-20",
-  "journeyTime": "20 days",
-  "items": [
-    {
-      "itemUniqueReference": 1,
-      "productCode": "W200",
-      "cnCode": "22041011",
-      "quantity": 500,
-      "grossMass": 900,
-      "netMass": 375
-    },
-    {
-      "itemUniqueReference": 2,
-      "productCode": "W300",
-      "cnCode": "27111901",
-      "quantity": 501,
-      "grossMass": 901,
-      "netMass": 475,
-      "alcoholicStrength": 12.7
-    }
-  ],
-  "numberOfItems": 2
-}
-```
+#### Error Response(s)
 
 **Status**: 500 (ISE)
 
-**Body**:
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
 
-```json
-{
-  "message": "JSON validation error"
-}
-```
 </details>
+
+---
+
+### Report Of Receipt
+
+<details>
+<summary>Submit a Report of Receipt
+
+**`POST`** /report-of-receipt/:ern/:arc</summary>
+
+**Request Body**: [SubmitReportOfReceiptModel Model](app/uk/gov/hmrc/emcstfe/models/reportOfReceipt/SubmitReportOfReceiptModel.scala)
+
+### Responses
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [GetMovementListResponse Model](app/uk/gov/hmrc/emcstfe/models/response/GetMovementListResponse.scala)
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+---
 
 ### User Answers
 
@@ -125,24 +103,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK) _(when data is found for supplied ern and arc)_
 
-**Body**:
-
-```json
-{
-  "internalId": "abcd1234",
-  "ern" : "ern",
-  "arc" : "arc",
-  "data": {
-    "page1": "foo",
-    "page2": "bar"
-  },
-  "lastUpdated": {
-    "$date": {
-      "$numberLong":"1678194091686"
-    }
-  }
-}
-```
+**Body**: [ReportReceiptUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ReportReceiptUserAnswers.scala)
 
 **Status**: 204 (NO_CONTENT) _(when NO data is found)_
 
@@ -153,13 +114,8 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 500 (ISE)
 
-**Body**:
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
 
-```json
-{
-  "message": "Err Message"
-}
-```
 </details>
 
 <details>
@@ -169,53 +125,13 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
 
-#### Request Body
-
-`ReportReceiptUserAnswers` model:
-
-```json
-{
-  "internalId": "abcd1234",
-  "ern" : "ern",
-  "arc" : "arc",
-  "data": {
-    "page1": "foo",
-    "page2": "bar",
-    "page3": "newEntry"
-  },
-  "lastUpdated": {
-    "$date": {
-      "$numberLong":"1678194091686"
-    }
-  }
-}
-```
+**Request Body**: [ReportReceiptUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ReportReceiptUserAnswers.scala)
 
 #### Success Response(s)
 
 **Status**: 200 (OK)
 
-**Body**:
-
-`ReportReceiptUserAnswers` model:
-
-```json
-{
-  "internalId": "abcd1234",
-  "ern" : "ern",
-  "arc" : "arc",
-  "data": {
-    "page1": "foo",
-    "page2": "bar",
-    "page3": "newEntry"
-  },
-  "lastUpdated": {
-    "$date": {
-      "$numberLong":"1678194091686"
-    }
-  }
-}
-```
+**Body**: [ReportReceiptUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ReportReceiptUserAnswers.scala)
 
 #### Error Response(s)
 
@@ -229,13 +145,8 @@ This method is idempotent, in the sense that if no data exists it will be create
 
 **Status**: 500 (ISE)
 
-**Body**:
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
 
-```json
-{
-  "message": "Err Message"
-}
-```
 </details>
 
 <details>
@@ -255,12 +166,7 @@ This method is idempotent, in the sense that if no data exists it returns NO_CON
 
 **Status**: 500 (ISE)
 
-**Body**:
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
 
-```json
-{
-  "message": "Err Message"
-}
-```
 </details>
   

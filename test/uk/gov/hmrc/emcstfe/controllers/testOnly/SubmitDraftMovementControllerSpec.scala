@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.controllers
+package uk.gov.hmrc.emcstfe.controllers.testOnly
 
 import play.api.Play.materializer
 import play.api.http.Status
@@ -42,12 +42,12 @@ class SubmitDraftMovementControllerSpec extends UnitSpec with MockSubmitDraftMov
     "return 200" when {
       "service returns a Right" in {
 
-        MockService.submitDraftMovement(submitDraftMovementRequest).returns(Future.successful(Right(submitDraftMovementResponse)))
+        MockService.submitDraftMovement(submitDraftMovementRequest).returns(Future.successful(Right(chrisSuccessResponse)))
 
         val result = controller.submitDraftMovement()(fakeRequest)
 
         status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe submitDraftMovementJson
+        contentAsJson(result) shouldBe chrisSuccessJson
       }
     }
     "return 500" when {

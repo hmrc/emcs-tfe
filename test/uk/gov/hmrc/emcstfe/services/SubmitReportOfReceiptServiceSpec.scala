@@ -16,40 +16,37 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitDraftMovementFixture
+import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
-import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{NoLrnError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.request.SubmitReportOfReceiptRequest
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
 
-class SubmitDraftMovementServiceSpec extends UnitSpec with SubmitDraftMovementFixture {
+class SubmitReportOfReceiptServiceSpec extends UnitSpec with SubmitReportOfReceiptFixtures {
   trait Test extends MockChrisConnector {
-    val submitDraftMovementRequest: SubmitDraftMovementRequest = SubmitDraftMovementRequest(exciseRegistrationNumber = "My ERN", arc = "My ARC", requestBody = submitDraftMovementRequestBody)
-    val service: SubmitDraftMovementService = new SubmitDraftMovementService(mockConnector)
+    val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(testErn, maxSubmitReportOfReceiptModel)
+    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockConnector)
   }
 
-  "submitDraftMovement" should {
+  "submit" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
         MockConnector
-          .submitDraftMovementChrisSOAPRequest(submitDraftMovementRequest)
+          .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
           .returns(Future.successful(Right(chrisSuccessResponse)))
 
-        await(service.submitDraftMovement(submitDraftMovementRequest)) shouldBe Right(chrisSuccessResponse)
+        await(service.submit(testErn, maxSubmitReportOfReceiptModel)) shouldBe Right(chrisSuccessResponse)
       }
     }
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
         MockConnector
-          .submitDraftMovementChrisSOAPRequest(submitDraftMovementRequest)
+          .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
           .returns(Future.successful(Left(XmlValidationError)))
 
-        await(service.submitDraftMovement(submitDraftMovementRequest)) shouldBe Left(XmlValidationError)
-      }
-      "request body doesn't contain an LRN" in new Test {
-        await(service.submitDraftMovement(submitDraftMovementRequest.copy(requestBody = "<Something />"))) shouldBe Left(NoLrnError)
+        await(service.submit(testErn, maxSubmitReportOfReceiptModel)) shouldBe Left(XmlValidationError)
       }
     }
   }
