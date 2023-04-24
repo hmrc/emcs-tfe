@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
+import cats.implicits.catsSyntaxTuple4Semigroupal
+import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
 
 import scala.xml.NodeSeq
@@ -24,6 +26,8 @@ case class TraderModel(traderId: Option[String],
                        traderName: Option[String],
                        address: Option[AddressModel],
                        eoriNumber: Option[String]) {
+
+  val isEmpty = traderId.isEmpty && traderName.isEmpty && (address.isEmpty || address.exists(_.isEmpty)) && eoriNumber.isEmpty
 
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
     traderId.map(x => Seq(<urn:Traderid>{x}</urn:Traderid>)),
@@ -34,5 +38,13 @@ case class TraderModel(traderId: Option[String],
 }
 
 object TraderModel {
+
+  implicit val xmlReads: XmlReader[TraderModel] = (
+    (__ \\ "Traderid").read[Option[String]],
+    (__ \\ "TraderName").read[Option[String]],
+    __.read[Option[AddressModel]],
+    (__ \\ "EoriNumber").read[Option[String]]
+  ).mapN(TraderModel.apply)
+
   implicit val fmt: Format[TraderModel] = Json.format
 }

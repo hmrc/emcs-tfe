@@ -86,6 +86,8 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovement
           val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Left(XmlParseError(Seq(
+            EmptyError(GetMovementResponse.arc),
+            EmptyError(GetMovementResponse.sequenceNumber),
             EmptyError(GetMovementResponse.localReferenceNumber),
             EmptyError(GetMovementResponse.eadStatus),
             EmptyError(GetMovementResponse.consignorName),
