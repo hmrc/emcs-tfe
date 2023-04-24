@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, TraderModel}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging}
 
 trait GetMovementFixture extends BaseFixtures {
@@ -458,6 +459,20 @@ trait GetMovementFixture extends BaseFixtures {
                                                |</tns:Envelope>""".stripMargin
 
   lazy val getMovementResponse: GetMovementResponse = GetMovementResponse(
+    arc = "13AB7778889991ABCDEF9",
+    sequenceNumber = 1,
+    consigneeTrader = Some(TraderModel(
+      traderId = Some("GB11100000002"),
+      traderName = Some("Current 801 Consignee"),
+      address = Some(AddressModel(
+        streetNumber = None,
+        street = Some("Aardvark Avenue 253"),
+        postcode = Some("SY1 3BQ"),
+        city = Some("Shrewsbury")
+      )),
+      eoriNumber = None
+    )),
+    deliveryPlaceTrader = None,
     localReferenceNumber = "EN",
     eadStatus = "Accepted",
     consignorName = "Current 801 Consignor",
@@ -503,6 +518,17 @@ trait GetMovementFixture extends BaseFixtures {
   )
 
   lazy val getMovementJson: JsValue = Json.obj(fields =
+    "arc" -> "13AB7778889991ABCDEF9",
+    "sequenceNumber" -> 1,
+    "consigneeTrader" -> Json.obj(fields =
+      "traderId" -> "GB11100000002",
+      "traderName" -> "Current 801 Consignee",
+      "address" -> Json.obj(
+        "street" -> "Aardvark Avenue 253",
+        "postcode" -> "SY1 3BQ",
+        "city" -> "Shrewsbury"
+      )
+    ),
     "localReferenceNumber" -> "EN",
     "eadStatus" -> "Accepted",
     "consignorName" -> "Current 801 Consignor",

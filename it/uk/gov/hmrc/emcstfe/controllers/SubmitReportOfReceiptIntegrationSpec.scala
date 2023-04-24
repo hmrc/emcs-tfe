@@ -21,7 +21,7 @@ import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import uk.gov.hmrc.emcstfe.fixtures.{SubmitDraftMovementFixture, SubmitReportOfReceiptFixtures}
+import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}

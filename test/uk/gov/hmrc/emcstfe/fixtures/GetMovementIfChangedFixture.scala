@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, TraderModel}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging}
 
 trait GetMovementIfChangedFixture extends BaseFixtures {
@@ -80,6 +81,14 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
                                                |              <body:Postcode>45690</body:Postcode>
                                                |              <body:City>Athens</body:City>
                                                |            </body:PlaceOfDispatchTrader>
+                                               |            <body:DeliveryPlaceTrader language="en">
+                                               |              <body:Traderid>GB11100000003</body:Traderid>
+                                               |              <body:TraderName>Delivery Place</body:TraderName>
+                                               |              <body:StreetNumber>253</body:StreetNumber>
+                                               |              <body:StreetName>Test Lane</body:StreetName>
+                                               |              <body:Postcode>TE1 1ST</body:Postcode>
+                                               |              <body:City>London</body:City>
+                                               |            </body:DeliveryPlaceTrader>
                                                |            <body:DeliveryPlaceCustomsOffice>
                                                |              <body:ReferenceNumber>FR000003</body:ReferenceNumber>
                                                |            </body:DeliveryPlaceCustomsOffice>
@@ -479,6 +488,30 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
                                                |</tns:Envelope>""".stripMargin
 
   lazy val getMovementIfChangedResponse: GetMovementResponse = GetMovementResponse(
+    arc = "13AB7778889991ABCDEF9",
+    sequenceNumber = 1,
+    consigneeTrader = Some(TraderModel(
+      traderId = Some("GB11100000002"),
+      traderName = Some("Current 801 Consignee"),
+      address = Some(AddressModel(
+        streetNumber = None,
+        street = Some("Aardvark Avenue 253"),
+        postcode = Some("SY1 3BQ"),
+        city = Some("Shrewsbury")
+      )),
+      eoriNumber = None
+    )),
+    deliveryPlaceTrader = Some(TraderModel(
+      traderId = Some("GB11100000003"),
+      traderName = Some("Delivery Place"),
+      address = Some(AddressModel(
+        streetNumber = Some("253"),
+        street = Some("Test Lane"),
+        postcode = Some("TE1 1ST"),
+        city = Some("London")
+      )),
+      eoriNumber = None
+    )),
     localReferenceNumber = "EN",
     eadStatus = "Beans",
     consignorName = "Current 801 Consignor",
