@@ -35,9 +35,9 @@ object Enumerable {
         case JsString(str) =>
           ev.withName(str).map {
             s => JsSuccess(s)
-          }.getOrElse(JsError("error.invalid"))
+          }.getOrElse(JsError(s"Invalid enumerable value of '$str'"))
         case _ =>
-          JsError("error.invalid")
+          JsError("Enumerable value was not of type JsString")
        }
     }
 
