@@ -472,7 +472,7 @@ trait GetMovementFixture extends BaseFixtures {
       )),
       eoriNumber = None
     )),
-    deliveryPlayTrader = None,
+    deliveryPlaceTrader = None,
     localReferenceNumber = "EN",
     eadStatus = "Accepted",
     consignorName = "Current 801 Consignor",

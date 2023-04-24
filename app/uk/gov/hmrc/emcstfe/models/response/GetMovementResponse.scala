@@ -26,7 +26,7 @@ import uk.gov.hmrc.emcstfe.models.reportOfReceipt.TraderModel
 case class GetMovementResponse(arc: String,
                                sequenceNumber: Int,
                                consigneeTrader: Option[TraderModel],
-                               deliveryPlayTrader: Option[TraderModel],
+                               deliveryPlaceTrader: Option[TraderModel],
                                localReferenceNumber: String,
                                eadStatus: String,
                                consignorName: String,

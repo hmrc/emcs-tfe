@@ -501,7 +501,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
       )),
       eoriNumber = None
     )),
-    deliveryPlayTrader = Some(TraderModel(
+    deliveryPlaceTrader = Some(TraderModel(
       traderId = Some("GB11100000003"),
       traderName = Some("Delivery Place"),
       address = Some(AddressModel(
