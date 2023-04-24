@@ -16,13 +16,17 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple7Semigroupal
+import cats.implicits.catsSyntaxTuple11Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.TraderModel
 
-case class GetMovementResponse(
+case class GetMovementResponse(arc: String,
+                               sequenceNumber: Int,
+                               consigneeTrader: Option[TraderModel],
+                               deliveryPlayTrader: Option[TraderModel],
                                localReferenceNumber: String,
                                eadStatus: String,
                                consignorName: String,
@@ -30,21 +34,29 @@ case class GetMovementResponse(
                                journeyTime: String,
                                items: Seq[MovementItem],
                                numberOfItems: Int
-                             )
+                              )
 
 object GetMovementResponse {
 
   val currentMovement: XPath = __ \\ "currentMovement"
   val eadStatus: XPath = currentMovement \ "status"
   val EADESADContainer: XPath = currentMovement \ "IE801" \ "Body" \ "EADESADContainer"
+  val arc: XPath = EADESADContainer \ "ExciseMovement" \ "AdministrativeReferenceCode"
   val localReferenceNumber: XPath = EADESADContainer \ "EadEsad" \ "LocalReferenceNumber"
   val consignorName: XPath = EADESADContainer \ "ConsignorTrader" \ "TraderName"
   val dateOfDispatch: XPath = EADESADContainer \ "EadEsad" \ "DateOfDispatch"
   val journeyTime: XPath = EADESADContainer \ "HeaderEadEsad" \ "JourneyTime"
+  val sequenceNumber: XPath = EADESADContainer \ "HeaderEadEsad" \ "SequenceNumber"
+  val consigneeTrader: XPath = EADESADContainer \\ "ConsigneeTrader"
+  val deliveryPlaceTrader: XPath = EADESADContainer \\ "DeliveryPlaceTrader"
   val items: XPath = EADESADContainer \ "BodyEadEsad"
   val numberOfItems: XPath = EADESADContainer \\ "BodyEadEsad" \\ "CnCode"
 
   implicit val xmlReader: XmlReader[GetMovementResponse] = (
+    arc.read[String],
+    sequenceNumber.read[Int],
+    consigneeTrader.read[Option[TraderModel]].map(model => if(model.exists(_.isEmpty)) None else model),
+    deliveryPlaceTrader.read[Option[TraderModel]].map(model => if(model.exists(_.isEmpty)) None else model),
     localReferenceNumber.read[String],
     eadStatus.read[String],
     consignorName.read[String],
