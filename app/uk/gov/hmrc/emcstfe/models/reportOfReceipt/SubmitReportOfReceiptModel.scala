@@ -20,6 +20,7 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
 
+import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import scala.xml.{Elem, NodeSeq}
 
@@ -46,7 +47,7 @@ case class SubmitReportOfReceiptModel(arc: String,
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes>
         <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-          {creationTimestamp.toString}
+          {creationTimestamp.truncatedTo(ChronoUnit.MILLIS).toString.replace("Z","")}
         </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
       </urn:Attributes>
       {consigneeTrader.map { ct =>
