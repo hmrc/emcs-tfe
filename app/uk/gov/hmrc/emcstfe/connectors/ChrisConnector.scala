@@ -64,6 +64,7 @@ class ChrisConnector @Inject()(val http: HttpClient,
   def submitReportOfReceiptChrisSOAPRequest[A](request: ChrisRequest)
                                               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
     val url: String = s"${appConfig.chrisUrl}/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+
     soapUtils.prepareXmlForSubmission(XML.loadString(request.requestBody)) match {
       case Left(errorResponse) => Future.successful(Left(errorResponse))
       case Right(preparedXml) =>

@@ -21,6 +21,7 @@ import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.Excess
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 trait SubmitReportOfReceiptFixtures extends BaseFixtures
   with TraderModelFixtures
@@ -49,7 +50,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes>
         <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-          {maxSubmitReportOfReceiptModel.creationTimestamp.toString}
+          {maxSubmitReportOfReceiptModel.creationTimestamp.truncatedTo(ChronoUnit.MILLIS).toString.replace("Z","").toString}
         </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
       </urn:Attributes>
       <urn:ConsigneeTrader language="en">
@@ -118,7 +119,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes>
         <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-          {minSubmitReportOfReceiptModel.creationTimestamp.toString}
+          {minSubmitReportOfReceiptModel.creationTimestamp.truncatedTo(ChronoUnit.MILLIS).toString.replace("Z","")}
         </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
       </urn:Attributes>
       <urn:ExciseMovement>
