@@ -25,6 +25,7 @@ trait MockAppConfig extends MockFactory {
 
   object MockedAppConfig {
     def chrisUrl: CallHandler[String] = ((() => mockAppConfig.chrisUrl): () => String).expects()
+    def chrisHeaders: CallHandler[Seq[String]] = ((() => mockAppConfig.chrisHeaders): () => Seq[String]).expects()
   }
 
 }

@@ -34,7 +34,11 @@ trait BaseConnector extends Logging {
 
   def postString[A, B](http: HttpClient, uri: String, body: String, action: String)
                       (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A,B]]): Future[Either[A, B]] = {
-    logger.debug(s"[postString] POST to $uri being made with body:\n\n$body")
-    http.POSTString[Either[A,B]](uri, body, chrisHeaders(action))
+
+    val extraHeaders = hc.headers(appConfig.chrisHeaders) ++ chrisHeaders(action)
+
+    logger.debug(s"[postString] POST to $uri being made with body:\n\n$body headers:\n\n$extraHeaders")
+
+    http.POSTString[Either[A,B]](uri, body, extraHeaders)
   }
 }
