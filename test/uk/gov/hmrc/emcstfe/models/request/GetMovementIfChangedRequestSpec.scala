@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import scala.xml.XML
 
 class GetMovementIfChangedRequestSpec extends UnitSpec {
-  val request = GetMovementIfChangedRequest("My ERN", "My ARC")
+  val request = GetMovementIfChangedRequest("My ERN", "My ARC", "1", "008")
 
   "requestBody" should {
     "generate the correct request XML" in {
@@ -32,7 +32,7 @@ class GetMovementIfChangedRequestSpec extends UnitSpec {
       (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Source").text shouldBe "emcs_tfe"
       (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Identity").text shouldBe "portal"
       (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Partner").text shouldBe "UK"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").map(_.text) shouldBe Seq("My ERN", "My ARC")
+      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").map(_.text) shouldBe Seq("My ERN", "My ARC", "1", "008")
     }
   }
 

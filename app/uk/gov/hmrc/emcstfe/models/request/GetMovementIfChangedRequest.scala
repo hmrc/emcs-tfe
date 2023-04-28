@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-case class GetMovementIfChangedRequest(exciseRegistrationNumber: String, arc: String) extends ChrisRequest {
+case class GetMovementIfChangedRequest(exciseRegistrationNumber: String, arc: String, sequenceNumber: String, versionTransactionReference: String) extends ChrisRequest {
   override def requestBody: String =
     s"""<?xml version='1.0' encoding='UTF-8'?>
       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -35,6 +35,8 @@ case class GetMovementIfChangedRequest(exciseRegistrationNumber: String, arc: St
       |        <Parameters>
       |          <Parameter Name="ExciseRegistrationNumber">$exciseRegistrationNumber</Parameter>
       |          <Parameter Name="ARC">$arc</Parameter>
+      |          <Parameter Name="SequenceNumber">$sequenceNumber</Parameter>
+      |          <Parameter Name="VersionTransactionReference">$versionTransactionReference</Parameter>
       |        </Parameters>
       |        <ReturnData>
       |          <Data Name="schema" />
