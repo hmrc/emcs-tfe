@@ -63,8 +63,12 @@ class GetMovementService @Inject()(
 
     val chrisResponseFutureModel: Future[Either[ErrorResponse, GetMovementIfChangedResponse]] =
       chrisResponseFutureRaw.map {
-        case Left(value) => Left(value)
-        case Right(value) => handleParseResult(XmlReader.of[GetMovementIfChangedResponse].read(value))
+        case Left(value) =>
+          logger.debug(s"Received Left(error) from ChRIS: $value")
+          Left(value)
+        case Right(value) =>
+          logger.debug(s"Received Right(value) from ChRIS: $value")
+          handleParseResult(XmlReader.of[GetMovementIfChangedResponse].read(value))
       }
 
     chrisResponseFutureModel.flatMap {
