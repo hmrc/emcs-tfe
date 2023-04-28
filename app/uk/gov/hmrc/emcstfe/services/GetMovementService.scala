@@ -46,7 +46,7 @@ class GetMovementService @Inject()(
     repository.get(request.internalId, request.ern, getMovementRequest.arc).flatMap {
       case Some(value) =>
         logger.info("[getMovement] Matching movement found, calling GetMovementIfChanged")
-        if(forceFetchNew) {
+        if (forceFetchNew) {
           getMovementIfChanged(getMovementRequest, value)
         } else {
           Future.successful(generateGetMovementResponse(value.data))
@@ -58,8 +58,22 @@ class GetMovementService @Inject()(
   }
 
   private[services] def getMovementIfChanged(getMovementRequest: GetMovementRequest, repositoryResult: GetMovementMongoResponse)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
-    val chrisResponseFutureRaw: Future[Either[ErrorResponse, NodeSeq]] =
-      connector.postChrisSOAPRequest(GetMovementIfChangedRequest(getMovementRequest.exciseRegistrationNumber, getMovementRequest.arc))
+    val chrisResponseFutureRaw: Future[Either[ErrorResponse, NodeSeq]] = {
+      Try {
+        XML.loadString(repositoryResult.data.as[String])
+      } match {
+        case Failure(e) =>
+          Future.successful(Left(XmlParseError(Seq(GenericParseError(e.getMessage)))))
+        case Success(value) =>
+          val getMovementIfChangedRequest = GetMovementIfChangedRequest(
+            exciseRegistrationNumber = getMovementRequest.exciseRegistrationNumber,
+            arc = getMovementRequest.arc,
+            sequenceNumber = extractSequenceNumberFromXml(value),
+            versionTransactionReference = extractVersionTransactionReferenceFromXml(value)
+          )
+          connector.postChrisSOAPRequest(getMovementIfChangedRequest)
+      }
+    }
 
     val chrisResponseFutureModel: Future[Either[ErrorResponse, GetMovementIfChangedResponse]] =
       chrisResponseFutureRaw.map {
@@ -89,6 +103,12 @@ class GetMovementService @Inject()(
         }.sequence.map(_.flatten)
     }
   }
+
+  private[services] def extractVersionTransactionReferenceFromXml(xml: NodeSeq): String =
+    (xml \\ "movementView" \\ "currentMovement" \\ "version_transaction_ref").text
+
+  private[services] def extractSequenceNumberFromXml(xml: NodeSeq): String =
+    (xml \\ "movementView" \\ "currentMovement" \\ "IE801" \\ "Body" \\ "EADESADContainer" \\ "HeaderEadEsad" \\ "SequenceNumber").text
 
   private[services] def generateGetMovementResponse(data: JsValue): Either[ErrorResponse, GetMovementResponse] = Try {
     XML.loadString(data.as[String])
