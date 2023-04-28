@@ -34,7 +34,7 @@ import scala.xml.XML
 class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMovementIfChangedFixture {
   trait Test extends MockChrisConnector with MockGetMovementRepository with MockXmlUtils {
     lazy val getMovementRequest: GetMovementRequest = GetMovementRequest(exciseRegistrationNumber = testErn, arc = testArc)
-    lazy val getMovementIfChangedRequest: GetMovementIfChangedRequest = GetMovementIfChangedRequest(exciseRegistrationNumber = testErn, arc = testArc)
+    lazy val getMovementIfChangedRequest: GetMovementIfChangedRequest = GetMovementIfChangedRequest(exciseRegistrationNumber = testErn, arc = testArc, sequenceNumber = "1", versionTransactionReference = "008")
 
     lazy val service: GetMovementService = new GetMovementService(
       mockConnector,
@@ -248,6 +248,24 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
         await(service.getMovementIfChanged(getMovementRequest, GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementIfChangedResponseBody)))) shouldBe Right(getMovementIfChangedResponse)
       }
+    }
+
+    "return a Left" when {
+      "data stored in Mongo can't be converted into a String so no call to ChRIS is made and the call fails early" in new Test {
+        await(service.getMovementIfChanged(getMovementRequest, GetMovementMongoResponse(testInternalId, testErn, testArc, JsNull))) shouldBe Left(XmlParseError(Seq(GenericParseError("JsResultException(errors:List((,List(JsonValidationError(List(error.expected.jsstring),ArraySeq())))))"))))
+      }
+    }
+  }
+
+  "extractVersionTransactionReferenceFromXml" should {
+    "extract the correct value" in new Test {
+      service.extractVersionTransactionReferenceFromXml(XML.loadString(getMovementResponseBody)) shouldBe getMovementIfChangedRequest.versionTransactionReference
+    }
+  }
+
+  "extractSequenceNumberFromXml" should {
+    "extract the correct value" in new Test {
+      service.extractSequenceNumberFromXml(XML.loadString(getMovementResponseBody)) shouldBe getMovementIfChangedRequest.sequenceNumber
     }
   }
 }
