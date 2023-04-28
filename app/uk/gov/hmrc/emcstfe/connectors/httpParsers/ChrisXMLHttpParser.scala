@@ -67,6 +67,7 @@ class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
         }
       case status =>
         logger.warn(s"[rawXMLHttpReads] Unexpected status from chris: $status")
+        logger.warn(s"[rawXMLHttpReads] Unexpected body from chris: ${response.body}")
         Left(UnexpectedDownstreamResponseError)
     }
   }
