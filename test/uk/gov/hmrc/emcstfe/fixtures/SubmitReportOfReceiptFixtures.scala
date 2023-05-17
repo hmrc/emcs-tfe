@@ -48,11 +48,6 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
 
   val maxSubmitReportOfReceiptModelXML =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
-      <urn:Attributes>
-        <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-          {maxSubmitReportOfReceiptModel.creationTimestamp.truncatedTo(ChronoUnit.MILLIS).toString.replace("Z","").toString}
-        </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-      </urn:Attributes>
       <urn:ConsigneeTrader language="en">
         <urn:Traderid>id</urn:Traderid>
         <urn:TraderName>name</urn:TraderName>
@@ -117,11 +112,6 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
 
   val minSubmitReportOfReceiptModelXML =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
-      <urn:Attributes>
-        <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-          {minSubmitReportOfReceiptModel.creationTimestamp.truncatedTo(ChronoUnit.MILLIS).toString.replace("Z","")}
-        </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-      </urn:Attributes>
       <urn:ExciseMovement>
         <urn:AdministrativeReferenceCode>
           {testArc}
