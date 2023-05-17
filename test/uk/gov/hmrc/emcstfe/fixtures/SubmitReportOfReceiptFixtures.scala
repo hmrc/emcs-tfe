@@ -48,6 +48,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
 
   val maxSubmitReportOfReceiptModelXML =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
+      <urn:Attributes/>
       <urn:ConsigneeTrader language="en">
         <urn:Traderid>id</urn:Traderid>
         <urn:TraderName>name</urn:TraderName>
@@ -112,6 +113,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
 
   val minSubmitReportOfReceiptModelXML =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
+      <urn:Attributes/>
       <urn:ExciseMovement>
         <urn:AdministrativeReferenceCode>
           {testArc}

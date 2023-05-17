@@ -43,6 +43,7 @@ case class SubmitReportOfReceiptModel(arc: String,
 
   def toXml: Elem =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
+      <urn:Attributes/>
       {consigneeTrader.map { ct =>
         <urn:ConsigneeTrader language="en">
           {ct.toXml}
