@@ -38,7 +38,7 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
               <ns:VendorID>1259</ns:VendorID>
               <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
               <ns:ServiceID>1138</ns:ServiceID>
-              <ns:ServiceMessageType>HMRC-EMCS-IE815-DIRECT</ns:ServiceMessageType>
+              <ns:ServiceMessageType>HMRC-EMCS-IE818-DIRECT</ns:ServiceMessageType>
             </ns:Info>
           </soapenv:Header>
           <soapenv:Body>
