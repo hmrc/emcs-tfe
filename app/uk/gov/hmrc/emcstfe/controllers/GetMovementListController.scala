@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.predicates.AuthAction
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper, UserAllowListAction}
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementListRequest, GetMovementListSearchOptions}
 import uk.gov.hmrc.emcstfe.services.GetMovementListService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -29,11 +29,12 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class GetMovementListController @Inject()(cc: ControllerComponents,
                                           service: GetMovementListService,
-                                          authAction: AuthAction
-                                         )(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                          override val auth: AuthAction,
+                                          override val userAllowList: UserAllowListAction
+                                         )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
   def getMovementList(exciseRegistrationNumber: String, searchOptions: GetMovementListSearchOptions): Action[AnyContent] =
-    authAction(exciseRegistrationNumber).async { implicit request =>
+    authorisedUserRequest(exciseRegistrationNumber) { implicit request =>
       service.getMovementList(GetMovementListRequest(exciseRegistrationNumber, searchOptions)).map {
         case Left(value) => InternalServerError(Json.toJson(value))
         case Right(value) => Ok(Json.toJson(value))

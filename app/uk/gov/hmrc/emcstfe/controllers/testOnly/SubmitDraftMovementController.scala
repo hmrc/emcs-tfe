@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers.testOnly
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.predicates.AuthAction
+import uk.gov.hmrc.emcstfe.controllers.actions.AuthAction
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
 import uk.gov.hmrc.emcstfe.services.SubmitDraftMovementService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController

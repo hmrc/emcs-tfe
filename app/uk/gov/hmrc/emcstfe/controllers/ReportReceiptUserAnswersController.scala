@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.predicates.AuthAction
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper, UserAllowListAction}
 import uk.gov.hmrc.emcstfe.models.mongo.ReportReceiptUserAnswers
 import uk.gov.hmrc.emcstfe.services.ReportReceiptUserAnswersService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -29,10 +29,11 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class ReportReceiptUserAnswersController @Inject()(cc: ControllerComponents,
                                                    userAnswersRepo: ReportReceiptUserAnswersService,
-                                                   authAction: AuthAction
-                                                  )(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                                   override val auth: AuthAction,
+                                                   override val userAllowList: UserAllowListAction
+                                                  )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
-  def get(ern: String, arc: String): Action[AnyContent] = authAction(ern).async { implicit request =>
+  def get(ern: String, arc: String): Action[AnyContent] = authorisedUserRequest(ern) { implicit request =>
     userAnswersRepo.get(request.internalId, ern, arc) map {
       case Right(Some(answers)) => Ok(Json.toJson(answers))
       case Right(None) => NoContent
@@ -40,7 +41,7 @@ class ReportReceiptUserAnswersController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def set(ern: String, arc: String): Action[JsValue] = authAction(ern).async(parse.json) { implicit request =>
+  def set(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[ReportReceiptUserAnswers] { answers =>
       userAnswersRepo.set(answers) map {
         case Right(answers) => Ok(Json.toJson(answers))
@@ -49,7 +50,7 @@ class ReportReceiptUserAnswersController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def clear(ern: String, arc: String): Action[AnyContent] = authAction(ern).async { implicit request =>
+  def clear(ern: String, arc: String): Action[AnyContent] = authorisedUserRequest(ern) { implicit request =>
     userAnswersRepo.clear(request.internalId, ern, arc) map {
       case Right(_) => NoContent
       case Left(mongoError) => InternalServerError(Json.toJson(mongoError))

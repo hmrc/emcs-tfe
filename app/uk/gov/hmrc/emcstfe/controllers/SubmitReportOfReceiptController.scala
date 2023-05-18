@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.predicates.AuthAction
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper, UserAllowListAction}
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.services.SubmitReportOfReceiptService
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -30,10 +30,11 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class SubmitReportOfReceiptController @Inject()(cc: ControllerComponents,
                                                 service: SubmitReportOfReceiptService,
-                                                authAction: AuthAction
-                                               )(implicit ec: ExecutionContext) extends BackendController(cc) with Logging {
+                                                override val auth: AuthAction,
+                                                override val userAllowList: UserAllowListAction
+                                               )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
 
-  def submit(ern: String, arc: String): Action[JsValue] = authAction(ern).async(parse.json) { implicit request =>
+  def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitReportOfReceiptModel] { submission =>
       service.submit(ern, submission).map {
         case Left(value) => InternalServerError(Json.toJson(value))

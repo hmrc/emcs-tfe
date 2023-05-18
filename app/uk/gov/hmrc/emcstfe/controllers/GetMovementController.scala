@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.predicates.AuthAction
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper, UserAllowListAction}
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.services.GetMovementService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -29,10 +29,11 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class GetMovementController @Inject()(cc: ControllerComponents,
                                       service: GetMovementService,
-                                      authAction: AuthAction
-                                     )(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                      override val auth: AuthAction,
+                                      override val userAllowList: UserAllowListAction
+                                     )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
-  def getMovement(exciseRegistrationNumber: String, arc: String, forceFetchNew: Boolean = false): Action[AnyContent] = authAction(exciseRegistrationNumber).async { implicit request =>
+  def getMovement(exciseRegistrationNumber: String, arc: String, forceFetchNew: Boolean = false): Action[AnyContent] = authorisedUserRequest(exciseRegistrationNumber) { implicit request =>
     service.getMovement(GetMovementRequest(exciseRegistrationNumber = exciseRegistrationNumber, arc = arc), forceFetchNew = forceFetchNew).map {
       case Left(value) => InternalServerError(Json.toJson(value))
       case Right(value) => Ok(Json.toJson(value))

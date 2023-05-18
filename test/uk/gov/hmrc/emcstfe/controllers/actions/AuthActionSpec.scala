@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.controllers.predicates
+package uk.gov.hmrc.emcstfe.controllers.actions
 
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}

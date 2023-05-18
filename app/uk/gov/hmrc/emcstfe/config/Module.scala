@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.config
 
 import com.google.inject.AbstractModule
-import uk.gov.hmrc.emcstfe.controllers.predicates.{AuthAction, AuthActionImpl}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionImpl, UserAllowListAction, UserAllowListActionImpl}
 import uk.gov.hmrc.emcstfe.utils.{TimeMachine, TimeMachineImpl}
 
 class Module extends AbstractModule {
@@ -25,7 +25,8 @@ class Module extends AbstractModule {
   override def configure(): Unit = {
 
     bind(classOf[AppConfig]).asEagerSingleton()
-    bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
+    bind(classOf[AuthAction]).to(classOf[AuthActionImpl]).asEagerSingleton()
+    bind(classOf[UserAllowListAction]).to(classOf[UserAllowListActionImpl]).asEagerSingleton()
     bind(classOf[TimeMachine]).to(classOf[TimeMachineImpl])
   }
 }

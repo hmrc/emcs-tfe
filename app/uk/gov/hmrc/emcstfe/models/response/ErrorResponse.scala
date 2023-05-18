@@ -68,4 +68,8 @@ object ErrorResponse {
     val message = s"Error from Mongo with message: $msg"
   }
 
+  case class UserAllowListError(ern: String) extends ErrorResponse {
+    val message = s"User with ern: '$ern' was not on the allow-list"
+  }
+
 }
