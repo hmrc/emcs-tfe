@@ -23,7 +23,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 
 @Singleton
-class AppConfig @Inject()(servicesConfig :ServicesConfig, configuration: Configuration) {
+class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configuration) {
 
   def chrisUrl: String = servicesConfig.baseUrl("chris")
 
@@ -32,4 +32,10 @@ class AppConfig @Inject()(servicesConfig :ServicesConfig, configuration: Configu
 
   def getMovementTTL(): Duration = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
   def getMovementReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.getMovement.replaceIndexes")
+
+  // user-allow-list config
+  private def userAllowListService: String = servicesConfig.baseUrl("user-allow-list")
+  def userAllowListBaseUrl: String = s"$userAllowListService/user-allow-list"
+  def allowListEnabled: Boolean = configuration.get[Boolean]("features.allowListEnabled")
+  def internalAuthToken: String = configuration.get[String]("internal-auth.token")
 }

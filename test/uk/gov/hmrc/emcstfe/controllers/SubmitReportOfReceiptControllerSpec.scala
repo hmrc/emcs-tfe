@@ -21,7 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.predicates.{AuthAction, FakeAuthAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction, FakeUserAllowListAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitReportOfReceiptService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
@@ -33,7 +33,7 @@ class SubmitReportOfReceiptControllerSpec extends UnitSpec with MockSubmitReport
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/report-of-receipt").withBody(Json.toJson(maxSubmitReportOfReceiptModel))
-    val controller = new SubmitReportOfReceiptController(Helpers.stubControllerComponents(), mockService, authAction)
+    val controller = new SubmitReportOfReceiptController(Helpers.stubControllerComponents(), mockService, authAction, FakeUserAllowListAction)
   }
 
   s"POST ${routes.SubmitReportOfReceiptController.submit(testErn, testArc)}" when {

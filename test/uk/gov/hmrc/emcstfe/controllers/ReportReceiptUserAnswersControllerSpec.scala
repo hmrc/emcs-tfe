@@ -20,7 +20,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.predicates.FakeAuthAction
+import uk.gov.hmrc.emcstfe.controllers.actions.{FakeAuthAction, FakeUserAllowListAction}
 import uk.gov.hmrc.emcstfe.mocks.services.MockReportReceiptUserAnswersService
 import uk.gov.hmrc.emcstfe.models.mongo.ReportReceiptUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
@@ -36,7 +36,8 @@ class ReportReceiptUserAnswersControllerSpec extends UnitSpec with MockReportRec
   private val controller = new ReportReceiptUserAnswersController(
     Helpers.stubControllerComponents(),
     mockService,
-    FakeSuccessAuthAction
+    FakeSuccessAuthAction,
+    FakeUserAllowListAction
   )
 
   val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))

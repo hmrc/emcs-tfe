@@ -21,7 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.predicates.FakeAuthAction
+import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
 import uk.gov.hmrc.emcstfe.fixtures.SubmitDraftMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitDraftMovementService
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
