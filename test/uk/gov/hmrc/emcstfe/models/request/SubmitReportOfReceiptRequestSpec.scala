@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
@@ -24,7 +26,8 @@ import scala.xml.XML
 
 class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfReceiptFixtures {
 
-  val request = SubmitReportOfReceiptRequest(exciseRegistrationNumber = "ERN", maxSubmitReportOfReceiptModel)
+  implicit val userRequest = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+  val request = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
   "requestBody" should {
 
@@ -40,6 +43,10 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
               <ns:ServiceID>1138</ns:ServiceID>
               <ns:ServiceMessageType>HMRC-EMCS-IE818-DIRECT</ns:ServiceMessageType>
             </ns:Info>
+            <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
+              <CredentialID>{testCredId}</CredentialID>
+              <Identifier>{testErn}</Identifier>
+            </MetaData>
           </soapenv:Header>
           <soapenv:Body>
             <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">

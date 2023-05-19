@@ -42,7 +42,7 @@ class SubmitReportOfReceiptControllerSpec extends UnitSpec with MockSubmitReport
       s"return ${Status.OK} (OK)" when {
         "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-          MockService.submit(testErn, maxSubmitReportOfReceiptModel).returns(Future.successful(Right(chrisSuccessResponse)))
+          MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(chrisSuccessResponse)))
 
           val result = controller.submit(testErn, testArc)(fakeRequest)
 
@@ -53,7 +53,7 @@ class SubmitReportOfReceiptControllerSpec extends UnitSpec with MockSubmitReport
       s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
         "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
 
-          MockService.submit(testErn, maxSubmitReportOfReceiptModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+          MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
           val result = controller.submit(testErn, testArc)(fakeRequest)
 

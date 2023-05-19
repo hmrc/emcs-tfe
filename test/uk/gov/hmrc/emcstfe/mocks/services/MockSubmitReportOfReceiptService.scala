@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.mocks.services
 import org.scalamock.handlers.CallHandler4
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitReportOfReceiptService
@@ -31,9 +32,9 @@ trait MockSubmitReportOfReceiptService extends MockFactory  {
   lazy val mockService: SubmitReportOfReceiptService = mock[SubmitReportOfReceiptService]
 
   object MockService extends Matchers {
-    def submit(ern: String, submission: SubmitReportOfReceiptModel): CallHandler4[String, SubmitReportOfReceiptModel, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
-      (mockService.submit(_: String, _: SubmitReportOfReceiptModel)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(ern, submission, *, *)
+    def submit(submission: SubmitReportOfReceiptModel): CallHandler4[SubmitReportOfReceiptModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
+      (mockService.submit(_: SubmitReportOfReceiptModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(submission, *, *, *)
   }
 }
 
