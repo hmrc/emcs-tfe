@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitReportOfReceiptRequest
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
@@ -28,8 +29,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmitReportOfReceiptService @Inject()(connector: ChrisConnector) extends Logging {
-  def submit(ern: String, submission: SubmitReportOfReceiptModel)
-            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    connector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](SubmitReportOfReceiptRequest(ern, submission))
+  def submit(submission: SubmitReportOfReceiptModel)
+            (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
+    connector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](SubmitReportOfReceiptRequest(submission))
 
 }

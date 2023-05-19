@@ -17,14 +17,16 @@
 package uk.gov.hmrc.emcstfe.connectors
 
 import play.api.http.{HeaderNames, MimeTypes, Status}
+import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitDraftMovementFixture, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitDraftMovementRequest, SubmitReportOfReceiptRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, UnexpectedDownstreamResponseError, XmlValidationError}
-import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, ChRISSuccessResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, GetMovementResponse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -216,7 +218,8 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
   "submitReportOfReceiptChrisSOAPRequest" should {
 
-    val submitReportOfReceiptRequest = SubmitReportOfReceiptRequest("ERN", maxSubmitReportOfReceiptModel)
+    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+    val submitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
     "return a Right" when {
       "downstream call is successful" in new Test {

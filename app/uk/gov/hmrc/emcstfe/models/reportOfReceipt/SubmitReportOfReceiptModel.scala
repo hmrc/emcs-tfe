@@ -34,8 +34,6 @@ case class SubmitReportOfReceiptModel(arc: String,
                                         individualItems: Seq[ReceiptedItemsModel],
                                         otherInformation: Option[String]) {
 
-  val creationTimestamp = Instant.now()
-
   val globalConclusion = acceptMovement match {
     case Satisfactory => 1
     case Unsatisfactory => 2
@@ -45,11 +43,7 @@ case class SubmitReportOfReceiptModel(arc: String,
 
   def toXml: Elem =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
-      <urn:Attributes>
-        <urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-          {creationTimestamp.truncatedTo(ChronoUnit.MILLIS).toString.replace("Z","")}
-        </urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-      </urn:Attributes>
+      <urn:Attributes/>
       {consigneeTrader.map { ct =>
         <urn:ConsigneeTrader language="en">
           {ct.toXml}

@@ -36,7 +36,7 @@ class SubmitReportOfReceiptController @Inject()(cc: ControllerComponents,
 
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitReportOfReceiptModel] { submission =>
-      service.submit(ern, submission).map {
+      service.submit(submission).map {
         case Left(value) => InternalServerError(Json.toJson(value))
         case Right(value) => Ok(Json.toJson(value))
       }

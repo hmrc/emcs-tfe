@@ -16,12 +16,16 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
 import java.time.{LocalDate, LocalTime, ZoneId}
 import java.util.UUID
 
-case class SubmitReportOfReceiptRequest(exciseRegistrationNumber: String, body: SubmitReportOfReceiptModel) extends ChrisRequest {
+case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
+                                       (implicit request: UserRequest[_]) extends ChrisRequest {
+
+  override def exciseRegistrationNumber: String = request.ern
 
   val preparedDate = LocalDate.now(ZoneId.of("UTC"))
   val preparedTime = LocalTime.now(ZoneId.of("UTC"))
@@ -31,7 +35,17 @@ case class SubmitReportOfReceiptRequest(exciseRegistrationNumber: String, body: 
   val soapRequest =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
       <soapenv:Header>
-        <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1"/>
+        <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
+          <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
+          <ns:VendorID>1259</ns:VendorID>
+          <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
+          <ns:ServiceID>1138</ns:ServiceID>
+          <ns:ServiceMessageType>HMRC-EMCS-IE818-DIRECT</ns:ServiceMessageType>
+        </ns:Info>
+        <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
+          <CredentialID>{request.credId}</CredentialID>
+          <Identifier>{exciseRegistrationNumber}</Identifier>
+        </MetaData>
       </soapenv:Header>
       <soapenv:Body>
         <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
