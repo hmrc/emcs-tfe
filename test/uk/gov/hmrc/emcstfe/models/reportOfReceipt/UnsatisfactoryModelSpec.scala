@@ -19,7 +19,6 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.UnsatisfactoryModelFixtures
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.UnsatisfactoryModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim

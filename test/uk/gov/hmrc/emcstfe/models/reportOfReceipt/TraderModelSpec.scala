@@ -18,7 +18,6 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.TraderModelFixtures
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.TraderModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 class TraderModelSpec extends UnitSpec with TraderModelFixtures {

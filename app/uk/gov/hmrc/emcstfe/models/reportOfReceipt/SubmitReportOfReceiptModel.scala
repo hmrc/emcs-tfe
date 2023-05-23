@@ -20,8 +20,7 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
 
-import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDate}
+import java.time.LocalDate
 import scala.xml.{Elem, NodeSeq}
 
 case class SubmitReportOfReceiptModel(arc: String,

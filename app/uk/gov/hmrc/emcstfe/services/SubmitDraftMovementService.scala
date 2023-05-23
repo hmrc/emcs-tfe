@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.services
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.NoLrnError
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, ChRISSuccessResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 

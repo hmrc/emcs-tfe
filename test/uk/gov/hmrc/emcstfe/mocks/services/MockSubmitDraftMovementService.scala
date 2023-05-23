@@ -20,7 +20,7 @@ import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, ChRISSuccessResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitDraftMovementService
 import uk.gov.hmrc.http.HeaderCarrier
 

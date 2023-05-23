@@ -21,7 +21,6 @@ import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.Excess
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 trait SubmitReportOfReceiptFixtures extends BaseFixtures
   with TraderModelFixtures
