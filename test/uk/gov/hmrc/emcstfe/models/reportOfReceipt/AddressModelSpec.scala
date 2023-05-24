@@ -18,7 +18,6 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.AddressModelFixtures
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.AddressModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 class AddressModelSpec extends UnitSpec with AddressModelFixtures {

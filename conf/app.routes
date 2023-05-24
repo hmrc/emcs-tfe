@@ -8,3 +8,7 @@ POST        /report-of-receipt/:ern/:arc                    uk.gov.hmrc.emcstfe.
 GET         /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.get(ern, arc)
 PUT         /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.set(ern, arc)
 DELETE      /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.clear(ern, arc)
+
+GET         /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.get(ern, lrn)
+PUT         /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.set(ern, lrn)
+DELETE      /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.clear(ern, lrn)
