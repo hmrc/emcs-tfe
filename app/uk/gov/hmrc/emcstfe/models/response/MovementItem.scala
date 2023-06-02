@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple8Semigroupal
+import cats.implicits.catsSyntaxTuple14Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -28,7 +28,14 @@ case class MovementItem(itemUniqueReference: Int,
                         grossMass: BigDecimal,
                         netMass: BigDecimal,
                         alcoholicStrength: Option[BigDecimal],
-                        packaging: Seq[Packaging])
+                        degreePlato: Option[BigDecimal],
+                        designationOfOrigin: Option[String],
+                        sizeOfProducer: Option[String],
+                        commercialDescription: Option[String],
+                        brandNameOfProduct: Option[String],
+                        packaging: Seq[Packaging],
+                        wineProduct: Option[WineProduct]
+                       )
 object MovementItem {
 
   implicit val xmlReader: XmlReader[MovementItem] = (
@@ -39,7 +46,13 @@ object MovementItem {
     (__ \ "GrossMass").read[String].map(BigDecimal(_)),
     (__ \ "NetMass").read[String].map(BigDecimal(_)),
     (__ \ "AlcoholicStrengthByVolumeInPercentage").read[String].map(BigDecimal(_)).optional,
-    (__ \ "Package").read[Seq[Packaging]](strictReadSeq)
+    (__ \ "DegreePlato").read[String].map(BigDecimal(_)).optional,
+    (__ \ "DesignationOfOrigin").read[String].optional,
+    (__ \ "SizeOfProducer").read[String].optional,
+    (__ \ "CommercialDescription").read[String].optional,
+    (__ \ "BrandNameOfProducts").read[String].optional,
+    (__ \ "Package").read[Seq[Packaging]](strictReadSeq),
+    (__ \ "WineProduct").read[WineProduct].optional
   ).mapN(MovementItem.apply)
 
   implicit val format: OFormat[MovementItem] = Json.format
