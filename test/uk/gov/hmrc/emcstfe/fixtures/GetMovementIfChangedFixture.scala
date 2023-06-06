@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, TraderModel}
-import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging}
+import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
 trait GetMovementIfChangedFixture extends BaseFixtures {
   lazy val getMovementIfChangedNoChangeSoapWrapper: String = """<tns:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
@@ -526,10 +526,27 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
         grossMass = BigDecimal(900),
         netMass = BigDecimal(375),
         alcoholicStrength = None,
-        Seq(
+        degreePlato = None,
+        designationOfOrigin = Some("Designation of Origin"),
+        sizeOfProducer = Some("20000"),
+        commercialDescription = Some("Retsina"),
+        brandNameOfProduct = Some("MALAMATINA"),
+        packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
-            quantity = 125
+            quantity = Some(125),
+            shippingMarks = None,
+            identityOfCommercialSeal = Some("SEAL456789321"),
+            sealInformation = Some("Red Strip")
+          )
+        ),
+        wineProduct = Some(
+          WineProduct(
+            wineProductCategory = "4",
+            wineGrowingZoneCode = None,
+            thirdCountryOfOrigin = Some("FJ"),
+            otherInformation = Some("Not available"),
+            wineOperations = Some(Seq("4", "5"))
           )
         )
       ),
@@ -541,14 +558,34 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
         grossMass = BigDecimal(901),
         netMass = BigDecimal(475),
         alcoholicStrength = Some(BigDecimal(12.7)),
-        Seq(
+        degreePlato = None,
+        designationOfOrigin = Some("Designation of Origin"),
+        sizeOfProducer = Some("20000"),
+        commercialDescription = Some("Retsina"),
+        brandNameOfProduct = Some("BrandName"),
+        packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
-            quantity = 125
+            quantity = Some(125),
+            shippingMarks = None,
+            identityOfCommercialSeal = Some("SEAL456789321"),
+            sealInformation = Some("Red Strip")
           ),
           Packaging(
             typeOfPackage = "HG",
-            quantity = 7
+            quantity = Some(7),
+            shippingMarks = None,
+            identityOfCommercialSeal = Some("SEAL77"),
+            sealInformation = Some("Cork")
+          )
+        ),
+        wineProduct = Some(
+          WineProduct(
+            wineProductCategory = "3",
+            wineGrowingZoneCode = None,
+            thirdCountryOfOrigin = Some("FJ"),
+            otherInformation = Some("Not available"),
+            wineOperations = Some(Seq("0", "1"))
           )
         )
       )

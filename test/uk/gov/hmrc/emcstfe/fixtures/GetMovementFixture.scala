@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, TraderModel}
-import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging}
+import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
 trait GetMovementFixture extends BaseFixtures {
   lazy val getMovementResponseBody: String = """<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
@@ -107,6 +107,7 @@ trait GetMovementFixture extends BaseFixtures {
                                                |              <body:NetMass>375</body:NetMass>
                                                |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
                                                |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+                                               |              <body:DegreePlato>1.2</body:DegreePlato>
                                                |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
                                                |              <body:SizeOfProducer>20000</body:SizeOfProducer>
                                                |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
@@ -487,10 +488,27 @@ trait GetMovementFixture extends BaseFixtures {
         grossMass = BigDecimal(900),
         netMass = BigDecimal(375),
         alcoholicStrength = None,
-        Seq(
+        degreePlato = Some(1.2),
+        designationOfOrigin = Some("Designation of Origin"),
+        sizeOfProducer = Some("20000"),
+        commercialDescription = Some("Retsina"),
+        brandNameOfProduct = Some("MALAMATINA"),
+        packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
-            quantity = 125
+            quantity = Some(125),
+            shippingMarks = None,
+            identityOfCommercialSeal = Some("SEAL456789321"),
+            sealInformation = Some("Red Strip")
+          )
+        ),
+        wineProduct = Some(
+          WineProduct(
+            wineProductCategory = "4",
+            wineGrowingZoneCode = None,
+            thirdCountryOfOrigin = Some("FJ"),
+            otherInformation = Some("Not available"),
+            wineOperations = Some(Seq("4", "5"))
           )
         )
       ),
@@ -502,14 +520,34 @@ trait GetMovementFixture extends BaseFixtures {
         grossMass = BigDecimal(901),
         netMass = BigDecimal(475),
         alcoholicStrength = Some(BigDecimal(12.7)),
-        Seq(
+        degreePlato = None,
+        designationOfOrigin = Some("Designation of Origin"),
+        sizeOfProducer = Some("20000"),
+        commercialDescription = Some("Retsina"),
+        brandNameOfProduct = Some("BrandName"),
+        packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
-            quantity = 125
+            quantity = Some(125),
+            shippingMarks = None,
+            identityOfCommercialSeal = Some("SEAL456789321"),
+            sealInformation = Some("Red Strip")
           ),
           Packaging(
             typeOfPackage = "HG",
-            quantity = 7
+            quantity = Some(7),
+            shippingMarks = None,
+            identityOfCommercialSeal = Some("SEAL77"),
+            sealInformation = Some("Cork")
+          )
+        ),
+        wineProduct = Some(
+          WineProduct(
+            wineProductCategory = "3",
+            wineGrowingZoneCode = None,
+            thirdCountryOfOrigin = Some("FJ"),
+            otherInformation = Some("Not available"),
+            wineOperations = Some(Seq("0", "1"))
           )
         )
       )
@@ -542,11 +580,24 @@ trait GetMovementFixture extends BaseFixtures {
         "quantity" -> 500,
         "grossMass" -> 900,
         "netMass" -> 375,
+        "degreePlato" -> 1.2,
+        "designationOfOrigin" -> "Designation of Origin",
+        "sizeOfProducer" -> "20000",
+        "commercialDescription" -> "Retsina",
+        "brandNameOfProduct" -> "MALAMATINA",
         "packaging" -> Json.arr(
           Json.obj(fields =
             "typeOfPackage" -> "BO",
-            "quantity" -> 125
+            "quantity" -> 125,
+            "identityOfCommercialSeal" -> "SEAL456789321",
+            "sealInformation" -> "Red Strip"
           )
+        ),
+        "wineProduct" -> Json.obj(
+          "wineProductCategory" -> "4",
+          "thirdCountryOfOrigin" -> "FJ",
+          "otherInformation" -> "Not available",
+          "wineOperations" -> Json.arr("4", "5")
         )
       ),
       Json.obj(fields =
@@ -557,15 +608,29 @@ trait GetMovementFixture extends BaseFixtures {
         "grossMass" -> 901,
         "netMass" -> 475,
         "alcoholicStrength" -> 12.7,
+        "designationOfOrigin" -> "Designation of Origin",
+        "sizeOfProducer" -> "20000",
+        "commercialDescription" -> "Retsina",
+        "brandNameOfProduct" -> "BrandName",
         "packaging" -> Json.arr(
           Json.obj(fields =
             "typeOfPackage" -> "BO",
-            "quantity" -> 125
+            "quantity" -> 125,
+            "identityOfCommercialSeal" -> "SEAL456789321",
+            "sealInformation" -> "Red Strip"
           ),
           Json.obj(fields =
             "typeOfPackage" -> "HG",
-            "quantity" -> 7
+            "quantity" -> 7,
+            "identityOfCommercialSeal" -> "SEAL77",
+            "sealInformation" -> "Cork"
           )
+        ),
+        "wineProduct" -> Json.obj(
+          "wineProductCategory" -> "3",
+          "thirdCountryOfOrigin" -> "FJ",
+          "otherInformation" -> "Not available",
+          "wineOperations" -> Json.arr("0", "1")
         )
       )
     ),

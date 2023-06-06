@@ -32,6 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.{Duration, SECONDS}
 
 class UserAllowListConnectorISpec
   extends IntegrationBaseSpec with ScalaFutures {
@@ -101,7 +102,7 @@ class UserAllowListConnectorISpec
           .willReturn(aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE))
       )
 
-      connector.check(request)(hc, ec).futureValue shouldBe Left(UnexpectedDownstreamResponseError)
+      await(connector.check(request)(hc, ec), 100, SECONDS) shouldBe Left(UnexpectedDownstreamResponseError)
     }
   }
 }

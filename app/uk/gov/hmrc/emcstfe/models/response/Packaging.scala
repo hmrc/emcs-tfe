@@ -16,17 +16,24 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple2Semigroupal
+import cats.implicits.catsSyntaxTuple5Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 
 case class Packaging(typeOfPackage: String,
-                     quantity: BigDecimal)
+                     quantity: Option[BigDecimal],
+                     shippingMarks: Option[String],
+                     identityOfCommercialSeal: Option[String],
+                     sealInformation: Option[String]
+                    )
 object Packaging {
 
   implicit val xmlReader: XmlReader[Packaging] = (
     (__ \ "KindOfPackages").read[String],
-    (__ \ "NumberOfPackages").read[String].map(BigDecimal(_))
+    (__ \ "NumberOfPackages").read[String].map(BigDecimal(_)).optional,
+    (__ \ "ShippingMarks").read[String].optional,
+    (__ \ "CommercialSealIdentification").read[String].optional,
+    (__ \ "SealInformation").read[String].optional,
   ).mapN(Packaging.apply)
 
   implicit val format: OFormat[Packaging] = Json.format
