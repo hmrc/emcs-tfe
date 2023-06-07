@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple14Semigroupal
+import cats.implicits.catsSyntaxTuple17Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -29,10 +29,13 @@ case class MovementItem(itemUniqueReference: Int,
                         netMass: BigDecimal,
                         alcoholicStrength: Option[BigDecimal],
                         degreePlato: Option[BigDecimal],
+                        fiscalMark: Option[String],
                         designationOfOrigin: Option[String],
                         sizeOfProducer: Option[String],
+                        density: Option[BigDecimal],
                         commercialDescription: Option[String],
                         brandNameOfProduct: Option[String],
+                        maturationAge: Option[String],
                         packaging: Seq[Packaging],
                         wineProduct: Option[WineProduct]
                        )
@@ -47,10 +50,13 @@ object MovementItem {
     (__ \ "NetMass").read[String].map(BigDecimal(_)),
     (__ \ "AlcoholicStrengthByVolumeInPercentage").read[String].map(BigDecimal(_)).optional,
     (__ \ "DegreePlato").read[String].map(BigDecimal(_)).optional,
+    (__ \ "FiscalMark").read[String].optional,
     (__ \ "DesignationOfOrigin").read[String].optional,
     (__ \ "SizeOfProducer").read[String].optional,
+    (__ \ "Density").read[String].map(BigDecimal(_)).optional,
     (__ \ "CommercialDescription").read[String].optional,
     (__ \ "BrandNameOfProducts").read[String].optional,
+    (__ \ "MaturationPeriodOrAgeOfProducts").read[String].optional,
     (__ \ "Package").read[Seq[Packaging]](strictReadSeq),
     (__ \ "WineProduct").read[WineProduct].optional
   ).mapN(MovementItem.apply)

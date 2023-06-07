@@ -108,18 +108,22 @@ trait GetMovementFixture extends BaseFixtures {
                                                |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
                                                |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
                                                |              <body:DegreePlato>1.2</body:DegreePlato>
+                                               |              <body:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</body:MaturationPeriodOrAgeOfProducts>
                                                |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
                                                |              <body:SizeOfProducer>20000</body:SizeOfProducer>
+                                               |              <body:Density>880</body:Density>
                                                |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
                                                |              <body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
                                                |              <body:Package>
                                                |                <body:KindOfPackages>BO</body:KindOfPackages>
                                                |                <body:NumberOfPackages>125</body:NumberOfPackages>
+                                               |                <body:ShippingMarks>MARKS</body:ShippingMarks>
                                                |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
                                                |                <body:SealInformation language="en">Red Strip</body:SealInformation>
                                                |              </body:Package>
                                                |              <body:WineProduct>
                                                |                <body:WineProductCategory>4</body:WineProductCategory>
+                                               |                <body:WineGrowingZoneCode>2</body:WineGrowingZoneCode>
                                                |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
                                                |                <body:OtherInformation language="en">Not available</body:OtherInformation>
                                                |                <body:WineOperation>
@@ -489,15 +493,18 @@ trait GetMovementFixture extends BaseFixtures {
         netMass = BigDecimal(375),
         alcoholicStrength = None,
         degreePlato = Some(1.2),
+        fiscalMark = Some("FM564789 Fiscal Mark"),
         designationOfOrigin = Some("Designation of Origin"),
         sizeOfProducer = Some("20000"),
+        density = Some(880),
         commercialDescription = Some("Retsina"),
         brandNameOfProduct = Some("MALAMATINA"),
+        maturationAge = Some("Maturation Period"),
         packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
             quantity = Some(125),
-            shippingMarks = None,
+            shippingMarks = Some("MARKS"),
             identityOfCommercialSeal = Some("SEAL456789321"),
             sealInformation = Some("Red Strip")
           )
@@ -505,7 +512,7 @@ trait GetMovementFixture extends BaseFixtures {
         wineProduct = Some(
           WineProduct(
             wineProductCategory = "4",
-            wineGrowingZoneCode = None,
+            wineGrowingZoneCode = Some("2"),
             thirdCountryOfOrigin = Some("FJ"),
             otherInformation = Some("Not available"),
             wineOperations = Some(Seq("4", "5"))
@@ -521,10 +528,13 @@ trait GetMovementFixture extends BaseFixtures {
         netMass = BigDecimal(475),
         alcoholicStrength = Some(BigDecimal(12.7)),
         degreePlato = None,
+        fiscalMark = Some("FM564790 Fiscal Mark"),
         designationOfOrigin = Some("Designation of Origin"),
         sizeOfProducer = Some("20000"),
+        density = None,
         commercialDescription = Some("Retsina"),
         brandNameOfProduct = Some("BrandName"),
+        maturationAge = None,
         packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
@@ -581,20 +591,25 @@ trait GetMovementFixture extends BaseFixtures {
         "grossMass" -> 900,
         "netMass" -> 375,
         "degreePlato" -> 1.2,
+        "fiscalMark" -> "FM564789 Fiscal Mark",
         "designationOfOrigin" -> "Designation of Origin",
         "sizeOfProducer" -> "20000",
+        "density" -> 880,
         "commercialDescription" -> "Retsina",
         "brandNameOfProduct" -> "MALAMATINA",
+        "maturationAge" -> "Maturation Period",
         "packaging" -> Json.arr(
           Json.obj(fields =
             "typeOfPackage" -> "BO",
             "quantity" -> 125,
+            "shippingMarks" -> "MARKS",
             "identityOfCommercialSeal" -> "SEAL456789321",
             "sealInformation" -> "Red Strip"
           )
         ),
         "wineProduct" -> Json.obj(
           "wineProductCategory" -> "4",
+          "wineGrowingZoneCode" -> "2",
           "thirdCountryOfOrigin" -> "FJ",
           "otherInformation" -> "Not available",
           "wineOperations" -> Json.arr("4", "5")
@@ -608,6 +623,7 @@ trait GetMovementFixture extends BaseFixtures {
         "grossMass" -> 901,
         "netMass" -> 475,
         "alcoholicStrength" -> 12.7,
+        "fiscalMark" -> "FM564790 Fiscal Mark",
         "designationOfOrigin" -> "Designation of Origin",
         "sizeOfProducer" -> "20000",
         "commercialDescription" -> "Retsina",

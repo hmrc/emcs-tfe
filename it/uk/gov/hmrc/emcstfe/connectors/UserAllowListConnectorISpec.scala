@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration, SECONDS}
+import scala.concurrent.duration.SECONDS
 
 class UserAllowListConnectorISpec
   extends IntegrationBaseSpec with ScalaFutures {

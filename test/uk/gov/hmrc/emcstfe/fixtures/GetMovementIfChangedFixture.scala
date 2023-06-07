@@ -527,10 +527,13 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
         netMass = BigDecimal(375),
         alcoholicStrength = None,
         degreePlato = None,
+        fiscalMark = Some("FM564789 Fiscal Mark"),
         designationOfOrigin = Some("Designation of Origin"),
         sizeOfProducer = Some("20000"),
+        density = None,
         commercialDescription = Some("Retsina"),
         brandNameOfProduct = Some("MALAMATINA"),
+        maturationAge = None,
         packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
@@ -559,10 +562,13 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
         netMass = BigDecimal(475),
         alcoholicStrength = Some(BigDecimal(12.7)),
         degreePlato = None,
+        fiscalMark = Some("FM564790 Fiscal Mark"),
         designationOfOrigin = Some("Designation of Origin"),
         sizeOfProducer = Some("20000"),
+        density = None,
         commercialDescription = Some("Retsina"),
         brandNameOfProduct = Some("BrandName"),
+        maturationAge = None,
         packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
