@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.fixtures
+package uk.gov.hmrc.emcstfe.models.common
 
-trait BaseFixtures {
+import uk.gov.hmrc.emcstfe.models.common.DestinationType._
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-  val testErn = "GBWK000001234"
-  val testArc: String = "23GB00000000000376967"
-  val testLrn: String = "LRN"
-  val testCredId = "cred1234567891"
-  val testInternalId = "int1234567891"
+class DestinationTypeSpec extends UnitSpec {
 
+  "DestinationType" should {
+
+    "have the correct codes" in {
+      TaxWarehouse.toString shouldBe "1"
+      RegisteredConsignee.toString shouldBe "2"
+      TemporaryRegisteredConsignee.toString shouldBe "3"
+      DirectDelivery.toString shouldBe "4"
+      ExemptedOrganisations.toString shouldBe "5"
+      Export.toString shouldBe "6"
+    }
+  }
 }

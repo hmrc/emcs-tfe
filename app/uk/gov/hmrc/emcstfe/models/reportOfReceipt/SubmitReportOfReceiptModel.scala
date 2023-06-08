@@ -17,21 +17,22 @@
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.emcstfe.models.common.AcceptMovement
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
+import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType}
 
 import java.time.LocalDate
 import scala.xml.{Elem, NodeSeq}
 
 case class SubmitReportOfReceiptModel(arc: String,
-                                        sequenceNumber: Int,
-                                        consigneeTrader: Option[TraderModel],
-                                        deliveryPlaceTrader: Option[TraderModel],
-                                        destinationOffice: String,
-                                        dateOfArrival: LocalDate,
-                                        acceptMovement: AcceptMovement,
-                                        individualItems: Seq[ReceiptedItemsModel],
-                                        otherInformation: Option[String]) {
+                                      sequenceNumber: Int,
+                                      destinationType: DestinationType,
+                                      consigneeTrader: Option[TraderModel],
+                                      deliveryPlaceTrader: Option[TraderModel],
+                                      destinationOffice: String,
+                                      dateOfArrival: LocalDate,
+                                      acceptMovement: AcceptMovement,
+                                      individualItems: Seq[ReceiptedItemsModel],
+                                      otherInformation: Option[String]) {
 
   val globalConclusion = acceptMovement match {
     case Satisfactory => 1
