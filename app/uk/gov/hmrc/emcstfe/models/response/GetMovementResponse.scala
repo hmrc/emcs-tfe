@@ -16,15 +16,16 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple11Semigroupal
+import cats.implicits.catsSyntaxTuple12Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.JourneyTime
+import uk.gov.hmrc.emcstfe.models.common.{DestinationType, JourneyTime}
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.TraderModel
 
 case class GetMovementResponse(arc: String,
                                sequenceNumber: Int,
+                               destinationType: DestinationType,
                                consigneeTrader: Option[TraderModel],
                                deliveryPlaceTrader: Option[TraderModel],
                                localReferenceNumber: String,
@@ -47,6 +48,7 @@ object GetMovementResponse {
   val dateOfDispatch: XPath = EADESADContainer \ "EadEsad" \ "DateOfDispatch"
   val journeyTime: XPath = EADESADContainer \ "HeaderEadEsad" \ "JourneyTime"
   val sequenceNumber: XPath = EADESADContainer \ "HeaderEadEsad" \ "SequenceNumber"
+  val destinationTypeCode: XPath = EADESADContainer \ "HeaderEadEsad" \ "DestinationTypeCode"
   val consigneeTrader: XPath = EADESADContainer \\ "ConsigneeTrader"
   val deliveryPlaceTrader: XPath = EADESADContainer \\ "DeliveryPlaceTrader"
   val items: XPath = EADESADContainer \ "BodyEadEsad"
@@ -55,6 +57,7 @@ object GetMovementResponse {
   implicit val xmlReader: XmlReader[GetMovementResponse] = (
     arc.read[String],
     sequenceNumber.read[Int],
+    destinationTypeCode.read[DestinationType](DestinationType.xmlReads(DestinationType.enumerable)),
     consigneeTrader.read[Option[TraderModel]].map(model => if(model.exists(_.isEmpty)) None else model),
     deliveryPlaceTrader.read[Option[TraderModel]].map(model => if(model.exists(_.isEmpty)) None else model),
     localReferenceNumber.read[String],

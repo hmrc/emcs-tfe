@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, TraderModel}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
@@ -462,6 +463,7 @@ trait GetMovementFixture extends BaseFixtures {
   lazy val getMovementResponse: GetMovementResponse = GetMovementResponse(
     arc = "13AB7778889991ABCDEF9",
     sequenceNumber = 1,
+    destinationType = Export,
     consigneeTrader = Some(TraderModel(
       traderId = Some("GB11100000002"),
       traderName = Some("Current 801 Consignee"),
@@ -557,6 +559,7 @@ trait GetMovementFixture extends BaseFixtures {
 
   lazy val getMovementJson: JsValue = Json.obj(fields =
     "arc" -> "13AB7778889991ABCDEF9",
+    "destinationType" -> "6",
     "sequenceNumber" -> 1,
     "consigneeTrader" -> Json.obj(fields =
       "traderId" -> "GB11100000002",
