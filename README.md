@@ -169,4 +169,3 @@ This method is idempotent, in the sense that if no data exists it returns NO_CON
 **Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
 
 </details>
-  
