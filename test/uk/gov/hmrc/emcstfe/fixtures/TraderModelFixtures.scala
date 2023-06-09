@@ -22,8 +22,10 @@ import scala.xml.NodeSeq
 
 trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
 
+  val traderId = "GB0000000012346"
+
   val maxTraderModel = TraderModel(
-    traderId = Some("id"),
+    traderId = Some(traderId),
     traderName = Some("name"),
     address = Some(maxAddressModel),
     eoriNumber = Some("eori")
@@ -31,7 +33,7 @@ trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
 
   val maxTraderModelXML =
     NodeSeq.fromSeq(Seq(
-      Seq(<urn:Traderid>id</urn:Traderid>),
+      Seq(<urn:Traderid>{traderId}</urn:Traderid>),
       Seq(<urn:TraderName>name</urn:TraderName>),
       maxAddressModelXML,
       Seq(<urn:EoriNumber>eori</urn:EoriNumber>)

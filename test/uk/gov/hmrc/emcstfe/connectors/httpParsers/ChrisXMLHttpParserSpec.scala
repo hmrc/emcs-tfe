@@ -20,6 +20,7 @@ import com.lucidchart.open.xtract._
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
+import uk.gov.hmrc.emcstfe.models.common.Enumerable.EnumerableXmlParseFailure
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse
@@ -88,6 +89,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovement
           result shouldBe Left(XmlParseError(Seq(
             EmptyError(GetMovementResponse.arc),
             EmptyError(GetMovementResponse.sequenceNumber),
+            EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
             EmptyError(GetMovementResponse.localReferenceNumber),
             EmptyError(GetMovementResponse.eadStatus),
             EmptyError(GetMovementResponse.consignorName),

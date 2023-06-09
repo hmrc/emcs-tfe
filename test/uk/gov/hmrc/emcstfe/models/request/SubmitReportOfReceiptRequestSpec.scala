@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.models.request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, Export, TaxWarehouse, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
@@ -51,8 +52,8 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
           <soapenv:Body>
             <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
               <urn:Header>
-                <urn1:MessageSender>NDEA.GB</urn1:MessageSender>
-                <urn1:MessageRecipient>NDEA.GB</urn1:MessageRecipient>
+                <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
+                <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>
                 <urn1:DateOfPreparation>
                   {request.preparedDate.toString}
                 </urn1:DateOfPreparation>
@@ -74,6 +75,93 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
         </soapenv:Envelope>
 
       trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+    }
+
+    "for the MessageSender and MessageRecipient headers" when {
+
+      val model =
+        maxSubmitReportOfReceiptModel
+          .copy(arc = "01DE0000012345")
+          .copy(consigneeTrader = Some(maxTraderModel.copy(traderId = Some("FR0000123456"))))
+          .copy(deliveryPlaceTrader = Some(maxTraderModel.copy(traderId = Some("IT0000123456"))))
+
+      "have the correct MessageSender" when {
+
+        "destination type is DirectDelivery" should {
+
+          "use the Consignee Trader ID for the Country Code" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = DirectDelivery))
+            request.messageSender shouldBe "NDEA.FR"
+          }
+
+          "use GB as default if the Consignee Trader ID does not exist" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = DirectDelivery, consigneeTrader = None))
+            request.messageSender shouldBe "NDEA.GB"
+          }
+        }
+
+        "destination type is anything other than DirectDelivery" should {
+
+          "use the ARC for the Country Code" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TaxWarehouse))
+            request.messageSender shouldBe "NDEA.DE"
+          }
+        }
+      }
+
+      "have the correct MessageRecipient" when {
+
+        "destination type is TaxWarehouse" should {
+
+          "use the Delivery Place Trader ID for the Country Code" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TaxWarehouse))
+            request.messageRecipient shouldBe "NDEA.IT"
+          }
+
+          "use GB as default when Delivery Place Trader ID does NOT exist" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TaxWarehouse, deliveryPlaceTrader = None))
+            request.messageRecipient shouldBe "NDEA.GB"
+          }
+        }
+
+        "destination type is TemporaryRegisteredConsignee" should {
+
+          "use the Consignee Trader Id for the Country Code when it exists" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TemporaryRegisteredConsignee))
+            request.messageRecipient shouldBe "NDEA.FR"
+          }
+
+          "use GB as default when consignee trader ID does NOT exist" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TemporaryRegisteredConsignee, consigneeTrader = None))
+            request.messageRecipient shouldBe "NDEA.GB"
+          }
+        }
+
+        "destination type is DirectDelivery" should {
+
+          "use the ARC for the Country Code" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = DirectDelivery))
+            request.messageRecipient shouldBe "NDEA.DE"
+          }
+        }
+
+        "destination type is anything else" should {
+
+          "use GB" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Export))
+            request.messageRecipient shouldBe "NDEA.GB"
+          }
+        }
+      }
     }
   }
 

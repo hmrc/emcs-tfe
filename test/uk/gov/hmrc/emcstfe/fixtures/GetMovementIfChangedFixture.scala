@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, TraderModel}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
@@ -490,6 +491,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
   lazy val getMovementIfChangedResponse: GetMovementResponse = GetMovementResponse(
     arc = "13AB7778889991ABCDEF9",
     sequenceNumber = 1,
+    destinationType = Export,
     consigneeTrader = Some(TraderModel(
       traderId = Some("GB11100000002"),
       traderName = Some("Current 801 Consignee"),

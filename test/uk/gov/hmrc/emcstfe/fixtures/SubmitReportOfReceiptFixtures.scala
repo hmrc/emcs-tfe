@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{PartiallyRefused, Satisfactory}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.TaxWarehouse
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.Excess
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
@@ -32,6 +33,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
 
   val maxSubmitReportOfReceiptModel = SubmitReportOfReceiptModel(
     arc = testArc,
+    destinationType = TaxWarehouse,
     sequenceNumber = 1,
     consigneeTrader = Some(maxTraderModel),
     deliveryPlaceTrader = Some(maxTraderModel.copy(eoriNumber = None)),
@@ -49,7 +51,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes/>
       <urn:ConsigneeTrader language="en">
-        <urn:Traderid>id</urn:Traderid>
+        <urn:Traderid>{traderId}</urn:Traderid>
         <urn:TraderName>name</urn:TraderName>
         <urn:StreetName>street</urn:StreetName>
         <urn:StreetNumber>number</urn:StreetNumber>
@@ -62,7 +64,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
         <urn:SequenceNumber>1</urn:SequenceNumber>
       </urn:ExciseMovement>
       <urn:DeliveryPlaceTrader language="en">
-        <urn:Traderid>id</urn:Traderid>
+        <urn:Traderid>{traderId}</urn:Traderid>
         <urn:TraderName>name</urn:TraderName>
         <urn:StreetName>street</urn:StreetName>
         <urn:StreetNumber>number</urn:StreetNumber>
@@ -100,6 +102,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
 
   val minSubmitReportOfReceiptModel = SubmitReportOfReceiptModel(
     arc = testArc,
+    destinationType = TaxWarehouse,
     sequenceNumber = 1,
     consigneeTrader = None,
     deliveryPlaceTrader = None,
