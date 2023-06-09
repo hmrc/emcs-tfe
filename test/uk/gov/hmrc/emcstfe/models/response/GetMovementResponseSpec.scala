@@ -126,27 +126,31 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |							<body:GuarantorTypeCode>2</body:GuarantorTypeCode>
             |						</body:MovementGuarantee>
             |						<body:BodyEadEsad>
-            |							<body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
-            |							<body:ExciseProductCode>W200</body:ExciseProductCode>
-            |							<body:CnCode>22041011</body:CnCode>
-            |							<body:Quantity>500</body:Quantity>
-            |							<body:GrossMass>900</body:GrossMass>
-            |							<body:NetMass>375</body:NetMass>
-            |							<body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
-            |							<body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-            |							<body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-            |             <body:DegreePlato>1.2</body:DegreePlato>
-            |							<body:SizeOfProducer>20000</body:SizeOfProducer>
-            |							<body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-            |							<body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
-            |             <body:Package>
+            |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
+            |              <body:ExciseProductCode>W200</body:ExciseProductCode>
+            |              <body:CnCode>22041011</body:CnCode>
+            |              <body:Quantity>500</body:Quantity>
+            |              <body:GrossMass>900</body:GrossMass>
+            |              <body:NetMass>375</body:NetMass>
+            |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
+            |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+            |              <body:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</body:MaturationPeriodOrAgeOfProducts>
+            |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
+            |              <body:DegreePlato>1.2</body:DegreePlato>
+            |              <body:SizeOfProducer>20000</body:SizeOfProducer>
+            |              <body:Density>880</body:Density>
+            |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
+            |              <body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+            |              <body:Package>
             |                <body:KindOfPackages>BO</body:KindOfPackages>
             |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:ShippingMarks>MARKS</body:ShippingMarks>
             |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
             |                <body:SealInformation language="en">Red Strip</body:SealInformation>
             |              </body:Package>
             |              <body:WineProduct>
             |                <body:WineProductCategory>4</body:WineProductCategory>
+            |                <body:WineGrowingZoneCode>2</body:WineGrowingZoneCode>
             |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
             |                <body:OtherInformation language="en">Not available</body:OtherInformation>
             |                <body:WineOperation>
@@ -237,10 +241,13 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
               netMass = BigDecimal(475),
               alcoholicStrength = Some(12.7),
               degreePlato = None,
+              fiscalMark = Some("FM564790 Fiscal Mark"),
               designationOfOrigin = Some("Designation of Origin"),
               sizeOfProducer = Some("20000"),
+              density = None,
               commercialDescription = Some("Retsina"),
               brandNameOfProduct = Some("BrandName"),
+              maturationAge = None,
               packaging = Seq(
                 Packaging(
                   typeOfPackage = "BO",
@@ -352,19 +359,23 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |              <body:NetMass>375</body:NetMass>
             |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
             |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+            |              <body:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</body:MaturationPeriodOrAgeOfProducts>
             |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
             |              <body:DegreePlato>1.2</body:DegreePlato>
             |              <body:SizeOfProducer>20000</body:SizeOfProducer>
+            |              <body:Density>880</body:Density>
             |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |              <body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
             |              <body:Package>
             |                <body:KindOfPackages>BO</body:KindOfPackages>
             |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:ShippingMarks>MARKS</body:ShippingMarks>
             |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
             |                <body:SealInformation language="en">Red Strip</body:SealInformation>
             |              </body:Package>
             |              <body:WineProduct>
             |                <body:WineProductCategory>4</body:WineProductCategory>
+            |                <body:WineGrowingZoneCode>2</body:WineGrowingZoneCode>
             |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
             |                <body:OtherInformation language="en">Not available</body:OtherInformation>
             |                <body:WineOperation>
@@ -523,19 +534,23 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |              <body:NetMass>375</body:NetMass>
             |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
             |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+            |              <body:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</body:MaturationPeriodOrAgeOfProducts>
             |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
             |              <body:DegreePlato>1.2</body:DegreePlato>
             |              <body:SizeOfProducer>20000</body:SizeOfProducer>
+            |              <body:Density>880</body:Density>
             |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
             |              <body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
             |              <body:Package>
             |                <body:KindOfPackages>BO</body:KindOfPackages>
             |                <body:NumberOfPackages>125</body:NumberOfPackages>
+            |                <body:ShippingMarks>MARKS</body:ShippingMarks>
             |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
             |                <body:SealInformation language="en">Red Strip</body:SealInformation>
             |              </body:Package>
             |              <body:WineProduct>
             |                <body:WineProductCategory>4</body:WineProductCategory>
+            |                <body:WineGrowingZoneCode>2</body:WineGrowingZoneCode>
             |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
             |                <body:OtherInformation language="en">Not available</body:OtherInformation>
             |                <body:WineOperation>
