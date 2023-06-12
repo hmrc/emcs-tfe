@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementListRequest, GetMovementListSearchOptions}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, XmlValidationError}
@@ -25,14 +26,15 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import scala.concurrent.Future
 
 class GetMovementListServiceSpec extends UnitSpec with GetMovementListFixture {
-  trait Test extends MockChrisConnector {
+  trait Test extends MockChrisConnector with MockAppConfig {
     val getMovementListRequest: GetMovementListRequest = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions())
-    val service: GetMovementListService = new GetMovementListService(mockConnector)
+    val service: GetMovementListService = new GetMovementListService(mockConnector, mockAppConfig)
   }
 
   "getMovementList" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
+
         MockConnector
           .postChrisSOAPRequestAndExtractToModel(getMovementListRequest)
           .returns(Future.successful(Right(getMovementListResponse)))

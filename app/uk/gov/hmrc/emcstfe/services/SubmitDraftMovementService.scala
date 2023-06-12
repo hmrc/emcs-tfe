@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.NoLrnError
@@ -28,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.XML
 
 @Singleton
-class SubmitDraftMovementService @Inject()(connector: ChrisConnector) extends Logging {
+class SubmitDraftMovementService @Inject()(connector: ChrisConnector, val appConfig: AppConfig) extends Logging {
   def submitDraftMovement(submitDraftMovementRequest: SubmitDraftMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ChRISSuccessResponse]] = {
     extractLrn(submitDraftMovementRequest.requestBody) match {
       case None => Future.successful(Left(NoLrnError))

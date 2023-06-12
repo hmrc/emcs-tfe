@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitDraftMovementFixture
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.models.request.SubmitDraftMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{NoLrnError, XmlValidationError}
@@ -25,14 +26,15 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import scala.concurrent.Future
 
 class SubmitDraftMovementServiceSpec extends UnitSpec with SubmitDraftMovementFixture {
-  trait Test extends MockChrisConnector {
+  trait Test extends MockChrisConnector with MockAppConfig {
     val submitDraftMovementRequest: SubmitDraftMovementRequest = SubmitDraftMovementRequest(exciseRegistrationNumber = "My ERN", arc = "My ARC", requestBody = submitDraftMovementRequestBody)
-    val service: SubmitDraftMovementService = new SubmitDraftMovementService(mockConnector)
+    val service: SubmitDraftMovementService = new SubmitDraftMovementService(mockConnector, mockAppConfig)
   }
 
   "submitDraftMovement" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
+
         MockConnector
           .submitDraftMovementChrisSOAPRequest(submitDraftMovementRequest)
           .returns(Future.successful(Right(chrisSuccessResponse)))
@@ -42,6 +44,7 @@ class SubmitDraftMovementServiceSpec extends UnitSpec with SubmitDraftMovementFi
     }
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
+
         MockConnector
           .submitDraftMovementChrisSOAPRequest(submitDraftMovementRequest)
           .returns(Future.successful(Left(XmlValidationError)))

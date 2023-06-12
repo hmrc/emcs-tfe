@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.services
 import play.api.libs.json.{JsNull, JsString}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, GetMovementIfChangedFixture}
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.mocks.repository.MockGetMovementRepository
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
@@ -32,14 +33,15 @@ import scala.concurrent.Future
 import scala.xml.XML
 
 class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMovementIfChangedFixture {
-  trait Test extends MockChrisConnector with MockGetMovementRepository with MockXmlUtils {
+  trait Test extends MockChrisConnector with MockGetMovementRepository with MockXmlUtils with MockAppConfig {
     lazy val getMovementRequest: GetMovementRequest = GetMovementRequest(exciseRegistrationNumber = testErn, arc = testArc)
     lazy val getMovementIfChangedRequest: GetMovementIfChangedRequest = GetMovementIfChangedRequest(exciseRegistrationNumber = testErn, arc = testArc, sequenceNumber = "1", versionTransactionReference = "008")
 
     lazy val service: GetMovementService = new GetMovementService(
       mockConnector,
       mockRepo,
-      mockXmlUtils
+      mockXmlUtils,
+      mockAppConfig
     )
 
     lazy implicit val userRequest: UserRequest[_] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
@@ -91,6 +93,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
       "return a Left" when {
         "GetMovement call is unsuccessful" in new Test {
           MockGetMovementRepository.get(testErn, testArc).thenReturn(Future.successful(None))
+
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Left(XmlValidationError)))
@@ -121,6 +124,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
         }
         "repository.set returns a failed future" in new Test {
           MockGetMovementRepository.get(testErn, testArc).thenReturn(Future.successful(None))
+
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -212,6 +216,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
   "getNewMovement" should {
     "return a Right" when {
       "connector call is successful and repository call is successful" in new Test {
+
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
@@ -228,6 +233,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
   "getMovementIfChanged" should {
     "return a Right" when {
       "downstream call is successful but response model is empty" in new Test {
+
         MockConnector
           .postChrisSOAPRequest(getMovementIfChangedRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementIfChangedNoChangeSoapWrapper))))
@@ -235,6 +241,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
         await(service.getMovementIfChanged(getMovementRequest, GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody)))) shouldBe Right(getMovementResponse)
       }
       "downstream call is successful and response model is not empty" in new Test {
+
 
         MockConnector
           .postChrisSOAPRequest(getMovementIfChangedRequest)

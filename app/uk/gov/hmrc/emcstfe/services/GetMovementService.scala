@@ -20,6 +20,7 @@ import cats.data.EitherT
 import cats.implicits._
 import com.lucidchart.open.xtract.XmlReader
 import play.api.libs.json.{JsString, JsValue}
+import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
@@ -40,7 +41,8 @@ import scala.xml.{NodeSeq, XML}
 class GetMovementService @Inject()(
                                     connector: ChrisConnector,
                                     repository: GetMovementRepository,
-                                    xmlUtils: XmlUtils
+                                    xmlUtils: XmlUtils,
+                                    val config: AppConfig,
                                   ) extends Logging {
   def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(request.internalId, request.ern, getMovementRequest.arc).flatMap {

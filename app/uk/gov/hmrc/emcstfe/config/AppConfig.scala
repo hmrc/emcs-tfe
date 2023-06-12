@@ -17,15 +17,19 @@
 package uk.gov.hmrc.emcstfe.config
 
 import play.api.Configuration
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{UseChrisStub, FeatureSwitching}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 
 @Singleton
-class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configuration) {
+class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configuration) extends FeatureSwitching {
+
+  override lazy val config: AppConfig = this
 
   def chrisUrl: String = servicesConfig.baseUrl("chris")
+  def chrisStubUrl: String = servicesConfig.baseUrl("chris-stub")
 
   def createMovementUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.createMovementUserAnswers.TTL"))
   def createMovementUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.createMovementUserAnswers.replaceIndexes")
@@ -41,4 +45,20 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def userAllowListBaseUrl: String = s"$userAllowListService/user-allow-list"
   def allowListEnabled: Boolean = configuration.get[Boolean]("features.allowListEnabled")
   def internalAuthToken: String = configuration.get[String]("internal-auth.token")
+
+  def getFeatureSwitchValue(feature: String): Boolean = configuration.get[Boolean](feature)
+
+
+  def urlEMCSApplicationService(): String =
+    if(isEnabled(UseChrisStub)) s"${chrisStubUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
+    else s"${chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
+
+  def urlSubmitDraftMovementPortal(): String =
+    if(isEnabled(UseChrisStub)) s"${chrisStubUrl}/ChRIS/EMCS/SubmitDraftMovementPortal/3"
+    else s"${chrisUrl}/ChRIS/EMCS/SubmitDraftMovementPortal/3"
+
+
+  def urlSubmitReportofReceiptPortal(): String =
+    if(isEnabled(UseChrisStub)) s"${chrisStubUrl}/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+    else s"${chrisUrl}/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
 }
