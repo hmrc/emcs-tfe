@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.mocks.config
+package uk.gov.hmrc.emcstfe.featureswitch.core.config
 
-import org.scalamock.handlers.{CallHandler, CallHandler1}
-import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.models.FeatureSwitch
 
-trait MockAppConfig extends MockFactory {
-  lazy val mockAppConfig: AppConfig = mock[AppConfig]
+trait FeatureSwitchRegistry {
 
-  object MockedAppConfig {
-    def chrisUrl: CallHandler[String] = ((() => mockAppConfig.chrisUrl): () => String).expects()
-    def chrisStubUrl: CallHandler[String] = ((() => mockAppConfig.chrisStubUrl): () => String).expects()
+  def switches: Seq[FeatureSwitch]
 
-    def isEnabled(feature: FeatureSwitch): CallHandler1[FeatureSwitch, Boolean] = {
-      (mockAppConfig.isEnabled(_: FeatureSwitch)).expects(feature)
+  def apply(name: String): FeatureSwitch =
+    get(name) match {
+      case Some(switch) => switch
+      case None => throw new IllegalArgumentException("Invalid feature switch: " + name)
     }
-  }
+
+  def get(name: String): Option[FeatureSwitch] = switches find (_.configName == name)
+
 }

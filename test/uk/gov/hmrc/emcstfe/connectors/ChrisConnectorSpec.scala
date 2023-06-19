@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.connectors
 
+import org.scalatest.BeforeAndAfterEach
 import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.test.FakeRequest
+import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{UseChrisStub, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitDraftMovementFixture, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
@@ -33,16 +36,22 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with MockXmlUtils
-  with GetMovementFixture with SubmitDraftMovementFixture with SubmitReportOfReceiptFixtures {
+  with GetMovementFixture with SubmitDraftMovementFixture with SubmitReportOfReceiptFixtures with FeatureSwitching with BeforeAndAfterEach {
+
+  override def afterEach(): Unit = {
+    disable(UseChrisStub)
+    super.afterEach()
+  }
+
+  lazy val config = app.injector.instanceOf[AppConfig]
 
   trait Test {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-    val connector = new ChrisConnector(mockHttpClient, mockAppConfig, new ChrisXMLHttpParser(mockXmlUtils), mockXmlUtils)
+    val connector = new ChrisConnector(mockHttpClient, config, new ChrisXMLHttpParser(mockXmlUtils), mockXmlUtils)
 
-    val baseUrl: String = "http://test-BaseUrl"
-    MockedAppConfig.chrisUrl.returns(baseUrl)
+    val baseUrl: String = "http://localhost:8308"
   }
 
   "postChrisSOAPRequestAndExtractToModel" should {

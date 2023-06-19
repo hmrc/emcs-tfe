@@ -16,19 +16,42 @@
 
 package uk.gov.hmrc.emcstfe.config
 
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.duration.Duration
 
-class AppConfigSpec extends UnitSpec {
+class AppConfigSpec extends UnitSpec with FeatureSwitching {
 
-  lazy val appConfig = app.injector.instanceOf[AppConfig]
+  lazy val config = app.injector.instanceOf[AppConfig]
 
   "AppConfig" must {
 
     "have a TTL for ReportAReceipt UserAnswers" in {
       //note: In app-config-base this will be set to the actual TTL for Environments including Production
-      appConfig.reportReceiptUserAnswersTTL() shouldBe Duration("15minutes")
+      config.reportReceiptUserAnswersTTL() shouldBe Duration("15minutes")
+    }
+
+    ".chris url()" should {
+      "when ReturnToLegacy is enabled" should  {
+
+        "must return to the legacy URL" in {
+          enable(UseChrisStub)
+          config.urlEMCSApplicationService() shouldBe s"http://localhost:8308/ChRISOSB/EMCS/EMCSApplicationService/2"
+          config.urlSubmitDraftMovementPortal() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
+          config.urlSubmitReportofReceiptPortal() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+        }
+      }
+
+      "when ReturnToLegacy is disabled" should {
+
+        "must return to the new URL" in {
+          disable(UseChrisStub)
+          config.urlEMCSApplicationService() shouldBe s"http://localhost:8308/ChRISOSB/EMCS/EMCSApplicationService/2"
+          config.urlSubmitDraftMovementPortal() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
+          config.urlSubmitReportofReceiptPortal() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+        }
+      }
     }
   }
 

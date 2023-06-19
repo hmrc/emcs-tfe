@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.mocks.config
+package uk.gov.hmrc.emcstfe.featureswitch.core.config
 
-import org.scalamock.handlers.{CallHandler, CallHandler1}
-import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.emcstfe.config.AppConfig
+import play.api.inject.{Binding, Module}
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.emcstfe.featureswitch.core.models.FeatureSwitch
 
-trait MockAppConfig extends MockFactory {
-  lazy val mockAppConfig: AppConfig = mock[AppConfig]
+import javax.inject.Singleton
 
-  object MockedAppConfig {
-    def chrisUrl: CallHandler[String] = ((() => mockAppConfig.chrisUrl): () => String).expects()
-    def chrisStubUrl: CallHandler[String] = ((() => mockAppConfig.chrisStubUrl): () => String).expects()
+@Singleton
+class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-    def isEnabled(feature: FeatureSwitch): CallHandler1[FeatureSwitch, Boolean] = {
-      (mockAppConfig.isEnabled(_: FeatureSwitch)).expects(feature)
-    }
+  val switches: Seq[FeatureSwitch] = Seq(UseChrisStub)
+
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
+    Seq(
+      bind[FeatureSwitchRegistry].to(this).eagerly()
+    )
   }
 }
+
+case object UseChrisStub extends FeatureSwitch {
+  override val configName: String = "features.chrisStub"
+  override val displayName: String = "enables chris stub"
+}
+

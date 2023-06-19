@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.mocks.config
+package uk.gov.hmrc.emcstfe.featureswitch.core.config
 
-import org.scalamock.handlers.{CallHandler, CallHandler1}
-import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.models.FeatureSwitch
 
-trait MockAppConfig extends MockFactory {
-  lazy val mockAppConfig: AppConfig = mock[AppConfig]
+trait FeatureSwitching {
 
-  object MockedAppConfig {
-    def chrisUrl: CallHandler[String] = ((() => mockAppConfig.chrisUrl): () => String).expects()
-    def chrisStubUrl: CallHandler[String] = ((() => mockAppConfig.chrisStubUrl): () => String).expects()
+  val config: AppConfig
 
-    def isEnabled(feature: FeatureSwitch): CallHandler1[FeatureSwitch, Boolean] = {
-      (mockAppConfig.isEnabled(_: FeatureSwitch)).expects(feature)
+  val FEATURE_SWITCH_ON = "true"
+  val FEATURE_SWITCH_OFF = "false"
+
+  def isEnabled(featureSwitch: FeatureSwitch): Boolean =
+    sys.props get featureSwitch.configName match {
+      case Some(value) => value == FEATURE_SWITCH_ON
+      case None => config.getFeatureSwitchValue(featureSwitch.configName)
     }
-  }
+
+  def enable(featureSwitch: FeatureSwitch): Unit =
+    sys.props += featureSwitch.configName -> FEATURE_SWITCH_ON
+
+  def disable(featureSwitch: FeatureSwitch): Unit =
+    sys.props += featureSwitch.configName -> FEATURE_SWITCH_OFF
+
 }
