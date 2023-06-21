@@ -1,5 +1,4 @@
 import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 lazy val ItTest = config("it") extend Test
 
@@ -16,7 +15,6 @@ lazy val microservice = Project("emcs-tfe", file("."))
     scalacOptions += "-Wconf:src=routes/.*:s",
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions"
   )
-  .settings(publishingSettings: _*)
   .configs(ItTest)
   .settings(inConfig(ItTest)(Defaults.itSettings ++ headerSettings(ItTest) ++ automateHeaderSettings(ItTest)): _*)
   .settings(
