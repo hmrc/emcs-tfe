@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, Export, TaxWarehouse, TemporaryRegisteredConsignee}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, Export, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
@@ -140,6 +140,21 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
           "use GB as default when consignee trader ID does NOT exist" in {
 
             val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TemporaryRegisteredConsignee, consigneeTrader = None))
+            request.messageRecipient shouldBe "NDEA.GB"
+          }
+        }
+
+        "destination type is RegisteredConsignee" should {
+
+          "use the Consignee Trader Id for the Country Code when it exists" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = RegisteredConsignee))
+            request.messageRecipient shouldBe "NDEA.FR"
+          }
+
+          "use GB as default when consignee trader ID does NOT exist" in {
+
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = RegisteredConsignee, consigneeTrader = None))
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }
