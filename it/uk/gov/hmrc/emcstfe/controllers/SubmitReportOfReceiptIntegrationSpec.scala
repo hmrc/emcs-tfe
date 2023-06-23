@@ -68,7 +68,7 @@ class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with Subm
         val response: WSResponse = await(request().post(Json.toJson(maxSubmitReportOfReceiptModel)))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(ChRISSuccessResponse.digestValue), EmptyError(ChRISSuccessResponse.digestValue))))
+        response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(ChRISSuccessResponse.digestValue), EmptyError(ChRISSuccessResponse.receiptDateTime), EmptyError(ChRISSuccessResponse.digestValue))))
       }
       "downstream call returns something other than XML" in new Test {
         val responseBody: JsValue = Json.obj("message" -> "Success!")
