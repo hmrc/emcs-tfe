@@ -45,18 +45,21 @@ trait ChRISResponsesFixture {
 
   lazy val chrisSuccessResponse: ChRISSuccessResponse = ChRISSuccessResponse(
     receipt = "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
+    receiptDate = "2009-01-01T10:10:10.000",
     lrn = Some("EN")
   )
 
   lazy val chrisSuccessJson: JsValue = Json.parse(
     """{
       |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
+      |    "receiptDate": "2009-01-01T10:10:10.000",
       |    "lrn": "EN"
       |}""".stripMargin)
 
   lazy val chrisSuccessJsonNoLRN: JsValue = Json.parse(
     """{
-      |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN"
+      |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
+      |    "receiptDate": "2009-01-01T10:10:10.000"
       |}""".stripMargin)
 
 }

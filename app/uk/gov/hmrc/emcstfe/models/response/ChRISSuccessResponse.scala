@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple2Semigroupal
+import cats.implicits.catsSyntaxTuple3Semigroupal
 import com.google.common.io.BaseEncoding
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OWrites}
@@ -25,21 +25,25 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 case class ChRISSuccessResponse(receipt: String,
+                                receiptDate: String,
                                 lrn: Option[String] = None)
 
 object ChRISSuccessResponse {
 
   private[response] def digestValueToReceipt(dv: String): String = {
-    val decodedValue: Array[Byte] = Base64.getDecoder().decode(dv.getBytes(StandardCharsets.UTF_8))
+    val decodedValue: Array[Byte] = Base64.getDecoder.decode(dv.getBytes(StandardCharsets.UTF_8))
     val stringValue: String = BaseEncoding.base32().encode(decodedValue)
     stringValue
   }
 
   val digestValue: XPath = __ \\ "Envelope" \ "Body" \ "HMRCSOAPResponse" \ "SuccessResponse" \ "IRmarkReceipt" \ "Signature" \ "SignedInfo" \ "Reference" \ "DigestValue"
 
+  val receiptDateTime: XPath = __ \\ "Envelope" \ "Body" \ "HMRCSOAPResponse" \ "SuccessResponse" \ "AcceptedTime"
+
   implicit val xmlReader: XmlReader[ChRISSuccessResponse] =
     (
       digestValue.read[String].map(digestValueToReceipt),
+      receiptDateTime.read[String],
       digestValue.read[String].map(_ => None) // can't think of a way to Reads.pure with xtract. TODO: investigate
     ).mapN(ChRISSuccessResponse.apply)
 
