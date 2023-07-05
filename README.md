@@ -78,7 +78,34 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK)
 
-**Body**: [GetMovementListResponse Model](app/uk/gov/hmrc/emcstfe/models/response/GetMovementListResponse.scala)
+**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+---
+
+### Explain Delay
+
+<details>
+<summary>Submit Explanation of Delay
+
+**`POST`** /explain-delay/:ern/:arc</summary>
+
+**Request Body**: [SubmitExplainDelayModel Model](app/uk/gov/hmrc/emcstfe/models/explainDelay/SubmitExplainDelayModel.scala)
+
+### Responses
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
 
 #### Error Response(s)
 
