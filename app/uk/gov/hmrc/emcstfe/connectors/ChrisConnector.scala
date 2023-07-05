@@ -36,47 +36,40 @@ class ChrisConnector @Inject()(val http: HttpClient,
                               ) extends BaseConnector {
 
   def postChrisSOAPRequestAndExtractToModel[A](request: ChrisRequest)
-                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
+                                              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
 
     val url = appConfig.urlEMCSApplicationService()
     postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(shouldExtractFromSoap = request.shouldExtractFromSoap))
   }
 
   def postChrisSOAPRequest(request: ChrisRequest)
-                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
+                          (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
 
     val url = appConfig.urlEMCSApplicationService()
     postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(shouldExtractFromSoap = request.shouldExtractFromSoap))
   }
 
-  def submitDraftMovementChrisSOAPRequest[A](request: ChrisRequest)
-                               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
-
-    val url = appConfig.urlSubmitDraftMovementPortal()
+  private def prepareXMLAndSubmit[A](url: String, request: ChrisRequest, callingMethod: String)
+                                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
     soapUtils.prepareXmlForSubmission(XML.loadString(request.requestBody)) match {
       case Left(errorResponse) => Future.successful(Left(errorResponse))
       case Right(preparedXml) =>
 
-        logger.debug(s"[submitDraftMovementChrisSOAPRequest] Sending to URL: $url")
-        logger.debug(s"[submitDraftMovementChrisSOAPRequest] Sending body: $preparedXml")
-
-        postString(http, url, preparedXml, request.action)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(shouldExtractFromSoap = false))
-    }
-  }
-
-  def submitReportOfReceiptChrisSOAPRequest[A](request: ChrisRequest)
-                                              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
-
-
-    val url = appConfig.urlSubmitReportofReceiptPortal()
-    soapUtils.prepareXmlForSubmission(XML.loadString(request.requestBody)) match {
-      case Left(errorResponse) => Future.successful(Left(errorResponse))
-      case Right(preparedXml) =>
-
-        logger.debug(s"[submitReportOfReceiptChrisSOAPRequest] Sending to URL: $url")
-        logger.debug(s"[submitReportOfReceiptChrisSOAPRequest] Sending body: $preparedXml")
+        logger.debug(s"[$callingMethod] Sending to URL: $url")
+        logger.debug(s"[$callingMethod] Sending body: $preparedXml")
 
         postString(http, url, preparedXml, request.action)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(request.shouldExtractFromSoap))
     }
-  }
+
+  def submitDraftMovementChrisSOAPRequest[A](request: ChrisRequest)
+                                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+    prepareXMLAndSubmit(appConfig.urlSubmitDraftMovementPortal(), request, "submitDraftMovementChrisSOAPRequest")
+
+  def submitReportOfReceiptChrisSOAPRequest[A](request: ChrisRequest)
+                                              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+    prepareXMLAndSubmit(appConfig.urlSubmitReportofReceiptPortal(), request, "submitReportOfReceiptChrisSOAPRequest")
+
+  def submitExplainDelayChrisSOAPRequest[A](request: ChrisRequest)
+                                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+    prepareXMLAndSubmit(appConfig.urlSubmitExplainDelay(), request, "submitExplainDelayChrisSOAPRequest")
 }
