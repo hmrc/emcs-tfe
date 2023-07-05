@@ -17,9 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{SubmitReportOfReceiptModel, TraderModel}
 
 import java.time.{LocalDate, LocalTime, ZoneId}
 import java.util.UUID
