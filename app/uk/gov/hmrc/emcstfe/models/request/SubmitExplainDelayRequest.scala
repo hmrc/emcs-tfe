@@ -26,15 +26,14 @@ import java.util.UUID
 
 case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
                                     (implicit request: UserRequest[_]) extends ChrisRequest {
+  override def exciseRegistrationNumber: String = request.ern
 
   private val NDEA = "NDEA."
   private val arcCountryCode = body.arc.substring(2, 4)
-  private val ernCountryCode = body.ern.substring(0, 2)
+  private val ernCountryCode = exciseRegistrationNumber.substring(0, 2)
 
   val messageRecipient = NDEA ++ arcCountryCode
   val messageSender: String = NDEA ++ ernCountryCode
-
-  override def exciseRegistrationNumber: String = request.ern
 
   val preparedDate = LocalDate.now(ZoneId.of("UTC"))
   val preparedTime = LocalTime.now(ZoneId.of("UTC"))

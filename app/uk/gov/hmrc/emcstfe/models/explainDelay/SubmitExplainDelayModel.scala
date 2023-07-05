@@ -17,21 +17,21 @@
 package uk.gov.hmrc.emcstfe.models.explainDelay
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 
 import scala.xml.{Elem, NodeSeq}
 
-case class SubmitExplainDelayModel(ern: String,
-                                   arc: String,
+case class SubmitExplainDelayModel(arc: String,
                                    sequenceNumber: Int,
                                    submitterType: SubmitterType,
                                    delayType: DelayType,
                                    delayReasonType: DelayReasonType,
                                    additionalInformation: Option[String]) {
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:ExplanationOnDelayForDelivery>
       <urn:Attributes>
-        <urn:SubmitterIdentification>{ern}</urn:SubmitterIdentification>
+        <urn:SubmitterIdentification>{request.ern}</urn:SubmitterIdentification>
         <urn:SubmitterType>{submitterType.toString}</urn:SubmitterType>
         <urn:ExplanationCode>{delayReasonType.toString}</urn:ExplanationCode>
         {additionalInformation.map(x => <urn:ComplementaryInformation language="en">{x}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}

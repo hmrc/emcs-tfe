@@ -24,7 +24,6 @@ import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
 trait SubmitExplainDelayFixtures extends BaseFixtures with ChRISResponsesFixture {
 
   val maxSubmitExplainDelayModel = SubmitExplainDelayModel(
-    ern = testErn,
     arc = testArc,
     sequenceNumber = 1,
     submitterType = Consignee,
@@ -57,14 +56,13 @@ trait SubmitExplainDelayFixtures extends BaseFixtures with ChRISResponsesFixture
           {testArc}
         </urn:AdministrativeReferenceCode>
         <urn:SequenceNumber>
-          {1}
+          1
         </urn:SequenceNumber>
       </urn:ExciseMovement>
     </urn:ExplanationOnDelayForDelivery>
 
 
   val minSubmitExplainDelayModel = SubmitExplainDelayModel(
-    ern = testErn,
     arc = testArc,
     sequenceNumber = 1,
     submitterType = Consignee,
@@ -94,7 +92,7 @@ trait SubmitExplainDelayFixtures extends BaseFixtures with ChRISResponsesFixture
           {testArc}
         </urn:AdministrativeReferenceCode>
         <urn:SequenceNumber>
-          {1}
+          1
         </urn:SequenceNumber>
       </urn:ExciseMovement>
     </urn:ExplanationOnDelayForDelivery>

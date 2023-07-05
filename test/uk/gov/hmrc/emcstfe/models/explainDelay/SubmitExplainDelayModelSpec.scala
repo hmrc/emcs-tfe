@@ -17,12 +17,16 @@
 package uk.gov.hmrc.emcstfe.models.explainDelay
 
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
 
 class SubmitExplainDelayModelSpec extends UnitSpec with SubmitExplainDelayFixtures {
+
+  implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
 
   "SubmitExplainDelayModel" must {
 

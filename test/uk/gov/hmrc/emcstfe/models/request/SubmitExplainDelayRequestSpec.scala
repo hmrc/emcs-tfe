@@ -78,13 +78,10 @@ class SubmitExplainDelayRequestSpec extends UnitSpec with SubmitExplainDelayFixt
 
     "for the MessageSender and MessageRecipient headers" when {
 
-      val model =
-        maxSubmitExplainDelayModel
-          .copy(ern = "XI0000012345")
-          .copy(arc = "01DE0000012345")
+      val model = maxSubmitExplainDelayModel.copy(arc = "01DE0000012345")
 
       "have the correct MessageSender" in {
-        SubmitExplainDelayRequest(model).messageSender shouldBe "NDEA.XI"
+        SubmitExplainDelayRequest(model).messageSender shouldBe "NDEA.GB"
       }
 
       "have the correct MessageRecipient" in {
