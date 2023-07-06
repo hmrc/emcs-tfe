@@ -48,17 +48,17 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def getFeatureSwitchValue(feature: String): Boolean = configuration.get[Boolean](feature)
 
+  def chrisBaseUrl: String = if(isEnabled(UseChrisStub)) chrisStubUrl else chrisUrl
 
   def urlEMCSApplicationService(): String =
-    if(isEnabled(UseChrisStub)) s"${chrisStubUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
-    else s"${chrisUrl}/ChRISOSB/EMCS/EMCSApplicationService/2"
+    chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
 
   def urlSubmitDraftMovementPortal(): String =
-    if(isEnabled(UseChrisStub)) s"${chrisStubUrl}/ChRIS/EMCS/SubmitDraftMovementPortal/3"
-    else s"${chrisUrl}/ChRIS/EMCS/SubmitDraftMovementPortal/3"
-
+    chrisBaseUrl + "/ChRIS/EMCS/SubmitDraftMovementPortal/3"
 
   def urlSubmitReportofReceiptPortal(): String =
-    if(isEnabled(UseChrisStub)) s"${chrisStubUrl}/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
-    else s"${chrisUrl}/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+    chrisBaseUrl + "/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+
+  def urlSubmitExplainDelay(): String =
+    chrisBaseUrl + "/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4"
 }
