@@ -14,3 +14,7 @@ DELETE      /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.
 GET         /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.get(ern, lrn)
 PUT         /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.set(ern, lrn)
 DELETE      /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.clear(ern, lrn)
+
+GET         /user-answers/explain-delay/:ern/:arc           uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.get(ern, arc)
+PUT         /user-answers/explain-delay/:ern/:arc           uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.set(ern, arc)
+DELETE      /user-answers/explain-delay/:ern/:arc           uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.clear(ern, arc)
