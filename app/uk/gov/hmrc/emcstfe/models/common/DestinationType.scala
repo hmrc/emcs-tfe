@@ -27,6 +27,9 @@ object DestinationType extends Enumerable.Implicits {
   case object ExemptedOrganisations extends WithName("5") with DestinationType
   case object Export extends WithName("6") with DestinationType
   case object UnknownDestination extends WithName("8") with DestinationType
+  case object CertifiedConsignee extends WithName("9") with DestinationType
+  case object TemporaryCertifiedConsignee extends WithName("10") with DestinationType
+  case object ReturnToThePlaceOfDispatchOfTheConsignor extends WithName("11") with DestinationType
 
   val values: Seq[DestinationType] = Seq(
     TaxWarehouse,
@@ -35,7 +38,10 @@ object DestinationType extends Enumerable.Implicits {
     DirectDelivery,
     ExemptedOrganisations,
     Export,
-    UnknownDestination
+    UnknownDestination,
+    CertifiedConsignee,
+    TemporaryCertifiedConsignee,
+    ReturnToThePlaceOfDispatchOfTheConsignor
   )
 
   implicit val enumerable: Enumerable[DestinationType] =
