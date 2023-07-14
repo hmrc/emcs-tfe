@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeOfDestination
+package uk.gov.hmrc.emcstfe.models.changeDestination
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OFormat}
 
 import scala.xml.{Elem, NodeSeq}
 
-case class AttributesModel(dateAndTimeOfValidationOfChangeOfDestination: Option[String]) extends ChangeOfDestinationModel {
+case class AttributesModel(dateAndTimeOfValidationOfChangeOfDestination: Option[String]) extends ChangeDestinationModel {
   def toXml: Elem = <urn:Attributes>
     {dateAndTimeOfValidationOfChangeOfDestination.map(
       value => <urn:DateAndTimeOfValidationOfChangeOfDestination>
@@ -31,5 +31,5 @@ case class AttributesModel(dateAndTimeOfValidationOfChangeOfDestination: Option[
 }
 
 object AttributesModel {
-  implicit val reads: Reads[AttributesModel] = Json.reads
+  implicit val fmt: OFormat[AttributesModel] = Json.format
 }

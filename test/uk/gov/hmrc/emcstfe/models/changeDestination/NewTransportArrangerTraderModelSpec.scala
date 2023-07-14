@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeOfDestination
+package uk.gov.hmrc.emcstfe.models.changeDestination
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeOfDestinationFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
 
-class NewTransportArrangerTraderModelSpec extends ChangeOfDestinationModelSpec with SubmitChangeOfDestinationFixtures {
+class NewTransportArrangerTraderModelSpec extends ChangeDestinationModelSpec with SubmitChangeDestinationFixtures {
   import NewTransportArrangerTraderFixtures._
 
   testJsonToModelToXml(

@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeOfDestination
+package uk.gov.hmrc.emcstfe.models.changeDestination
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeOfDestinationFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
 
-class DestinationChangedModelSpec extends ChangeOfDestinationModelSpec with SubmitChangeOfDestinationFixtures {
-  import DestinationChangedFixtures._
+class DeliveryPlaceTraderModelSpec extends ChangeDestinationModelSpec with SubmitChangeDestinationFixtures {
+  import DeliveryPlaceTraderFixtures._
 
   testJsonToModelToXml(
-    scenario = "DestinationChangedModel with max fields",
-    json = destinationChangedJsonMax,
-    model = destinationChangedModelMax,
-    xml = destinationChangedXmlMax
+    scenario = "DeliveryPlaceTraderModel with max fields",
+    json = deliveryPlaceTraderJsonMax,
+    model = deliveryPlaceTraderModelMax,
+    xml = deliveryPlaceTraderXmlMax
   )
 
   testJsonToModelToXml(
-    scenario = "DestinationChangedModel with min fields",
-    json = destinationChangedJsonMin,
-    model = destinationChangedModelMin,
-    xml = destinationChangedXmlMin
+    scenario = "DeliveryPlaceTraderModel with min fields",
+    json = deliveryPlaceTraderJsonMin,
+    model = deliveryPlaceTraderModelMin,
+    xml = deliveryPlaceTraderXmlMin
   )
 }

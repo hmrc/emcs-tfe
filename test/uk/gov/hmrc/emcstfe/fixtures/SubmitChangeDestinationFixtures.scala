@@ -263,7 +263,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
     lazy val movementGuaranteeJsonMax: JsObject = Json.obj(
       "guarantorTypeCode" -> "124",
-      "guarantorTrader" -> Json.arr(guarantorTraderJsonMax, guarantorTraderJsonMax),
+      "guarantorTrader" -> Json.arr(guarantorTraderJsonMax, guarantorTraderJsonMax)
     )
 
     lazy val movementGuaranteeJsonMin: JsObject = Json.obj(

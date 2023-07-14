@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeOfDestination
+package uk.gov.hmrc.emcstfe.models.changeDestination
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OFormat}
 
 import scala.xml.{Elem, NodeSeq}
 
@@ -27,7 +27,7 @@ case class NewTransporterTraderModel(
                                       streetNumber: Option[String],
                                       postcode: String,
                                       city: String
-                                    ) extends ChangeOfDestinationModel {
+                                    ) extends ChangeDestinationModel {
   def toXml: Elem = <urn:NewTransporterTrader language="en">
     {vatNumber.map(value => <urn:VatNumber>{value}</urn:VatNumber>).getOrElse(NodeSeq.Empty)}
     <urn:TraderName>{traderName}</urn:TraderName>
@@ -39,5 +39,5 @@ case class NewTransporterTraderModel(
 }
 
 object NewTransporterTraderModel {
-  implicit val reads: Reads[NewTransporterTraderModel] = Json.reads
+  implicit val fmt: OFormat[NewTransporterTraderModel] = Json.format
 }
