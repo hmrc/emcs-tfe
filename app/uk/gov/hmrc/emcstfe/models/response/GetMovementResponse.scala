@@ -21,7 +21,7 @@ import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, JourneyTime}
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.TraderModel
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ConsignorTraderModel, TraderModel}
 
 case class GetMovementResponse(arc: String,
                                sequenceNumber: Int,
@@ -30,7 +30,7 @@ case class GetMovementResponse(arc: String,
                                deliveryPlaceTrader: Option[TraderModel],
                                localReferenceNumber: String,
                                eadStatus: String,
-                               consignorName: String,
+                               consignorTrader: ConsignorTraderModel,
                                dateOfDispatch: String,
                                journeyTime: String,
                                items: Seq[MovementItem],
@@ -44,11 +44,11 @@ object GetMovementResponse {
   val EADESADContainer: XPath = currentMovement \ "IE801" \ "Body" \ "EADESADContainer"
   val arc: XPath = EADESADContainer \ "ExciseMovement" \ "AdministrativeReferenceCode"
   val localReferenceNumber: XPath = EADESADContainer \ "EadEsad" \ "LocalReferenceNumber"
-  val consignorName: XPath = EADESADContainer \ "ConsignorTrader" \ "TraderName"
   val dateOfDispatch: XPath = EADESADContainer \ "EadEsad" \ "DateOfDispatch"
   val journeyTime: XPath = EADESADContainer \ "HeaderEadEsad" \ "JourneyTime"
   val sequenceNumber: XPath = EADESADContainer \ "HeaderEadEsad" \ "SequenceNumber"
   val destinationTypeCode: XPath = EADESADContainer \ "HeaderEadEsad" \ "DestinationTypeCode"
+  val consignorTrader: XPath = EADESADContainer \\ "ConsignorTrader"
   val consigneeTrader: XPath = EADESADContainer \\ "ConsigneeTrader"
   val deliveryPlaceTrader: XPath = EADESADContainer \\ "DeliveryPlaceTrader"
   val items: XPath = EADESADContainer \ "BodyEadEsad"
@@ -62,7 +62,7 @@ object GetMovementResponse {
     deliveryPlaceTrader.read[Option[TraderModel]].map(model => if(model.exists(_.isEmpty)) None else model),
     localReferenceNumber.read[String],
     eadStatus.read[String],
-    consignorName.read[String],
+    consignorTrader.read[ConsignorTraderModel](ConsignorTraderModel.xmlReads),
     dateOfDispatch.read[String],
     journeyTime.read[JourneyTime].map(_.toString),
     items.read[Seq[MovementItem]](strictReadSeq),

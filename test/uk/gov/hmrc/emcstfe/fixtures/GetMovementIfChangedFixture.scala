@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, TraderModel}
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, ConsignorTraderModel, TraderModel}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
 trait GetMovementIfChangedFixture extends BaseFixtures {
@@ -516,7 +516,16 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
     )),
     localReferenceNumber = "EN",
     eadStatus = "Beans",
-    consignorName = "Current 801 Consignor",
+    consignorTrader = ConsignorTraderModel(
+      traderExciseNumber = "GB12345GTR144",
+      traderName = "Current 801 Consignor",
+      address = AddressModel(
+        streetNumber = None,
+        street = Some("Main101"),
+        postcode = Some("ZZ78"),
+        city = Some("Zeebrugge")
+      )
+    ),
     dateOfDispatch = "2008-11-20",
     journeyTime = "20 days",
     items = Seq(

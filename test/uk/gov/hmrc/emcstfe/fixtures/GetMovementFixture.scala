@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, TraderModel}
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{AddressModel, ConsignorTraderModel, TraderModel}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
 trait GetMovementFixture extends BaseFixtures {
@@ -482,7 +482,16 @@ trait GetMovementFixture extends BaseFixtures {
     deliveryPlaceTrader = None,
     localReferenceNumber = "EN",
     eadStatus = "Accepted",
-    consignorName = "Current 801 Consignor",
+    consignorTrader = ConsignorTraderModel(
+      traderExciseNumber = "GB12345GTR144",
+      traderName = "Current 801 Consignor",
+      address = AddressModel(
+        streetNumber = None,
+        street = Some("Main101"),
+        postcode = Some("ZZ78"),
+        city = Some("Zeebrugge")
+      )
+    ),
     dateOfDispatch = "2008-11-20",
     journeyTime = "20 days",
     items = Seq(
@@ -569,8 +578,8 @@ trait GetMovementFixture extends BaseFixtures {
 
   lazy val getMovementJson: JsValue = Json.obj(fields =
     "arc" -> "13AB7778889991ABCDEF9",
-    "destinationType" -> "6",
     "sequenceNumber" -> 1,
+    "destinationType" -> "6",
     "consigneeTrader" -> Json.obj(fields =
       "traderId" -> "GB11100000002",
       "traderName" -> "Current 801 Consignee",
@@ -582,7 +591,15 @@ trait GetMovementFixture extends BaseFixtures {
     ),
     "localReferenceNumber" -> "EN",
     "eadStatus" -> "Accepted",
-    "consignorName" -> "Current 801 Consignor",
+    "consignorTrader" -> Json.obj(fields =
+      "traderExciseNumber" -> "GB12345GTR144",
+      "traderName" -> "Current 801 Consignor",
+      "address" -> Json.obj(
+        "street" -> "Main101",
+        "postcode" -> "ZZ78",
+        "city" -> "Zeebrugge"
+      )
+    ),
     "dateOfDispatch" -> "2008-11-20",
     "journeyTime" -> "20 days",
     "items" -> Json.arr(
