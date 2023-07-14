@@ -23,12 +23,14 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub}
 import uk.gov.hmrc.emcstfe.fixtures._
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeOfDestinationFixtures, SubmitDraftMovementFixture, SubmitExplainDelayFixtures, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request._
+import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeOfDestinationRequest, SubmitDraftMovementRequest, SubmitExplainDelayRequest, SubmitReportOfReceiptRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, UnexpectedDownstreamResponseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, GetMovementResponse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
