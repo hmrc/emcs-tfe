@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TransportArrangement}
 
 import scala.xml.Elem
 
-trait SubmitChangeOfDestinationFixtures extends BaseFixtures {
+trait SubmitChangeOfDestinationFixtures extends BaseFixtures with ChRISResponsesFixture {
   object AttributesFixtures {
     lazy val attributesModelMax: AttributesModel = AttributesModel(
       dateAndTimeOfValidationOfChangeOfDestination = Some("date")
