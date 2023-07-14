@@ -22,12 +22,12 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub}
-import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeOfDestinationFixtures, SubmitDraftMovementFixture, SubmitExplainDelayFixtures, SubmitReportOfReceiptFixtures}
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures, SubmitDraftMovementFixture, SubmitExplainDelayFixtures, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeOfDestinationRequest, SubmitDraftMovementRequest, SubmitExplainDelayRequest, SubmitReportOfReceiptRequest}
+import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeDestinationRequest, SubmitDraftMovementRequest, SubmitExplainDelayRequest, SubmitReportOfReceiptRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, UnexpectedDownstreamResponseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, GetMovementResponse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -40,7 +40,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
   with SubmitDraftMovementFixture
   with SubmitReportOfReceiptFixtures
   with SubmitExplainDelayFixtures
-  with SubmitChangeOfDestinationFixtures {
+  with SubmitChangeDestinationFixtures {
 
   override def afterEach(): Unit = {
     disable(UseChrisStub)
@@ -373,22 +373,22 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     }
   }
 
-  "submitChangeOfDestinationChrisSOAPRequest" should {
+  "submitChangeDestinationChrisSOAPRequest" should {
 
-    import SubmitChangeOfDestinationFixtures.submitChangeOfDestinationModelMax
+    import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitChangeOfDestinationRequest = SubmitChangeOfDestinationRequest(submitChangeOfDestinationModelMax)
+    val submitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
 
     "return a Right" when {
       "downstream call is successful" in new Test {
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3",
-          body = submitChangeOfDestinationRequest.requestBody,
+          body = submitChangeDestinationRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitChangeOfDestinationRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitChangeDestinationRequest.action}""""
           )
         )
           .returns(Future.successful(Right(chrisSuccessResponse)))
@@ -396,7 +396,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitChangeOfDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeOfDestinationRequest)) shouldBe Right(chrisSuccessResponse)
+        await(connector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeDestinationRequest)) shouldBe Right(chrisSuccessResponse)
       }
     }
     "return a Left" when {
@@ -406,34 +406,34 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3",
-          body = submitChangeOfDestinationRequest.requestBody,
+          body = submitChangeDestinationRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitChangeOfDestinationRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitChangeDestinationRequest.action}""""
           )
         ).returns(Future.successful(response))
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitChangeOfDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeOfDestinationRequest)) shouldBe response
+        await(connector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeDestinationRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3",
-          body = submitChangeOfDestinationRequest.requestBody,
+          body = submitChangeDestinationRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitChangeOfDestinationRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitChangeDestinationRequest.action}""""
           )
         ).returns(Future.successful(response))
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitChangeOfDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeOfDestinationRequest)) shouldBe response
+        await(connector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeDestinationRequest)) shouldBe response
       }
       "cannot prepare XML for submission" in new Test {
 
@@ -442,7 +442,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         MockXmlUtils.prepareXmlForSubmission()
           .returns(response)
 
-        await(connector.submitChangeOfDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeOfDestinationRequest)) shouldBe response
+        await(connector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeDestinationRequest)) shouldBe response
       }
     }
   }

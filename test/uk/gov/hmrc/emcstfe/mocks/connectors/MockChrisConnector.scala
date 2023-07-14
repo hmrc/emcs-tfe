@@ -58,7 +58,7 @@ trait MockChrisConnector extends MockFactory  {
     }
 
     def submitChangeOfDestinationChrisSOAPRequest[A](chrisRequest: ChrisRequest): CallHandler4[ChrisRequest, HeaderCarrier, ExecutionContext, XmlReader[A], Future[Either[ErrorResponse, A]]] = {
-      (mockConnector.submitChangeOfDestinationChrisSOAPRequest[A](_: ChrisRequest)(_: HeaderCarrier, _: ExecutionContext, _: XmlReader[A]))
+      (mockConnector.submitChangeDestinationChrisSOAPRequest[A](_: ChrisRequest)(_: HeaderCarrier, _: ExecutionContext, _: XmlReader[A]))
         .expects(chrisRequest, *, *, *)
     }
   }
