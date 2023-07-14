@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TransportArrangement}
 
 import scala.xml.Elem
 
-trait SubmitChangeOfDestinationFixtures {
+trait SubmitChangeOfDestinationFixtures extends BaseFixtures {
   object AttributesFixtures {
     lazy val attributesModelMax: AttributesModel = AttributesModel(
       dateAndTimeOfValidationOfChangeOfDestination = Some("date")
@@ -99,7 +99,7 @@ trait SubmitChangeOfDestinationFixtures {
 
   object UpdateEadEsadFixtures {
     lazy val updateEadEsadModelMax: UpdateEadEsadModel = UpdateEadEsadModel(
-      administrativeReferenceCode = "arc",
+      administrativeReferenceCode = testArc,
       journeyTime = Some("time"),
       changedTransportArrangement = Some(TransportArrangement.OwnerOfGoods),
       sequenceNumber = Some("1"),
@@ -110,7 +110,7 @@ trait SubmitChangeOfDestinationFixtures {
     )
 
     lazy val updateEadEsadModelMin: UpdateEadEsadModel = UpdateEadEsadModel(
-      administrativeReferenceCode = "arc",
+      administrativeReferenceCode = testArc,
       journeyTime = None,
       changedTransportArrangement = None,
       sequenceNumber = None,
@@ -121,7 +121,7 @@ trait SubmitChangeOfDestinationFixtures {
     )
 
     lazy val updateEadEsadXmlMax: Elem = <urn:UpdateEadEsad>
-      <urn:AdministrativeReferenceCode>arc</urn:AdministrativeReferenceCode>
+      <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>
       <urn:JourneyTime>time</urn:JourneyTime>
       <urn:ChangedTransportArrangement>3</urn:ChangedTransportArrangement>
       <urn:SequenceNumber>1</urn:SequenceNumber>
@@ -132,11 +132,11 @@ trait SubmitChangeOfDestinationFixtures {
     </urn:UpdateEadEsad>
 
     lazy val updateEadEsadXmlMin: Elem = <urn:UpdateEadEsad>
-      <urn:AdministrativeReferenceCode>arc</urn:AdministrativeReferenceCode>
+      <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>
     </urn:UpdateEadEsad>
 
     lazy val updateEadEsadJsonMax: JsObject = Json.obj(
-      "administrativeReferenceCode" -> "arc",
+      "administrativeReferenceCode" -> testArc,
       "journeyTime" -> "time",
       "changedTransportArrangement" -> TransportArrangement.OwnerOfGoods.toString,
       "sequenceNumber" -> "1",
@@ -147,7 +147,7 @@ trait SubmitChangeOfDestinationFixtures {
     )
 
     lazy val updateEadEsadJsonMin: JsObject = Json.obj(
-      "administrativeReferenceCode" -> "arc"
+      "administrativeReferenceCode" -> testArc
     )
   }
 
@@ -251,16 +251,15 @@ trait SubmitChangeOfDestinationFixtures {
 
   object DeliveryPlaceCustomsOfficeFixtures {
     lazy val deliveryPlaceCustomsOfficeModel: DeliveryPlaceCustomsOfficeModel = DeliveryPlaceCustomsOfficeModel(
-      referenceNumber = Seq("number 1", "number 2")
+      referenceNumber = "number"
     )
 
     lazy val deliveryPlaceCustomsOfficeXml: Elem = <urn:DeliveryPlaceCustomsOffice>
-      <urn:ReferenceNumber>number 1</urn:ReferenceNumber>
-      <urn:ReferenceNumber>number 2</urn:ReferenceNumber>
+      <urn:ReferenceNumber>number</urn:ReferenceNumber>
     </urn:DeliveryPlaceCustomsOffice>
 
     lazy val deliveryPlaceCustomsOfficeJson: JsObject = Json.obj(
-      "referenceNumber" -> Json.arr("number 1", "number 2")
+      "referenceNumber" -> "number"
     )
   }
 

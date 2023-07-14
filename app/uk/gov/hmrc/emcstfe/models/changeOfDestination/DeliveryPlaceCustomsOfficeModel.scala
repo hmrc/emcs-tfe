@@ -21,11 +21,10 @@ import play.api.libs.json.{Json, Reads}
 import scala.xml.Elem
 
 case class DeliveryPlaceCustomsOfficeModel(
-                                            referenceNumber: Seq[String]
+                                            referenceNumber: String
                                           ) extends ChangeOfDestinationModel {
-  assume(referenceNumber.nonEmpty, "referenceNumber.length must be > 0")
   def toXml: Elem = <urn:DeliveryPlaceCustomsOffice>
-    {referenceNumber.map(value => <urn:ReferenceNumber>{value}</urn:ReferenceNumber>)}
+    <urn:ReferenceNumber>{referenceNumber}</urn:ReferenceNumber>
   </urn:DeliveryPlaceCustomsOffice>
 }
 
