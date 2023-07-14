@@ -72,4 +72,8 @@ class ChrisConnector @Inject()(val http: HttpClient,
   def submitExplainDelayChrisSOAPRequest[A](request: ChrisRequest)
                                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
     prepareXMLAndSubmit(appConfig.urlSubmitExplainDelay(), request, "submitExplainDelayChrisSOAPRequest")
+
+  def submitChangeOfDestinationChrisSOAPRequest[A](request: ChrisRequest)
+                                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+    prepareXMLAndSubmit(appConfig.urlSubmitChangeOfDestination(), request, "submitChangeOfDestinationChrisSOAPRequest")
 }
