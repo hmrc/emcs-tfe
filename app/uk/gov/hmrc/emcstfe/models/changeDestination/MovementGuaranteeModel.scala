@@ -23,7 +23,7 @@ import scala.xml.{Elem, NodeSeq}
 
 case class MovementGuaranteeModel(
                                    guarantorTypeCode: String,
-                                   guarantorTrader: Option[Seq[GuarantorTraderModel]]
+                                   guarantorTrader: Option[Seq[TraderModel]]
                                  ) extends ChangeDestinationModel {
   def toXml: Elem = <urn:MovementGuarantee>
     <urn:GuarantorTypeCode>{guarantorTypeCode}</urn:GuarantorTypeCode>
