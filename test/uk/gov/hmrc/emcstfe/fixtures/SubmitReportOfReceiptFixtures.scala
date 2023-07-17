@@ -52,6 +52,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
       <urn:Attributes/>
       <urn:ConsigneeTrader language="en">
         <urn:VatNumber>number</urn:VatNumber>
+        <urn:TraderExciseNumber>excise number</urn:TraderExciseNumber>
         <urn:Traderid>{traderId}</urn:Traderid>
         <urn:TraderName>name</urn:TraderName>
         <urn:StreetName>street</urn:StreetName>
@@ -66,6 +67,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
       </urn:ExciseMovement>
       <urn:DeliveryPlaceTrader language="en">
         <urn:VatNumber>number</urn:VatNumber>
+        <urn:TraderExciseNumber>excise number</urn:TraderExciseNumber>
         <urn:Traderid>{traderId}</urn:Traderid>
         <urn:TraderName>name</urn:TraderName>
         <urn:StreetName>street</urn:StreetName>

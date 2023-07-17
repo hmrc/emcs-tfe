@@ -18,29 +18,25 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.changeDestination._
-import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TransportArrangement}
+import uk.gov.hmrc.emcstfe.models.common.{AddressModel, DestinationType, TraderModel, TransportArrangement}
 
 import scala.xml.Elem
 
 trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFixture {
 
   object NewTransportArrangerTraderFixtures {
-    lazy val newTransportArrangerTraderModelMax: NewTransportArrangerTraderModel = NewTransportArrangerTraderModel(
+    lazy val newTransportArrangerTraderModelMax: TraderModel = TraderModel(
       vatNumber = Some("number"),
-      traderName = "name",
-      streetName = "street",
-      streetNumber = Some("street number"),
-      postcode = "a postcode",
-      city = "a city"
-    )
-
-    lazy val newTransportArrangerTraderModelMin: NewTransportArrangerTraderModel = NewTransportArrangerTraderModel(
-      vatNumber = None,
-      traderName = "name",
-      streetName = "street",
-      streetNumber = None,
-      postcode = "a postcode",
-      city = "a city"
+      traderExciseNumber = None,
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("street number"),
+        street = Some("street"),
+        postcode = Some("a postcode"),
+        city = Some("a city")
+      )),
+      traderId = None,
+      eoriNumber = None
     )
 
     lazy val newTransportArrangerTraderXmlMax: Elem = <urn:NewTransportArrangerTrader language="en">
@@ -52,27 +48,15 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
       <urn:City>a city</urn:City>
     </urn:NewTransportArrangerTrader>
 
-    lazy val newTransportArrangerTraderXmlMin: Elem = <urn:NewTransportArrangerTrader language="en">
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:Postcode>a postcode</urn:Postcode>
-      <urn:City>a city</urn:City>
-    </urn:NewTransportArrangerTrader>
-
     lazy val newTransportArrangerTraderJsonMax: JsObject = Json.obj(
       "vatNumber" -> "number",
       "traderName" -> "name",
-      "streetName" -> "street",
-      "streetNumber" -> "street number",
-      "postcode" -> "a postcode",
-      "city" -> "a city"
-    )
-
-    lazy val newTransportArrangerTraderJsonMin: JsObject = Json.obj(
-      "traderName" -> "name",
-      "streetName" -> "street",
-      "postcode" -> "a postcode",
-      "city" -> "a city"
+      "address" -> Json.obj(
+        "streetNumber" -> "street number",
+        "street" -> "street",
+        "postcode" -> "a postcode",
+        "city" -> "a city"
+      )
     )
   }
 
@@ -131,24 +115,18 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
   }
 
   object NewConsigneeTraderFixtures {
-    lazy val newConsigneeTraderModelMax: NewConsigneeTraderModel = NewConsigneeTraderModel(
+    lazy val newConsigneeTraderModelMax: TraderModel = TraderModel(
+      vatNumber = None,
+      traderExciseNumber = None,
       traderId = Some("id"),
-      traderName = "name",
-      streetName = "street",
-      streetNumber = Some("street number"),
-      postcode = "a postcode",
-      city = "a city",
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("street number"),
+        street = Some("street"),
+        postcode = Some("a postcode"),
+        city = Some("a city")
+      )),
       eoriNumber = Some("eori")
-    )
-
-    lazy val newConsigneeTraderModelMin: NewConsigneeTraderModel = NewConsigneeTraderModel(
-      traderId = None,
-      traderName = "name",
-      streetName = "street",
-      streetNumber = None,
-      postcode = "a postcode",
-      city = "a city",
-      eoriNumber = None
     )
 
     lazy val newConsigneeTraderXmlMax: Elem = <urn:NewConsigneeTrader language="en">
@@ -161,48 +139,32 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
       <urn:EoriNumber>eori</urn:EoriNumber>
     </urn:NewConsigneeTrader>
 
-    lazy val newConsigneeTraderXmlMin: Elem = <urn:NewConsigneeTrader language="en">
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:Postcode>a postcode</urn:Postcode>
-      <urn:City>a city</urn:City>
-    </urn:NewConsigneeTrader>
-
     lazy val newConsigneeTraderJsonMax: JsObject = Json.obj(
       "traderId" -> "id",
       "traderName" -> "name",
-      "streetName" -> "street",
-      "streetNumber" -> "street number",
-      "postcode" -> "a postcode",
-      "city" -> "a city",
+      "address" -> Json.obj(
+        "street" -> "street",
+        "streetNumber" -> "street number",
+        "postcode" -> "a postcode",
+        "city" -> "a city"
+      ),
       "eoriNumber" -> "eori"
-    )
-
-    lazy val newConsigneeTraderJsonMin: JsObject = Json.obj(
-      "traderName" -> "name",
-      "streetName" -> "street",
-      "postcode" -> "a postcode",
-      "city" -> "a city"
     )
   }
 
   object DeliveryPlaceTraderFixtures {
-    lazy val deliveryPlaceTraderModelMax: DeliveryPlaceTraderModel = DeliveryPlaceTraderModel(
+    lazy val deliveryPlaceTraderModelMax: TraderModel = TraderModel(
+      vatNumber = None,
+      traderExciseNumber = None,
       traderId = Some("id"),
       traderName = Some("name"),
-      streetName = Some("street"),
-      streetNumber = Some("street number"),
-      postcode = Some("a postcode"),
-      city = Some("a city")
-    )
-
-    lazy val deliveryPlaceTraderModelMin: DeliveryPlaceTraderModel = DeliveryPlaceTraderModel(
-      traderId = None,
-      traderName = None,
-      streetName = None,
-      streetNumber = None,
-      postcode = None,
-      city = None
+      address = Some(AddressModel(
+        streetNumber = Some("street number"),
+        street = Some("street"),
+        postcode = Some("a postcode"),
+        city = Some("a city")
+      )),
+      eoriNumber = None
     )
 
     lazy val deliveryPlaceTraderXmlMax: Elem = <urn:DeliveryPlaceTrader language="en">
@@ -214,18 +176,16 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
       <urn:City>a city</urn:City>
     </urn:DeliveryPlaceTrader>
 
-    lazy val deliveryPlaceTraderXmlMin: Elem = <urn:DeliveryPlaceTrader language="en"/>
-
     lazy val deliveryPlaceTraderJsonMax: JsObject = Json.obj(
       "traderId" -> "id",
       "traderName" -> "name",
-      "streetName" -> "street",
-      "streetNumber" -> "street number",
-      "postcode" -> "a postcode",
-      "city" -> "a city"
+      "address" -> Json.obj(
+        "streetNumber" -> "street number",
+        "street" -> "street",
+        "postcode" -> "a postcode",
+        "city" -> "a city"
+      )
     )
-
-    lazy val deliveryPlaceTraderJsonMin: JsObject = Json.obj()
   }
 
   object DeliveryPlaceCustomsOfficeFixtures {
@@ -243,49 +203,41 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
   }
 
   object GuarantorTraderFixtures {
-    lazy val guarantorTraderModelMax: GuarantorTraderModel = GuarantorTraderModel(
+    lazy val guarantorTraderModelMax: TraderModel = TraderModel(
       traderExciseNumber = Some("trader number"),
       traderName = Some("name"),
-      streetName = Some("street"),
-      streetNumber = Some("street number"),
-      city = Some("a city"),
-      postcode = Some("a postcode"),
-      vatNumber = Some("vat number")
-    )
-
-    lazy val guarantorTraderModelMin: GuarantorTraderModel = GuarantorTraderModel(
-      traderExciseNumber = None,
-      traderName = None,
-      streetName = None,
-      streetNumber = None,
-      city = None,
-      postcode = None,
-      vatNumber = None
+      address = Some(AddressModel(
+        street = Some("street"),
+        streetNumber = Some("street number"),
+        city = Some("a city"),
+        postcode = Some("a postcode")
+      )),
+      vatNumber = Some("vat number"),
+      eoriNumber = None,
+      traderId = None
     )
 
     lazy val guarantorTraderXmlMax: Elem = <urn:GuarantorTrader language="en">
+      <urn:VatNumber>vat number</urn:VatNumber>
       <urn:TraderExciseNumber>trader number</urn:TraderExciseNumber>
       <urn:TraderName>name</urn:TraderName>
       <urn:StreetName>street</urn:StreetName>
       <urn:StreetNumber>street number</urn:StreetNumber>
-      <urn:City>a city</urn:City>
       <urn:Postcode>a postcode</urn:Postcode>
-      <urn:VatNumber>vat number</urn:VatNumber>
+      <urn:City>a city</urn:City>
     </urn:GuarantorTrader>
-
-    lazy val guarantorTraderXmlMin: Elem = <urn:GuarantorTrader language="en"/>
 
     lazy val guarantorTraderJsonMax: JsObject = Json.obj(
       "traderExciseNumber" -> "trader number",
       "traderName" -> "name",
-      "streetName" -> "street",
-      "streetNumber" -> "street number",
-      "city" -> "a city",
-      "postcode" -> "a postcode",
+      "address" -> Json.obj(
+        "street" -> "street",
+        "streetNumber" -> "street number",
+        "city" -> "a city",
+        "postcode" -> "a postcode"
+      ),
       "vatNumber" -> "vat number"
     )
-
-    lazy val guarantorTraderJsonMin: JsObject = Json.obj()
   }
 
   object MovementGuaranteeFixtures {
@@ -293,7 +245,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
     lazy val movementGuaranteeModelMax: MovementGuaranteeModel = MovementGuaranteeModel(
       guarantorTypeCode = "124",
-      guarantorTrader = Some(Seq(guarantorTraderModelMax, guarantorTraderModelMin))
+      guarantorTrader = Some(Seq(guarantorTraderModelMax, guarantorTraderModelMax))
     )
 
     lazy val movementGuaranteeModelMin: MovementGuaranteeModel = MovementGuaranteeModel(
@@ -304,7 +256,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
     lazy val movementGuaranteeXmlMax: Elem = <urn:MovementGuarantee>
       <urn:GuarantorTypeCode>124</urn:GuarantorTypeCode>
       {guarantorTraderXmlMax}
-      {guarantorTraderXmlMin}
+      {guarantorTraderXmlMax}
     </urn:MovementGuarantee>
 
     lazy val movementGuaranteeXmlMin: Elem = <urn:MovementGuarantee>
@@ -313,7 +265,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
     lazy val movementGuaranteeJsonMax: JsObject = Json.obj(
       "guarantorTypeCode" -> "124",
-      "guarantorTrader" -> Json.arr(guarantorTraderJsonMax, guarantorTraderJsonMin),
+      "guarantorTrader" -> Json.arr(guarantorTraderJsonMax, guarantorTraderJsonMax),
     )
 
     lazy val movementGuaranteeJsonMin: JsObject = Json.obj(
@@ -369,22 +321,18 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
   }
 
   object NewTransporterTraderFixtures {
-    lazy val newTransporterTraderModelMax: NewTransporterTraderModel = NewTransporterTraderModel(
+    lazy val newTransporterTraderModelMax: TraderModel = TraderModel(
       vatNumber = Some("number"),
-      traderName = "name",
-      streetName = "street",
-      streetNumber = Some("street number"),
-      postcode = "a postcode",
-      city = "a city"
-    )
-
-    lazy val newTransporterTraderModelMin: NewTransporterTraderModel = NewTransporterTraderModel(
-      vatNumber = None,
-      traderName = "name",
-      streetName = "street",
-      streetNumber = None,
-      postcode = "a postcode",
-      city = "a city"
+      traderExciseNumber = None,
+      traderId = None,
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        street = Some("street"),
+        streetNumber = Some("street number"),
+        postcode = Some("a postcode"),
+        city = Some("a city")
+      )),
+      eoriNumber = None
     )
 
     lazy val newTransporterTraderXmlMax: Elem = <urn:NewTransporterTrader language="en">
@@ -396,27 +344,15 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
       <urn:City>a city</urn:City>
     </urn:NewTransporterTrader>
 
-    lazy val newTransporterTraderXmlMin: Elem = <urn:NewTransporterTrader language="en">
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:Postcode>a postcode</urn:Postcode>
-      <urn:City>a city</urn:City>
-    </urn:NewTransporterTrader>
-
     lazy val newTransporterTraderJsonMax: JsObject = Json.obj(
       "vatNumber" -> "number",
       "traderName" -> "name",
-      "streetName" -> "street",
-      "streetNumber" -> "street number",
-      "postcode" -> "a postcode",
-      "city" -> "a city"
-    )
-
-    lazy val newTransporterTraderJsonMin: JsObject = Json.obj(
-      "traderName" -> "name",
-      "streetName" -> "street",
-      "postcode" -> "a postcode",
-      "city" -> "a city"
+      "address" -> Json.obj(
+        "street" -> "street",
+        "streetNumber" -> "street number",
+        "postcode" -> "a postcode",
+        "city" -> "a city"
+      )
     )
   }
 

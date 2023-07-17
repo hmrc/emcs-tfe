@@ -17,24 +17,29 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.TraderModel
 
 import scala.xml.{Elem, NodeSeq}
 
 case class SubmitChangeDestinationModel(
-                                          newTransportArrangerTrader: Option[NewTransportArrangerTraderModel],
+                                          newTransportArrangerTrader: Option[TraderModel],
                                           updateEadEsad: UpdateEadEsadModel,
                                           destinationChanged: DestinationChangedModel,
-                                          newTransporterTrader: Option[NewTransporterTraderModel],
+                                          newTransporterTrader: Option[TraderModel],
                                           transportDetails: Option[Seq[TransportDetailsModel]]
                                          ) extends ChangeDestinationModel {
 
   def toXml: Elem =
     <urn:ChangeOfDestination>
       <urn:Attributes/>
-      {newTransportArrangerTrader.map(_.toXml).getOrElse(NodeSeq.Empty)}
+      {newTransportArrangerTrader.map(trader =>
+        <urn:NewTransportArrangerTrader language="en">{trader.toXml}</urn:NewTransportArrangerTrader>
+      ).getOrElse(NodeSeq.Empty)}
       {updateEadEsad.toXml}
       {destinationChanged.toXml}
-      {newTransporterTrader.map(_.toXml).getOrElse(NodeSeq.Empty)}
+      {newTransportArrangerTrader.map(trader =>
+        <urn:NewTransporterTrader language="en">{trader.toXml}</urn:NewTransporterTrader>
+      ).getOrElse(NodeSeq.Empty)}
       {transportDetails.map(_.map(_.toXml)).getOrElse(NodeSeq.Empty)}
     </urn:ChangeOfDestination>
 }

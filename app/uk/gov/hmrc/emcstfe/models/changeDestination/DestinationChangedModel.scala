@@ -17,21 +17,25 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.DestinationType
+import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TraderModel}
 
 import scala.xml.{Elem, NodeSeq}
 
 case class DestinationChangedModel(
                                     destinationTypeCode: DestinationType,
-                                    newConsigneeTrader: Option[NewConsigneeTraderModel],
-                                    deliveryPlaceTrader: Option[DeliveryPlaceTraderModel],
+                                    newConsigneeTrader: Option[TraderModel],
+                                    deliveryPlaceTrader: Option[TraderModel],
                                     deliveryPlaceCustomsOffice: Option[DeliveryPlaceCustomsOfficeModel],
                                     movementGuarantee: Option[MovementGuaranteeModel]
                                   ) extends ChangeDestinationModel {
   def toXml: Elem = <urn:DestinationChanged>
     <urn:DestinationTypeCode>{destinationTypeCode.toString}</urn:DestinationTypeCode>
-    {newConsigneeTrader.map(_.toXml).getOrElse(NodeSeq.Empty)}
-    {deliveryPlaceTrader.map(_.toXml).getOrElse(NodeSeq.Empty)}
+    {newConsigneeTrader.map(trader =>
+      <urn:NewConsigneeTrader language="en">{trader.toXml}</urn:NewConsigneeTrader>
+    ).getOrElse(NodeSeq.Empty)}
+    {deliveryPlaceTrader.map(trader =>
+      <urn:DeliveryPlaceTrader language="en">{trader.toXml}</urn:DeliveryPlaceTrader>
+    ).getOrElse(NodeSeq.Empty)}
     {deliveryPlaceCustomsOffice.map(_.toXml).getOrElse(NodeSeq.Empty)}
     {movementGuarantee.map(_.toXml).getOrElse(NodeSeq.Empty)}
   </urn:DestinationChanged>

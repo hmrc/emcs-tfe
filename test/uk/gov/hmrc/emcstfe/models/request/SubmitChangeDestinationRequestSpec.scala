@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import play.api.test.FakeRequest
-import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
+import uk.gov.hmrc.emcstfe.fixtures.{SubmitChangeDestinationFixtures, TraderModelFixtures}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -25,7 +25,7 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDestinationFixtures {
+class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDestinationFixtures with TraderModelFixtures {
 
   import DeliveryPlaceCustomsOfficeFixtures._
   import DestinationChangedFixtures._
@@ -113,7 +113,7 @@ class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDesti
           }
 
           "use GB as default when newConsigneeTrader traderId does NOT exist" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse, newConsigneeTrader = Some(newConsigneeTraderModelMin))))
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse, newConsigneeTrader = Some(minTraderModel))))
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }

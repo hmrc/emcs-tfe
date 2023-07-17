@@ -16,19 +16,21 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.common.AddressModel
+
 import scala.xml.NodeSeq
 
 trait AddressModelFixtures extends BaseFixtures {
 
-  val maxAddressModel = AddressModel(
+  val maxAddressModel: AddressModel = AddressModel(
     streetNumber = Some("number"),
     street = Some("street"),
     postcode = Some("postcode"),
     city = Some("city")
   )
 
-  val maxAddressModelXML =
+  val maxAddressModelXML: NodeSeq =
     NodeSeq.fromSeq(Seq(
       <urn:StreetName>street</urn:StreetName>,
       <urn:StreetNumber>number</urn:StreetNumber>,
@@ -36,13 +38,22 @@ trait AddressModelFixtures extends BaseFixtures {
       <urn:City>city</urn:City>
     ))
 
-  val minAddressModel = AddressModel(
+  val maxAddressModelJson: JsObject = Json.obj(
+    "streetNumber" -> "number",
+    "street" -> "street",
+    "postcode" -> "postcode",
+    "city" -> "city"
+  )
+
+  val minAddressModel: AddressModel = AddressModel(
     streetNumber = None,
     street = None,
     postcode = None,
     city = None
   )
 
-  val minAddressModelXML = NodeSeq.Empty
+  val minAddressModelXML: NodeSeq = NodeSeq.Empty
+
+  val minAddressModelJson: JsObject = Json.obj()
 
 }
