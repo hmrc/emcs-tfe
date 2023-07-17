@@ -23,27 +23,6 @@ import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TransportArrangement}
 import scala.xml.Elem
 
 trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFixture {
-  object AttributesFixtures {
-    lazy val attributesModelMax: AttributesModel = AttributesModel(
-      dateAndTimeOfValidationOfChangeOfDestination = Some("date")
-    )
-
-    lazy val attributesModelMin: AttributesModel = AttributesModel(
-      dateAndTimeOfValidationOfChangeOfDestination = None
-    )
-
-    lazy val attributesXmlMax: Elem = <urn:Attributes>
-      <urn:DateAndTimeOfValidationOfChangeOfDestination>date</urn:DateAndTimeOfValidationOfChangeOfDestination>
-    </urn:Attributes>
-
-    lazy val attributesXmlMin: Elem = <urn:Attributes/>
-
-    lazy val attributesJsonMax: JsObject = Json.obj(
-      "dateAndTimeOfValidationOfChangeOfDestination" -> "date"
-    )
-
-    lazy val attributesJsonMin: JsObject = Json.obj()
-  }
 
   object NewTransportArrangerTraderFixtures {
     lazy val newTransportArrangerTraderModelMax: NewTransportArrangerTraderModel = NewTransportArrangerTraderModel(
@@ -484,7 +463,6 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
   }
 
   object SubmitChangeDestinationFixtures {
-    import AttributesFixtures._
     import NewTransportArrangerTraderFixtures._
     import UpdateEadEsadFixtures._
     import DestinationChangedFixtures._
@@ -492,7 +470,6 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
     import TransportDetailsFixtures._
 
     lazy val submitChangeDestinationModelMax: SubmitChangeDestinationModel = SubmitChangeDestinationModel(
-      attributes = attributesModelMax,
       newTransportArrangerTrader = Some(newTransportArrangerTraderModelMax),
       updateEadEsad = updateEadEsadModelMax,
       destinationChanged = destinationChangedModelMax,
@@ -501,7 +478,6 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
     )
 
     lazy val submitChangeDestinationModelMin: SubmitChangeDestinationModel = SubmitChangeDestinationModel(
-      attributes = attributesModelMin,
       newTransportArrangerTrader = None,
       updateEadEsad = updateEadEsadModelMin,
       destinationChanged = destinationChangedModelMin,
@@ -510,7 +486,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
     )
 
     lazy val submitChangeDestinationXmlMax: Elem = <urn:ChangeOfDestination>
-      {attributesXmlMax}
+      <urn:Attributes />
       {newTransportArrangerTraderXmlMax}
       {updateEadEsadXmlMax}
       {destinationChangedXmlMax}
@@ -520,13 +496,12 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
     </urn:ChangeOfDestination>
 
     lazy val submitChangeDestinationXmlMin: Elem = <urn:ChangeOfDestination>
-      {attributesXmlMin}
+      <urn:Attributes/>
       {updateEadEsadXmlMin}
       {destinationChangedXmlMin}
     </urn:ChangeOfDestination>
 
     lazy val submitChangeDestinationJsonMax: JsObject = Json.obj(
-      "attributes" -> attributesJsonMax,
       "newTransportArrangerTrader" -> newTransportArrangerTraderJsonMax,
       "updateEadEsad" -> updateEadEsadJsonMax,
       "destinationChanged" -> destinationChangedJsonMax,
@@ -535,7 +510,6 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
     )
 
     lazy val submitChangeDestinationJsonMin: JsObject = Json.obj(
-      "attributes" -> attributesJsonMin,
       "updateEadEsad" -> updateEadEsadJsonMin,
       "destinationChanged" -> destinationChangedJsonMin
     )

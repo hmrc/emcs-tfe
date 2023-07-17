@@ -21,7 +21,6 @@ import play.api.libs.json.{Json, OFormat}
 import scala.xml.{Elem, NodeSeq}
 
 case class SubmitChangeDestinationModel(
-                                          attributes: AttributesModel,
                                           newTransportArrangerTrader: Option[NewTransportArrangerTraderModel],
                                           updateEadEsad: UpdateEadEsadModel,
                                           destinationChanged: DestinationChangedModel,
@@ -31,7 +30,7 @@ case class SubmitChangeDestinationModel(
 
   def toXml: Elem =
     <urn:ChangeOfDestination>
-      {attributes.toXml}
+      <urn:Attributes/>
       {newTransportArrangerTrader.map(_.toXml).getOrElse(NodeSeq.Empty)}
       {updateEadEsad.toXml}
       {destinationChanged.toXml}
