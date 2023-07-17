@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.AddressModel
-
+import uk.gov.hmrc.emcstfe.models.common.AddressModel
 import scala.xml.NodeSeq
 
 trait AddressModelFixtures extends BaseFixtures {

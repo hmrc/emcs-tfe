@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.reportOfReceipt
+package uk.gov.hmrc.emcstfe.models.common
 
 import cats.implicits.catsSyntaxTuple4Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}

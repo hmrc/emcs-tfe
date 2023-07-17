@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.reportOfReceipt
+package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.AddressModelFixtures

@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 import cats.implicits.catsSyntaxTuple3Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.emcstfe.models.common.AddressModel
 
 import scala.xml.NodeSeq
 
