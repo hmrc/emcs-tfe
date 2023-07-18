@@ -26,6 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class MetricsService @Inject()(metrics: Metrics) extends Logging {
 
   def chrisTimer(metricName: String): Timer = metrics.defaultRegistry.timer(s"chris.$metricName.timer")
+  lazy val userAllowListTimer: Timer = metrics.defaultRegistry.timer(s"user-allow-list.check.timer")
 
   def processWithTimer[T](timer: Timer.Context)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     f map { data =>
