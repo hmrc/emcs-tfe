@@ -18,23 +18,31 @@ package uk.gov.hmrc.emcstfe.connectors
 
 import play.api.http.HeaderNames
 import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.models.request.ChrisRequest
+import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseConnector extends Logging {
+trait BaseChrisConnector extends Logging {
 
   def appConfig: AppConfig
+  def metricsService: MetricsService
 
   private def chrisHeaders(action: String): Seq[(String, String)] = Seq(
     HeaderNames.ACCEPT -> "application/soap+xml",
     HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action""""
   )
 
-  def postString[A, B](http: HttpClient, uri: String, body: String, action: String)
+  private def withTimer[T](chrisRequest: ChrisRequest)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] =
+    metricsService.processWithTimer(metricsService.chrisTimer(chrisRequest.metricName).time())(f)
+
+  def postString[A, B](http: HttpClient, uri: String, body: String, request: ChrisRequest)
                       (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A,B]]): Future[Either[A, B]] = {
-    logger.debug(s"[postString] POST to $uri being made with body:\n\n$body")
-    http.POSTString[Either[A,B]](uri, body, chrisHeaders(action))
+    withTimer(request) {
+      logger.debug(s"[postString] POST to $uri being made with body:\n\n$body")
+      http.POSTString[Either[A, B]](uri, body, chrisHeaders(request.action))
+    }
   }
 }

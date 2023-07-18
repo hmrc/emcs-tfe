@@ -52,4 +52,6 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
   override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementList"
 
   override def shouldExtractFromSoap: Boolean = true
+
+  override def metricName = "get-movement-list"
 }
