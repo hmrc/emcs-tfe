@@ -20,29 +20,80 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
+import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{Refused, Satisfactory, Unsatisfactory}
 import uk.gov.hmrc.emcstfe.models.request.SubmitReportOfReceiptRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
 
-class SubmitReportOfReceiptServiceSpec extends UnitSpec with SubmitReportOfReceiptFixtures {
+class SubmitReportOfReceiptServiceSpec extends UnitSpec with SubmitReportOfReceiptFixtures with MockMetricsService {
   trait Test extends MockChrisConnector with MockAppConfig {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
-    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockConnector, mockAppConfig)
+    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockConnector, mockAppConfig, mockMetricsService)
   }
 
   "submit" should {
     "return a Right" when {
-      "connector call is successful and XML is the correct format" in new Test {
+      "connector call is successful and XML is the correct format" when {
+        "status is partially-refused" in new Test {
 
-        MockConnector
-          .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
-          .returns(Future.successful(Right(chrisSuccessResponse)))
+          MockConnector
+            .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
+            .returns(Future.successful(Right(chrisSuccessResponse)))
 
-        await(service.submit(maxSubmitReportOfReceiptModel)) shouldBe Right(chrisSuccessResponse)
+          MockMetricsService.rorStatusCounter("partially-refused")
+
+          await(service.submit(maxSubmitReportOfReceiptModel)) shouldBe Right(chrisSuccessResponse)
+        }
+
+        "status is refused" in new Test {
+
+          val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = Refused)
+
+          override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
+            SubmitReportOfReceiptRequest(model)
+
+          MockConnector
+            .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
+            .returns(Future.successful(Right(chrisSuccessResponse)))
+
+          MockMetricsService.rorStatusCounter("refused")
+
+          await(service.submit(model)) shouldBe Right(chrisSuccessResponse)
+        }
+        "status is satisfactory" in new Test {
+
+          val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = Satisfactory)
+
+          override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(model)
+
+          MockConnector
+            .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
+            .returns(Future.successful(Right(chrisSuccessResponse)))
+
+          MockMetricsService.rorStatusCounter("satisfactory")
+
+          await(service.submit(model)) shouldBe Right(chrisSuccessResponse)
+        }
+        "status is unsatisfactory" in new Test {
+
+          val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = Unsatisfactory)
+
+          override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
+            SubmitReportOfReceiptRequest(model)
+
+          MockConnector
+            .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
+            .returns(Future.successful(Right(chrisSuccessResponse)))
+
+          MockMetricsService.rorStatusCounter("unsatisfactory")
+
+          await(service.submit(model)) shouldBe Right(chrisSuccessResponse)
+        }
       }
     }
     "return a Left" when {
@@ -52,6 +103,8 @@ class SubmitReportOfReceiptServiceSpec extends UnitSpec with SubmitReportOfRecei
         MockConnector
           .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
           .returns(Future.successful(Left(XmlValidationError)))
+
+        MockMetricsService.rorStatusCounter("failed-submission")
 
         await(service.submit(maxSubmitReportOfReceiptModel)) shouldBe Left(XmlValidationError)
       }
