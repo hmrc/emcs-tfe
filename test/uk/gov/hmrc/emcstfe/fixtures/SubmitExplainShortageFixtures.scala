@@ -78,17 +78,17 @@ trait SubmitExplainShortageFixtures {
 
   object ExciseMovementFixtures {
     val exciseMovementModel: ExciseMovementModel = ExciseMovementModel(
-      arc = "arc",
+      arc = "01DE0000012345",
       sequenceNumber = "1"
     )
 
     val exciseMovementXml: Elem = <urn:ExciseMovement>
-      <urn:AdministrativeReferenceCode>arc</urn:AdministrativeReferenceCode>
+      <urn:AdministrativeReferenceCode>01DE0000012345</urn:AdministrativeReferenceCode>
       <urn:SequenceNumber>1</urn:SequenceNumber>
     </urn:ExciseMovement>
 
     val exciseMovementJson: JsObject = Json.obj(
-      "arc" -> "arc",
+      "arc" -> "01DE0000012345",
       "sequenceNumber" -> "1"
     )
   }

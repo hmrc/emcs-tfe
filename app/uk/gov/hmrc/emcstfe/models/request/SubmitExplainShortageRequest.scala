@@ -18,11 +18,7 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
-import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
 import uk.gov.hmrc.emcstfe.models.explainShortage.SubmitExplainShortageModel
-
-import java.time.{LocalDate, LocalTime, ZoneId}
-import java.util.UUID
 
 case class SubmitExplainShortageRequest(body: SubmitExplainShortageModel)
                                        (implicit request: UserRequest[_]) extends ChrisRequest {
@@ -30,27 +26,23 @@ case class SubmitExplainShortageRequest(body: SubmitExplainShortageModel)
 
   private val NDEA = "NDEA."
   private val GB = "GB"
-  private val countryCode: Option[String] => String = _.map(_.substring(0, 2)).getOrElse(GB)
 
-  val messageRecipient = {
-    body.attributes.submitterType match {
+  val messageRecipient: String = {
+    val countryCode: String = body.attributes.submitterType match {
       case SubmitterType.Consignor => body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
-      case SubmitterType.Consignee => ???
+      case SubmitterType.Consignee => body.exciseMovement.arc.substring(2, 4)
     }
+
+    NDEA ++ countryCode
   }
   val messageSender: String = {
     val countryCode: String = body.attributes.submitterType match {
-      case SubmitterType.Consignor => ???
+      case SubmitterType.Consignor => body.exciseMovement.arc.substring(2, 4)
       case SubmitterType.Consignee => body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
     }
 
     NDEA ++ countryCode
   }
-
-  val preparedDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID = UUID.randomUUID()
-  val messageUUID = UUID.randomUUID()
 
   val soapRequest =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -68,7 +60,7 @@ case class SubmitExplainShortageRequest(body: SubmitExplainShortageModel)
         </MetaData>
       </soapenv:Header>
       <soapenv:Body>
-        <urn:IE837 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+        <urn:IE871 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
           <urn:Header>
             <urn1:MessageSender>{messageSender}</urn1:MessageSender>
             <urn1:MessageRecipient>{messageRecipient}</urn1:MessageRecipient>
@@ -80,7 +72,7 @@ case class SubmitExplainShortageRequest(body: SubmitExplainShortageModel)
           <urn:Body>
             {body.toXml}
           </urn:Body>
-        </urn:IE837>
+        </urn:IE871>
       </soapenv:Body>
     </soapenv:Envelope>
 

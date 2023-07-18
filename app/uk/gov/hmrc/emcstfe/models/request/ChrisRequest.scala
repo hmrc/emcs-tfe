@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import java.time.{LocalDate, LocalTime, ZoneId}
+import java.util.UUID
+
 trait ChrisRequest {
   def requestBody: String
 
@@ -28,4 +31,9 @@ trait ChrisRequest {
   def shouldExtractFromSoap: Boolean
 
   def metricName: String
+
+  val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
+  val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
+  val correlationUUID: UUID = UUID.randomUUID()
+  val messageUUID: UUID = UUID.randomUUID()
 }

@@ -21,9 +21,6 @@ import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, Regist
 import uk.gov.hmrc.emcstfe.models.common.TraderModel
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
-import java.time.{LocalDate, LocalTime, ZoneId}
-import java.util.UUID
-
 case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
                                        (implicit request: UserRequest[_]) extends ChrisRequest {
 
@@ -48,11 +45,6 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
     })
 
   override def exciseRegistrationNumber: String = request.ern
-
-  val preparedDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID = UUID.randomUUID()
-  val messageUUID = UUID.randomUUID()
 
   val soapRequest =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">

@@ -19,9 +19,6 @@ package uk.gov.hmrc.emcstfe.models.request
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
 
-import java.time.{LocalDate, LocalTime, ZoneId}
-import java.util.UUID
-
 case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
                                     (implicit request: UserRequest[_]) extends ChrisRequest {
   override def exciseRegistrationNumber: String = request.ern
@@ -32,11 +29,6 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
 
   val messageRecipient = NDEA ++ arcCountryCode
   val messageSender: String = NDEA ++ ernCountryCode
-
-  val preparedDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID = UUID.randomUUID()
-  val messageUUID = UUID.randomUUID()
 
   val soapRequest =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">

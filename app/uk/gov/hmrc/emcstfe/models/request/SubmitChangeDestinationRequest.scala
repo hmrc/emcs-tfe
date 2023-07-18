@@ -20,8 +20,6 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, TaxWarehouse}
 
-import java.time.{LocalDate, LocalTime, ZoneId}
-import java.util.UUID
 import scala.xml.Elem
 
 case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
@@ -42,11 +40,6 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
     })
 
   override def exciseRegistrationNumber: String = request.ern
-
-  val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID: UUID = UUID.randomUUID()
-  val messageUUID: UUID = UUID.randomUUID()
 
   val soapRequest: Elem =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
