@@ -20,6 +20,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.request.CheckUserAllowListRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
+import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient}
 
 import javax.inject.{Inject, Singleton}
@@ -27,20 +28,26 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UserAllowListConnector @Inject()(http: HttpClient,
-                                       config: AppConfig) extends UserAllowListHttpParser {
+                                       config: AppConfig,
+                                       metricsService: MetricsService) extends UserAllowListHttpParser {
 
   def check(checkRequest: CheckUserAllowListRequest)
            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] = {
     val headerCarrierWithInternalAuthToken = hc.copy(authorization = Some(Authorization(config.internalAuthToken)))
 
-    http.POST[CheckUserAllowListRequest, Either[ErrorResponse, Boolean]](
-      url = config.userAllowListBaseUrl + "/emcs-tfe/reportOfReceipt/check",
-      body = checkRequest
-    )(CheckUserAllowListRequest.writes, UserAllowListReads, headerCarrierWithInternalAuthToken, ec)
+    withTimer {
+      http.POST[CheckUserAllowListRequest, Either[ErrorResponse, Boolean]](
+        url = config.userAllowListBaseUrl + "/emcs-tfe/reportOfReceipt/check",
+        body = checkRequest
+      )(CheckUserAllowListRequest.writes, UserAllowListReads, headerCarrierWithInternalAuthToken, ec)
+    }
   }.recover {
     error =>
       logger.warn(s"[check] Unexpected error from user-allow-list: ${error.getClass} ${error.getMessage}")
       Left(UnexpectedDownstreamResponseError)
   }
+
+  private def withTimer[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T] =
+    metricsService.processWithTimer(metricsService.userAllowListTimer.time())(f)
 
 }
