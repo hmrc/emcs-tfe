@@ -33,6 +33,7 @@ class MetricsService @Inject()(metrics: Metrics) extends Logging {
     case "get-movement-list" => getMovementListTimer
     case "get-movement-if-changed" => getMovementIfChangedTimer
   }
+
   lazy val submitReportOfReceiptTimer = metrics.defaultRegistry.timer(s"chris.report-receipt.timer")
   lazy val explainDelayTimer = metrics.defaultRegistry.timer(s"chris.explain-delay.timer")
   lazy val createMovementTimer = metrics.defaultRegistry.timer(s"chris.create-movement.timer")
