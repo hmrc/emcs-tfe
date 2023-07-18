@@ -78,5 +78,5 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
 
   override def shouldExtractFromSoap: Boolean = false
 
-  override def metricName = "submit-explain-delay-to-delivery"
+  override def metricName = "explain-delay"
 }

@@ -35,8 +35,10 @@ trait BaseChrisConnector extends Logging {
     HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action""""
   )
 
-  private def withTimer[T](chrisRequest: ChrisRequest)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] =
-    metricsService.processWithTimer(metricsService.chrisTimer(chrisRequest.metricName).time())(f)
+  private def withTimer[T](chrisRequest: ChrisRequest)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+    val timer = metricsService.chrisTimer(chrisRequest.metricName).time()
+    metricsService.processWithTimer(timer)(f)
+  }
 
   def postString[A, B](http: HttpClient, uri: String, body: String, request: ChrisRequest)
                       (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A,B]]): Future[Either[A, B]] = {

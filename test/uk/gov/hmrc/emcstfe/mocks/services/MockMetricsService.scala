@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import com.codahale.metrics.Timer
+import com.codahale.metrics.{Counter, Timer}
 import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.services.MetricsService
@@ -27,6 +27,7 @@ trait MockMetricsService extends MockFactory  {
 
   lazy val mockMetricsService: MetricsService = mock[MetricsService]
   lazy val mockTimer: Timer = new Timer()
+  lazy val mockCounter = new Counter()
 
   object MockMetricsService {
     def processWithTimer[T]() =
@@ -39,6 +40,9 @@ trait MockMetricsService extends MockFactory  {
 
     def chrisTimer(metricName: String): CallHandler1[String, Timer] =
       (mockMetricsService.chrisTimer(_: String)).expects(metricName).returns(mockTimer)
+
+    def rorStatusCounter(status: String) =
+      (mockMetricsService.rorStatusCounter(_: String)).expects(status).returns(mockCounter)
   }
 }
 
