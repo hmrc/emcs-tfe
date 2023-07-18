@@ -94,5 +94,5 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
 
   override def shouldExtractFromSoap: Boolean = false
 
-  override def metricName: String = "submit-report-receipt"
+  override def metricName: String = "report-receipt"
 }

@@ -21,5 +21,5 @@ case class SubmitDraftMovementRequest(exciseRegistrationNumber: String = "", arc
 
   override def shouldExtractFromSoap: Boolean = false
 
-  override def metricName = "submit-draft-movement"
+  override def metricName = "create-movement"
 }

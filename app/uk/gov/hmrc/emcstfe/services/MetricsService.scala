@@ -25,8 +25,28 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MetricsService @Inject()(metrics: Metrics) extends Logging {
 
-  def chrisTimer(metricName: String): Timer = metrics.defaultRegistry.timer(s"chris.$metricName.timer")
+  def chrisTimer(metricName: String): Timer = metricName match {
+    case "explain-delay" => explainDelayTimer
+    case "report-receipt" => submitReportOfReceiptTimer
+    case "create-movement" => createMovementTimer
+    case "get-movement" => getMovementTimer
+    case "get-movement-list" => getMovementListTimer
+    case "get-movement-if-changed" => getMovementIfChangedTimer
+  }
+  lazy val submitReportOfReceiptTimer = metrics.defaultRegistry.timer(s"chris.report-receipt.timer")
+  lazy val explainDelayTimer = metrics.defaultRegistry.timer(s"chris.explain-delay.timer")
+  lazy val createMovementTimer = metrics.defaultRegistry.timer(s"chris.create-movement.timer")
+  lazy val getMovementTimer = metrics.defaultRegistry.timer(s"chris.get-movement.timer")
+  lazy val getMovementIfChangedTimer = metrics.defaultRegistry.timer(s"chris.get-movement-if-changed.timer")
+  lazy val getMovementListTimer = metrics.defaultRegistry.timer(s"chris.get-movement-list.timer")
   lazy val userAllowListTimer: Timer = metrics.defaultRegistry.timer(s"user-allow-list.check.timer")
+
+  def rorStatusCounter(status: String) = metrics.defaultRegistry.counter(s"report-receipt.status-count.$status")
+  lazy val rorSatisfactoryCount = rorStatusCounter("satisfactory")
+  lazy val rorUnsatisfactoryCount = rorStatusCounter("unsatisfactory")
+  lazy val rorPartiallyRefused = rorStatusCounter("partially-refused")
+  lazy val rorRefused = rorStatusCounter("refused")
+  lazy val rorFailedSubmission = rorStatusCounter("failed-submission")
 
   def processWithTimer[T](timer: Timer.Context)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     f map { data =>
