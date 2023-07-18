@@ -20,4 +20,6 @@ case class SubmitDraftMovementRequest(exciseRegistrationNumber: String = "", arc
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
 
   override def shouldExtractFromSoap: Boolean = false
+
+  override def metricName = "submit-draft-movement"
 }

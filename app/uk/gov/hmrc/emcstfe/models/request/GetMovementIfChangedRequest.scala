@@ -49,4 +49,6 @@ case class GetMovementIfChangedRequest(exciseRegistrationNumber: String, arc: St
   override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementIfChanged"
 
   override def shouldExtractFromSoap: Boolean = false
+
+  override def metricName = "get-movement-if-changed"
 }

@@ -77,4 +77,6 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitexplaindelaytodeliveryportal"
 
   override def shouldExtractFromSoap: Boolean = false
+
+  override def metricName = "submit-explain-delay-to-delivery"
 }

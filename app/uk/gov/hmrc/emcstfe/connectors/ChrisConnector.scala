@@ -21,6 +21,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
 import uk.gov.hmrc.emcstfe.models.request.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.XmlUtils
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -31,23 +32,18 @@ import scala.xml.{NodeSeq, XML}
 @Singleton
 class ChrisConnector @Inject()(val http: HttpClient,
                                override val appConfig: AppConfig,
+                               override val metricsService: MetricsService,
                                chrisHttpParser: ChrisXMLHttpParser,
                                soapUtils: XmlUtils
-                              ) extends BaseConnector {
+                              ) extends BaseChrisConnector {
 
   def postChrisSOAPRequestAndExtractToModel[A](request: ChrisRequest)
-                                              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] = {
-
-    val url = appConfig.urlEMCSApplicationService()
-    postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(shouldExtractFromSoap = request.shouldExtractFromSoap))
-  }
+                                              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+    postString(http, appConfig.urlEMCSApplicationService(), request.requestBody, request)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(request.shouldExtractFromSoap))
 
   def postChrisSOAPRequest(request: ChrisRequest)
-                          (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] = {
-
-    val url = appConfig.urlEMCSApplicationService()
-    postString(http, url, request.requestBody, request.action)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(shouldExtractFromSoap = request.shouldExtractFromSoap))
-  }
+                          (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] =
+      postString(http, appConfig.urlEMCSApplicationService(), request.requestBody, request)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(request.shouldExtractFromSoap))
 
   private def prepareXMLAndSubmit[A](url: String, request: ChrisRequest, callingMethod: String)
                                   (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
@@ -58,7 +54,7 @@ class ChrisConnector @Inject()(val http: HttpClient,
         logger.debug(s"[$callingMethod] Sending to URL: $url")
         logger.debug(s"[$callingMethod] Sending body: $preparedXml")
 
-        postString(http, url, preparedXml, request.action)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(request.shouldExtractFromSoap))
+        postString(http, url, preparedXml, request)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(request.shouldExtractFromSoap))
     }
 
   def submitDraftMovementChrisSOAPRequest[A](request: ChrisRequest)

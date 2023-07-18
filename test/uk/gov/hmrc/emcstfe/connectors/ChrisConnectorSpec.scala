@@ -25,6 +25,7 @@ import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChris
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitDraftMovementFixture, SubmitExplainDelayFixtures, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
+import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitDraftMovementRequest, SubmitExplainDelayRequest, SubmitReportOfReceiptRequest}
@@ -39,7 +40,8 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
   with GetMovementFixture
   with SubmitDraftMovementFixture
   with SubmitReportOfReceiptFixtures
-  with SubmitExplainDelayFixtures {
+  with SubmitExplainDelayFixtures
+  with MockMetricsService {
 
   override def afterEach(): Unit = {
     disable(UseChrisStub)
@@ -52,7 +54,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-    val connector = new ChrisConnector(mockHttpClient, config, new ChrisXMLHttpParser(mockXmlUtils), mockXmlUtils)
+    val connector = new ChrisConnector(mockHttpClient, config, mockMetricsService, new ChrisXMLHttpParser(mockXmlUtils), mockXmlUtils)
 
     val baseUrl: String = "http://localhost:8308"
   }
@@ -61,6 +63,10 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     val getMovementRequest = GetMovementRequest("", "")
     "return a Right" when {
       "downstream call is successful" in new Test {
+
+
+        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
@@ -80,6 +86,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response = Left(XmlValidationError)
 
+        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
           body = getMovementRequest.requestBody,
@@ -93,6 +102,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
@@ -113,6 +125,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Right" when {
       "downstream call is successful" in new Test {
 
+        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
           body = getMovementRequest.requestBody,
@@ -131,6 +146,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response = Left(XmlValidationError)
 
+        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
           body = getMovementRequest.requestBody,
@@ -144,6 +162,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRISOSB/EMCS/EMCSApplicationService/2",
@@ -163,6 +184,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     val submitDraftMovementRequest = SubmitDraftMovementRequest("", "", submitDraftMovementRequestBody)
     "return a Right" when {
       "downstream call is successful" in new Test {
+
+        MockMetricsService.chrisTimer(submitDraftMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
@@ -185,6 +209,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response = Left(XmlValidationError)
 
+        MockMetricsService.chrisTimer(submitDraftMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
           body = submitDraftMovementRequest.requestBody,
@@ -201,6 +228,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(submitDraftMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
@@ -236,6 +266,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Right" when {
       "downstream call is successful" in new Test {
 
+        MockMetricsService.chrisTimer(submitReportOfReceiptRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitReportofReceiptPortal/4",
           body = submitReportOfReceiptRequest.requestBody,
@@ -257,6 +290,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response = Left(XmlValidationError)
 
+        MockMetricsService.chrisTimer(submitReportOfReceiptRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitReportofReceiptPortal/4",
           body = submitReportOfReceiptRequest.requestBody,
@@ -273,6 +309,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(submitReportOfReceiptRequest.metricName)
+        MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitReportofReceiptPortal/4",
@@ -308,6 +347,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Right" when {
       "downstream call is successful" in new Test {
 
+        MockMetricsService.chrisTimer(submitExplainDelayRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4",
           body = submitExplainDelayRequest.requestBody,
@@ -329,6 +371,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response = Left(XmlValidationError)
 
+        MockMetricsService.chrisTimer(submitExplainDelayRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4",
           body = submitExplainDelayRequest.requestBody,
@@ -345,6 +390,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(submitExplainDelayRequest.metricName)
+        MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4",
