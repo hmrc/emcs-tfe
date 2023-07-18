@@ -203,28 +203,26 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
   }
 
   object GuarantorTraderFixtures {
-    lazy val guarantorTraderModelMax: TraderModel = TraderModel(
+    lazy val guarantorTraderModelMax: GuarantorTraderModel = GuarantorTraderModel(
       traderExciseNumber = Some("trader number"),
       traderName = Some("name"),
-      address = Some(AddressModel(
+      address = Some(GuarantorAddressModel(
         street = Some("street"),
         streetNumber = Some("street number"),
         city = Some("a city"),
         postcode = Some("a postcode")
       )),
-      vatNumber = Some("vat number"),
-      eoriNumber = None,
-      traderId = None
+      vatNumber = Some("vat number")
     )
 
     lazy val guarantorTraderXmlMax: Elem = <urn:GuarantorTrader language="en">
-      <urn:VatNumber>vat number</urn:VatNumber>
       <urn:TraderExciseNumber>trader number</urn:TraderExciseNumber>
       <urn:TraderName>name</urn:TraderName>
       <urn:StreetName>street</urn:StreetName>
       <urn:StreetNumber>street number</urn:StreetNumber>
-      <urn:Postcode>a postcode</urn:Postcode>
       <urn:City>a city</urn:City>
+      <urn:Postcode>a postcode</urn:Postcode>
+      <urn:VatNumber>vat number</urn:VatNumber>
     </urn:GuarantorTrader>
 
     lazy val guarantorTraderJsonMax: JsObject = Json.obj(
