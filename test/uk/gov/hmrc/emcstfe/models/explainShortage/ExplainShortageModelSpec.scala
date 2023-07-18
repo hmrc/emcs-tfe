@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeDestination
+package uk.gov.hmrc.emcstfe.models.explainShortage
 
 import play.api.libs.json.{JsObject, Reads}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -22,14 +22,14 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import scala.xml.Elem
 import scala.xml.Utility.trim
 
-trait ChangeDestinationModelSpec extends UnitSpec {
-  def testJsonToModelToXml[Model <: ChangeDestinationModel](
-                          scenario: String,
-                          json: JsObject,
-                          model: Model,
-                          xml: Elem
-                          )(implicit reads: Reads[Model]): Unit = {
-    s"Change of destination scenario: [$scenario]" should {
+trait ExplainShortageModelSpec extends UnitSpec {
+  def testJsonToModelToXml[Model <: ExplainShortageModel](
+                                                           scenario: String,
+                                                           json: JsObject,
+                                                           model: Model,
+                                                           xml: Elem
+                                                         )(implicit reads: Reads[Model]): Unit = {
+    s"Explain shortage scenario: [$scenario]" should {
       "convert JSON to a model correctly" in {
         json.as[Model] shouldBe model
       }

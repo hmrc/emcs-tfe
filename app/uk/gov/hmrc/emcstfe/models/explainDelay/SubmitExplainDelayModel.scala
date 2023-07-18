@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.explainDelay
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 
 import scala.xml.{Elem, NodeSeq}
 

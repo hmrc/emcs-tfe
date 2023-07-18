@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainDelay
+package uk.gov.hmrc.emcstfe.models.explainShortage
 
-import uk.gov.hmrc.emcstfe.models.common.{Enumerable, WithName}
+import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageFixtures
 
-sealed trait SubmitterType
+class AttributesModelSpec extends ExplainShortageModelSpec with SubmitExplainShortageFixtures {
+  import AttributesFixtures._
 
-object SubmitterType extends Enumerable.Implicits {
-
-  case object Consignor extends WithName("1") with SubmitterType
-  case object Consignee extends WithName("2") with SubmitterType
-
-  val values: Seq[SubmitterType] = Seq(Consignor, Consignee)
-
-  implicit val enumerable: Enumerable[SubmitterType] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+  testJsonToModelToXml(
+    scenario = "AttributesModel",
+    json = attributesJson,
+    model = attributesModel,
+    xml = attributesXml
+  )
 }

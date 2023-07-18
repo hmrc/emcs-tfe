@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainDelay
+package uk.gov.hmrc.emcstfe.models.explainShortage
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
-import SubmitterType.{Consignee, Consignor}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 
-class SubmitterTypeSpec extends UnitSpec with SubmitExplainDelayFixtures {
+import scala.xml.Elem
 
-  "SubmitterType" must {
 
-    "have the correct underlying enum values" in {
-      Consignor.toString shouldBe "1"
-      Consignee.toString shouldBe "2"
-    }
-  }
+case class AttributesModel(
+                        submitterType: SubmitterType
+                     ) extends ExplainShortageModel {
+  def toXml: Elem = <urn:Attributes>
+    <urn:SubmitterType>{submitterType.toString}</urn:SubmitterType>
+  </urn:Attributes>
+}
+
+object AttributesModel {
+  implicit val fmt: OFormat[AttributesModel] = Json.format
 }
