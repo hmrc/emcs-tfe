@@ -17,13 +17,12 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.TraderModel
 
 import scala.xml.{Elem, NodeSeq}
 
 case class MovementGuaranteeModel(
                                    guarantorTypeCode: String,
-                                   guarantorTrader: Option[Seq[TraderModel]]
+                                   guarantorTrader: Option[Seq[GuarantorTraderModel]]
                                  ) extends ChangeDestinationModel {
   def toXml: Elem = <urn:MovementGuarantee>
     <urn:GuarantorTypeCode>{guarantorTypeCode}</urn:GuarantorTypeCode>

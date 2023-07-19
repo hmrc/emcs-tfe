@@ -83,4 +83,6 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitreasonforshortageportal"
 
   override def shouldExtractFromSoap: Boolean = false
+
+  override def metricName = "explain-shortage-excess"
 }
