@@ -67,4 +67,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def urlSubmitChangeDestination(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3"
+
+  def urlSubmitExplainShortageExcess(): String =
+    chrisBaseUrl + "/ChRIS/EMCS/SubmitReasonForShortagePortal/2"
 }
