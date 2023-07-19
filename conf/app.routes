@@ -1,20 +1,22 @@
 # microservice specific routes
 
-GET         /movements/:ern                                 uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(ern, search: GetMovementListSearchOptions)
-GET         /movement/:ern/:arc                             uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(ern, arc, forceFetchNew: Boolean)
+GET           /movements/:ern                                uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(ern, search: GetMovementListSearchOptions)
+GET           /movement/:ern/:arc                            uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(ern, arc, forceFetchNew: Boolean)
 
-POST        /report-of-receipt/:ern/:arc                    uk.gov.hmrc.emcstfe.controllers.SubmitReportOfReceiptController.submit(ern, arc)
+POST          /report-of-receipt/:ern/:arc                   uk.gov.hmrc.emcstfe.controllers.SubmitReportOfReceiptController.submit(ern, arc)
 
-POST        /explain-delay/:ern/:arc                        uk.gov.hmrc.emcstfe.controllers.SubmitExplainDelayController.submit(ern, arc)
+POST          /explain-delay/:ern/:arc                       uk.gov.hmrc.emcstfe.controllers.SubmitExplainDelayController.submit(ern, arc)
 
-GET         /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.get(ern, arc)
-PUT         /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.set(ern, arc)
-DELETE      /user-answers/report-receipt/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.clear(ern, arc)
+POST          /change-destination/:ern/:arc                  uk.gov.hmrc.emcstfe.controllers.SubmitChangeDestinationController.submit(ern, arc)
 
-GET         /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.get(ern, lrn)
-PUT         /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.set(ern, lrn)
-DELETE      /user-answers/create-movement/:ern/:lrn         uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.clear(ern, lrn)
+GET           /user-answers/report-receipt/:ern/:arc         uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.get(ern, arc)
+PUT           /user-answers/report-receipt/:ern/:arc         uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.set(ern, arc)
+DELETE        /user-answers/report-receipt/:ern/:arc         uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.clear(ern, arc)
 
-GET         /user-answers/explain-delay/:ern/:arc           uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.get(ern, arc)
-PUT         /user-answers/explain-delay/:ern/:arc           uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.set(ern, arc)
-DELETE      /user-answers/explain-delay/:ern/:arc           uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.clear(ern, arc)
+GET           /user-answers/create-movement/:ern/:lrn        uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.get(ern, lrn)
+PUT           /user-answers/create-movement/:ern/:lrn        uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.set(ern, lrn)
+DELETE        /user-answers/create-movement/:ern/:lrn        uk.gov.hmrc.emcstfe.controllers.CreateMovementUserAnswersController.clear(ern, lrn)
+
+GET           /user-answers/explain-delay/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.get(ern, arc)
+PUT           /user-answers/explain-delay/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.set(ern, arc)
+DELETE        /user-answers/explain-delay/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ExplainDelayUserAnswersController.clear(ern, arc)

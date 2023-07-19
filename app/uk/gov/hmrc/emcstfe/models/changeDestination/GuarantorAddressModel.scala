@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.reportOfReceipt
+package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import cats.implicits.catsSyntaxTuple4Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
@@ -22,29 +22,18 @@ import play.api.libs.json.{Format, Json}
 
 import scala.xml.NodeSeq
 
-case class AddressModel(streetNumber: Option[String],
+case class GuarantorAddressModel(streetNumber: Option[String],
                         street: Option[String],
                         postcode: Option[String],
                         city: Option[String]) {
-
-  val isEmpty = streetNumber.isEmpty && street.isEmpty && postcode.isEmpty && city.isEmpty
-
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
     {street.map(x => <urn:StreetName>{x}</urn:StreetName>)},
     {streetNumber.map(x => <urn:StreetNumber>{x}</urn:StreetNumber>)},
-    {postcode.map(x => <urn:Postcode>{x}</urn:Postcode>)},
-    {city.map(x => <urn:City>{x}</urn:City>)}
+    {city.map(x => <urn:City>{x}</urn:City>)},
+    {postcode.map(x => <urn:Postcode>{x}</urn:Postcode>)}
   ).flatten)
 }
 
-object AddressModel {
-
-  implicit val xmlReads: XmlReader[AddressModel] = (
-    (__ \\ "StreetNumber").read[Option[String]],
-    (__ \\ "StreetName").read[Option[String]],
-    (__ \\ "Postcode").read[Option[String]],
-    (__ \\ "City").read[Option[String]]
-  ).mapN(AddressModel.apply)
-
-  implicit val fmt: Format[AddressModel] = Json.format
+object GuarantorAddressModel {
+  implicit val fmt: Format[GuarantorAddressModel] = Json.format
 }

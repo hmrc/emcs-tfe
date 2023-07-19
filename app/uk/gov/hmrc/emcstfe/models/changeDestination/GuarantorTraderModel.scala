@@ -14,33 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.reportOfReceipt
+package uk.gov.hmrc.emcstfe.models.changeDestination
 
-import cats.implicits.catsSyntaxTuple3Semigroupal
+import cats.implicits.catsSyntaxTuple6Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.emcstfe.models.common.AddressModel
 
 import scala.xml.NodeSeq
 
-case class ConsignorTraderModel(traderExciseNumber: String,
-                       traderName: String,
-                       address: AddressModel) {
+case class GuarantorTraderModel(
+                                 traderExciseNumber: Option[String],
+                                 traderName: Option[String],
+                                 address: Option[GuarantorAddressModel],
+                                 vatNumber: Option[String]
+                               ) {
 
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
-    Seq(<urn:TraderExciseNumber>{traderExciseNumber}</urn:TraderExciseNumber>),
-    Seq(<urn:TraderName>{traderName}</urn:TraderName>),
-    address.toXml.theSeq
+    traderExciseNumber.map(x => Seq(<urn:TraderExciseNumber>{x}</urn:TraderExciseNumber>)),
+    traderName.map(x => Seq(<urn:TraderName>{x}</urn:TraderName>)),
+    address.map(_.toXml.theSeq),
+    vatNumber.map(x => Seq(<urn:VatNumber>{x}</urn:VatNumber>))
   ).flatten.flatten)
 }
 
-object ConsignorTraderModel {
-
-  implicit val xmlReads: XmlReader[ConsignorTraderModel] = (
-    (__ \\ "TraderExciseNumber").read[String],
-    (__ \\ "TraderName").read[String],
-    __.read[AddressModel]
-  ).mapN(ConsignorTraderModel.apply)
-
-  implicit val fmt: Format[ConsignorTraderModel] = Json.format
+object GuarantorTraderModel {
+  implicit val fmt: Format[GuarantorTraderModel] = Json.format
 }

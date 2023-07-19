@@ -64,4 +64,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def urlSubmitExplainDelay(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4"
+
+  def urlSubmitChangeDestination(): String =
+    chrisBaseUrl + "/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3"
 }

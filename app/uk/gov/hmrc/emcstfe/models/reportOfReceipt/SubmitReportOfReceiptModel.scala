@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
-import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType}
+import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType, TraderModel}
 
 import java.time.LocalDate
 import scala.xml.{Elem, NodeSeq}

@@ -17,44 +17,38 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
-import uk.gov.hmrc.emcstfe.models.common.TraderModel
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
+import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, TaxWarehouse}
 
 import java.time.{LocalDate, LocalTime, ZoneId}
 import java.util.UUID
+import scala.xml.Elem
 
-case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
-                                       (implicit request: UserRequest[_]) extends ChrisRequest {
+case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
+                                         (implicit request: UserRequest[_]) extends ChrisRequest {
 
   private val NDEA = "NDEA."
   private val GB = "GB"
-  private val arcCountryCode = body.arc.substring(2, 4)
-  private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(GB)
+  private val arcCountryCode = body.updateEadEsad.administrativeReferenceCode.substring(2, 4)
+  private val countryCode: Option[String] => String = _.map(_.substring(0, 2)).getOrElse(GB)
 
-  val messageSender =
-    NDEA ++ (if (body.destinationType == DirectDelivery) {
-      traderModelCountryCode(body.consigneeTrader)
-    } else {
-      arcCountryCode
-    })
+  val messageSender: String = NDEA ++ arcCountryCode
 
-  val messageRecipient =
-    NDEA ++ (body.destinationType match {
-      case TaxWarehouse => traderModelCountryCode(body.deliveryPlaceTrader)
-      case TemporaryRegisteredConsignee | RegisteredConsignee => traderModelCountryCode(body.consigneeTrader)
-      case DirectDelivery => arcCountryCode
+  val messageRecipient: String =
+    NDEA ++ (body.destinationChanged.destinationTypeCode match {
+      case TaxWarehouse => countryCode(body.destinationChanged.newConsigneeTrader.flatMap(_.traderId))
+      case Export => countryCode(body.destinationChanged.deliveryPlaceCustomsOffice.map(_.referenceNumber))
       case _ => GB
     })
 
   override def exciseRegistrationNumber: String = request.ern
 
-  val preparedDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID = UUID.randomUUID()
-  val messageUUID = UUID.randomUUID()
+  val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
+  val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
+  val correlationUUID: UUID = UUID.randomUUID()
+  val messageUUID: UUID = UUID.randomUUID()
 
-  val soapRequest =
+  val soapRequest: Elem =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
       <soapenv:Header>
         <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
@@ -62,7 +56,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
           <ns:VendorID>1259</ns:VendorID>
           <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
           <ns:ServiceID>1138</ns:ServiceID>
-          <ns:ServiceMessageType>HMRC-EMCS-IE818-DIRECT</ns:ServiceMessageType>
+          <ns:ServiceMessageType>HMRC-EMCS-IE813-DIRECT</ns:ServiceMessageType>
         </ns:Info>
         <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
           <CredentialID>{request.credId}</CredentialID>
@@ -70,7 +64,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
         </MetaData>
       </soapenv:Header>
       <soapenv:Body>
-        <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+        <urn:IE813 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
           <urn:Header>
             <urn1:MessageSender>{messageSender}</urn1:MessageSender>
             <urn1:MessageRecipient>{messageRecipient}</urn1:MessageRecipient>
@@ -82,7 +76,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
           <urn:Body>
             {body.toXml}
           </urn:Body>
-        </urn:IE818>
+        </urn:IE813>
       </soapenv:Body>
     </soapenv:Envelope>
 
@@ -90,7 +84,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
     s"""<?xml version='1.0' encoding='UTF-8'?>
        |${soapRequest.toString}""".stripMargin
 
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitreportofreceiptportal"
+  override def action: String = "http://www.hmrc.gov.uk/emcs/submitchangeofdestinationportal"
 
   override def shouldExtractFromSoap: Boolean = false
 }

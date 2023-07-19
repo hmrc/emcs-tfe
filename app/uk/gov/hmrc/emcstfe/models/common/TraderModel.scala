@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.reportOfReceipt
+package uk.gov.hmrc.emcstfe.models.common
 
-import cats.implicits.catsSyntaxTuple4Semigroupal
+import cats.implicits.catsSyntaxTuple6Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
 
 import scala.xml.NodeSeq
 
-case class TraderModel(traderId: Option[String],
+case class TraderModel(vatNumber: Option[String],
+                       traderExciseNumber: Option[String],
+                       traderId: Option[String],
                        traderName: Option[String],
                        address: Option[AddressModel],
                        eoriNumber: Option[String]) {
@@ -32,6 +34,8 @@ case class TraderModel(traderId: Option[String],
   val countryCode = traderId.map(_.substring(0,2))
 
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
+    vatNumber.map(x => Seq(<urn:VatNumber>{x}</urn:VatNumber>)),
+    traderExciseNumber.map(x => Seq(<urn:TraderExciseNumber>{x}</urn:TraderExciseNumber>)),
     traderId.map(x => Seq(<urn:Traderid>{x}</urn:Traderid>)),
     traderName.map(x => Seq(<urn:TraderName>{x}</urn:TraderName>)),
     address.map(_.toXml.theSeq),
@@ -42,6 +46,8 @@ case class TraderModel(traderId: Option[String],
 object TraderModel {
 
   implicit val xmlReads: XmlReader[TraderModel] = (
+    (__ \\ "VatNumber").read[Option[String]],
+    (__ \\ "TraderExciseNumber").read[Option[String]],
     (__ \\ "Traderid").read[Option[String]],
     (__ \\ "TraderName").read[Option[String]],
     __.read[Option[AddressModel]],
