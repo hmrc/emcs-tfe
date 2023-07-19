@@ -93,4 +93,6 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitreportofreceiptportal"
 
   override def shouldExtractFromSoap: Boolean = false
+
+  override def metricName: String = "report-receipt"
 }
