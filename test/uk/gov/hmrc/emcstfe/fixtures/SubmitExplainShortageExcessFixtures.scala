@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, Attribut
 
 import scala.xml.Elem
 
-trait SubmitExplainShortageExcessFixtures {
+trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
 
   object AttributesFixtures {
     val attributesModel: AttributesModel = AttributesModel(
