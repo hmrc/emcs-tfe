@@ -40,7 +40,7 @@ class SubmitChangeDestinationServiceSpec extends UnitSpec with SubmitChangeDesti
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector.submitChangeOfDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
+        MockConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
           Future.successful(Right(chrisSuccessResponse))
         )
 
@@ -50,7 +50,7 @@ class SubmitChangeDestinationServiceSpec extends UnitSpec with SubmitChangeDesti
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockConnector.submitChangeOfDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
+        MockConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
           Future.successful(Left(XmlValidationError))
         )
 
