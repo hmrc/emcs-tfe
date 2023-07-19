@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortage
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 
-class AnalysisModelSpec extends ExplainShortageModelSpec with SubmitExplainShortageFixtures {
-  import AnalysisFixtures._
+class ExciseMovementModelSpec extends ExplainShortageExcessModelSpec with SubmitExplainShortageExcessFixtures {
+  import ExciseMovementFixtures._
 
   testJsonToModelToXml(
-    scenario = "AnalysisModel",
-    json = analysisJson,
-    model = analysisModel,
-    xml = analysisXml
+    scenario = "ExciseMovementModel",
+    json = exciseMovementJson,
+    model = exciseMovementModel,
+    xml = exciseMovementXml
   )
 }

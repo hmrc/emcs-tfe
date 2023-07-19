@@ -17,21 +17,21 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import play.api.test.FakeRequest
-import uk.gov.hmrc.emcstfe.fixtures.{SubmitExplainShortageFixtures, TraderModelFixtures}
+import uk.gov.hmrc.emcstfe.fixtures.{SubmitExplainShortageExcessFixtures, TraderModelFixtures}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{SubmitterType, TraderModel}
-import uk.gov.hmrc.emcstfe.models.explainShortage.AttributesModel
+import uk.gov.hmrc.emcstfe.models.explainShortageExcess.AttributesModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitExplainShortageRequestSpec extends UnitSpec with SubmitExplainShortageFixtures with TraderModelFixtures {
+class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplainShortageExcessFixtures with TraderModelFixtures {
 
-  import SubmitExplainShortageFixtures._
+  import SubmitExplainShortageExcessFixtures._
 
   implicit val userRequest = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-  val request = SubmitExplainShortageRequest(submitExplainShortageModelMax)
+  val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax)
 
   "requestBody" should {
 
@@ -71,7 +71,7 @@ class SubmitExplainShortageRequestSpec extends UnitSpec with SubmitExplainShorta
                 </urn1:CorrelationIdentifier>
               </urn:Header>
               <urn:Body>
-                {submitExplainShortageXmlMax}
+                {submitExplainShortageExcessXmlMax}
               </urn:Body>
             </urn:IE871>
           </soapenv:Body>
@@ -87,7 +87,7 @@ class SubmitExplainShortageRequestSpec extends UnitSpec with SubmitExplainShorta
       val defaultConsigneeTraderModel = ConsigneeTraderFixtures.consigneeTraderModel.copy(traderId = Some(idErn))
 
       def model(submitterType: SubmitterType, consigneeTrader: Option[TraderModel] = Some(defaultConsigneeTraderModel)) =
-        submitExplainShortageModelMax
+        submitExplainShortageExcessModelMax
           .copy(attributes = AttributesModel(submitterType))
           .copy(
             exciseMovement = ExciseMovementFixtures.exciseMovementModel.copy(arc = idArc),
@@ -97,24 +97,24 @@ class SubmitExplainShortageRequestSpec extends UnitSpec with SubmitExplainShorta
       "SubmitterType.Consignor" when {
         "generating MessageSender" should {
           "use the country code from the ARC" in {
-            val request = SubmitExplainShortageRequest(model(SubmitterType.Consignor))
+            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor))
             request.messageSender shouldBe "NDEA.DE"
           }
         }
         "generating MessageRecipient" should {
           "use the country code from the ConsigneeTrader Traderid" when {
             "ConsigneeTrader Traderid is defined" in {
-              val request = SubmitExplainShortageRequest(model(SubmitterType.Consignor))
+              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor))
               request.messageRecipient shouldBe "NDEA.FR"
             }
           }
           "use GB" when {
             "ConsigneeTrader is not defined" in {
-              val request = SubmitExplainShortageRequest(model(SubmitterType.Consignor, consigneeTrader = None))
+              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor, consigneeTrader = None))
               request.messageRecipient shouldBe "NDEA.GB"
             }
             "ConsigneeTrader Traderid is not defined" in {
-              val request = SubmitExplainShortageRequest(model(SubmitterType.Consignor, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderId = None))))
+              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderId = None))))
               request.messageRecipient shouldBe "NDEA.GB"
             }
           }
@@ -125,24 +125,24 @@ class SubmitExplainShortageRequestSpec extends UnitSpec with SubmitExplainShorta
         "generating MessageSender" should {
           "use the country code from the ConsigneeTrader Traderid" when {
             "ConsigneeTrader Traderid is defined" in {
-              val request = SubmitExplainShortageRequest(model(SubmitterType.Consignee))
+              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee))
               request.messageSender shouldBe "NDEA.FR"
             }
           }
           "use GB" when {
             "ConsigneeTrader is not defined" in {
-              val request = SubmitExplainShortageRequest(model(SubmitterType.Consignee, consigneeTrader = None))
+              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee, consigneeTrader = None))
               request.messageSender shouldBe "NDEA.GB"
             }
             "ConsigneeTrader Traderid is not defined" in {
-              val request = SubmitExplainShortageRequest(model(SubmitterType.Consignee, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderId = None))))
+              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderId = None))))
               request.messageSender shouldBe "NDEA.GB"
             }
           }
         }
         "generating MessageRecipient" should {
           "use the country code from the ARC" in {
-            val request = SubmitExplainShortageRequest(model(SubmitterType.Consignee))
+            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee))
             request.messageRecipient shouldBe "NDEA.DE"
           }
         }

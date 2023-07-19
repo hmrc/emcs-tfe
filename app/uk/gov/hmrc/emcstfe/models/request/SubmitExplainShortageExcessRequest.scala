@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
-import uk.gov.hmrc.emcstfe.models.explainShortage.SubmitExplainShortageModel
+import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
 
-case class SubmitExplainShortageRequest(body: SubmitExplainShortageModel)
+case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessModel)
                                        (implicit request: UserRequest[_]) extends ChrisRequest {
   override def exciseRegistrationNumber: String = request.ern
 

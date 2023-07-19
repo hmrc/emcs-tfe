@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortage
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 
-class SubmitExplainShortageModelSpec extends ExplainShortageModelSpec with SubmitExplainShortageFixtures {
-  import SubmitExplainShortageFixtures._
+class BodyAnalysisModelSpec extends ExplainShortageExcessModelSpec with SubmitExplainShortageExcessFixtures {
+  import BodyAnalysisFixtures._
 
   testJsonToModelToXml(
-    scenario = "SubmitExplainShortageModel with max fields",
-    json = submitExplainShortageJsonMax,
-    model = submitExplainShortageModelMax,
-    xml = submitExplainShortageXmlMax
+    scenario = "BodyAnalysisModel with max fields",
+    json = bodyAnalysisJsonMax,
+    model = bodyAnalysisModelMax,
+    xml = bodyAnalysisXmlMax
   )
 
   testJsonToModelToXml(
-    scenario = "SubmitExplainShortageModel with min fields",
-    json = submitExplainShortageJsonMin,
-    model = submitExplainShortageModelMin,
-    xml = submitExplainShortageXmlMin
+    scenario = "BodyAnalysisModel with min fields",
+    json = bodyAnalysisJsonMin,
+    model = bodyAnalysisModelMin,
+    xml = bodyAnalysisXmlMin
   )
 }

@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortage
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.TraderModel
 
 import scala.xml.{Elem, NodeSeq}
 
-case class SubmitExplainShortageModel(
+case class SubmitExplainShortageExcessModel(
                                        attributes: AttributesModel,
                                        consigneeTrader: Option[TraderModel],
                                        exciseMovement: ExciseMovementModel,
                                        consignorTrader: Option[TraderModel],
                                        analysis: Option[AnalysisModel],
                                        bodyAnalysis: Option[Seq[BodyAnalysisModel]]
-                                     ) extends ExplainShortageModel {
+                                     ) extends ExplainShortageExcessModel {
 
   def toXml: Elem =
     <urn:ExplanationOnReasonForShortage>
@@ -49,6 +49,6 @@ case class SubmitExplainShortageModel(
     </urn:ExplanationOnReasonForShortage>
 }
 
-object SubmitExplainShortageModel {
-  implicit val fmt: OFormat[SubmitExplainShortageModel] = Json.format
+object SubmitExplainShortageExcessModel {
+  implicit val fmt: OFormat[SubmitExplainShortageExcessModel] = Json.format
 }

@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortage
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageFixtures
+import scala.xml.Elem
 
-class ExciseMovementModelSpec extends ExplainShortageModelSpec with SubmitExplainShortageFixtures {
-  import ExciseMovementFixtures._
-
-  testJsonToModelToXml(
-    scenario = "ExciseMovementModel",
-    json = exciseMovementJson,
-    model = exciseMovementModel,
-    xml = exciseMovementXml
-  )
+trait ExplainShortageExcessModel {
+  def toXml: Elem
 }

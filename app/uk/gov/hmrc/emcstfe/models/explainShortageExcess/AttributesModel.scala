@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortage
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
@@ -24,7 +24,7 @@ import scala.xml.Elem
 
 case class AttributesModel(
                         submitterType: SubmitterType
-                     ) extends ExplainShortageModel {
+                     ) extends ExplainShortageExcessModel {
   def toXml: Elem = <urn:Attributes>
     <urn:SubmitterType>{submitterType.toString}</urn:SubmitterType>
   </urn:Attributes>

@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortage
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageFixtures
+import play.api.libs.json.{Json, OFormat}
 
-class AttributesModelSpec extends ExplainShortageModelSpec with SubmitExplainShortageFixtures {
-  import AttributesFixtures._
+import scala.xml.Elem
 
-  testJsonToModelToXml(
-    scenario = "AttributesModel",
-    json = attributesJson,
-    model = attributesModel,
-    xml = attributesXml
-  )
+case class AnalysisModel(
+                          dateOfAnalysis: String,
+                          globalExplanation: String
+                        ) extends ExplainShortageExcessModel {
+  def toXml: Elem = <urn:Analysis>
+    <urn:DateOfAnalysis>{dateOfAnalysis}</urn:DateOfAnalysis>
+    <urn:GlobalExplanation language="en">{globalExplanation}</urn:GlobalExplanation>
+  </urn:Analysis>
+}
+
+object AnalysisModel {
+  implicit val fmt: OFormat[AnalysisModel] = Json.format
 }

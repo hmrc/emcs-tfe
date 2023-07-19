@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortage
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{JsObject, Reads}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -22,8 +22,8 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import scala.xml.Elem
 import scala.xml.Utility.trim
 
-trait ExplainShortageModelSpec extends UnitSpec {
-  def testJsonToModelToXml[Model <: ExplainShortageModel](
+trait ExplainShortageExcessModelSpec extends UnitSpec {
+  def testJsonToModelToXml[Model <: ExplainShortageExcessModel](
                                                            scenario: String,
                                                            json: JsObject,
                                                            model: Model,

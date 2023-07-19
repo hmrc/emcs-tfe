@@ -18,11 +18,11 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.common.{AddressModel, SubmitterType, TraderModel}
-import uk.gov.hmrc.emcstfe.models.explainShortage.{AnalysisModel, AttributesModel, BodyAnalysisModel, ExciseMovementModel, SubmitExplainShortageModel}
+import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, AttributesModel, BodyAnalysisModel, ExciseMovementModel, SubmitExplainShortageExcessModel}
 
 import scala.xml.Elem
 
-trait SubmitExplainShortageFixtures {
+trait SubmitExplainShortageExcessFixtures {
 
   object AttributesFixtures {
     val attributesModel: AttributesModel = AttributesModel(
@@ -188,7 +188,7 @@ trait SubmitExplainShortageFixtures {
     )
   }
 
-  object SubmitExplainShortageFixtures {
+  object SubmitExplainShortageExcessFixtures {
     import AttributesFixtures._
     import ConsigneeTraderFixtures._
     import ExciseMovementFixtures._
@@ -196,7 +196,7 @@ trait SubmitExplainShortageFixtures {
     import AnalysisFixtures._
     import BodyAnalysisFixtures._
 
-    val submitExplainShortageModelMax: SubmitExplainShortageModel = SubmitExplainShortageModel(
+    val submitExplainShortageExcessModelMax: SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
       attributes = attributesModel,
       consigneeTrader = Some(consigneeTraderModel),
       exciseMovement = exciseMovementModel,
@@ -205,7 +205,7 @@ trait SubmitExplainShortageFixtures {
       bodyAnalysis = Some(Seq(bodyAnalysisModelMax, bodyAnalysisModelMin))
     )
 
-    val submitExplainShortageModelMin: SubmitExplainShortageModel = SubmitExplainShortageModel(
+    val submitExplainShortageExcessModelMin: SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
       attributes = attributesModel,
       consigneeTrader = None,
       exciseMovement = exciseMovementModel,
@@ -214,7 +214,7 @@ trait SubmitExplainShortageFixtures {
       bodyAnalysis = None
     )
 
-    val submitExplainShortageXmlMax: Elem = <urn:ExplanationOnReasonForShortage>
+    val submitExplainShortageExcessXmlMax: Elem = <urn:ExplanationOnReasonForShortage>
       {attributesXml}
       {consigneeTraderXml}
       {exciseMovementXml}
@@ -224,12 +224,12 @@ trait SubmitExplainShortageFixtures {
       {bodyAnalysisXmlMin}
     </urn:ExplanationOnReasonForShortage>
 
-    val submitExplainShortageXmlMin: Elem = <urn:ExplanationOnReasonForShortage>
+    val submitExplainShortageExcessXmlMin: Elem = <urn:ExplanationOnReasonForShortage>
       {attributesXml}
       {exciseMovementXml}
     </urn:ExplanationOnReasonForShortage>
 
-    val submitExplainShortageJsonMax: JsObject = Json.obj(
+    val submitExplainShortageExcessJsonMax: JsObject = Json.obj(
       "attributes" -> attributesJson,
       "consigneeTrader" -> consigneeTraderJson,
       "exciseMovement" -> exciseMovementJson,
@@ -238,7 +238,7 @@ trait SubmitExplainShortageFixtures {
       "bodyAnalysis" -> Json.arr(bodyAnalysisJsonMax, bodyAnalysisJsonMin)
     )
 
-    val submitExplainShortageJsonMin: JsObject = Json.obj(
+    val submitExplainShortageExcessJsonMin: JsObject = Json.obj(
       "attributes" -> attributesJson,
       "exciseMovement" -> exciseMovementJson
     )
