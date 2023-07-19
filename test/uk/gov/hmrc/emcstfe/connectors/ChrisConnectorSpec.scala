@@ -431,6 +431,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Right" when {
       "downstream call is successful" in new Test {
 
+        MockMetricsService.chrisTimer(submitChangeDestinationRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3",
           body = submitChangeDestinationRequest.requestBody,
@@ -452,6 +455,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response = Left(XmlValidationError)
 
+        MockMetricsService.chrisTimer(submitChangeDestinationRequest.metricName)
+        MockMetricsService.processWithTimer()
+
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3",
           body = submitChangeDestinationRequest.requestBody,
@@ -468,6 +474,9 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "downstream call is unsuccessful" in new Test {
         val response = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(submitChangeDestinationRequest.metricName)
+        MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3",

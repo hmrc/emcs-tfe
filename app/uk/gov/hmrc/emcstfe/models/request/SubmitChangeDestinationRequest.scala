@@ -87,4 +87,6 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitchangeofdestinationportal"
 
   override def shouldExtractFromSoap: Boolean = false
+
+  override def metricName: String = "change-of-destination"
 }
