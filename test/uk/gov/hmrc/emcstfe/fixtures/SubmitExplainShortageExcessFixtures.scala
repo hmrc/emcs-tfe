@@ -79,7 +79,7 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
   object ExciseMovementFixtures {
     val exciseMovementModel: ExciseMovementModel = ExciseMovementModel(
       arc = "01DE0000012345",
-      sequenceNumber = "1"
+      sequenceNumber = 1
     )
 
     val exciseMovementXml: Elem = <urn:ExciseMovement>
@@ -89,7 +89,7 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
 
     val exciseMovementJson: JsObject = Json.obj(
       "arc" -> "01DE0000012345",
-      "sequenceNumber" -> "1"
+      "sequenceNumber" -> 1
     )
   }
 

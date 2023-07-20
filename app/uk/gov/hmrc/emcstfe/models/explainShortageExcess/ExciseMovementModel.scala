@@ -22,7 +22,7 @@ import scala.xml.Elem
 
 case class ExciseMovementModel(
                                 arc: String,
-                                sequenceNumber: String
+                                sequenceNumber: Int
                               ) extends ExplainShortageExcessModel {
   def toXml: Elem = <urn:ExciseMovement>
     <urn:AdministrativeReferenceCode>{arc}</urn:AdministrativeReferenceCode>
