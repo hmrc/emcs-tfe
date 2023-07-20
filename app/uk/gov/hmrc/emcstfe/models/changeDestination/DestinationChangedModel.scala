@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementGuaranteeModel, TraderModel, XmlBaseModel}
 
 import scala.xml.{Elem, NodeSeq}
 

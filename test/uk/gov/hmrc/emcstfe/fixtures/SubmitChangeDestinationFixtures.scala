@@ -18,7 +18,8 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.changeDestination._
-import uk.gov.hmrc.emcstfe.models.common.{AddressModel, DestinationType, TraderModel, TransportArrangement}
+import uk.gov.hmrc.emcstfe.models.common.JourneyTime.Hours
+import uk.gov.hmrc.emcstfe.models.common.{AddressModel, DestinationType, GuarantorAddressModel, GuarantorTraderModel, MovementGuaranteeModel, TraderModel, TransportArrangement, TransportDetailsModel}
 
 import scala.xml.Elem
 
@@ -26,6 +27,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
   object NewTransportArrangerTraderFixtures {
     lazy val newTransportArrangerTraderModelMax: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
       vatNumber = Some("number"),
       traderExciseNumber = None,
       traderName = Some("name"),
@@ -63,7 +65,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
   object UpdateEadEsadFixtures {
     lazy val updateEadEsadModelMax: UpdateEadEsadModel = UpdateEadEsadModel(
       administrativeReferenceCode = testArc,
-      journeyTime = Some("time"),
+      journeyTime = Some(Hours("20")),
       changedTransportArrangement = Some(TransportArrangement.OwnerOfGoods),
       sequenceNumber = Some("1"),
       invoiceDate = Some("date"),
@@ -85,7 +87,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
     lazy val updateEadEsadXmlMax: Elem = <urn:UpdateEadEsad>
       <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>
-      <urn:JourneyTime>time</urn:JourneyTime>
+      <urn:JourneyTime>H20</urn:JourneyTime>
       <urn:ChangedTransportArrangement>3</urn:ChangedTransportArrangement>
       <urn:SequenceNumber>1</urn:SequenceNumber>
       <urn:InvoiceDate>date</urn:InvoiceDate>
@@ -100,7 +102,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
     lazy val updateEadEsadJsonMax: JsObject = Json.obj(
       "administrativeReferenceCode" -> testArc,
-      "journeyTime" -> "time",
+      "journeyTime" -> "20 hours",
       "changedTransportArrangement" -> TransportArrangement.OwnerOfGoods.toString,
       "sequenceNumber" -> "1",
       "invoiceDate" -> "date",
@@ -116,6 +118,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
   object NewConsigneeTraderFixtures {
     lazy val newConsigneeTraderModelMax: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
       vatNumber = None,
       traderExciseNumber = None,
       traderId = Some("id"),
@@ -154,6 +157,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
   object DeliveryPlaceTraderFixtures {
     lazy val deliveryPlaceTraderModelMax: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
       vatNumber = None,
       traderExciseNumber = None,
       traderId = Some("id"),
@@ -320,6 +324,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
 
   object NewTransporterTraderFixtures {
     lazy val newTransporterTraderModelMax: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
       vatNumber = Some("number"),
       traderExciseNumber = None,
       traderId = None,

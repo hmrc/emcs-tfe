@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeDestination
+package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.{Format, Json}
 

@@ -470,6 +470,7 @@ trait GetMovementFixture extends BaseFixtures {
     sequenceNumber = 1,
     destinationType = Export,
     consigneeTrader = Some(TraderModel(
+      referenceOfTaxWarehouse = None,
       vatNumber = None,
       traderExciseNumber = None,
       traderId = Some("GB11100000002"),

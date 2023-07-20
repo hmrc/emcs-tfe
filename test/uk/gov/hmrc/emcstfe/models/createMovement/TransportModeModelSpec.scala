@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeDestination
+package uk.gov.hmrc.emcstfe.models.createMovement
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
-import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
+import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 
-class MovementGuaranteeModelSpec extends XmlModelBaseSpec with SubmitChangeDestinationFixtures {
-  import MovementGuaranteeFixtures._
+class TransportModeModelSpec extends CreateMovementSpec with CreateMovementFixtures {
+  import TransportModeFixtures._
 
   testJsonToModelToXml(
-    scenario = "max fields",
-    json = movementGuaranteeJsonMax,
-    model = movementGuaranteeModelMax,
-    xml = movementGuaranteeXmlMax
+    scenario = "TransportModeModel with max fields",
+    json = transportModeJsonMax,
+    model = transportModeModelMax,
+    xml = transportModeXmlMax
   )
 
   testJsonToModelToXml(
-    scenario = "min fields",
-    json = movementGuaranteeJsonMin,
-    model = movementGuaranteeModelMin,
-    xml = movementGuaranteeXmlMin
+    scenario = "TransportModeModel with min fields",
+    json = transportModeJsonMin,
+    model = transportModeModelMin,
+    xml = transportModeXmlMin
   )
 }

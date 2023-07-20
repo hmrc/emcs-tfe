@@ -17,13 +17,13 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{TransportArrangement, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common.{JourneyTime, TransportArrangement, XmlBaseModel}
 
 import scala.xml.{Elem, NodeSeq}
 
 case class UpdateEadEsadModel(
                                administrativeReferenceCode: String,
-                               journeyTime: Option[String],
+                               journeyTime: Option[JourneyTime],
                                changedTransportArrangement: Option[TransportArrangement],
                                sequenceNumber: Option[String],
                                invoiceDate: Option[String],
@@ -34,7 +34,7 @@ case class UpdateEadEsadModel(
 
   def toXml: Elem = <urn:UpdateEadEsad>
     <urn:AdministrativeReferenceCode>{administrativeReferenceCode}</urn:AdministrativeReferenceCode>
-    {journeyTime.map(value => <urn:JourneyTime>{value}</urn:JourneyTime>).getOrElse(NodeSeq.Empty)}
+    {journeyTime.map(value => <urn:JourneyTime>{value.toDownstream}</urn:JourneyTime>).getOrElse(NodeSeq.Empty)}
     {changedTransportArrangement.map(value => <urn:ChangedTransportArrangement>{value.toString}</urn:ChangedTransportArrangement>).getOrElse(NodeSeq.Empty)}
     {sequenceNumber.map(value => <urn:SequenceNumber>{value}</urn:SequenceNumber>).getOrElse(NodeSeq.Empty)}
     {invoiceDate.map(value => <urn:InvoiceDate>{value}</urn:InvoiceDate>).getOrElse(NodeSeq.Empty)}

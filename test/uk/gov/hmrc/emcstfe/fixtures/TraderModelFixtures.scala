@@ -26,6 +26,7 @@ trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
   val traderId = "GB0000000012346"
 
   val maxTraderModel: TraderModel = TraderModel(
+    referenceOfTaxWarehouse = Some("reference"),
     vatNumber = Some("number"),
     traderExciseNumber = Some("excise number"),
     traderId = Some(traderId),
@@ -36,6 +37,7 @@ trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
 
   val maxTraderModelXML: NodeSeq =
     NodeSeq.fromSeq(Seq(
+      Seq(<urn:ReferenceOfTaxWarehouse>reference</urn:ReferenceOfTaxWarehouse>),
       Seq(<urn:VatNumber>number</urn:VatNumber>),
       Seq(<urn:TraderExciseNumber>excise number</urn:TraderExciseNumber>),
       Seq(<urn:Traderid>{traderId}</urn:Traderid>),
@@ -45,6 +47,7 @@ trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
     ).flatten)
 
   val maxTraderModelJson: JsObject = Json.obj(
+    "referenceOfTaxWarehouse" -> "reference",
     "vatNumber" -> "number",
     "traderExciseNumber" -> "excise number",
     "traderId" -> traderId,
@@ -54,6 +57,7 @@ trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
   )
 
   val minTraderModel: TraderModel = TraderModel(
+    referenceOfTaxWarehouse = None,
     vatNumber = None,
     traderExciseNumber = None,
     traderId = None,

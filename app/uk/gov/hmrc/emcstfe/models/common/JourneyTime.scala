@@ -23,6 +23,7 @@ import scala.xml.NodeSeq
 
 sealed trait JourneyTime {
   val time: String
+  def toDownstream: String
 }
 
 object JourneyTime {
@@ -34,17 +35,30 @@ object JourneyTime {
     unit match {
       case "H" => ParseSuccess(Hours(number))
       case "D" => ParseSuccess(Days(number))
-      case _ => ParseFailure(JourneyTimeParseFailure(s"Could not parse JourneyTime, received: '${xml.text}'"))
+      case _ => ParseFailure(JourneyTimeParseFailure(s"Could not parse JourneyTime from XML, received: '${xml.text}'"))
     }
+  }
+
+  implicit val reads: Reads[JourneyTime] = {
+    case JsString(value) => value.split(" ").toList match {
+      case value :: "hours" :: Nil => JsSuccess(Hours(value))
+      case value :: "days" :: Nil => JsSuccess(Days(value))
+      case other => JsError(s"Could not parse JourneyTime from JSON, received: '${other.mkString(" ")}'")
+    }
+    case other => JsError(s"Value is not a String: $other")
   }
 
   implicit val writes: Writes[JourneyTime] = (o: JourneyTime) => JsString(o.toString)
 
   case class Hours(time: String) extends JourneyTime {
     override def toString: String = s"$time hours"
+
+    def toDownstream: String = s"H$time"
   }
 
   case class Days(time: String) extends JourneyTime {
     override def toString: String = s"$time days"
+
+    def toDownstream: String = s"D$time"
   }
 }
