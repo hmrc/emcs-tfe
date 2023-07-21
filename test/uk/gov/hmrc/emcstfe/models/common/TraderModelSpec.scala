@@ -45,5 +45,20 @@ class TraderModelSpec extends UnitSpec with TraderModelFixtures {
         minTraderModel.toXml shouldBe minTraderModelXML
       }
     }
+
+    "calculate countryCode" when {
+      "traderId.length >= 2" in {
+        maxTraderModel.countryCode shouldBe Some("GB")
+      }
+    }
+
+    "return for countryCode None" when {
+      "traderId is None" in {
+        minTraderModel.countryCode shouldBe None
+      }
+      "traderId.length < 2" in {
+        maxTraderModel.copy(traderId = Some("a")).countryCode shouldBe None
+      }
+    }
   }
 }

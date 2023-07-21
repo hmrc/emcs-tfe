@@ -29,9 +29,12 @@ case class TraderModel(vatNumber: Option[String],
                        address: Option[AddressModel],
                        eoriNumber: Option[String]) {
 
-  val isEmpty = traderId.isEmpty && traderName.isEmpty && (address.isEmpty || address.exists(_.isEmpty)) && eoriNumber.isEmpty
+  lazy val isEmpty: Boolean = traderId.isEmpty && traderName.isEmpty && (address.isEmpty || address.exists(_.isEmpty)) && eoriNumber.isEmpty
 
-  val countryCode = traderId.map(_.substring(0,2))
+  lazy val countryCode: Option[String] = traderId match {
+    case Some(str) if str.length >= 2 => Some(str.substring(0, 2))
+    case _ => None
+  }
 
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
     vatNumber.map(x => Seq(<urn:VatNumber>{x}</urn:VatNumber>)),
