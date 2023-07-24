@@ -81,8 +81,15 @@ class SubmitAlertOrRejectionRequestSpec extends UnitSpec with SubmitAlertOrRejec
 
       val model = maxSubmitAlertOrRejectionModel.copy(exciseMovement = ExciseMovementModel("01DE0000012345", 1))
 
-      "have the correct MessageSender" in {
-        SubmitAlertOrRejectionRequest(model).messageSender shouldBe "NDEA.GB"
+      "have the correct MessageSender" when {
+
+        "consignee trader exists" in {
+          SubmitAlertOrRejectionRequest(model.copy(consigneeTrader = Some(maxTraderModel.copy(traderId = Some("FR00001"))))).messageSender shouldBe "NDEA.FR"
+        }
+
+        "consignee trader DOES NOT exist" in {
+          SubmitAlertOrRejectionRequest(model.copy(consigneeTrader = None)).messageSender shouldBe "NDEA.GB"
+        }
       }
 
       "have the correct MessageRecipient" in {
