@@ -16,30 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, TaxWarehouse}
 
-import scala.xml.Elem
-
-case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
-                                         (implicit request: UserRequest[_]) extends ChrisRequest {
-
-  private val arcCountryCode = body.updateEadEsad.administrativeReferenceCode.substring(2, 4)
-  private val countryCode: Option[String] => String = _.map(_.substring(0, 2)).getOrElse(GB)
-
-  val messageSender: String = NDEA ++ arcCountryCode
-
-  val messageRecipient: String =
-    NDEA ++ (body.destinationChanged.destinationTypeCode match {
-      case TaxWarehouse => countryCode(body.destinationChanged.newConsigneeTrader.flatMap(_.traderId))
-      case Export => countryCode(body.destinationChanged.deliveryPlaceCustomsOffice.map(_.referenceNumber))
-      case _ => GB
-    })
-
+case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel)
+                                        (implicit request: UserRequest[_]) extends ChrisRequest {
   override def exciseRegistrationNumber: String = request.ern
 
-  val soapRequest: Elem =
+  private val arcCountryCode = body.exciseMovement.arc.substring(2, 4)
+  private val consigneeCountryCode = body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
+
+  val messageRecipient = NDEA ++ arcCountryCode
+  val messageSender: String = NDEA ++ consigneeCountryCode
+
+  val soapRequest =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
       <soapenv:Header>
         <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
@@ -47,7 +37,7 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
           <ns:VendorID>1259</ns:VendorID>
           <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
           <ns:ServiceID>1138</ns:ServiceID>
-          <ns:ServiceMessageType>HMRC-EMCS-IE813-DIRECT</ns:ServiceMessageType>
+          <ns:ServiceMessageType>HMRC-EMCS-IE819-DIRECT</ns:ServiceMessageType>
         </ns:Info>
         <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
           <CredentialID>{request.credId}</CredentialID>
@@ -55,7 +45,7 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
         </MetaData>
       </soapenv:Header>
       <soapenv:Body>
-        <urn:IE813 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+        <urn:IE819 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
           <urn:Header>
             <urn1:MessageSender>{messageSender}</urn1:MessageSender>
             <urn1:MessageRecipient>{messageRecipient}</urn1:MessageRecipient>
@@ -67,7 +57,7 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
           <urn:Body>
             {body.toXml}
           </urn:Body>
-        </urn:IE813>
+        </urn:IE819>
       </soapenv:Body>
     </soapenv:Envelope>
 
@@ -75,9 +65,9 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
     s"""<?xml version='1.0' encoding='UTF-8'?>
        |${soapRequest.toString}""".stripMargin
 
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitchangeofdestinationportal"
+  override def action: String = "http://www.hmrc.gov.uk/emcs/SubmitAlertOrRejectionMovementPortal"
 
   override def shouldExtractFromSoap: Boolean = false
 
-  override def metricName: String = "change-of-destination"
+  override def metricName = "alert-or-rejection"
 }

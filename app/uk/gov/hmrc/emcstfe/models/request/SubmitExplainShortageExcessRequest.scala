@@ -24,9 +24,6 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
                                        (implicit request: UserRequest[_]) extends ChrisRequest {
   override def exciseRegistrationNumber: String = request.ern
 
-  private val NDEA = "NDEA."
-  private val GB = "GB"
-
   val messageRecipient: String = {
     val countryCode: String = body.attributes.submitterType match {
       case SubmitterType.Consignor => body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)

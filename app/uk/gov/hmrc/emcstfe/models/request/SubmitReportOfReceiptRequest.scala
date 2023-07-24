@@ -24,8 +24,6 @@ import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
                                        (implicit request: UserRequest[_]) extends ChrisRequest {
 
-  private val NDEA = "NDEA."
-  private val GB = "GB"
   private val arcCountryCode = body.arc.substring(2, 4)
   private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(GB)
 
