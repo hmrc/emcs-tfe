@@ -66,6 +66,11 @@ trait MockChrisConnector extends MockFactory  {
       (mockConnector.submitExplainShortageExcessChrisSOAPRequest[A](_: ChrisRequest)(_: HeaderCarrier, _: ExecutionContext, _: XmlReader[A]))
         .expects(chrisRequest, *, *, *)
     }
+
+    def submitAlertOrRejectionChrisSOAPRequest[A](chrisRequest: ChrisRequest): CallHandler4[ChrisRequest, HeaderCarrier, ExecutionContext, XmlReader[A], Future[Either[ErrorResponse, A]]] = {
+      (mockConnector.submitAlertOrRejectionChrisSOAPRequest[A](_: ChrisRequest)(_: HeaderCarrier, _: ExecutionContext, _: XmlReader[A]))
+        .expects(chrisRequest, *, *, *)
+    }
   }
 }
 

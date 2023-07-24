@@ -43,6 +43,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
   with SubmitExplainDelayFixtures
   with SubmitChangeDestinationFixtures
   with SubmitExplainShortageExcessFixtures
+  with SubmitAlertOrRejectionFixtures
   with MockMetricsService {
 
   override def afterEach(): Unit = {
@@ -584,6 +585,87 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
           .returns(response)
 
         await(connector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+      }
+    }
+  }
+
+  "submitAlertOrRejectionChrisSOAPRequest" should {
+
+    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+    val submitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
+
+    "return a Right" when {
+      "downstream call is successful" in new Test {
+
+        MockMetricsService.chrisTimer(submitAlertOrRejectionRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitAlertOrRejectionMovementPortal/2",
+          body = submitAlertOrRejectionRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitAlertOrRejectionRequest.action}""""
+          )
+        )
+          .returns(Future.successful(Right(chrisSuccessResponse)))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](submitAlertOrRejectionRequest)) shouldBe Right(chrisSuccessResponse)
+      }
+    }
+    "return a Left" when {
+      "downstream call is successful but can't convert the response to XML" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
+
+        MockMetricsService.chrisTimer(submitAlertOrRejectionRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitAlertOrRejectionMovementPortal/2",
+          body = submitAlertOrRejectionRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitAlertOrRejectionRequest.action}""""
+          )
+        ).returns(Future.successful(response))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](submitAlertOrRejectionRequest)) shouldBe response
+      }
+      "downstream call is unsuccessful" in new Test {
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(submitAlertOrRejectionRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitAlertOrRejectionMovementPortal/2",
+          body = submitAlertOrRejectionRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitAlertOrRejectionRequest.action}""""
+          )
+        ).returns(Future.successful(response))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](submitAlertOrRejectionRequest)) shouldBe response
+      }
+      "cannot prepare XML for submission" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(MarkPlacementError)
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(response)
+
+        await(connector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](submitAlertOrRejectionRequest)) shouldBe response
       }
     }
   }

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import play.api.test.FakeRequest
-import uk.gov.hmrc.emcstfe.fixtures.{SubmitAlertOrRejectionFixtures, SubmitExplainDelayFixtures}
+import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.ExciseMovementModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
