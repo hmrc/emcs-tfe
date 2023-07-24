@@ -18,7 +18,8 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.common.{AddressModel, SubmitterType, TraderModel}
-import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, AttributesModel, BodyAnalysisModel, ExciseMovementModel, SubmitExplainShortageExcessModel}
+import uk.gov.hmrc.emcstfe.models.explainShortageExcess._
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
 
 import scala.xml.Elem
 
@@ -94,18 +95,15 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
   }
 
   object ConsignorTraderFixtures {
-    val consignorTraderModel: TraderModel = TraderModel(
-      vatNumber = None,
-      traderExciseNumber = Some("excise number"),
-      traderId = None,
-      traderName = Some("name"),
-      address = Some(AddressModel(
+    val consignorTraderModel: ConsignorTraderModel = ConsignorTraderModel(
+      traderExciseNumber = "excise number",
+      traderName = "name",
+      address = AddressModel(
         streetNumber = Some("number"),
         street = Some("street"),
         postcode = Some("a postcode"),
         city = Some("a city")
-      )),
-      eoriNumber = None
+      )
     )
 
     val consignorTraderXml: Elem = <urn:ConsignorTrader language="en">
@@ -189,12 +187,12 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
   }
 
   object SubmitExplainShortageExcessFixtures {
-    import AttributesFixtures._
-    import ConsigneeTraderFixtures._
-    import ExciseMovementFixtures._
-    import ConsignorTraderFixtures._
     import AnalysisFixtures._
+    import AttributesFixtures._
     import BodyAnalysisFixtures._
+    import ConsigneeTraderFixtures._
+    import ConsignorTraderFixtures._
+    import ExciseMovementFixtures._
 
     val submitExplainShortageExcessModelMax: SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
       attributes = attributesModel,
