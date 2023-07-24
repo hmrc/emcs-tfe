@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainDelay
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
-import uk.gov.hmrc.emcstfe.models.common.{Enumerable, WithName}
+import play.api.libs.json.{Json, OFormat}
 
-sealed trait SubmitterType
+import scala.xml.Elem
 
-object SubmitterType extends Enumerable.Implicits {
+case class AnalysisModel(
+                          dateOfAnalysis: String,
+                          globalExplanation: String
+                        ) extends ExplainShortageExcessModel {
+  def toXml: Elem = <urn:Analysis>
+    <urn:DateOfAnalysis>{dateOfAnalysis}</urn:DateOfAnalysis>
+    <urn:GlobalExplanation language="en">{globalExplanation}</urn:GlobalExplanation>
+  </urn:Analysis>
+}
 
-  case object Consignor extends WithName("1") with SubmitterType
-  case object Consignee extends WithName("2") with SubmitterType
-
-  val values: Seq[SubmitterType] = Seq(Consignor, Consignee)
-
-  implicit val enumerable: Enumerable[SubmitterType] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+object AnalysisModel {
+  implicit val fmt: OFormat[AnalysisModel] = Json.format
 }

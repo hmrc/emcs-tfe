@@ -30,7 +30,7 @@ import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, UnexpectedDownstreamResponseError, XmlValidationError}
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, GetMovementResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse, GetMovementResponse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -42,6 +42,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
   with SubmitReportOfReceiptFixtures
   with SubmitExplainDelayFixtures
   with SubmitChangeDestinationFixtures
+  with SubmitExplainShortageExcessFixtures
   with MockMetricsService {
 
   override def afterEach(): Unit = {
@@ -49,7 +50,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     super.afterEach()
   }
 
-  lazy val config = app.injector.instanceOf[AppConfig]
+  lazy val config: AppConfig = app.injector.instanceOf[AppConfig]
 
   trait Test {
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -85,7 +86,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Left" when {
       "downstream call is successful but can't convert the response to XML" in new Test {
 
-        val response = Left(XmlValidationError)
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
         MockMetricsService.chrisTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -102,7 +103,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         await(connector.postChrisSOAPRequestAndExtractToModel[GetMovementResponse](getMovementRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
-        val response = Left(UnexpectedDownstreamResponseError)
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
         MockMetricsService.chrisTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -145,7 +146,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Left" when {
       "downstream call is successful but can't convert the response to XML" in new Test {
 
-        val response = Left(XmlValidationError)
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
         MockMetricsService.chrisTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -162,7 +163,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         await(connector.postChrisSOAPRequest(getMovementRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
-        val response = Left(UnexpectedDownstreamResponseError)
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
         MockMetricsService.chrisTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -208,7 +209,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Left" when {
       "downstream call is successful but can't convert the response to XML" in new Test {
 
-        val response = Left(XmlValidationError)
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
         MockMetricsService.chrisTimer(submitDraftMovementRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -228,7 +229,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
-        val response = Left(UnexpectedDownstreamResponseError)
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
         MockMetricsService.chrisTimer(submitDraftMovementRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -248,7 +249,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe response
       }
       "cannot prepare XML for submission" in new Test {
-        val response = Left(MarkPlacementError)
+        val response: Either[ErrorResponse, String] = Left(MarkPlacementError)
 
 
         MockXmlUtils.prepareXmlForSubmission()
@@ -289,7 +290,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Left" when {
       "downstream call is successful but can't convert the response to XML" in new Test {
 
-        val response = Left(XmlValidationError)
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
         MockMetricsService.chrisTimer(submitReportOfReceiptRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -309,7 +310,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         await(connector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
-        val response = Left(UnexpectedDownstreamResponseError)
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
         MockMetricsService.chrisTimer(submitReportOfReceiptRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -330,7 +331,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "cannot prepare XML for submission" in new Test {
 
-        val response = Left(MarkPlacementError)
+        val response: Either[ErrorResponse, String] = Left(MarkPlacementError)
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(response)
@@ -370,7 +371,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Left" when {
       "downstream call is successful but can't convert the response to XML" in new Test {
 
-        val response = Left(XmlValidationError)
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
         MockMetricsService.chrisTimer(submitExplainDelayRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -390,7 +391,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         await(connector.submitExplainDelayChrisSOAPRequest[ChRISSuccessResponse](submitExplainDelayRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
-        val response = Left(UnexpectedDownstreamResponseError)
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
         MockMetricsService.chrisTimer(submitExplainDelayRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -411,7 +412,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "cannot prepare XML for submission" in new Test {
 
-        val response = Left(MarkPlacementError)
+        val response: Either[ErrorResponse, String] = Left(MarkPlacementError)
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(response)
@@ -453,7 +454,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     "return a Left" when {
       "downstream call is successful but can't convert the response to XML" in new Test {
 
-        val response = Left(XmlValidationError)
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
         MockMetricsService.chrisTimer(submitChangeDestinationRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -473,7 +474,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         await(connector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeDestinationRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
-        val response = Left(UnexpectedDownstreamResponseError)
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
         MockMetricsService.chrisTimer(submitChangeDestinationRequest.metricName)
         MockMetricsService.processWithTimer()
@@ -494,12 +495,95 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
       }
       "cannot prepare XML for submission" in new Test {
 
-        val response = Left(MarkPlacementError)
+        val response: Either[ErrorResponse, String] = Left(MarkPlacementError)
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(response)
 
         await(connector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](submitChangeDestinationRequest)) shouldBe response
+      }
+    }
+  }
+
+  "submitExplainShortageExcessChrisSOAPRequest" should {
+
+    import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
+
+    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+    val submitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax)
+
+    "return a Right" when {
+      "downstream call is successful" in new Test {
+
+        MockMetricsService.chrisTimer(submitExplainShortageExcessRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitReasonForShortagePortal/2",
+          body = submitExplainShortageExcessRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitExplainShortageExcessRequest.action}""""
+          )
+        )
+          .returns(Future.successful(Right(chrisSuccessResponse)))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe Right(chrisSuccessResponse)
+      }
+    }
+    "return a Left" when {
+      "downstream call is successful but can't convert the response to XML" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
+
+        MockMetricsService.chrisTimer(submitExplainShortageExcessRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitReasonForShortagePortal/2",
+          body = submitExplainShortageExcessRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitExplainShortageExcessRequest.action}""""
+          )
+        ).returns(Future.successful(response))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+      }
+      "downstream call is unsuccessful" in new Test {
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(submitExplainShortageExcessRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitReasonForShortagePortal/2",
+          body = submitExplainShortageExcessRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitExplainShortageExcessRequest.action}""""
+          )
+        ).returns(Future.successful(response))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+      }
+      "cannot prepare XML for submission" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(MarkPlacementError)
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(response)
+
+        await(connector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
       }
     }
   }

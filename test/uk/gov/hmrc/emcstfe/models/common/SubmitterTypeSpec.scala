@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request
+package uk.gov.hmrc.emcstfe.models.common
 
-import java.time.{LocalDate, LocalTime, ZoneId}
-import java.util.UUID
+import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.{Consignee, Consignor}
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-trait ChrisRequest {
-  def requestBody: String
+class SubmitterTypeSpec extends UnitSpec with SubmitExplainDelayFixtures {
 
-  def exciseRegistrationNumber: String
+  "SubmitterType" must {
 
-  def action: String
-
-  def uuid: String = java.util.UUID.randomUUID().toString
-
-  def shouldExtractFromSoap: Boolean
-
-  def metricName: String
-
-  val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID: UUID = UUID.randomUUID()
-  val messageUUID: UUID = UUID.randomUUID()
+    "have the correct underlying enum values" in {
+      Consignor.toString shouldBe "1"
+      Consignee.toString shouldBe "2"
+    }
+  }
 }

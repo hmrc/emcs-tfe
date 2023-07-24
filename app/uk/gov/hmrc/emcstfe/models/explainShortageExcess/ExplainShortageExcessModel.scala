@@ -14,26 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request
+package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
-import java.time.{LocalDate, LocalTime, ZoneId}
-import java.util.UUID
+import scala.xml.Elem
 
-trait ChrisRequest {
-  def requestBody: String
-
-  def exciseRegistrationNumber: String
-
-  def action: String
-
-  def uuid: String = java.util.UUID.randomUUID().toString
-
-  def shouldExtractFromSoap: Boolean
-
-  def metricName: String
-
-  val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID: UUID = UUID.randomUUID()
-  val messageUUID: UUID = UUID.randomUUID()
+trait ExplainShortageExcessModel {
+  def toXml: Elem
 }

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitterType.Consignee
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignee
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType.Strikes
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayType.DelayWithReportReceipt
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel

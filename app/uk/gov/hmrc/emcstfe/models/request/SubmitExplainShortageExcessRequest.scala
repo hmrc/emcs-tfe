@@ -17,34 +17,32 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
-import uk.gov.hmrc.emcstfe.models.common.TraderModel
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType
+import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
 
-case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
+case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessModel)
                                        (implicit request: UserRequest[_]) extends ChrisRequest {
+  override def exciseRegistrationNumber: String = request.ern
 
   private val NDEA = "NDEA."
   private val GB = "GB"
-  private val arcCountryCode = body.arc.substring(2, 4)
-  private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(GB)
 
-  val messageSender =
-    NDEA ++ (if (body.destinationType == DirectDelivery) {
-      traderModelCountryCode(body.consigneeTrader)
-    } else {
-      arcCountryCode
-    })
+  val messageRecipient: String = {
+    val countryCode: String = body.attributes.submitterType match {
+      case SubmitterType.Consignor => body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
+      case SubmitterType.Consignee => body.exciseMovement.arc.substring(2, 4)
+    }
 
-  val messageRecipient =
-    NDEA ++ (body.destinationType match {
-      case TaxWarehouse => traderModelCountryCode(body.deliveryPlaceTrader)
-      case TemporaryRegisteredConsignee | RegisteredConsignee => traderModelCountryCode(body.consigneeTrader)
-      case DirectDelivery => arcCountryCode
-      case _ => GB
-    })
+    NDEA ++ countryCode
+  }
+  val messageSender: String = {
+    val countryCode: String = body.attributes.submitterType match {
+      case SubmitterType.Consignor => body.exciseMovement.arc.substring(2, 4)
+      case SubmitterType.Consignee => body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
+    }
 
-  override def exciseRegistrationNumber: String = request.ern
+    NDEA ++ countryCode
+  }
 
   val soapRequest =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -54,7 +52,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
           <ns:VendorID>1259</ns:VendorID>
           <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
           <ns:ServiceID>1138</ns:ServiceID>
-          <ns:ServiceMessageType>HMRC-EMCS-IE818-DIRECT</ns:ServiceMessageType>
+          <ns:ServiceMessageType>HMRC-EMCS-IE871-DIRECT</ns:ServiceMessageType>
         </ns:Info>
         <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
           <CredentialID>{request.credId}</CredentialID>
@@ -62,7 +60,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
         </MetaData>
       </soapenv:Header>
       <soapenv:Body>
-        <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+        <urn:IE871 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
           <urn:Header>
             <urn1:MessageSender>{messageSender}</urn1:MessageSender>
             <urn1:MessageRecipient>{messageRecipient}</urn1:MessageRecipient>
@@ -74,7 +72,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
           <urn:Body>
             {body.toXml}
           </urn:Body>
-        </urn:IE818>
+        </urn:IE871>
       </soapenv:Body>
     </soapenv:Envelope>
 
@@ -82,9 +80,9 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
     s"""<?xml version='1.0' encoding='UTF-8'?>
        |${soapRequest.toString}""".stripMargin
 
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitreportofreceiptportal"
+  override def action: String = "http://www.hmrc.gov.uk/emcs/submitreasonforshortageportal"
 
   override def shouldExtractFromSoap: Boolean = false
 
-  override def metricName: String = "report-receipt"
+  override def metricName = "explain-shortage-excess"
 }

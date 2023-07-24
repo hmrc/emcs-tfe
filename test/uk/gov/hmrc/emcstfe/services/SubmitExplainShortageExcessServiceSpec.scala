@@ -17,44 +17,44 @@
 package uk.gov.hmrc.emcstfe.services
 
 import play.api.test.FakeRequest
-import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
+import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
 
-class SubmitChangeDestinationServiceSpec extends UnitSpec with SubmitChangeDestinationFixtures {
+class SubmitExplainShortageExcessServiceSpec extends UnitSpec with SubmitExplainShortageExcessFixtures {
 
-  import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
+  import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
   trait Test extends MockChrisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
-    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockConnector)
+    val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax)
+    val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockConnector)
   }
 
   "submit" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
+        MockConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
           Future.successful(Right(chrisSuccessResponse))
         )
 
-        await(service.submit(submitChangeDestinationModelMax)) shouldBe Right(chrisSuccessResponse)
+        await(service.submit(submitExplainShortageExcessModelMax)) shouldBe Right(chrisSuccessResponse)
       }
     }
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
+        MockConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
           Future.successful(Left(XmlValidationError))
         )
 
-        await(service.submit(submitChangeDestinationModelMax)) shouldBe Left(XmlValidationError)
+        await(service.submit(submitExplainShortageExcessModelMax)) shouldBe Left(XmlValidationError)
       }
     }
   }

@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
-import cats.implicits.catsSyntaxTuple4Semigroupal
-import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
 
 import scala.xml.NodeSeq
