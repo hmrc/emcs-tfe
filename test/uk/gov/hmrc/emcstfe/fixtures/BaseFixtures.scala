@@ -23,5 +23,6 @@ trait BaseFixtures {
   val testLrn: String = "LRN"
   val testCredId = "cred1234567891"
   val testInternalId = "int1234567891"
+  val testDestinationOffice = "GB1234"
 
 }

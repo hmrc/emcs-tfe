@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortageExcess
+package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
 import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class ExciseMovementModelSpec extends XmlModelBaseSpec with SubmitExplainShortageExcessFixtures {
-  import ExciseMovementFixtures._
+class SubmitAlertOrRejectionReasonModelSpec extends XmlModelBaseSpec with SubmitAlertOrRejectionFixtures {
 
   testJsonToModelToXml(
     scenario = "max fields",
-    json = exciseMovementJson,
-    model = exciseMovementModel,
-    xml = exciseMovementXml
+    json = maxSubmitAlertOrRejectionModelJson,
+    model = maxSubmitAlertOrRejectionModel,
+    xml = maxSubmitAlertOrRejectionModelXML
+  )
+
+  testJsonToModelToXml(
+    scenario = "min fields",
+    json = minSubmitAlertOrRejectionModelJson,
+    model = minSubmitAlertOrRejectionModel,
+    xml = minSubmitAlertOrRejectionModelXML
   )
 }

@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.explainShortageExcess
+package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.{Json, OFormat}
 
 import scala.xml.Elem
 
-case class ExciseMovementModel(
-                                arc: String,
-                                sequenceNumber: Int
-                              ) extends ExplainShortageExcessModel {
+case class ExciseMovementModel(arc: String,
+                               sequenceNumber: Int) extends XmlBaseModel {
   def toXml: Elem = <urn:ExciseMovement>
     <urn:AdministrativeReferenceCode>{arc}</urn:AdministrativeReferenceCode>
     <urn:SequenceNumber>{sequenceNumber}</urn:SequenceNumber>

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.TransportArrangement
+import uk.gov.hmrc.emcstfe.models.common.{TransportArrangement, XmlBaseModel}
 
 import scala.xml.{Elem, NodeSeq}
 
@@ -30,7 +30,7 @@ case class UpdateEadEsadModel(
                                invoiceNumber: Option[String],
                                transportModeCode: Option[String],
                                complementaryInformation: Option[String]
-                             ) extends ChangeDestinationModel {
+                             ) extends XmlBaseModel {
 
   def toXml: Elem = <urn:UpdateEadEsad>
     <urn:AdministrativeReferenceCode>{administrativeReferenceCode}</urn:AdministrativeReferenceCode>

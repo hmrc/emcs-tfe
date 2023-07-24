@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TraderModel}
+import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TraderModel, XmlBaseModel}
 
 import scala.xml.{Elem, NodeSeq}
 
@@ -27,7 +27,7 @@ case class DestinationChangedModel(
                                     deliveryPlaceTrader: Option[TraderModel],
                                     deliveryPlaceCustomsOffice: Option[DeliveryPlaceCustomsOfficeModel],
                                     movementGuarantee: Option[MovementGuaranteeModel]
-                                  ) extends ChangeDestinationModel {
+                                  ) extends XmlBaseModel {
   def toXml: Elem = <urn:DestinationChanged>
     <urn:DestinationTypeCode>{destinationTypeCode.toString}</urn:DestinationTypeCode>
     {newConsigneeTrader.map(trader =>
