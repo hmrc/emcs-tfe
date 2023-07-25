@@ -17,12 +17,13 @@
 package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class AttributesModelSpec extends ExplainShortageExcessModelSpec with SubmitExplainShortageExcessFixtures {
+class AttributesModelSpec extends XmlModelBaseSpec with SubmitExplainShortageExcessFixtures {
   import AttributesFixtures._
 
   testJsonToModelToXml(
-    scenario = "AttributesModel",
+    scenario = "max fields",
     json = attributesJson,
     model = attributesModel,
     xml = attributesXml

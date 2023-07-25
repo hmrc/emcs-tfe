@@ -70,4 +70,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def urlSubmitExplainShortageExcess(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitReasonForShortagePortal/2"
+
+  def urlSubmitAlertOrRejection(): String =
+    chrisBaseUrl + "/ChRIS/EMCS/SubmitAlertOrRejectionMovementPortal/2"
 }

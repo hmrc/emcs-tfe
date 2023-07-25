@@ -23,7 +23,6 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
                                     (implicit request: UserRequest[_]) extends ChrisRequest {
   override def exciseRegistrationNumber: String = request.ern
 
-  private val NDEA = "NDEA."
   private val arcCountryCode = body.arc.substring(2, 4)
   private val ernCountryCode = exciseRegistrationNumber.substring(0, 2)
 

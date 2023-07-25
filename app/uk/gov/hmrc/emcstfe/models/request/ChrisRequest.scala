@@ -36,4 +36,7 @@ trait ChrisRequest {
   val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
   val correlationUUID: UUID = UUID.randomUUID()
   val messageUUID: UUID = UUID.randomUUID()
+
+  val NDEA = "NDEA."
+  val GB = "GB"
 }

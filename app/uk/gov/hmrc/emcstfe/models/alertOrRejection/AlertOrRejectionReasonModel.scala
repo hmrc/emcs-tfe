@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeDestination
+package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
 import scala.xml.{Elem, NodeSeq}
 
-case class MovementGuaranteeModel(
-                                   guarantorTypeCode: String,
-                                   guarantorTrader: Option[Seq[GuarantorTraderModel]]
-                                 ) extends XmlBaseModel {
-  def toXml: Elem = <urn:MovementGuarantee>
-    <urn:GuarantorTypeCode>{guarantorTypeCode}</urn:GuarantorTypeCode>
-    {guarantorTrader.map(_.map(trader =>
-      <urn:GuarantorTrader language="en">{trader.toXml}</urn:GuarantorTrader>
-    )).getOrElse(NodeSeq.Empty)}
-  </urn:MovementGuarantee>
+case class AlertOrRejectionReasonModel(reason: AlertOrRejectionReasonType,
+                                       additionalInformation: Option[String]) extends XmlBaseModel {
+  def toXml: Elem = <urn:AlertOrRejectionOfEadEsadReason>
+    <urn:AlertOrRejectionOfMovementReasonCode>{reason}</urn:AlertOrRejectionOfMovementReasonCode>
+    {additionalInformation.map(info => <urn:ComplementaryInformation language="en">{info}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+  </urn:AlertOrRejectionOfEadEsadReason>
 }
 
-object MovementGuaranteeModel {
-  implicit val fmt: OFormat[MovementGuaranteeModel] = Json.format
+object AlertOrRejectionReasonModel {
+  implicit val fmt: OFormat[AlertOrRejectionReasonModel] = Json.format
 }

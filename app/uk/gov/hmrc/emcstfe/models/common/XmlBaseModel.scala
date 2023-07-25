@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.changeDestination
+package uk.gov.hmrc.emcstfe.models.common
 
 import scala.xml.Elem
 
-trait ChangeDestinationModel {
+trait XmlBaseModel {
   def toXml: Elem
 }

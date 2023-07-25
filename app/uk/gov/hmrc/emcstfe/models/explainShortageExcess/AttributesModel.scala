@@ -17,14 +17,14 @@
 package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.SubmitterType
+import uk.gov.hmrc.emcstfe.models.common.{SubmitterType, XmlBaseModel}
 
 import scala.xml.Elem
 
 
 case class AttributesModel(
                         submitterType: SubmitterType
-                     ) extends ExplainShortageExcessModel {
+                     ) extends XmlBaseModel {
   def toXml: Elem = <urn:Attributes>
     <urn:SubmitterType>{submitterType.toString}</urn:SubmitterType>
   </urn:Attributes>

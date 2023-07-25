@@ -17,12 +17,13 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class DeliveryPlaceCustomsOfficeModelSpec extends ChangeDestinationModelSpec with SubmitChangeDestinationFixtures {
+class DeliveryPlaceCustomsOfficeModelSpec extends XmlModelBaseSpec with SubmitChangeDestinationFixtures {
   import DeliveryPlaceCustomsOfficeFixtures._
 
   testJsonToModelToXml(
-    scenario = "DeliveryPlaceCustomsOfficeModel",
+    scenario = "max fields",
     json = deliveryPlaceCustomsOfficeJson,
     model = deliveryPlaceCustomsOfficeModel,
     xml = deliveryPlaceCustomsOfficeXml

@@ -17,19 +17,20 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class SubmitChangeDestinationModelSpec extends ChangeDestinationModelSpec with SubmitChangeDestinationFixtures {
+class SubmitChangeDestinationModelSpec extends XmlModelBaseSpec with SubmitChangeDestinationFixtures {
   import SubmitChangeDestinationFixtures._
 
   testJsonToModelToXml(
-    scenario = "SubmitChangeDestinationModel with max fields",
+    scenario = "max fields",
     json = submitChangeDestinationJsonMax,
     model = submitChangeDestinationModelMax,
     xml = submitChangeDestinationXmlMax
   )
 
   testJsonToModelToXml(
-    scenario = "SubmitChangeDestinationModel with min fields",
+    scenario = "min fields",
     json = submitChangeDestinationJsonMin,
     model = submitChangeDestinationModelMin,
     xml = submitChangeDestinationXmlMin

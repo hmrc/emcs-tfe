@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
 import scala.xml.{Elem, NodeSeq}
 
@@ -26,7 +27,7 @@ case class TransportDetailsModel(
                                   commercialSealIdentification: Option[String],
                                   complementaryInformation: Option[String],
                                   sealInformation: Option[String],
-                                ) extends ChangeDestinationModel {
+                                ) extends XmlBaseModel {
   def toXml: Elem = <urn:TransportDetails>
     <urn:TransportUnitCode>{transportUnitCode}</urn:TransportUnitCode>
     {identityOfTransportUnits.map(value => <urn:IdentityOfTransportUnits>{value}</urn:IdentityOfTransportUnits>).getOrElse(NodeSeq.Empty)}

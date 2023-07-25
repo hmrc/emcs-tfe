@@ -17,8 +17,8 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.models.common.{AddressModel, SubmitterType, TraderModel}
-import uk.gov.hmrc.emcstfe.models.explainShortageExcess._
+import uk.gov.hmrc.emcstfe.models.common.{AddressModel, ExciseMovementModel, SubmitterType, TraderModel}
+import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, AttributesModel, BodyAnalysisModel, SubmitExplainShortageExcessModel}
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
 
 import scala.xml.Elem

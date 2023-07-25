@@ -76,4 +76,8 @@ class ChrisConnector @Inject()(val http: HttpClient,
   def submitExplainShortageExcessChrisSOAPRequest[A](request: ChrisRequest)
                                                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
     prepareXMLAndSubmit(appConfig.urlSubmitExplainShortageExcess(), request, "submitExplainShortageExcessChrisSOAPRequest")
+
+  def submitAlertOrRejectionChrisSOAPRequest[A](request: ChrisRequest)
+                                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+    prepareXMLAndSubmit(appConfig.urlSubmitAlertOrRejection(), request, "submitAlertOrRejectionChrisSOAPRequest")
 }
