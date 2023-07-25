@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class WineProductModel(
                              wineProductCategory: String,
@@ -25,13 +27,13 @@ case class WineProductModel(
                              thirdCountryOfOrigin: Option[String],
                              otherInformation: Option[String],
                              wineOperations: Option[Seq[String]]
-                           ) extends CreateMovement {
+                           ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:WineProduct>
     <urn:WineProductCategory>{wineProductCategory}</urn:WineProductCategory>
-    {wineGrowingZoneCode.map(value => <urn:WineGrowingZoneCode>{value}</urn:WineGrowingZoneCode>).getOrElse(NodeSeq.Empty)}
-    {thirdCountryOfOrigin.map(value => <urn:ThirdCountryOfOrigin>{value}</urn:ThirdCountryOfOrigin>).getOrElse(NodeSeq.Empty)}
-    {otherInformation.map(value => <urn:OtherInformation language="en">{value}</urn:OtherInformation>).getOrElse(NodeSeq.Empty)}
-    {wineOperations.map(_.map(value => <urn:WineOperation>{value}</urn:WineOperation>)).getOrElse(NodeSeq.Empty)}
+    {wineGrowingZoneCode.mapNodeSeq(value => <urn:WineGrowingZoneCode>{value}</urn:WineGrowingZoneCode>)}
+    {thirdCountryOfOrigin.mapNodeSeq(value => <urn:ThirdCountryOfOrigin>{value}</urn:ThirdCountryOfOrigin>)}
+    {otherInformation.mapNodeSeq(value => <urn:OtherInformation language="en">{value}</urn:OtherInformation>)}
+    {wineOperations.mapNodeSeq(_.map(value => <urn:WineOperation>{value}</urn:WineOperation>))}
   </urn:WineProduct>
 }
 

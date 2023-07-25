@@ -16,20 +16,22 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class DocumentCertificateModel(
                                      documentType: Option[String],
                                      documentReference: Option[String],
                                      documentDescription: Option[String],
                                      referenceOfDocument: Option[String],
-                                   ) extends CreateMovement {
+                                   ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:DocumentCertificate>
-    {documentType.map(x => <urn:DocumentType>{x}</urn:DocumentType>).getOrElse(NodeSeq.Empty)}
-    {documentReference.map(x => <urn:DocumentReference>{x}</urn:DocumentReference>).getOrElse(NodeSeq.Empty)}
-    {documentDescription.map(x => <urn:DocumentDescription language="en">{x}</urn:DocumentDescription>).getOrElse(NodeSeq.Empty)}
-    {referenceOfDocument.map(x => <urn:ReferenceOfDocument language="en">{x}</urn:ReferenceOfDocument>).getOrElse(NodeSeq.Empty)}
+    {documentType.mapNodeSeq(x => <urn:DocumentType>{x}</urn:DocumentType>)}
+    {documentReference.mapNodeSeq(x => <urn:DocumentReference>{x}</urn:DocumentReference>)}
+    {documentDescription.mapNodeSeq(x => <urn:DocumentDescription language="en">{x}</urn:DocumentDescription>)}
+    {referenceOfDocument.mapNodeSeq(x => <urn:ReferenceOfDocument language="en">{x}</urn:ReferenceOfDocument>)}
   </urn:DocumentCertificate>
 }
 

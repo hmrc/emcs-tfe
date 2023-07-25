@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{JourneyTime, TransportArrangement}
+import uk.gov.hmrc.emcstfe.models.common.{JourneyTime, TransportArrangement, XmlBaseModel}
 
 import scala.xml.Elem
 
@@ -25,7 +25,7 @@ case class HeaderEadEsadModel(
                                destinationTypeCode: String,
                                journeyTime: JourneyTime,
                                transportArrangement: TransportArrangement
-                             ) extends CreateMovement {
+                             ) extends XmlBaseModel {
   def toXml: Elem = <urn:HeaderEadEsad>
     <urn:DestinationTypeCode>{destinationTypeCode}</urn:DestinationTypeCode>
     <urn:JourneyTime>{journeyTime.toDownstream}</urn:JourneyTime>

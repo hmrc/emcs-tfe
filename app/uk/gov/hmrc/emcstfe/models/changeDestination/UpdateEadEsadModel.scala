@@ -18,8 +18,9 @@ package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.{JourneyTime, TransportArrangement, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class UpdateEadEsadModel(
                                administrativeReferenceCode: String,
@@ -30,17 +31,17 @@ case class UpdateEadEsadModel(
                                invoiceNumber: Option[String],
                                transportModeCode: Option[String],
                                complementaryInformation: Option[String]
-                             ) extends XmlBaseModel {
+                             ) extends XmlBaseModel with XmlWriterUtils {
 
   def toXml: Elem = <urn:UpdateEadEsad>
     <urn:AdministrativeReferenceCode>{administrativeReferenceCode}</urn:AdministrativeReferenceCode>
-    {journeyTime.map(value => <urn:JourneyTime>{value.toDownstream}</urn:JourneyTime>).getOrElse(NodeSeq.Empty)}
-    {changedTransportArrangement.map(value => <urn:ChangedTransportArrangement>{value.toString}</urn:ChangedTransportArrangement>).getOrElse(NodeSeq.Empty)}
-    {sequenceNumber.map(value => <urn:SequenceNumber>{value}</urn:SequenceNumber>).getOrElse(NodeSeq.Empty)}
-    {invoiceDate.map(value => <urn:InvoiceDate>{value}</urn:InvoiceDate>).getOrElse(NodeSeq.Empty)}
-    {invoiceNumber.map(value => <urn:InvoiceNumber>{value}</urn:InvoiceNumber>).getOrElse(NodeSeq.Empty)}
-    {transportModeCode.map(value => <urn:TransportModeCode>{value}</urn:TransportModeCode>).getOrElse(NodeSeq.Empty)}
-    {complementaryInformation.map(value => <urn:ComplementaryInformation language="en">{value}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+    {journeyTime.mapNodeSeq(value => <urn:JourneyTime>{value.toDownstream}</urn:JourneyTime>)}
+    {changedTransportArrangement.mapNodeSeq(value => <urn:ChangedTransportArrangement>{value.toString}</urn:ChangedTransportArrangement>)}
+    {sequenceNumber.mapNodeSeq(value => <urn:SequenceNumber>{value}</urn:SequenceNumber>)}
+    {invoiceDate.mapNodeSeq(value => <urn:InvoiceDate>{value}</urn:InvoiceDate>)}
+    {invoiceNumber.mapNodeSeq(value => <urn:InvoiceNumber>{value}</urn:InvoiceNumber>)}
+    {transportModeCode.mapNodeSeq(value => <urn:TransportModeCode>{value}</urn:TransportModeCode>)}
+    {complementaryInformation.mapNodeSeq(value => <urn:ComplementaryInformation language="en">{value}</urn:ComplementaryInformation>)}
   </urn:UpdateEadEsad>
 }
 

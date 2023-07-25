@@ -18,9 +18,10 @@ package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.{ExciseMovementModel, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import java.time.LocalDate
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class SubmitAlertOrRejectionModel(consigneeTrader: Option[TraderModel],
                                        exciseMovement: ExciseMovementModel,
@@ -28,16 +29,16 @@ case class SubmitAlertOrRejectionModel(consigneeTrader: Option[TraderModel],
                                        dateOfAlertOrRejection: LocalDate,
                                        isRejected: Boolean,
                                        alertOrRejectionReasons: Option[Seq[AlertOrRejectionReasonModel]]
-                                      ) extends XmlBaseModel {
+                                      ) extends XmlBaseModel with XmlWriterUtils {
 
   def toXml: Elem =
     <urn:AlertOrRejectionOfEADESAD>
       <urn:Attributes/>
-      {consigneeTrader.map(trader =>
+      {consigneeTrader.mapNodeSeq(trader =>
         <urn:ConsigneeTrader language="en">
           {trader.toXml}
         </urn:ConsigneeTrader>
-      ).getOrElse(NodeSeq.Empty)}
+      )}
       {exciseMovement.toXml}
       <urn:DestinationOffice>
         <urn:ReferenceNumber>
@@ -49,10 +50,10 @@ case class SubmitAlertOrRejectionModel(consigneeTrader: Option[TraderModel],
           {dateOfAlertOrRejection.toString}
         </urn:DateOfAlertOrRejection>
         <urn:EadEsadRejectedFlag>
-          {if(isRejected) 1 else 0}
+          {isRejected.toFlag}
         </urn:EadEsadRejectedFlag>
       </urn:AlertOrRejection>
-      {alertOrRejectionReasons.map(_.map(_.toXml)).getOrElse(NodeSeq.Empty)}
+      {alertOrRejectionReasons.mapNodeSeq(_.map(_.toXml))}
     </urn:AlertOrRejectionOfEADESAD>
 }
 

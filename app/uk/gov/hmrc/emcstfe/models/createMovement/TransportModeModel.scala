@@ -16,16 +16,18 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class TransportModeModel(
                                transportModeCode: String,
                                complementaryInformation: Option[String]
-                             ) extends CreateMovement {
+                             ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:TransportMode>
     <urn:TransportModeCode>{transportModeCode}</urn:TransportModeCode>
-    {complementaryInformation.map(value => <urn:ComplementaryInformation language="en">{value}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+    {complementaryInformation.mapNodeSeq(value => <urn:ComplementaryInformation language="en">{value}</urn:ComplementaryInformation>)}
   </urn:TransportMode>
 }
 

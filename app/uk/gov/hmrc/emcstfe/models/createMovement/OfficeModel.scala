@@ -17,10 +17,11 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
 import scala.xml.Elem
 
-case class OfficeModel(referenceNumber: String) extends CreateMovement {
+case class OfficeModel(referenceNumber: String) extends XmlBaseModel {
   def toXml: Elem = <urn:ReferenceNumber>{referenceNumber}</urn:ReferenceNumber>
 }
 

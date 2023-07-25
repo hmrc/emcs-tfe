@@ -18,14 +18,15 @@ package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class AlertOrRejectionReasonModel(reason: AlertOrRejectionReasonType,
-                                       additionalInformation: Option[String]) extends XmlBaseModel {
+                                       additionalInformation: Option[String]) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:AlertOrRejectionOfEadEsadReason>
     <urn:AlertOrRejectionOfMovementReasonCode>{reason}</urn:AlertOrRejectionOfMovementReasonCode>
-    {additionalInformation.map(info => <urn:ComplementaryInformation language="en">{info}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+    {additionalInformation.mapNodeSeq(info => <urn:ComplementaryInformation language="en">{info}</urn:ComplementaryInformation>)}
   </urn:AlertOrRejectionOfEadEsadReason>
 }
 

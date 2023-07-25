@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class TransportDetailsModel(
                                   transportUnitCode: String,
@@ -27,13 +27,13 @@ case class TransportDetailsModel(
                                   commercialSealIdentification: Option[String],
                                   complementaryInformation: Option[String],
                                   sealInformation: Option[String],
-                                ) extends XmlBaseModel {
+                                ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:TransportDetails>
     <urn:TransportUnitCode>{transportUnitCode}</urn:TransportUnitCode>
-    {identityOfTransportUnits.map(value => <urn:IdentityOfTransportUnits>{value}</urn:IdentityOfTransportUnits>).getOrElse(NodeSeq.Empty)}
-    {commercialSealIdentification.map(value => <urn:CommercialSealIdentification>{value}</urn:CommercialSealIdentification>).getOrElse(NodeSeq.Empty)}
-    {complementaryInformation.map(value => <urn:ComplementaryInformation language="en">{value}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
-    {sealInformation.map(value => <urn:SealInformation language="en">{value}</urn:SealInformation>).getOrElse(NodeSeq.Empty)}
+    {identityOfTransportUnits.mapNodeSeq(value => <urn:IdentityOfTransportUnits>{value}</urn:IdentityOfTransportUnits>)}
+    {commercialSealIdentification.mapNodeSeq(value => <urn:CommercialSealIdentification>{value}</urn:CommercialSealIdentification>)}
+    {complementaryInformation.mapNodeSeq(value => <urn:ComplementaryInformation language="en">{value}</urn:ComplementaryInformation>)}
+    {sealInformation.mapNodeSeq(value => <urn:SealInformation language="en">{value}</urn:SealInformation>)}
   </urn:TransportDetails>
 }
 

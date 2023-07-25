@@ -17,18 +17,18 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class ComplementConsigneeTraderModel(
                                            memberStateCode: String,
                                            serialNumberOfCertificateOfExemption: Option[String]
-                                         ) extends CreateMovement {
+                                         ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:ComplementConsigneeTrader>
     <urn:MemberStateCode>{memberStateCode}</urn:MemberStateCode>
-    {serialNumberOfCertificateOfExemption.map(x =>
-      <urn:SerialNumberOfCertificateOfExemption>{x}</urn:SerialNumberOfCertificateOfExemption>
-    ).getOrElse(NodeSeq.Empty)}
+    {serialNumberOfCertificateOfExemption.mapNodeSeq(x => <urn:SerialNumberOfCertificateOfExemption>{x}</urn:SerialNumberOfCertificateOfExemption>)}
   </urn:ComplementConsigneeTrader>
 }
 

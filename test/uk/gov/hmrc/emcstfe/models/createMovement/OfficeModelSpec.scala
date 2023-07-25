@@ -17,8 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class OfficeModelSpec extends CreateMovementSpec with CreateMovementFixtures {
+class OfficeModelSpec extends XmlModelBaseSpec with CreateMovementFixtures {
   import OfficeFixtures._
 
   testJsonToModelToXml(

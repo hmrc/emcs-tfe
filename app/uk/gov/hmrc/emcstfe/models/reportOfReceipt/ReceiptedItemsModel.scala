@@ -17,15 +17,14 @@
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
-
-import scala.xml.NodeSeq
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 case class ReceiptedItemsModel(eadBodyUniqueReference: Int,
                                productCode: String,
                                excessAmount: Option[BigDecimal],
                                shortageAmount: Option[BigDecimal],
                                refusedAmount: Option[BigDecimal],
-                               unsatisfactoryReasons: Seq[UnsatisfactoryModel]) {
+                               unsatisfactoryReasons: Seq[UnsatisfactoryModel]) extends XmlWriterUtils {
 
   private val shortageExcessIndicator = (excessAmount, shortageAmount) match {
     case (Some(amt), _) if amt > 0 => Some("E")
@@ -44,12 +43,12 @@ case class ReceiptedItemsModel(eadBodyUniqueReference: Int,
       <urn:BodyRecordUniqueReference>
         {eadBodyUniqueReference}
       </urn:BodyRecordUniqueReference>
-      {shortageExcessIndicator.map(x => <urn:IndicatorOfShortageOrExcess>{x}</urn:IndicatorOfShortageOrExcess>).getOrElse(NodeSeq.Empty)}
-      {shortageExcessAmount.map(x => <urn:ObservedShortageOrExcess>{x}</urn:ObservedShortageOrExcess>).getOrElse(NodeSeq.Empty)}
+      {shortageExcessIndicator.mapNodeSeq(x => <urn:IndicatorOfShortageOrExcess>{x}</urn:IndicatorOfShortageOrExcess>)}
+      {shortageExcessAmount.mapNodeSeq(x => <urn:ObservedShortageOrExcess>{x}</urn:ObservedShortageOrExcess>)}
       <urn:ExciseProductCode>
         {productCode}
       </urn:ExciseProductCode>
-      {refusedAmount.map(x => <urn:RefusedQuantity>{x}</urn:RefusedQuantity>).getOrElse(NodeSeq.Empty)}
+      {refusedAmount.mapNodeSeq(x => <urn:RefusedQuantity>{x}</urn:RefusedQuantity>)}
       {unsatisfactoryReasons.map(_.toXml)}
     </urn:BodyReportOfReceiptExport>
 }

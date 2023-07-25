@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.Flag
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class BodyEadEsadModel(
-                             bodyRecordUniqueReference: String,
+                             bodyRecordUniqueReference: Int,
                              exciseProductCode: String,
                              cnCode: String,
                              quantity: BigDecimal,
@@ -30,16 +31,16 @@ case class BodyEadEsadModel(
                              alcoholicStrengthByVolumeInPercentage: Option[BigDecimal],
                              degreePlato: Option[BigDecimal],
                              fiscalMark: Option[String],
-                             fiscalMarkUsedFlag: Option[Flag],
+                             fiscalMarkUsedFlag: Option[Boolean],
                              designationOfOrigin: Option[String],
                              sizeOfProducer: Option[Int],
                              density: Option[BigDecimal],
                              commercialDescription: Option[String],
                              brandNameOfProducts: Option[String],
                              maturationPeriodOrAgeOfProducts: Option[String],
-                             `package`: Seq[PackageModel],
+                             packages: Seq[PackageModel],
                              wineProduct: Option[WineProductModel]
-                           ) extends CreateMovement {
+                           ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:BodyEadEsad>
     <BodyRecordUniqueReference>{bodyRecordUniqueReference}</BodyRecordUniqueReference>
     <ExciseProductCode>{exciseProductCode}</ExciseProductCode>
@@ -47,18 +48,18 @@ case class BodyEadEsadModel(
     <Quantity>{quantity}</Quantity>
     <GrossMass>{grossMass}</GrossMass>
     <NetMass>{netMass}</NetMass>
-    {alcoholicStrengthByVolumeInPercentage.map(value => <AlcoholicStrengthByVolumeInPercentage>{value}</AlcoholicStrengthByVolumeInPercentage>).getOrElse(NodeSeq.Empty)}
-    {degreePlato.map(value => <DegreePlato>{value}</DegreePlato>).getOrElse(NodeSeq.Empty)}
-    {fiscalMark.map(value => <FiscalMark language="en">{value}</FiscalMark>).getOrElse(NodeSeq.Empty)}
-    {fiscalMarkUsedFlag.map(value => <FiscalMarkUsedFlag>{value.toString}</FiscalMarkUsedFlag>).getOrElse(NodeSeq.Empty)}
-    {designationOfOrigin.map(value => <DesignationOfOrigin language="en">{value}</DesignationOfOrigin>).getOrElse(NodeSeq.Empty)}
-    {sizeOfProducer.map(value => <SizeOfProducer>{value}</SizeOfProducer>).getOrElse(NodeSeq.Empty)}
-    {density.map(value => <Density>{value}</Density>).getOrElse(NodeSeq.Empty)}
-    {commercialDescription.map(value => <CommercialDescription language="en">{value}</CommercialDescription>).getOrElse(NodeSeq.Empty)}
-    {brandNameOfProducts.map(value => <BrandNameOfProducts language="en">{value}</BrandNameOfProducts>).getOrElse(NodeSeq.Empty)}
-    {maturationPeriodOrAgeOfProducts.map(value => <MaturationPeriodOrAgeOfProducts language="en">{value}</MaturationPeriodOrAgeOfProducts>).getOrElse(NodeSeq.Empty)}
-    {`package`.map(_.toXml)}
-    {wineProduct.map(_.toXml).getOrElse(NodeSeq.Empty)}
+    {alcoholicStrengthByVolumeInPercentage.mapNodeSeq(value => <AlcoholicStrengthByVolumeInPercentage>{value}</AlcoholicStrengthByVolumeInPercentage>)}
+    {degreePlato.mapNodeSeq(value => <DegreePlato>{value}</DegreePlato>)}
+    {fiscalMark.mapNodeSeq(value => <FiscalMark language="en">{value}</FiscalMark>)}
+    {fiscalMarkUsedFlag.mapNodeSeq(value => <FiscalMarkUsedFlag>{value.toFlag}</FiscalMarkUsedFlag>)}
+    {designationOfOrigin.mapNodeSeq(value => <DesignationOfOrigin language="en">{value}</DesignationOfOrigin>)}
+    {sizeOfProducer.mapNodeSeq(value => <SizeOfProducer>{value}</SizeOfProducer>)}
+    {density.mapNodeSeq(value => <Density>{value}</Density>)}
+    {commercialDescription.mapNodeSeq(value => <CommercialDescription language="en">{value}</CommercialDescription>)}
+    {brandNameOfProducts.mapNodeSeq(value => <BrandNameOfProducts language="en">{value}</BrandNameOfProducts>)}
+    {maturationPeriodOrAgeOfProducts.mapNodeSeq(value => <MaturationPeriodOrAgeOfProducts language="en">{value}</MaturationPeriodOrAgeOfProducts>)}
+    {packages.map(_.toXml)}
+    {wineProduct.mapNodeSeq(_.toXml)}
   </urn:BodyEadEsad>
 }
 

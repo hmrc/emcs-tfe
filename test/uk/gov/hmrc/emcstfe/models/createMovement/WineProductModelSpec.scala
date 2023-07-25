@@ -17,8 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class WineProductModelSpec extends CreateMovementSpec with CreateMovementFixtures {
+class WineProductModelSpec extends XmlModelBaseSpec with CreateMovementFixtures {
   import WineProductFixtures._
 
   testJsonToModelToXml(

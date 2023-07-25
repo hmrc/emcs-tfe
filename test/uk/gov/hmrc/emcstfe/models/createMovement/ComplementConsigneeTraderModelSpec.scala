@@ -17,8 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class ComplementConsigneeTraderModelSpec extends CreateMovementSpec with CreateMovementFixtures {
+class ComplementConsigneeTraderModelSpec extends XmlModelBaseSpec with CreateMovementFixtures {
   import ComplementConsigneeTraderFixtures._
 
   testJsonToModelToXml(

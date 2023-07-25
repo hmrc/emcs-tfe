@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class EadEsadDraftModel(
                               localReferenceNumber: String,
@@ -27,15 +29,15 @@ case class EadEsadDraftModel(
                               dateOfDispatch: String,
                               timeOfDispatch: Option[String],
                               importSad: Option[Seq[ImportSadModel]]
-                            ) extends CreateMovement {
+                            ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:EadEsadDraft>
     <urn:LocalReferenceNumber>{localReferenceNumber}</urn:LocalReferenceNumber>
     <urn:InvoiceNumber>{invoiceNumber}</urn:InvoiceNumber>
-    {invoiceDate.map(value => <urn:InvoiceDate>{value}</urn:InvoiceDate>).getOrElse(NodeSeq.Empty)}
+    {invoiceDate.mapNodeSeq(value => <urn:InvoiceDate>{value}</urn:InvoiceDate>)}
     <urn:OriginTypeCode>{originTypeCode}</urn:OriginTypeCode>
     <urn:DateOfDispatch>{dateOfDispatch}</urn:DateOfDispatch>
-    {timeOfDispatch.map(value => <urn:TimeOfDispatch>{value}</urn:TimeOfDispatch>).getOrElse(NodeSeq.Empty)}
-    {importSad.map(_.map(_.toXml)).getOrElse(NodeSeq.Empty)}
+    {timeOfDispatch.mapNodeSeq(value => <urn:TimeOfDispatch>{value}</urn:TimeOfDispatch>)}
+    {importSad.mapNodeSeq(_.map(_.toXml))}
   </urn:EadEsadDraft>
 }
 

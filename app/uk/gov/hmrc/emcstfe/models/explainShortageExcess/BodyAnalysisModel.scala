@@ -18,20 +18,21 @@ package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class BodyAnalysisModel(
                               exciseProductCode: String,
                               bodyRecordUniqueReference: Int,
                               explanation: String,
                               actualQuantity: Option[BigDecimal]
-                            ) extends XmlBaseModel {
+                            ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:BodyAnalysis>
     <urn:ExciseProductCode>{exciseProductCode}</urn:ExciseProductCode>
     <urn:BodyRecordUniqueReference>{bodyRecordUniqueReference}</urn:BodyRecordUniqueReference>
     <urn:Explanation language="en">{explanation}</urn:Explanation>
-    {actualQuantity.map(quantity => <urn:ActualQuantity>{quantity}</urn:ActualQuantity>).getOrElse(NodeSeq.Empty)}
+    {actualQuantity.mapNodeSeq(quantity => <urn:ActualQuantity>{quantity}</urn:ActualQuantity>)}
   </urn:BodyAnalysis>
 }
 

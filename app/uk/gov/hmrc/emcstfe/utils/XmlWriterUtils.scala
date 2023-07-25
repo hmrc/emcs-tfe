@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.createMovement
+package uk.gov.hmrc.emcstfe.utils
 
-import scala.xml.Elem
+import scala.xml.NodeSeq
 
-trait CreateMovement {
-  def toXml: Elem
+trait XmlWriterUtils {
+
+  implicit class OptionExtension[T](x: Option[T]) {
+    def mapNodeSeq(f: T => NodeSeq): NodeSeq = x.map(f).getOrElse(NodeSeq.Empty)
+  }
+
+  implicit class BooleanExtensions(x: Boolean) {
+    def toFlag: String = if(x) "1" else "0"
+  }
+
 }

@@ -18,8 +18,9 @@ package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.{TraderModel, XmlBaseModel, TransportDetailsModel}
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class SubmitChangeDestinationModel(
                                           newTransportArrangerTrader: Option[TraderModel],
@@ -27,20 +28,16 @@ case class SubmitChangeDestinationModel(
                                           destinationChanged: DestinationChangedModel,
                                           newTransporterTrader: Option[TraderModel],
                                           transportDetails: Option[Seq[TransportDetailsModel]]
-                                         ) extends XmlBaseModel {
+                                         ) extends XmlBaseModel with XmlWriterUtils {
 
   def toXml: Elem =
     <urn:ChangeOfDestination>
       <urn:Attributes/>
-      {newTransportArrangerTrader.map(trader =>
-        <urn:NewTransportArrangerTrader language="en">{trader.toXml}</urn:NewTransportArrangerTrader>
-      ).getOrElse(NodeSeq.Empty)}
+      {newTransportArrangerTrader.mapNodeSeq(trader => <urn:NewTransportArrangerTrader language="en">{trader.toXml}</urn:NewTransportArrangerTrader>)}
       {updateEadEsad.toXml}
       {destinationChanged.toXml}
-      {newTransportArrangerTrader.map(trader =>
-        <urn:NewTransporterTrader language="en">{trader.toXml}</urn:NewTransporterTrader>
-      ).getOrElse(NodeSeq.Empty)}
-      {transportDetails.map(_.map(_.toXml)).getOrElse(NodeSeq.Empty)}
+      {newTransportArrangerTrader.mapNodeSeq(trader => <urn:NewTransporterTrader language="en">{trader.toXml}</urn:NewTransporterTrader>)}
+      {transportDetails.mapNodeSeq(_.map(_.toXml))}
     </urn:ChangeOfDestination>
 }
 

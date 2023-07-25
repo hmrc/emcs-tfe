@@ -17,19 +17,20 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class AttributesModelSpec extends CreateMovementSpec with CreateMovementFixtures {
+class AttributesModelSpec extends XmlModelBaseSpec with CreateMovementFixtures {
   import AttributesFixtures._
 
   testJsonToModelToXml(
-    scenario = "AttributesModel with max fields",
+    scenario = "max fields",
     json = attributesJsonMax,
     model = attributesModelMax,
     xml = attributesXmlMax
   )
 
   testJsonToModelToXml(
-    scenario = "AttributesModel with min fields",
+    scenario = "min fields",
     json = attributesJsonMin,
     model = attributesModelMin,
     xml = attributesXmlMin

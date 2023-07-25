@@ -17,17 +17,18 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.Flag
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class AttributesModel(
                             submissionMessageType: SubmissionMessageType,
-                            deferredSubmissionFlag: Option[Flag]
-                          ) extends CreateMovement {
+                            deferredSubmissionFlag: Option[Boolean]
+                          ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:Attributes>
     <urn:SubmissionMessageType>{submissionMessageType.toString}</urn:SubmissionMessageType>
-    {deferredSubmissionFlag.map(flag => <urn:DeferredSubmissionFlag>{flag}</urn:DeferredSubmissionFlag>).getOrElse(NodeSeq.Empty)}
+    {deferredSubmissionFlag.mapNodeSeq(bool => <urn:DeferredSubmissionFlag>{bool.toFlag}</urn:DeferredSubmissionFlag>)}
   </urn:Attributes>
 }
 

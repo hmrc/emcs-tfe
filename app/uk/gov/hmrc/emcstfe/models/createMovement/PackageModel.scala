@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class PackageModel(
                          kindOfPackages: String,
@@ -25,13 +27,13 @@ case class PackageModel(
                          shippingMarks: Option[String],
                          commercialSealIdentification: Option[String],
                          sealInformation: Option[String]
-                       ) extends CreateMovement {
+                       ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:Package>
     <urn:KindOfPackages>{kindOfPackages}</urn:KindOfPackages>
-    {numberOfPackages.map(value => <urn:NumberOfPackages>{value}</urn:NumberOfPackages>).getOrElse(NodeSeq.Empty)}
-    {shippingMarks.map(value => <urn:ShippingMarks>{value}</urn:ShippingMarks>).getOrElse(NodeSeq.Empty)}
-    {commercialSealIdentification.map(value => <urn:CommercialSealIdentification>{value}</urn:CommercialSealIdentification>).getOrElse(NodeSeq.Empty)}
-    {sealInformation.map(value => <urn:SealInformation language="en">{value}</urn:SealInformation>).getOrElse(NodeSeq.Empty)}
+    {numberOfPackages.mapNodeSeq(value => <urn:NumberOfPackages>{value}</urn:NumberOfPackages>)}
+    {shippingMarks.mapNodeSeq(value => <urn:ShippingMarks>{value}</urn:ShippingMarks>)}
+    {commercialSealIdentification.mapNodeSeq(value => <urn:CommercialSealIdentification>{value}</urn:CommercialSealIdentification>)}
+    {sealInformation.mapNodeSeq(value => <urn:SealInformation language="en">{value}</urn:SealInformation>)}
   </urn:Package>
 }
 

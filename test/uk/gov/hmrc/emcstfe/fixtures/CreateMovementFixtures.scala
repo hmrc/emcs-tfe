@@ -27,7 +27,7 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
   object AttributesFixtures {
     lazy val attributesModelMax: AttributesModel = AttributesModel(
       submissionMessageType = SubmissionMessageType.DutyPaidB2B,
-      deferredSubmissionFlag = Some(Flag.True)
+      deferredSubmissionFlag = Some(true)
     )
     lazy val attributesModelMin: AttributesModel = AttributesModel(
       submissionMessageType = SubmissionMessageType.Standard,
@@ -42,7 +42,7 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
     </urn:Attributes>
     lazy val attributesJsonMax: JsObject = Json.obj(
       "submissionMessageType" -> "3",
-      "deferredSubmissionFlag" -> "1"
+      "deferredSubmissionFlag" -> true
     )
     lazy val attributesJsonMin: JsObject = Json.obj(
       "submissionMessageType" -> "1"
@@ -526,7 +526,7 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
     import WineProductFixtures._
 
     lazy val bodyEadEsadModelMax: BodyEadEsadModel = BodyEadEsadModel(
-      bodyRecordUniqueReference = "unique ref",
+      bodyRecordUniqueReference = 1,
       exciseProductCode = "epc",
       cnCode = "cn",
       quantity = 1.1,
@@ -535,18 +535,18 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       alcoholicStrengthByVolumeInPercentage = Some(1.4),
       degreePlato = Some(1.5),
       fiscalMark = Some("mark"),
-      fiscalMarkUsedFlag = Some(Flag.False),
+      fiscalMarkUsedFlag = Some(false),
       designationOfOrigin = Some("destination"),
       sizeOfProducer = Some(1),
       density = Some(1.6),
       commercialDescription = Some("description"),
       brandNameOfProducts = Some("name"),
       maturationPeriodOrAgeOfProducts = Some("age"),
-      `package` = Seq(packageModelMax, packageModelMin),
+      packages = Seq(packageModelMax, packageModelMin),
       wineProduct = Some(wineProductModelMax)
     )
     lazy val bodyEadEsadModelMin: BodyEadEsadModel = BodyEadEsadModel(
-      bodyRecordUniqueReference = "unique ref",
+      bodyRecordUniqueReference = 1,
       exciseProductCode = "epc",
       cnCode = "cn",
       quantity = 1.1,
@@ -562,11 +562,11 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       commercialDescription = None,
       brandNameOfProducts = None,
       maturationPeriodOrAgeOfProducts = None,
-      `package` = Seq(packageModelMin),
+      packages = Seq(packageModelMin),
       wineProduct = None
     )
     lazy val bodyEadEsadXmlMax: Elem = <urn:BodyEadEsad>
-      <BodyRecordUniqueReference>unique ref</BodyRecordUniqueReference>
+      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
       <ExciseProductCode>epc</ExciseProductCode>
       <CnCode>cn</CnCode>
       <Quantity>1.1</Quantity>
@@ -587,7 +587,7 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       {wineProductXmlMax}
     </urn:BodyEadEsad>
     lazy val bodyEadEsadXmlMin: Elem = <urn:BodyEadEsad>
-      <BodyRecordUniqueReference>unique ref</BodyRecordUniqueReference>
+      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
       <ExciseProductCode>epc</ExciseProductCode>
       <CnCode>cn</CnCode>
       <Quantity>1.1</Quantity>
@@ -596,7 +596,7 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       {packageXmlMin}
     </urn:BodyEadEsad>
     lazy val bodyEadEsadJsonMax: JsObject = Json.obj(
-      "bodyRecordUniqueReference" -> "unique ref",
+      "bodyRecordUniqueReference" -> 1,
       "exciseProductCode" -> "epc",
       "cnCode" -> "cn",
       "quantity" -> 1.1,
@@ -605,24 +605,24 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       "alcoholicStrengthByVolumeInPercentage" -> 1.4,
       "degreePlato" -> 1.5,
       "fiscalMark" -> "mark",
-      "fiscalMarkUsedFlag" -> "0",
+      "fiscalMarkUsedFlag" -> false,
       "designationOfOrigin" -> "destination",
       "sizeOfProducer" -> 1,
       "density" -> 1.6,
       "commercialDescription" -> "description",
       "brandNameOfProducts" -> "name",
       "maturationPeriodOrAgeOfProducts" -> "age",
-      "package" -> Json.arr(packageJsonMax, packageJsonMin),
+      "packages" -> Json.arr(packageJsonMax, packageJsonMin),
       "wineProduct" -> wineProductJsonMax
     )
     lazy val bodyEadEsadJsonMin: JsObject = Json.obj(
-      "bodyRecordUniqueReference" -> "unique ref",
+      "bodyRecordUniqueReference" -> 1,
       "exciseProductCode" -> "epc",
       "cnCode" -> "cn",
       "quantity" -> 1.1,
       "grossMass" -> 1.2,
       "netMass" -> 1.3,
-      "package" -> Json.arr(packageJsonMin)
+      "packages" -> Json.arr(packageJsonMin)
     )
   }
 

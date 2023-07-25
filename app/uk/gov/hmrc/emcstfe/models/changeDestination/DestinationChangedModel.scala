@@ -18,8 +18,9 @@ package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementGuaranteeModel, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class DestinationChangedModel(
                                     destinationTypeCode: DestinationType,
@@ -27,17 +28,13 @@ case class DestinationChangedModel(
                                     deliveryPlaceTrader: Option[TraderModel],
                                     deliveryPlaceCustomsOffice: Option[DeliveryPlaceCustomsOfficeModel],
                                     movementGuarantee: Option[MovementGuaranteeModel]
-                                  ) extends XmlBaseModel {
+                                  ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:DestinationChanged>
     <urn:DestinationTypeCode>{destinationTypeCode.toString}</urn:DestinationTypeCode>
-    {newConsigneeTrader.map(trader =>
-      <urn:NewConsigneeTrader language="en">{trader.toXml}</urn:NewConsigneeTrader>
-    ).getOrElse(NodeSeq.Empty)}
-    {deliveryPlaceTrader.map(trader =>
-      <urn:DeliveryPlaceTrader language="en">{trader.toXml}</urn:DeliveryPlaceTrader>
-    ).getOrElse(NodeSeq.Empty)}
-    {deliveryPlaceCustomsOffice.map(_.toXml).getOrElse(NodeSeq.Empty)}
-    {movementGuarantee.map(_.toXml).getOrElse(NodeSeq.Empty)}
+    {newConsigneeTrader.mapNodeSeq(trader => <urn:NewConsigneeTrader language="en">{trader.toXml}</urn:NewConsigneeTrader>)}
+    {deliveryPlaceTrader.mapNodeSeq(trader => <urn:DeliveryPlaceTrader language="en">{trader.toXml}</urn:DeliveryPlaceTrader>)}
+    {deliveryPlaceCustomsOffice.mapNodeSeq(_.toXml)}
+    {movementGuarantee.mapNodeSeq(_.toXml)}
   </urn:DestinationChanged>
 }
 
