@@ -20,8 +20,7 @@ import cats.implicits.catsSyntaxTuple12Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{DestinationType, JourneyTime, TraderModel}
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
+import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, DestinationType, JourneyTime, TraderModel}
 
 case class GetMovementResponse(arc: String,
                                sequenceNumber: Int,

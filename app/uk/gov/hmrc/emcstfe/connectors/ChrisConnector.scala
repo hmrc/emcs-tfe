@@ -59,11 +59,15 @@ class ChrisConnector @Inject()(val http: HttpClient,
 
   def submitDraftMovementChrisSOAPRequest[A](request: ChrisRequest)
                                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
-    prepareXMLAndSubmit(appConfig.urlSubmitDraftMovementPortal(), request, "submitDraftMovementChrisSOAPRequest")
+    prepareXMLAndSubmit(appConfig.urlSubmitCreateMovement(), request, "submitDraftMovementChrisSOAPRequest")
+
+  def submitCreateMovementChrisSOAPRequest[A](request: ChrisRequest)
+                                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+    prepareXMLAndSubmit(appConfig.urlSubmitCreateMovement(), request, "submitCreateMovementChrisSOAPRequest")
 
   def submitReportOfReceiptChrisSOAPRequest[A](request: ChrisRequest)
                                               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
-    prepareXMLAndSubmit(appConfig.urlSubmitReportofReceiptPortal(), request, "submitReportOfReceiptChrisSOAPRequest")
+    prepareXMLAndSubmit(appConfig.urlSubmitReportOfReceipt(), request, "submitReportOfReceiptChrisSOAPRequest")
 
   def submitExplainDelayChrisSOAPRequest[A](request: ChrisRequest)
                                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =

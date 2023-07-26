@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.reportOfReceipt
+package uk.gov.hmrc.emcstfe.models.common
 
 import cats.implicits.catsSyntaxTuple3Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.emcstfe.models.common.AddressModel
 
-import scala.xml.NodeSeq
+import scala.xml.Elem
 
 case class ConsignorTraderModel(traderExciseNumber: String,
                                 traderName: String,
                                 address: AddressModel) {
 
-  def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
-    Seq(<urn:TraderExciseNumber>{traderExciseNumber}</urn:TraderExciseNumber>),
-    Seq(<urn:TraderName>{traderName}</urn:TraderName>),
-    address.toXml.theSeq
-  ).flatten.flatten)
+  lazy val countryCode: Option[String] = traderExciseNumber match {
+    case str if str.length >= 2 => Some(str.substring(0, 2).toUpperCase)
+    case _ => None
+  }
+
+  def toXml: Elem =
+    <urn:ConsignorTrader language="en">
+      <urn:TraderExciseNumber>{traderExciseNumber}</urn:TraderExciseNumber>
+      <urn:TraderName>{traderName}</urn:TraderName>
+      {address.toXml}
+    </urn:ConsignorTrader>
 }
 
 object ConsignorTraderModel {

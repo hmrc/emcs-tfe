@@ -16,22 +16,23 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
-import uk.gov.hmrc.emcstfe.fixtures.TransportDetailsFixtures
-import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
+import uk.gov.hmrc.emcstfe.models.common.MovementType._
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class TransportDetailsModelSpec extends XmlModelBaseSpec with TransportDetailsFixtures {
+class MovementTypeSpec extends UnitSpec {
 
-  testJsonToModelToXml(
-    scenario = "max fields",
-    json = maxTransportDetailsJson,
-    model = maxTransportDetailsModel,
-    xml = maxTransportDetailsXml
-  )
+  "MovementType" should {
 
-  testJsonToModelToXml(
-    scenario = "min fields",
-    json = minTransportDetailsJson,
-    model = minTransportDetailsModel,
-    xml = minTransportDetailsXml
-  )
+    "have the correct codes" in {
+      UKtoUK.toString shouldBe "1"
+      UKtoEU.toString shouldBe "2"
+      DirectExport.toString shouldBe "3"
+      ImportEU.toString shouldBe "4"
+      ImportUK.toString shouldBe "5"
+      IndirectExport.toString shouldBe "6"
+      ImportDirectExport.toString shouldBe "7"
+      ImportIndirectExport.toString shouldBe "8"
+      ImportUnknownDestination.toString shouldBe "9"
+    }
+  }
 }

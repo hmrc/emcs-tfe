@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.models.common.TraderModel
+import uk.gov.hmrc.emcstfe.models.common.{AddressModel, TraderModel}
 
-import scala.xml.NodeSeq
+import scala.xml.{Elem, NodeSeq}
 
 trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
 
@@ -69,5 +69,259 @@ trait TraderModelFixtures extends BaseFixtures with AddressModelFixtures {
   val minTraderModelXML: NodeSeq = NodeSeq.Empty
 
   val minTraderModelJson: JsObject = Json.obj()
+
+  object ConsigneeTraderFixtures {
+    lazy val consigneeTraderModel: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
+      vatNumber = None,
+      traderExciseNumber = None,
+      traderId = Some("GB000001"),
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("number"),
+        street = Some("street"),
+        postcode = Some("postcode"),
+        city = Some("city")
+      )),
+      eoriNumber = Some("eori")
+    )
+    lazy val consigneeTraderXml: Elem = <urn:ConsigneeTrader language="en">
+      <urn:Traderid>GB000001</urn:Traderid>
+      <urn:TraderName>name</urn:TraderName>
+      <urn:StreetName>street</urn:StreetName>
+      <urn:StreetNumber>number</urn:StreetNumber>
+      <urn:Postcode>postcode</urn:Postcode>
+      <urn:City>city</urn:City>
+      <urn:EoriNumber>eori</urn:EoriNumber>
+    </urn:ConsigneeTrader>
+    lazy val consigneeTraderJson: JsObject = Json.obj(
+      "traderId" -> "GB000001",
+      "traderName" -> "name",
+      "address" -> Json.obj(
+        "streetNumber" -> "number",
+        "street" -> "street",
+        "postcode" -> "postcode",
+        "city" -> "city"
+      ),
+      "eoriNumber" -> "eori"
+    )
+  }
+
+  object PlaceOfDispatchTraderFixtures {
+    lazy val placeOfDispatchTraderModel: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = Some("GB000001"),
+      vatNumber = None,
+      traderExciseNumber = None,
+      traderId = None,
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("number"),
+        street = Some("street"),
+        postcode = Some("postcode"),
+        city = Some("city")
+      )),
+      eoriNumber = None
+    )
+    lazy val placeOfDispatchTraderXml: Elem = <urn:PlaceOfDispatchTrader language="en">
+      <urn:ReferenceOfTaxWarehouse>GB000001</urn:ReferenceOfTaxWarehouse>
+      <urn:TraderName>name</urn:TraderName>
+      <urn:StreetName>street</urn:StreetName>
+      <urn:StreetNumber>number</urn:StreetNumber>
+      <urn:Postcode>postcode</urn:Postcode>
+      <urn:City>city</urn:City>
+    </urn:PlaceOfDispatchTrader>
+    lazy val placeOfDispatchTraderJson: JsObject = Json.obj(
+      "referenceOfTaxWarehouse" -> "GB000001",
+      "traderName" -> "name",
+      "address" -> Json.obj(
+        "streetNumber" -> "number",
+        "street" -> "street",
+        "postcode" -> "postcode",
+        "city" -> "city"
+      )
+    )
+  }
+
+  object DeliveryPlaceTraderFixtures {
+
+    lazy val deliveryPlaceTraderModel: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
+      vatNumber = None,
+      traderExciseNumber = None,
+      traderId = Some("GB000001"),
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("number"),
+        street = Some("street"),
+        postcode = Some("postcode"),
+        city = Some("city")
+      )),
+      eoriNumber = None
+    )
+    lazy val deliveryPlaceTraderXml: Elem = <urn:DeliveryPlaceTrader language="en">
+      <urn:Traderid>GB000001</urn:Traderid>
+      <urn:TraderName>name</urn:TraderName>
+      <urn:StreetName>street</urn:StreetName>
+      <urn:StreetNumber>number</urn:StreetNumber>
+      <urn:Postcode>postcode</urn:Postcode>
+      <urn:City>city</urn:City>
+    </urn:DeliveryPlaceTrader>
+    lazy val deliveryPlaceTraderJson: JsObject = Json.obj(
+      "traderId" -> "GB000001",
+      "traderName" -> "name",
+      "address" -> Json.obj(
+        "streetNumber" -> "number",
+        "street" -> "street",
+        "postcode" -> "postcode",
+        "city" -> "city"
+      )
+    )
+  }
+
+  object TransportArrangerTraderFixtures {
+    lazy val transportArrangerTraderModel: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
+      vatNumber = Some("vat"),
+      traderExciseNumber = None,
+      traderId = None,
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("number"),
+        street = Some("street"),
+        postcode = Some("postcode"),
+        city = Some("city")
+      )),
+      eoriNumber = None
+    )
+    lazy val transportArrangerTraderXml: Elem = <urn:TransportArrangerTrader language="en">
+      <urn:VatNumber>vat</urn:VatNumber>
+      <urn:TraderName>name</urn:TraderName>
+      <urn:StreetName>street</urn:StreetName>
+      <urn:StreetNumber>number</urn:StreetNumber>
+      <urn:Postcode>postcode</urn:Postcode>
+      <urn:City>city</urn:City>
+    </urn:TransportArrangerTrader>
+    lazy val transportArrangerTraderJson: JsObject = Json.obj(
+      "vatNumber" -> "vat",
+      "traderName" -> "name",
+      "address" -> Json.obj(
+        "streetNumber" -> "number",
+        "street" -> "street",
+        "postcode" -> "postcode",
+        "city" -> "city"
+      )
+    )
+  }
+
+  object FirstTransporterTraderFixtures {
+    lazy val firstTransporterTraderModel: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
+      vatNumber = Some("vat"),
+      traderExciseNumber = None,
+      traderId = None,
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("number"),
+        street = Some("street"),
+        postcode = Some("postcode"),
+        city = Some("city")
+      )),
+      eoriNumber = None
+    )
+    lazy val firstTransporterTraderXml: Elem = <urn:FirstTransporterTrader language="en">
+      <urn:VatNumber>vat</urn:VatNumber>
+      <urn:TraderName>name</urn:TraderName>
+      <urn:StreetName>street</urn:StreetName>
+      <urn:StreetNumber>number</urn:StreetNumber>
+      <urn:Postcode>postcode</urn:Postcode>
+      <urn:City>city</urn:City>
+    </urn:FirstTransporterTrader>
+    lazy val firstTransporterTraderJson: JsObject = Json.obj(
+      "vatNumber" -> "vat",
+      "traderName" -> "name",
+      "address" -> Json.obj(
+        "streetNumber" -> "number",
+        "street" -> "street",
+        "postcode" -> "postcode",
+        "city" -> "city"
+      )
+    )
+  }
+
+  object NewTransportArrangerTraderFixtures {
+    lazy val newTransportArrangerTraderModelMax: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
+      vatNumber = Some("number"),
+      traderExciseNumber = None,
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("street number"),
+        street = Some("street"),
+        postcode = Some("a postcode"),
+        city = Some("a city")
+      )),
+      traderId = None,
+      eoriNumber = None
+    )
+
+    lazy val newTransportArrangerTraderXmlMax: Elem = <urn:NewTransportArrangerTrader language="en">
+      <urn:VatNumber>number</urn:VatNumber>
+      <urn:TraderName>name</urn:TraderName>
+      <urn:StreetName>street</urn:StreetName>
+      <urn:StreetNumber>street number</urn:StreetNumber>
+      <urn:Postcode>a postcode</urn:Postcode>
+      <urn:City>a city</urn:City>
+    </urn:NewTransportArrangerTrader>
+
+    lazy val newTransportArrangerTraderJsonMax: JsObject = Json.obj(
+      "vatNumber" -> "number",
+      "traderName" -> "name",
+      "address" -> Json.obj(
+        "streetNumber" -> "street number",
+        "street" -> "street",
+        "postcode" -> "a postcode",
+        "city" -> "a city"
+      )
+    )
+  }
+
+  object NewConsigneeTraderFixtures {
+    lazy val newConsigneeTraderModelMax: TraderModel = TraderModel(
+      referenceOfTaxWarehouse = None,
+      vatNumber = None,
+      traderExciseNumber = None,
+      traderId = Some("id"),
+      traderName = Some("name"),
+      address = Some(AddressModel(
+        streetNumber = Some("street number"),
+        street = Some("street"),
+        postcode = Some("a postcode"),
+        city = Some("a city")
+      )),
+      eoriNumber = Some("eori")
+    )
+
+    lazy val newConsigneeTraderXmlMax: Elem = <urn:NewConsigneeTrader language="en">
+      <urn:Traderid>id</urn:Traderid>
+      <urn:TraderName>name</urn:TraderName>
+      <urn:StreetName>street</urn:StreetName>
+      <urn:StreetNumber>street number</urn:StreetNumber>
+      <urn:Postcode>a postcode</urn:Postcode>
+      <urn:City>a city</urn:City>
+      <urn:EoriNumber>eori</urn:EoriNumber>
+    </urn:NewConsigneeTrader>
+
+    lazy val newConsigneeTraderJsonMax: JsObject = Json.obj(
+      "traderId" -> "id",
+      "traderName" -> "name",
+      "address" -> Json.obj(
+        "street" -> "street",
+        "streetNumber" -> "street number",
+        "postcode" -> "a postcode",
+        "city" -> "a city"
+      ),
+      "eoriNumber" -> "eori"
+    )
+  }
 
 }

@@ -20,7 +20,7 @@ import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
 class AttributesModelSpec extends XmlModelBaseSpec with CreateMovementFixtures {
-  import AttributesFixtures._
+  import CaMAttributesFixtures._
 
   testJsonToModelToXml(
     scenario = "max fields",

@@ -17,6 +17,10 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 case class SubmitDraftMovementRequest(exciseRegistrationNumber: String = "", arc: String = "", requestBody: String) extends ChrisRequest {
+
+  val messageSender: String = ""
+  val messageRecipient: String = ""
+
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
 
   override def shouldExtractFromSoap: Boolean = false

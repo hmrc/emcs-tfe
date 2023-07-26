@@ -17,35 +17,36 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{MovementGuaranteeModel, TraderModel, TransportDetailsModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, MovementGuaranteeModel, MovementType, TraderModel, TransportDetailsModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
 
 case class CreateMovementModel(
-                                      attributes: AttributesModel,
-                                      consigneeTrader: Option[TraderModel],
-                                      consignorTrader: TraderModel,
-                                      placeOfDispatchTrader: Option[TraderModel],
-                                      dispatchImportOffice: Option[OfficeModel],
-                                      complementConsigneeTrader: Option[ComplementConsigneeTraderModel],
-                                      deliveryPlaceTrader: Option[TraderModel],
-                                      deliveryPlaceCustomsOffice: Option[OfficeModel],
-                                      competentAuthorityDispatchOffice: OfficeModel,
-                                      transportArrangerTrader: Option[TraderModel],
-                                      firstTransporterTrader: Option[TraderModel],
-                                      documentCertificate: Option[Seq[DocumentCertificateModel]],
-                                      headerEadEsad: HeaderEadEsadModel,
-                                      transportMode: TransportModeModel,
-                                      movementGuarantee: MovementGuaranteeModel,
-                                      bodyEadEsad: Seq[BodyEadEsadModel],
-                                      eadEsadDraft: EadEsadDraftModel,
-                                      transportDetails: Seq[TransportDetailsModel],
-                                    ) extends XmlBaseModel with XmlWriterUtils {
+                                movementType: MovementType,
+                                attributes: AttributesModel,
+                                consigneeTrader: Option[TraderModel],
+                                consignorTrader: ConsignorTraderModel,
+                                placeOfDispatchTrader: Option[TraderModel],
+                                dispatchImportOffice: Option[OfficeModel],
+                                complementConsigneeTrader: Option[ComplementConsigneeTraderModel],
+                                deliveryPlaceTrader: Option[TraderModel],
+                                deliveryPlaceCustomsOffice: Option[OfficeModel],
+                                competentAuthorityDispatchOffice: OfficeModel,
+                                transportArrangerTrader: Option[TraderModel],
+                                firstTransporterTrader: Option[TraderModel],
+                                documentCertificate: Option[Seq[DocumentCertificateModel]],
+                                headerEadEsad: HeaderEadEsadModel,
+                                transportMode: TransportModeModel,
+                                movementGuarantee: MovementGuaranteeModel,
+                                bodyEadEsad: Seq[BodyEadEsadModel],
+                                eadEsadDraft: EadEsadDraftModel,
+                                transportDetails: Seq[TransportDetailsModel],
+                              ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:SubmittedDraftOfEADESAD>
     {attributes.toXml}
     {consigneeTrader.mapNodeSeq(trader => <urn:ConsigneeTrader language="en">{trader.toXml}</urn:ConsigneeTrader>)}
-    <urn:ConsignorTrader language="en">{consignorTrader.toXml}</urn:ConsignorTrader>
+    {consignorTrader.toXml}
     {placeOfDispatchTrader.mapNodeSeq(trader => <urn:PlaceOfDispatchTrader language="en">{trader.toXml}</urn:PlaceOfDispatchTrader>)}
     {dispatchImportOffice.mapNodeSeq(office => <urn:DispatchImportOffice>{office.toXml}</urn:DispatchImportOffice>)}
     {complementConsigneeTrader.mapNodeSeq(_.toXml)}

@@ -17,14 +17,21 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.TaxWarehouse
+import uk.gov.hmrc.emcstfe.models.common.MovementType.UKtoUK
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.createMovement._
 
 import scala.xml.Elem
 
-trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
+trait CreateMovementFixtures extends BaseFixtures
+  with TraderModelFixtures
+  with ConsignorTraderModelFixtures
+  with MovementGuaranteeFixtures
+  with TransportDetailsFixtures
+  with ChRISResponsesFixture {
 
-  object AttributesFixtures {
+  object CaMAttributesFixtures {
     lazy val attributesModelMax: AttributesModel = AttributesModel(
       submissionMessageType = SubmissionMessageType.DutyPaidB2B,
       deferredSubmissionFlag = Some(true)
@@ -49,112 +56,6 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
     )
   }
 
-  object ConsigneeTraderFixtures {
-    lazy val consigneeTraderModel: TraderModel = TraderModel(
-      referenceOfTaxWarehouse = None,
-      vatNumber = None,
-      traderExciseNumber = None,
-      traderId = Some("GB000001"),
-      traderName = Some("name"),
-      address = Some(AddressModel(
-        streetNumber = Some("number"),
-        street = Some("street"),
-        postcode = Some("postcode"),
-        city = Some("city")
-      )),
-      eoriNumber = Some("eori")
-    )
-    lazy val consigneeTraderXml: Elem = <urn:ConsigneeTrader language="en">
-      <urn:Traderid>GB000001</urn:Traderid>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>number</urn:StreetNumber>
-      <urn:Postcode>postcode</urn:Postcode>
-      <urn:City>city</urn:City>
-      <urn:EoriNumber>eori</urn:EoriNumber>
-    </urn:ConsigneeTrader>
-    lazy val consigneeTraderJson: JsObject = Json.obj(
-      "traderId" -> "GB000001",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "streetNumber" -> "number",
-        "street" -> "street",
-        "postcode" -> "postcode",
-        "city" -> "city"
-      ),
-      "eoriNumber" -> "eori"
-    )
-  }
-
-  object ConsignorTraderFixtures {
-    lazy val consignorTraderModel: TraderModel = TraderModel(
-      referenceOfTaxWarehouse = None,
-      vatNumber = None,
-      traderExciseNumber = Some("GB000001"),
-      traderId = None,
-      traderName = Some("name"),
-      address = Some(AddressModel(
-        streetNumber = Some("number"),
-        street = Some("street"),
-        postcode = Some("postcode"),
-        city = Some("city")
-      )),
-      eoriNumber = None
-    )
-    lazy val consignorTraderXml: Elem = <urn:ConsignorTrader language="en">
-      <urn:TraderExciseNumber>GB000001</urn:TraderExciseNumber>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>number</urn:StreetNumber>
-      <urn:Postcode>postcode</urn:Postcode>
-      <urn:City>city</urn:City>
-    </urn:ConsignorTrader>
-    lazy val consignorTraderJson: JsObject = Json.obj(
-      "traderExciseNumber" -> "GB000001",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "streetNumber" -> "number",
-        "street" -> "street",
-        "postcode" -> "postcode",
-        "city" -> "city"
-      )
-    )
-  }
-
-  object PlaceOfDispatchTraderFixtures {
-    lazy val placeOfDispatchTraderModel: TraderModel = TraderModel(
-      referenceOfTaxWarehouse = Some("GB000001"),
-      vatNumber = None,
-      traderExciseNumber = None,
-      traderId = None,
-      traderName = Some("name"),
-      address = Some(AddressModel(
-        streetNumber = Some("number"),
-        street = Some("street"),
-        postcode = Some("postcode"),
-        city = Some("city")
-      )),
-      eoriNumber = None
-    )
-    lazy val placeOfDispatchTraderXml: Elem = <urn:PlaceOfDispatchTrader language="en">
-      <urn:ReferenceOfTaxWarehouse>GB000001</urn:ReferenceOfTaxWarehouse>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>number</urn:StreetNumber>
-      <urn:Postcode>postcode</urn:Postcode>
-      <urn:City>city</urn:City>
-    </urn:PlaceOfDispatchTrader>
-    lazy val placeOfDispatchTraderJson: JsObject = Json.obj(
-      "referenceOfTaxWarehouse" -> "GB000001",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "streetNumber" -> "number",
-        "street" -> "street",
-        "postcode" -> "postcode",
-        "city" -> "city"
-      )
-    )
-  }
 
   object OfficeFixtures {
     lazy val officeModel: OfficeModel = OfficeModel(
@@ -191,111 +92,6 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
     )
   }
 
-  object DeliveryPlaceTraderFixtures {
-    lazy val deliveryPlaceTraderModel: TraderModel = TraderModel(
-      referenceOfTaxWarehouse = None,
-      vatNumber = None,
-      traderExciseNumber = None,
-      traderId = Some("GB000001"),
-      traderName = Some("name"),
-      address = Some(AddressModel(
-        streetNumber = Some("number"),
-        street = Some("street"),
-        postcode = Some("postcode"),
-        city = Some("city")
-      )),
-      eoriNumber = None
-    )
-    lazy val deliveryPlaceTraderXml: Elem = <urn:DeliveryPlaceTrader language="en">
-      <urn:Traderid>GB000001</urn:Traderid>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>number</urn:StreetNumber>
-      <urn:Postcode>postcode</urn:Postcode>
-      <urn:City>city</urn:City>
-    </urn:DeliveryPlaceTrader>
-    lazy val deliveryPlaceTraderJson: JsObject = Json.obj(
-      "traderId" -> "GB000001",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "streetNumber" -> "number",
-        "street" -> "street",
-        "postcode" -> "postcode",
-        "city" -> "city"
-      )
-    )
-  }
-
-  object TransportArrangerTraderFixtures {
-    lazy val transportArrangerTraderModel: TraderModel = TraderModel(
-      referenceOfTaxWarehouse = None,
-      vatNumber = Some("vat"),
-      traderExciseNumber = None,
-      traderId = None,
-      traderName = Some("name"),
-      address = Some(AddressModel(
-        streetNumber = Some("number"),
-        street = Some("street"),
-        postcode = Some("postcode"),
-        city = Some("city")
-      )),
-      eoriNumber = None
-    )
-    lazy val transportArrangerTraderXml: Elem = <urn:TransportArrangerTrader language="en">
-      <urn:VatNumber>vat</urn:VatNumber>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>number</urn:StreetNumber>
-      <urn:Postcode>postcode</urn:Postcode>
-      <urn:City>city</urn:City>
-    </urn:TransportArrangerTrader>
-    lazy val transportArrangerTraderJson: JsObject = Json.obj(
-      "vatNumber" -> "vat",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "streetNumber" -> "number",
-        "street" -> "street",
-        "postcode" -> "postcode",
-        "city" -> "city"
-      )
-    )
-  }
-
-  object FirstTransporterTraderFixtures {
-    lazy val firstTransporterTraderModel: TraderModel = TraderModel(
-      referenceOfTaxWarehouse = None,
-      vatNumber = Some("vat"),
-      traderExciseNumber = None,
-      traderId = None,
-      traderName = Some("name"),
-      address = Some(AddressModel(
-        streetNumber = Some("number"),
-        street = Some("street"),
-        postcode = Some("postcode"),
-        city = Some("city")
-      )),
-      eoriNumber = None
-    )
-    lazy val firstTransporterTraderXml: Elem = <urn:FirstTransporterTrader language="en">
-      <urn:VatNumber>vat</urn:VatNumber>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>number</urn:StreetNumber>
-      <urn:Postcode>postcode</urn:Postcode>
-      <urn:City>city</urn:City>
-    </urn:FirstTransporterTrader>
-    lazy val firstTransporterTraderJson: JsObject = Json.obj(
-      "vatNumber" -> "vat",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "streetNumber" -> "number",
-        "street" -> "street",
-        "postcode" -> "postcode",
-        "city" -> "city"
-      )
-    )
-  }
-
   object DocumentCertificateFixtures {
     lazy val documentCertificateModelMax: DocumentCertificateModel = DocumentCertificateModel(
       documentType = Some("type"),
@@ -327,19 +123,19 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
 
   object HeaderEadEsadFixtures {
     lazy val headerEadEsadModel: HeaderEadEsadModel = HeaderEadEsadModel(
-      destinationTypeCode = "123",
+      destinationType = TaxWarehouse,
       journeyTime = JourneyTime.Hours("3"),
       transportArrangement = TransportArrangement.OwnerOfGoods
     )
     lazy val headerEadEsadXml: Elem = <urn:HeaderEadEsad>
-      <urn:DestinationTypeCode>123</urn:DestinationTypeCode>
+      <urn:DestinationTypeCode>{TaxWarehouse.toString}</urn:DestinationTypeCode>
       <urn:JourneyTime>H3</urn:JourneyTime>
-      <urn:TransportArrangement>3</urn:TransportArrangement>
+      <urn:TransportArrangement>{TransportArrangement.OwnerOfGoods.toString}</urn:TransportArrangement>
     </urn:HeaderEadEsad>
     lazy val headerEadEsadJson: JsObject = Json.obj(
-      "destinationTypeCode" -> "123",
+      "destinationType" -> TaxWarehouse.toString,
       "journeyTime" -> "3 hours",
-      "transportArrangement" -> "3"
+      "transportArrangement" -> TransportArrangement.OwnerOfGoods.toString
     )
   }
 
@@ -365,84 +161,6 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
     )
     lazy val transportModeJsonMin: JsObject = Json.obj(
       "transportModeCode" -> "code"
-    )
-  }
-
-  object MovementGuaranteeFixtures {
-    lazy val movementGuaranteeModel: MovementGuaranteeModel = MovementGuaranteeModel(
-      guarantorTypeCode = "code",
-      guarantorTrader = Some(Seq(
-        GuarantorTraderModel(
-          traderExciseNumber = Some("number"),
-          traderName = Some("name"),
-          address = Some(GuarantorAddressModel(
-            streetNumber = Some("number"),
-            street = Some("street"),
-            postcode = Some("postcode"),
-            city = Some("city"))
-          ),
-          vatNumber = Some("vat")
-        ),
-        GuarantorTraderModel(
-          traderExciseNumber = Some("number 2"),
-          traderName = Some("name 2"),
-          address = Some(GuarantorAddressModel(
-            streetNumber = Some("number 2"),
-            street = Some("street 2"),
-            postcode = Some("postcode 2"),
-            city = Some("city 2"))
-          ),
-          vatNumber = Some("vat 2")
-        )
-      ))
-    )
-    lazy val movementGuaranteeXml: Elem = <urn:MovementGuarantee>
-      <urn:GuarantorTypeCode>code</urn:GuarantorTypeCode>
-      <urn:GuarantorTrader language="en">
-        <urn:TraderExciseNumber>number</urn:TraderExciseNumber>
-        <urn:TraderName>name</urn:TraderName>
-        <urn:StreetName>street</urn:StreetName>
-        <urn:StreetNumber>number</urn:StreetNumber>
-        <urn:City>city</urn:City>
-        <urn:Postcode>postcode</urn:Postcode>
-        <urn:VatNumber>vat</urn:VatNumber>
-      </urn:GuarantorTrader>
-      <urn:GuarantorTrader language="en">
-        <urn:TraderExciseNumber>number 2</urn:TraderExciseNumber>
-        <urn:TraderName>name 2</urn:TraderName>
-        <urn:StreetName>street 2</urn:StreetName>
-        <urn:StreetNumber>number 2</urn:StreetNumber>
-        <urn:City>city 2</urn:City>
-        <urn:Postcode>postcode 2</urn:Postcode>
-        <urn:VatNumber>vat 2</urn:VatNumber>
-      </urn:GuarantorTrader>
-    </urn:MovementGuarantee>
-    lazy val movementGuaranteeJson: JsObject = Json.obj(
-      "guarantorTypeCode" -> "code",
-      "guarantorTrader" -> Json.arr(
-        Json.obj(
-          "traderExciseNumber" -> "number",
-          "traderName" -> "name",
-          "address" -> Json.obj(
-            "streetNumber" -> "number",
-            "street" -> "street",
-            "postcode" -> "postcode",
-            "city" -> "city"
-          ),
-          "vatNumber" -> "vat"
-        ),
-        Json.obj(
-          "traderExciseNumber" -> "number 2",
-          "traderName" -> "name 2",
-          "address" -> Json.obj(
-            "streetNumber" -> "number 2",
-            "street" -> "street 2",
-            "postcode" -> "postcode 2",
-            "city" -> "city 2"
-          ),
-          "vatNumber" -> "vat 2"
-        )
-      )
     )
   }
 
@@ -691,48 +409,22 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
     )
   }
 
-  object TransportDetailsFixtures {
-    lazy val transportDetailsModel: TransportDetailsModel = TransportDetailsModel(
-      transportUnitCode = "code",
-      identityOfTransportUnits = Some("units"),
-      commercialSealIdentification = Some("id"),
-      complementaryInformation = Some("comp info"),
-      sealInformation = Some("seal info")
-    )
-    lazy val transportDetailsXml: Elem = <urn:TransportDetails>
-      <urn:TransportUnitCode>code</urn:TransportUnitCode>
-      <urn:IdentityOfTransportUnits>units</urn:IdentityOfTransportUnits>
-      <urn:CommercialSealIdentification>id</urn:CommercialSealIdentification>
-      <urn:ComplementaryInformation language="en">comp info</urn:ComplementaryInformation>
-      <urn:SealInformation language="en">seal info</urn:SealInformation>
-    </urn:TransportDetails>
-    lazy val transportDetailsJson: JsObject = Json.obj(
-      "transportUnitCode" -> "code",
-      "identityOfTransportUnits" -> "units",
-      "commercialSealIdentification" -> "id",
-      "complementaryInformation" -> "comp info",
-      "sealInformation" -> "seal info"
-    )
-  }
-
   object CreateMovementFixtures {
-    import AttributesFixtures._
+    import CaMAttributesFixtures._
     import BodyEadEsadFixtures._
     import ComplementConsigneeTraderFixtures._
     import ConsigneeTraderFixtures._
-    import ConsignorTraderFixtures._
     import DeliveryPlaceTraderFixtures._
     import DocumentCertificateFixtures._
     import EadEsadDraftFixtures._
     import FirstTransporterTraderFixtures._
     import HeaderEadEsadFixtures._
-    import MovementGuaranteeFixtures._
     import OfficeFixtures._
     import PlaceOfDispatchTraderFixtures._
     import TransportArrangerTraderFixtures._
-    import TransportDetailsFixtures._
     import TransportModeFixtures._
     lazy val createMovementModelMax: CreateMovementModel = CreateMovementModel(
+      movementType = UKtoUK,
       attributes = attributesModelMax,
       consigneeTrader = Some(consigneeTraderModel),
       consignorTrader = consignorTraderModel,
@@ -747,12 +439,13 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       documentCertificate = Some(Seq(documentCertificateModelMax, documentCertificateModelMin)),
       headerEadEsad = headerEadEsadModel,
       transportMode = transportModeModelMax,
-      movementGuarantee = movementGuaranteeModel,
+      movementGuarantee = maxMovementGuaranteeModel,
       bodyEadEsad = Seq(bodyEadEsadModelMax, bodyEadEsadModelMin),
       eadEsadDraft = eadEsadDraftModelMax,
-      transportDetails = Seq(transportDetailsModel)
+      transportDetails = Seq(maxTransportDetailsModel)
     )
     lazy val createMovementModelMin: CreateMovementModel = CreateMovementModel(
+      movementType = UKtoUK,
       attributes = attributesModelMin,
       consigneeTrader = None,
       consignorTrader = consignorTraderModel,
@@ -767,15 +460,38 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       documentCertificate = None,
       headerEadEsad = headerEadEsadModel,
       transportMode = transportModeModelMin,
-      movementGuarantee = movementGuaranteeModel,
+      movementGuarantee = maxMovementGuaranteeModel,
       bodyEadEsad = Seq(bodyEadEsadModelMin),
       eadEsadDraft = eadEsadDraftModelMin,
-      transportDetails = Seq(transportDetailsModel)
+      transportDetails = Seq(maxTransportDetailsModel)
     )
+
+    lazy val createMovementModelMultipleCountryCodes: CreateMovementModel = CreateMovementModel(
+      movementType = UKtoUK,
+      attributes = attributesModelMax,
+      consigneeTrader = Some(consigneeTraderModel.copy(traderId = Some("CT000001"))),
+      consignorTrader = consignorTraderModel,
+      placeOfDispatchTrader = Some(placeOfDispatchTraderModel.copy(traderId = Some("PD000001"))),
+      dispatchImportOffice = Some(officeModel),
+      complementConsigneeTrader = Some(complementConsigneeTraderModelMax.copy(memberStateCode = "CC000001")),
+      deliveryPlaceTrader = Some(deliveryPlaceTraderModel.copy(traderId = Some("DP000001"))),
+      deliveryPlaceCustomsOffice = Some(officeModel),
+      competentAuthorityDispatchOffice = officeModel,
+      transportArrangerTrader = Some(transportArrangerTraderModel),
+      firstTransporterTrader = Some(firstTransporterTraderModel),
+      documentCertificate = Some(Seq(documentCertificateModelMax, documentCertificateModelMin)),
+      headerEadEsad = headerEadEsadModel,
+      transportMode = transportModeModelMax,
+      movementGuarantee = maxMovementGuaranteeModel,
+      bodyEadEsad = Seq(bodyEadEsadModelMax, bodyEadEsadModelMin),
+      eadEsadDraft = eadEsadDraftModelMax,
+      transportDetails = Seq(maxTransportDetailsModel)
+    )
+
     lazy val createMovementXmlMax: Elem = <urn:SubmittedDraftOfEADESAD>
       {attributesXmlMax}
       {consigneeTraderXml}
-      {consignorTraderXml}
+      {consignorTraderModelXML}
       {placeOfDispatchTraderXml}
       <urn:DispatchImportOffice>{officeXml}</urn:DispatchImportOffice>
       {complementConsigneeTraderXmlMax}
@@ -788,24 +504,25 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       {documentCertificateXmlMin}
       {headerEadEsadXml}
       {transportModeXmlMax}
-      {movementGuaranteeXml}
+      {maxMovementGuaranteeXml}
       {bodyEadEsadXmlMax}
       {bodyEadEsadXmlMin}
       {eadEsadDraftXmlMax}
-      {transportDetailsXml}
+      {maxTransportDetailsXml}
     </urn:SubmittedDraftOfEADESAD>
     lazy val createMovementXmlMin: Elem = <urn:SubmittedDraftOfEADESAD>
       {attributesXmlMin}
-      {consignorTraderXml}
+      {consignorTraderModelXML}
       <urn:CompetentAuthorityDispatchOffice>{officeXml}</urn:CompetentAuthorityDispatchOffice>
       {headerEadEsadXml}
       {transportModeXmlMin}
-      {movementGuaranteeXml}
+      {maxMovementGuaranteeXml}
       {bodyEadEsadXmlMin}
       {eadEsadDraftXmlMin}
-      {transportDetailsXml}
+      {maxTransportDetailsXml}
     </urn:SubmittedDraftOfEADESAD>
     lazy val createMovementJsonMax: JsObject = Json.obj(
+      "movementType" -> UKtoUK.toString,
       "attributes" -> attributesJsonMax,
       "consigneeTrader" -> consigneeTraderJson,
       "consignorTrader" -> consignorTraderJson,
@@ -820,21 +537,22 @@ trait CreateMovementFixtures extends BaseFixtures with ChRISResponsesFixture {
       "documentCertificate" -> Json.arr(documentCertificateJsonMax, documentCertificateJsonMin),
       "headerEadEsad" -> headerEadEsadJson,
       "transportMode" -> transportModeJsonMax,
-      "movementGuarantee" -> movementGuaranteeJson,
+      "movementGuarantee" -> maxMovementGuaranteeJson,
       "bodyEadEsad" -> Json.arr(bodyEadEsadJsonMax, bodyEadEsadJsonMin),
       "eadEsadDraft" -> eadEsadDraftJsonMax,
-      "transportDetails" -> Json.arr(transportDetailsJson)
+      "transportDetails" -> Json.arr(maxTransportDetailsJson)
     )
     lazy val createMovementJsonMin: JsObject = Json.obj(
+      "movementType" -> UKtoUK.toString,
       "attributes" -> attributesJsonMin,
       "consignorTrader" -> consignorTraderJson,
       "competentAuthorityDispatchOffice" -> officeJson,
       "headerEadEsad" -> headerEadEsadJson,
       "transportMode" -> transportModeJsonMin,
-      "movementGuarantee" -> movementGuaranteeJson,
+      "movementGuarantee" -> maxMovementGuaranteeJson,
       "bodyEadEsad" -> Json.arr(bodyEadEsadJsonMin),
       "eadEsadDraft" -> eadEsadDraftJsonMin,
-      "transportDetails" -> Json.arr(transportDetailsJson)
+      "transportDetails" -> Json.arr(maxTransportDetailsJson)
     )
   }
 

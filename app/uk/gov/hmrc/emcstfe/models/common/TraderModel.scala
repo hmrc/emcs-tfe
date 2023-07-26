@@ -40,7 +40,7 @@ case class TraderModel(referenceOfTaxWarehouse: Option[String],
       eoriNumber.isEmpty
 
   lazy val countryCode: Option[String] = traderId match {
-    case Some(str) if str.length >= 2 => Some(str.substring(0, 2))
+    case Some(str) if str.length >= 2 => Some(str.substring(0, 2).toUpperCase)
     case _ => None
   }
 

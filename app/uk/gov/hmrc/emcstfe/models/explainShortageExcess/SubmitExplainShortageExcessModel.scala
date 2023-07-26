@@ -17,8 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{ExciseMovementModel, TraderModel, XmlBaseModel}
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
+import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, ExciseMovementModel, TraderModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -40,11 +39,7 @@ case class SubmitExplainShortageExcessModel(attributes: AttributesModel,
       </urn:ConsigneeTrader>
     )}
       {exciseMovement.toXml}
-      {consignorTrader.mapNodeSeq(trader =>
-      <urn:ConsignorTrader language="en">
-        {trader.toXml}
-      </urn:ConsignorTrader>
-    )}
+      {consignorTrader.mapNodeSeq(_.toXml)}
       {analysis.mapNodeSeq(_.toXml)}
       {bodyAnalysis.mapNodeSeq(_.map(_.toXml))}
     </urn:ExplanationOnReasonForShortage>

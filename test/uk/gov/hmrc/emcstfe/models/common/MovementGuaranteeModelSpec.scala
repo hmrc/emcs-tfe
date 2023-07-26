@@ -16,30 +16,22 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.fixtures.MovementGuaranteeFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-import scala.xml.Utility.trim
+class MovementGuaranteeModelSpec extends XmlModelBaseSpec with MovementGuaranteeFixtures {
 
-class MovementGuaranteeModelSpec extends UnitSpec with SubmitChangeDestinationFixtures {
+  testJsonToModelToXml(
+    scenario = "max fields",
+    json = maxMovementGuaranteeJson,
+    model = maxMovementGuaranteeModel,
+    xml = maxMovementGuaranteeXml
+  )
 
-  import MovementGuaranteeFixtures._
-
-  s"MovementGuaranteeModel with max fields" should {
-    "convert JSON to a model correctly" in {
-      movementGuaranteeJsonMax.as[MovementGuaranteeModel] shouldBe movementGuaranteeModelMax
-    }
-    "convert a model to XML correctly" in {
-      trim(movementGuaranteeModelMax.toXml) shouldBe trim(movementGuaranteeXmlMax)
-    }
-  }
-
-  s"MovementGuaranteeModel with min fields" should {
-    "convert JSON to a model correctly" in {
-      movementGuaranteeJsonMin.as[MovementGuaranteeModel] shouldBe movementGuaranteeModelMin
-    }
-    "convert a model to XML correctly" in {
-      trim(movementGuaranteeModelMin.toXml) shouldBe trim(movementGuaranteeXmlMin)
-    }
-  }
+  testJsonToModelToXml(
+    scenario = "min fields",
+    json = minMovementGuaranteeJson,
+    model = minMovementGuaranteeModel,
+    xml = minMovementGuaranteeXml
+  )
 }
