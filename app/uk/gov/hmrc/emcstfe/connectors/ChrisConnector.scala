@@ -57,10 +57,6 @@ class ChrisConnector @Inject()(val http: HttpClient,
         postString(http, url, preparedXml, request)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(request.shouldExtractFromSoap))
     }
 
-  def submitDraftMovementChrisSOAPRequest[A](request: ChrisRequest)
-                                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
-    prepareXMLAndSubmit(appConfig.urlSubmitCreateMovement(), request, "submitDraftMovementChrisSOAPRequest")
-
   def submitCreateMovementChrisSOAPRequest[A](request: ChrisRequest)
                                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
     prepareXMLAndSubmit(appConfig.urlSubmitCreateMovement(), request, "submitCreateMovementChrisSOAPRequest")

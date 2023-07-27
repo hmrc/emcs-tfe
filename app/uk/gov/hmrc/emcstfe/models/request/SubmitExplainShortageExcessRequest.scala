@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
@@ -26,19 +27,19 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
 
   val messageRecipient: String = {
     val countryCode: String = body.attributes.submitterType match {
-      case SubmitterType.Consignor => body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
+      case SubmitterType.Consignor => body.consigneeTrader.flatMap(_.countryCode).getOrElse(Constants.GB)
       case SubmitterType.Consignee => body.exciseMovement.arc.substring(2, 4)
     }
 
-    NDEA ++ countryCode
+    Constants.NDEA ++ countryCode
   }
   val messageSender: String = {
     val countryCode: String = body.attributes.submitterType match {
       case SubmitterType.Consignor => body.exciseMovement.arc.substring(2, 4)
-      case SubmitterType.Consignee => body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
+      case SubmitterType.Consignee => body.consigneeTrader.flatMap(_.countryCode).getOrElse(Constants.GB)
     }
 
-    NDEA ++ countryCode
+    Constants.NDEA ++ countryCode
   }
 
   val soapRequest =

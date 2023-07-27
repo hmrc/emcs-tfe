@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.models.common.TraderModel
@@ -25,21 +26,21 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
                                        (implicit request: UserRequest[_]) extends ChrisRequest {
 
   private val arcCountryCode = body.arc.substring(2, 4)
-  private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(GB)
+  private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(Constants.GB)
 
   val messageSender =
-    NDEA ++ (if (body.destinationType == DirectDelivery) {
+    Constants.NDEA ++ (if (body.destinationType == DirectDelivery) {
       traderModelCountryCode(body.consigneeTrader)
     } else {
       arcCountryCode
     })
 
   val messageRecipient =
-    NDEA ++ (body.destinationType match {
+    Constants.NDEA ++ (body.destinationType match {
       case TaxWarehouse => traderModelCountryCode(body.deliveryPlaceTrader)
       case TemporaryRegisteredConsignee | RegisteredConsignee => traderModelCountryCode(body.consigneeTrader)
       case DirectDelivery => arcCountryCode
-      case _ => GB
+      case _ => Constants.GB
     })
 
   override def exciseRegistrationNumber: String = request.ern

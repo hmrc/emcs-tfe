@@ -1,5 +1,3 @@
-POST        /submit        uk.gov.hmrc.emcstfe.controllers.testOnly.SubmitDraftMovementController.submitDraftMovement()
-
 GET        /api/feature-switches    uk.gov.hmrc.emcstfe.featureswitch.api.controllers.FeatureSwitchApiController.getFeatureSwitches()
 + nocsrf
 POST       /api/feature-switches    uk.gov.hmrc.emcstfe.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches()

@@ -36,6 +36,7 @@ import uk.gov.hmrc.emcstfe.support.UnitSpec
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import play.api.test.FakeRequest
+import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementType}
 
 class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtures {
@@ -57,7 +58,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
       s"return country code $deliveryPlaceTraderCountryCode from deliveryPlaceTrader" in {
 
-        requestWithMovement(MovementType.UKtoUK).messageRecipientCountryCode() shouldBe Some(deliveryPlaceTraderCountryCode)
+        requestWithMovement(MovementType.UKtoUK).messageRecipientCountryCode() shouldBe deliveryPlaceTraderCountryCode
       }
     }
 
@@ -65,7 +66,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
       s"return country code $deliveryPlaceTraderCountryCode from deliveryPlaceTrader" in {
 
-        requestWithMovement(MovementType.ImportUK).messageRecipientCountryCode() shouldBe Some(deliveryPlaceTraderCountryCode)
+        requestWithMovement(MovementType.ImportUK).messageRecipientCountryCode() shouldBe deliveryPlaceTraderCountryCode
       }
     }
 
@@ -75,7 +76,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $complementConsigneeTraderCountryCode from complementConsigneeTrader" in {
 
-          requestWithMovement(MovementType.UKtoEU, DestinationType.ExemptedOrganisations).messageRecipientCountryCode() shouldBe Some(complementConsigneeTraderCountryCode)
+          requestWithMovement(MovementType.UKtoEU, DestinationType.ExemptedOrganisations).messageRecipientCountryCode() shouldBe complementConsigneeTraderCountryCode
         }
       }
 
@@ -83,7 +84,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $deliveryPlaceTraderCountryCode from deliveryPlaceTrader" in {
 
-          requestWithMovement(MovementType.UKtoEU).messageRecipientCountryCode() shouldBe Some(deliveryPlaceTraderCountryCode)
+          requestWithMovement(MovementType.UKtoEU).messageRecipientCountryCode() shouldBe deliveryPlaceTraderCountryCode
         }
       }
 
@@ -91,7 +92,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $consigneeTraderCountryCode from consigneeTrader" in {
 
-          requestWithMovement(MovementType.UKtoEU, DestinationType.RegisteredConsignee).messageRecipientCountryCode() shouldBe Some(consigneeTraderCountryCode)
+          requestWithMovement(MovementType.UKtoEU, DestinationType.RegisteredConsignee).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
         }
       }
 
@@ -99,7 +100,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $consigneeTraderCountryCode from consigneeTrader" in {
 
-          requestWithMovement(MovementType.UKtoEU, DestinationType.TemporaryRegisteredConsignee).messageRecipientCountryCode() shouldBe Some(consigneeTraderCountryCode)
+          requestWithMovement(MovementType.UKtoEU, DestinationType.TemporaryRegisteredConsignee).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
         }
       }
 
@@ -107,7 +108,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $consigneeTraderCountryCode from consigneeTrader" in {
 
-          requestWithMovement(MovementType.UKtoEU, DestinationType.DirectDelivery).messageRecipientCountryCode() shouldBe Some(consigneeTraderCountryCode)
+          requestWithMovement(MovementType.UKtoEU, DestinationType.DirectDelivery).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
         }
       }
 
@@ -115,7 +116,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $consigneeTraderCountryCode from consigneeTrader" in {
 
-          requestWithMovement(MovementType.UKtoEU, DestinationType.Export).messageRecipientCountryCode() shouldBe Some(consigneeTraderCountryCode)
+          requestWithMovement(MovementType.UKtoEU, DestinationType.Export).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
         }
       }
 
@@ -123,7 +124,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $placeOfDispatchTraderCountryCode from placeOfDispatchTrader" in {
 
-          requestWithMovement(MovementType.UKtoEU, DestinationType.UnknownDestination).messageRecipientCountryCode() shouldBe Some(placeOfDispatchTraderCountryCode)
+          requestWithMovement(MovementType.UKtoEU, DestinationType.UnknownDestination).messageRecipientCountryCode() shouldBe placeOfDispatchTraderCountryCode
         }
       }
     }
@@ -132,7 +133,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
       s"return country code $deliveryPlaceCustomsOfficeCountryCode from deliveryPlaceCustomsOffice" in {
 
-        requestWithMovement(MovementType.DirectExport).messageRecipientCountryCode() shouldBe Some(deliveryPlaceCustomsOfficeCountryCode)
+        requestWithMovement(MovementType.DirectExport).messageRecipientCountryCode() shouldBe deliveryPlaceCustomsOfficeCountryCode
       }
     }
 
@@ -140,7 +141,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
       s"return country code $deliveryPlaceCustomsOfficeCountryCode from deliveryPlaceCustomsOffice" in {
 
-        requestWithMovement(MovementType.IndirectExport).messageRecipientCountryCode() shouldBe Some(deliveryPlaceCustomsOfficeCountryCode)
+        requestWithMovement(MovementType.IndirectExport).messageRecipientCountryCode() shouldBe deliveryPlaceCustomsOfficeCountryCode
       }
     }
 
@@ -148,7 +149,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
       s"return country code $deliveryPlaceCustomsOfficeCountryCode from deliveryPlaceCustomsOffice" in {
 
-        requestWithMovement(MovementType.ImportDirectExport).messageRecipientCountryCode() shouldBe Some(deliveryPlaceCustomsOfficeCountryCode)
+        requestWithMovement(MovementType.ImportDirectExport).messageRecipientCountryCode() shouldBe deliveryPlaceCustomsOfficeCountryCode
       }
     }
 
@@ -156,7 +157,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
       s"return country code $deliveryPlaceCustomsOfficeCountryCode from deliveryPlaceCustomsOffice" in {
 
-        requestWithMovement(MovementType.ImportIndirectExport).messageRecipientCountryCode() shouldBe Some(deliveryPlaceCustomsOfficeCountryCode)
+        requestWithMovement(MovementType.ImportIndirectExport).messageRecipientCountryCode() shouldBe deliveryPlaceCustomsOfficeCountryCode
       }
     }
 
@@ -166,7 +167,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $deliveryPlaceTraderCountryCode from deliveryPlaceTrader " in {
 
-          requestWithMovement(MovementType.ImportEU).messageRecipientCountryCode() shouldBe Some(deliveryPlaceTraderCountryCode)
+          requestWithMovement(MovementType.ImportEU).messageRecipientCountryCode() shouldBe deliveryPlaceTraderCountryCode
         }
       }
 
@@ -174,7 +175,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $complementConsigneeTraderCountryCode from complementConsigneeTrader" in {
 
-          requestWithMovement(MovementType.ImportEU, DestinationType.ExemptedOrganisations).messageRecipientCountryCode() shouldBe Some(complementConsigneeTraderCountryCode)
+          requestWithMovement(MovementType.ImportEU, DestinationType.ExemptedOrganisations).messageRecipientCountryCode() shouldBe complementConsigneeTraderCountryCode
         }
       }
 
@@ -182,7 +183,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $consigneeTraderCountryCode from consigneeTrader" in {
 
-          requestWithMovement(MovementType.ImportEU, DestinationType.DirectDelivery).messageRecipientCountryCode() shouldBe Some(consigneeTraderCountryCode)
+          requestWithMovement(MovementType.ImportEU, DestinationType.DirectDelivery).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
         }
       }
 
@@ -190,7 +191,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $consigneeTraderCountryCode from consigneeTraderCountryCode" in {
 
-          requestWithMovement(MovementType.ImportEU, DestinationType.RegisteredConsignee).messageRecipientCountryCode() shouldBe Some(consigneeTraderCountryCode)
+          requestWithMovement(MovementType.ImportEU, DestinationType.RegisteredConsignee).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
         }
       }
 
@@ -198,8 +199,16 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
         s"return country code $consigneeTraderCountryCode from consigneeTrader" in {
 
-          requestWithMovement(MovementType.ImportEU, DestinationType.TemporaryRegisteredConsignee).messageRecipientCountryCode() shouldBe Some(consigneeTraderCountryCode)
+          requestWithMovement(MovementType.ImportEU, DestinationType.TemporaryRegisteredConsignee).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
         }
+      }
+    }
+
+    "movementType is anything else (e.g. ImportUnknownDestination)" should {
+
+      s"return country code GB" in {
+
+        requestWithMovement(MovementType.ImportUnknownDestination).messageRecipientCountryCode() shouldBe Constants.GB
       }
     }
   }
@@ -208,11 +217,22 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
     Seq(MovementType.UKtoUK, MovementType.UKtoEU, MovementType.DirectExport, MovementType.IndirectExport).foreach { movementType =>
 
-      s"movementType is $movementType" should {
+      s"movementType is $movementType" when {
 
-        s"return country code $placeOfDispatchTraderCountryCode from placeOfDispatchTrader" in {
+        "placeOfDispatch is defined" should {
 
-          requestWithMovement(movementType).messageSenderCountryCode() shouldBe Some(placeOfDispatchTraderCountryCode)
+          s"return country code $placeOfDispatchTraderCountryCode from placeOfDispatchTrader" in {
+
+            requestWithMovement(movementType).messageSenderCountryCode() shouldBe placeOfDispatchTraderCountryCode
+          }
+        }
+
+        "placeOfDispatch is NOT defined" should {
+
+          s"return country code GB" in {
+
+            requestWithMovement(movementType, hasPlaceOfDispatch = false).messageSenderCountryCode() shouldBe Constants.GB
+          }
         }
       }
     }
@@ -221,13 +241,13 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
       s"return country code $consignorTraderCountryCode from consignorTrader" in {
 
-        requestWithMovement(MovementType.ImportDirectExport).messageSenderCountryCode() shouldBe Some(consignorTraderCountryCode)
+        requestWithMovement(MovementType.ImportDirectExport).messageSenderCountryCode() shouldBe consignorTraderCountryCode
       }
     }
   }
 
 
-  "action" should {
+  ".action" should {
 
     "be correct" in {
 
@@ -235,7 +255,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
     }
   }
 
-  "shouldExtractFromSoap" should {
+  ".shouldExtractFromSoap" should {
 
     "be correct" in {
 
@@ -243,9 +263,19 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
     }
   }
 
+  ".exciseRegistrationNumber" should {
+
+    "be correct" in {
+
+      request.exciseRegistrationNumber shouldBe testErn
+    }
+  }
+
   def requestWithMovement(movement: MovementType,
-                          destinationType: DestinationType = DestinationType.TaxWarehouse): SubmitCreateMovementRequest =
-    SubmitCreateMovementRequest(
+                          destinationType: DestinationType = DestinationType.TaxWarehouse,
+                          hasPlaceOfDispatch: Boolean = true): SubmitCreateMovementRequest = {
+
+    val request =
       CreateMovementFixtures.createMovementModelMax
         .copy(movementType = movement)
         .copy(headerEadEsad = HeaderEadEsadFixtures.headerEadEsadModel.copy(
@@ -253,9 +283,6 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
         ))
         .copy(consigneeTrader = CreateMovementFixtures.createMovementModelMax.consigneeTrader.map(
           _.copy(traderId = Some(consigneeTraderCountryCode))
-        ))
-        .copy(placeOfDispatchTrader = CreateMovementFixtures.createMovementModelMax.placeOfDispatchTrader.map(
-          _.copy(traderId = Some(placeOfDispatchTraderCountryCode))
         ))
         .copy(complementConsigneeTrader = CreateMovementFixtures.createMovementModelMax.complementConsigneeTrader.map(
           _.copy(memberStateCode = complementConsigneeTraderCountryCode)
@@ -269,5 +296,13 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
         .copy(consignorTrader = CreateMovementFixtures.createMovementModelMax.consignorTrader
           .copy(traderExciseNumber = consignorTraderCountryCode)
         )
+
+    SubmitCreateMovementRequest(
+      if(!hasPlaceOfDispatch) request else {
+        request.copy(placeOfDispatchTrader = CreateMovementFixtures.createMovementModelMax.placeOfDispatchTrader.map(
+          _.copy(traderId = Some(placeOfDispatchTraderCountryCode))
+        ))
+      }
     )
+  }
 }

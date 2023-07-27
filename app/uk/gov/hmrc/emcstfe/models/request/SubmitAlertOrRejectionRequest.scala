@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 
@@ -24,10 +25,10 @@ case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel)
   override def exciseRegistrationNumber: String = request.ern
 
   private val arcCountryCode = body.exciseMovement.arc.substring(2, 4)
-  private val consigneeCountryCode = body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
+  private val consigneeCountryCode = body.consigneeTrader.flatMap(_.countryCode).getOrElse(Constants.GB)
 
-  val messageRecipient = NDEA ++ arcCountryCode
-  val messageSender: String = NDEA ++ consigneeCountryCode
+  val messageRecipient = Constants.NDEA ++ arcCountryCode
+  val messageSender: String = Constants.NDEA ++ consigneeCountryCode
 
   val soapRequest =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, TaxWarehouse}
@@ -26,15 +27,15 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
                                          (implicit request: UserRequest[_]) extends ChrisRequest {
 
   private val arcCountryCode = body.updateEadEsad.administrativeReferenceCode.substring(2, 4)
-  private val countryCode: Option[String] => String = _.map(_.substring(0, 2)).getOrElse(GB)
+  private val countryCode: Option[String] => String = _.map(_.substring(0, 2)).getOrElse(Constants.GB)
 
-  val messageSender: String = NDEA ++ arcCountryCode
+  val messageSender: String = Constants.NDEA ++ arcCountryCode
 
   val messageRecipient: String =
-    NDEA ++ (body.destinationChanged.destinationTypeCode match {
+    Constants.NDEA ++ (body.destinationChanged.destinationTypeCode match {
       case TaxWarehouse => countryCode(body.destinationChanged.newConsigneeTrader.flatMap(_.traderId))
       case Export => countryCode(body.destinationChanged.deliveryPlaceCustomsOffice.map(_.referenceNumber))
-      case _ => GB
+      case _ => Constants.GB
     })
 
   override def exciseRegistrationNumber: String = request.ern

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.MovementType
 import uk.gov.hmrc.emcstfe.models.common.DestinationType
@@ -27,8 +28,8 @@ case class SubmitCreateMovementRequest(body: CreateMovementModel)
                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {
   override def exciseRegistrationNumber: String = request.ern
 
-  val messageRecipient = NDEA ++ messageRecipientCountryCode().getOrElse(GB)
-  val messageSender: String = NDEA ++ messageSenderCountryCode().getOrElse(GB)
+  val messageRecipient = Constants.NDEA ++ messageRecipientCountryCode()
+  val messageSender: String = Constants.NDEA ++ messageSenderCountryCode()
 
   val soapRequest = envelope(body, 815, messageSender, messageRecipient)
 
@@ -43,11 +44,11 @@ case class SubmitCreateMovementRequest(body: CreateMovementModel)
   override def metricName = "create-movement"
 
 
-  private[request] def messageRecipientCountryCode(): Option[String] = {
+  private[request] def messageRecipientCountryCode(): String = {
     val movementType: MovementType = body.movementType
     val destinationType: DestinationType = body.headerEadEsad.destinationType
 
-    (movementType, destinationType) match {
+    ((movementType, destinationType) match {
       case (UKtoUK | ImportUK, _) | (UKtoEU | ImportEU, TaxWarehouse) =>
         body.deliveryPlaceTrader.flatMap(_.countryCode)
       case (UKtoEU | ImportEU, ExemptedOrganisations) =>
@@ -60,14 +61,14 @@ case class SubmitCreateMovementRequest(body: CreateMovementModel)
       case (DirectExport | IndirectExport | ImportDirectExport | ImportIndirectExport, _) =>
         body.deliveryPlaceCustomsOffice.map(_.referenceNumber.substring(0,2).toUpperCase)
       case _ =>
-        Some(GB)
-    }
+        None
+    }).getOrElse(Constants.GB)
   }
 
-  private[request] def messageSenderCountryCode(): Option[String] =
+  private[request] def messageSenderCountryCode(): String =
     body.movementType match {
       case UKtoUK | UKtoEU | DirectExport | IndirectExport =>
-        body.placeOfDispatchTrader.flatMap(_.countryCode)
+        body.placeOfDispatchTrader.flatMap(_.countryCode).getOrElse(Constants.GB)
       case _ =>
         body.consignorTrader.countryCode
     }

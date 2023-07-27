@@ -26,10 +26,7 @@ case class ConsignorTraderModel(traderExciseNumber: String,
                                 traderName: String,
                                 address: AddressModel) {
 
-  lazy val countryCode: Option[String] = traderExciseNumber match {
-    case str if str.length >= 2 => Some(str.substring(0, 2).toUpperCase)
-    case _ => None
-  }
+  lazy val countryCode: String = traderExciseNumber.substring(0, 2).toUpperCase
 
   def toXml: Elem =
     <urn:ConsignorTrader language="en">

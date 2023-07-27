@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request
+package uk.gov.hmrc.emcstfe.config
 
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+object Constants {
 
-class SubmitDraftMovementRequestSpec extends UnitSpec {
-  val request = SubmitDraftMovementRequest("My ERN", "My ARC", "")
+  val NDEA = "NDEA."
+  val GB = "GB"
 
-  "action" should {
-    "be correct" in {
-      request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
-    }
-  }
-
-  "shouldExtractFromSoap" should {
-    "be correct" in {
-      request.shouldExtractFromSoap shouldBe false
-    }
-  }
 }
