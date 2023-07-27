@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.emcstfe.models.common.GuarantorType.ConsignorOwner
 import uk.gov.hmrc.emcstfe.models.common.{GuarantorAddressModel, GuarantorTraderModel, MovementGuaranteeModel}
 
 import scala.xml.Elem
@@ -24,7 +25,7 @@ import scala.xml.Elem
 trait MovementGuaranteeFixtures extends BaseFixtures with AddressModelFixtures {
 
   lazy val maxMovementGuaranteeModel: MovementGuaranteeModel = MovementGuaranteeModel(
-    guarantorTypeCode = "code",
+    guarantorTypeCode = ConsignorOwner,
     guarantorTrader = Some(Seq(
       GuarantorTraderModel(
         traderExciseNumber = Some("number"),
@@ -52,7 +53,7 @@ trait MovementGuaranteeFixtures extends BaseFixtures with AddressModelFixtures {
   )
 
   lazy val maxMovementGuaranteeXml: Elem = <urn:MovementGuarantee>
-    <urn:GuarantorTypeCode>code</urn:GuarantorTypeCode>
+    <urn:GuarantorTypeCode>{ConsignorOwner.toString}</urn:GuarantorTypeCode>
     <urn:GuarantorTrader language="en">
       <urn:TraderExciseNumber>number</urn:TraderExciseNumber>
       <urn:TraderName>name</urn:TraderName>
@@ -74,7 +75,7 @@ trait MovementGuaranteeFixtures extends BaseFixtures with AddressModelFixtures {
   </urn:MovementGuarantee>
 
   lazy val maxMovementGuaranteeJson: JsObject = Json.obj(
-    "guarantorTypeCode" -> "code",
+    "guarantorTypeCode" -> ConsignorOwner.toString,
     "guarantorTrader" -> Json.arr(
       Json.obj(
         "traderExciseNumber" -> "number",
@@ -103,16 +104,16 @@ trait MovementGuaranteeFixtures extends BaseFixtures with AddressModelFixtures {
 
 
   lazy val minMovementGuaranteeModel: MovementGuaranteeModel = MovementGuaranteeModel(
-    guarantorTypeCode = "code",
+    guarantorTypeCode = ConsignorOwner,
     guarantorTrader = None
   )
 
   lazy val minMovementGuaranteeXml: Elem = <urn:MovementGuarantee>
-    <urn:GuarantorTypeCode>code</urn:GuarantorTypeCode>
+    <urn:GuarantorTypeCode>{ConsignorOwner.toString}</urn:GuarantorTypeCode>
   </urn:MovementGuarantee>
 
   lazy val minMovementGuaranteeJson: JsObject = Json.obj(
-    "guarantorTypeCode" -> "code"
+    "guarantorTypeCode" -> ConsignorOwner.toString
   )
 
 }

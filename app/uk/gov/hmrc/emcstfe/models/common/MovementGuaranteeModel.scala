@@ -22,11 +22,11 @@ import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 import scala.xml.Elem
 
 case class MovementGuaranteeModel(
-                                   guarantorTypeCode: String,
+                                   guarantorTypeCode: GuarantorType,
                                    guarantorTrader: Option[Seq[GuarantorTraderModel]]
                                  ) extends XmlBaseModel with XmlWriterUtils {
   def toXml: Elem = <urn:MovementGuarantee>
-    <urn:GuarantorTypeCode>{guarantorTypeCode}</urn:GuarantorTypeCode>
+    <urn:GuarantorTypeCode>{guarantorTypeCode.toString}</urn:GuarantorTypeCode>
     {guarantorTrader.mapNodeSeq(_.map(trader => <urn:GuarantorTrader language="en">{trader.toXml}</urn:GuarantorTrader>))}
   </urn:MovementGuarantee>
 }

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.models.common.{OriginType, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -25,7 +25,7 @@ case class EadEsadDraftModel(
                               localReferenceNumber: String,
                               invoiceNumber: String,
                               invoiceDate: Option[String],
-                              originTypeCode: String,
+                              originTypeCode: OriginType,
                               dateOfDispatch: String,
                               timeOfDispatch: Option[String],
                               importSad: Option[Seq[ImportSadModel]]
@@ -34,7 +34,7 @@ case class EadEsadDraftModel(
     <urn:LocalReferenceNumber>{localReferenceNumber}</urn:LocalReferenceNumber>
     <urn:InvoiceNumber>{invoiceNumber}</urn:InvoiceNumber>
     {invoiceDate.mapNodeSeq(value => <urn:InvoiceDate>{value}</urn:InvoiceDate>)}
-    <urn:OriginTypeCode>{originTypeCode}</urn:OriginTypeCode>
+    <urn:OriginTypeCode>{originTypeCode.toString}</urn:OriginTypeCode>
     <urn:DateOfDispatch>{dateOfDispatch}</urn:DateOfDispatch>
     {timeOfDispatch.mapNodeSeq(value => <urn:TimeOfDispatch>{value}</urn:TimeOfDispatch>)}
     {importSad.mapNodeSeq(_.map(_.toXml))}
