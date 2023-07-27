@@ -13,6 +13,8 @@ POST          /change-destination/:ern/:arc                  uk.gov.hmrc.emcstfe
 
 POST          /explain-shortage-excess/:ern/:arc             uk.gov.hmrc.emcstfe.controllers.SubmitExplainShortageExcessController.submit(ern, arc)
 
+POST          /cancel-movement/:ern/:arc                     uk.gov.hmrc.emcstfe.controllers.SubmitCancellationOfMovementController.submit(ern, arc)
+
 GET           /user-answers/report-receipt/:ern/:arc         uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.get(ern, arc)
 PUT           /user-answers/report-receipt/:ern/:arc         uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.set(ern, arc)
 DELETE        /user-answers/report-receipt/:ern/:arc         uk.gov.hmrc.emcstfe.controllers.ReportReceiptUserAnswersController.clear(ern, arc)

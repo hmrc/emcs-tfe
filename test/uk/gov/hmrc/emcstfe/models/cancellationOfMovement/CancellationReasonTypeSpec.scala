@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.alertOrRejection
+package uk.gov.hmrc.emcstfe.models.cancellationOfMovement
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
-import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType._
+import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
+import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.CancellationReasonType._
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class AlertOrRejectionReasonTypeSpec extends UnitSpec with SubmitAlertOrRejectionFixtures {
+class CancellationReasonTypeSpec extends UnitSpec with SubmitExplainDelayFixtures {
 
-  "AlertOrRejectionReasonType" must {
+  "CancellationReasonType" must {
 
     "have the correct underlying enum values" in {
       Other.toString shouldBe "0"
-      EADNotConcernRecipient.toString shouldBe "1"
-      ProductDoesNotMatchOrder.toString shouldBe "2"
-      QuantityDoesNotMatchOrder.toString shouldBe "3"
+      TypingError.toString shouldBe "1"
+      SaleInterrupted.toString shouldBe "2"
+      DuplicateMovement.toString shouldBe "3"
+      LateMovement.toString shouldBe "4"
     }
   }
 }

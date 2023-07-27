@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.connectors
 
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.{HeaderNames, MimeTypes, Status}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
@@ -44,6 +45,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
   with SubmitChangeDestinationFixtures
   with SubmitExplainShortageExcessFixtures
   with SubmitAlertOrRejectionFixtures
+  with SubmitCancellationOfMovementFixtures
   with MockMetricsService {
 
   override def afterEach(): Unit = {
@@ -666,6 +668,87 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
           .returns(response)
 
         await(connector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](submitAlertOrRejectionRequest)) shouldBe response
+      }
+    }
+  }
+
+  "submitCancellationOfMovementChrisSOAPRequest" should {
+
+    implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+    val submitCancellationOfMovementRequest: SubmitCancellationOfMovementRequest = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
+
+    "return a Right" when {
+      "downstream call is successful" in new Test {
+
+        MockMetricsService.chrisTimer(submitCancellationOfMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitCancellationPortal/3",
+          body = submitCancellationOfMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitCancellationOfMovementRequest.action}""""
+          )
+        )
+          .returns(Future.successful(Right(chrisSuccessResponse)))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitCancellationOfMovementChrisSOAPRequest[ChRISSuccessResponse](submitCancellationOfMovementRequest)) shouldBe Right(chrisSuccessResponse)
+      }
+    }
+    "return a Left" when {
+      "downstream call is successful but can't convert the response to XML" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(XmlValidationError)
+
+        MockMetricsService.chrisTimer(submitCancellationOfMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitCancellationPortal/3",
+          body = submitCancellationOfMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitCancellationOfMovementRequest.action}""""
+          )
+        ).returns(Future.successful(response))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitCancellationOfMovementChrisSOAPRequest[ChRISSuccessResponse](submitCancellationOfMovementRequest)) shouldBe response
+      }
+      "downstream call is unsuccessful" in new Test {
+        val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
+
+        MockMetricsService.chrisTimer(submitCancellationOfMovementRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient.postString(
+          url = s"$baseUrl/ChRIS/EMCS/SubmitCancellationPortal/3",
+          body = submitCancellationOfMovementRequest.requestBody,
+          headers = Seq(
+            HeaderNames.ACCEPT -> "application/soap+xml",
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitCancellationOfMovementRequest.action}""""
+          )
+        ).returns(Future.successful(response))
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(Right(""))
+
+        await(connector.submitCancellationOfMovementChrisSOAPRequest[ChRISSuccessResponse](submitCancellationOfMovementRequest)) shouldBe response
+      }
+      "cannot prepare XML for submission" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(MarkPlacementError)
+
+        MockXmlUtils.prepareXmlForSubmission()
+          .returns(response)
+
+        await(connector.submitCancellationOfMovementChrisSOAPRequest[ChRISSuccessResponse](submitCancellationOfMovementRequest)) shouldBe response
       }
     }
   }

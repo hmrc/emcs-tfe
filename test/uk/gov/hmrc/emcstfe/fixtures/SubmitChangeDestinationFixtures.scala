@@ -272,10 +272,10 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
   }
 
   object DestinationChangedFixtures {
-    import NewConsigneeTraderFixtures._
-    import DeliveryPlaceTraderFixtures._
     import DeliveryPlaceCustomsOfficeFixtures._
+    import DeliveryPlaceTraderFixtures._
     import MovementGuaranteeFixtures._
+    import NewConsigneeTraderFixtures._
 
     lazy val destinationChangedModelMax: DestinationChangedModel = DestinationChangedModel(
       destinationTypeCode = DestinationType.TemporaryCertifiedConsignee,
@@ -397,11 +397,11 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures with ChRISResponsesFi
   }
 
   object SubmitChangeDestinationFixtures {
-    import NewTransportArrangerTraderFixtures._
-    import UpdateEadEsadFixtures._
     import DestinationChangedFixtures._
+    import NewTransportArrangerTraderFixtures._
     import NewTransporterTraderFixtures._
     import TransportDetailsFixtures._
+    import UpdateEadEsadFixtures._
 
     lazy val submitChangeDestinationModelMax: SubmitChangeDestinationModel = SubmitChangeDestinationModel(
       newTransportArrangerTrader = Some(newTransportArrangerTraderModelMax),

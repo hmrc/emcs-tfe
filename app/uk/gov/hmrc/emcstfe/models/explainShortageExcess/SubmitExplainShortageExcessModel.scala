@@ -22,29 +22,28 @@ import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
 
 import scala.xml.{Elem, NodeSeq}
 
-case class SubmitExplainShortageExcessModel(
-                                             attributes: AttributesModel,
-                                             consigneeTrader: Option[TraderModel],
-                                             exciseMovement: ExciseMovementModel,
-                                             consignorTrader: Option[ConsignorTraderModel],
-                                             analysis: Option[AnalysisModel],
-                                             bodyAnalysis: Option[Seq[BodyAnalysisModel]]
-                                     ) extends XmlBaseModel {
+case class SubmitExplainShortageExcessModel(attributes: AttributesModel,
+                                            consigneeTrader: Option[TraderModel],
+                                            exciseMovement: ExciseMovementModel,
+                                            consignorTrader: Option[ConsignorTraderModel],
+                                            analysis: Option[AnalysisModel],
+                                            bodyAnalysis: Option[Seq[BodyAnalysisModel]]
+                                           ) extends XmlBaseModel {
 
   def toXml: Elem =
     <urn:ExplanationOnReasonForShortage>
       {attributes.toXml}
       {consigneeTrader.map(trader =>
-        <urn:ConsigneeTrader language="en">
-          {trader.toXml}
-        </urn:ConsigneeTrader>
-      ).getOrElse(NodeSeq.Empty)}
+      <urn:ConsigneeTrader language="en">
+        {trader.toXml}
+      </urn:ConsigneeTrader>
+    ).getOrElse(NodeSeq.Empty)}
       {exciseMovement.toXml}
       {consignorTrader.map(trader =>
-        <urn:ConsignorTrader language="en">
-          {trader.toXml}
-        </urn:ConsignorTrader>
-      ).getOrElse(NodeSeq.Empty)}
+      <urn:ConsignorTrader language="en">
+        {trader.toXml}
+      </urn:ConsignorTrader>
+    ).getOrElse(NodeSeq.Empty)}
       {analysis.map(_.toXml).getOrElse(NodeSeq.Empty)}
       {bodyAnalysis.map(_.map(_.toXml)).getOrElse(NodeSeq.Empty)}
     </urn:ExplanationOnReasonForShortage>
