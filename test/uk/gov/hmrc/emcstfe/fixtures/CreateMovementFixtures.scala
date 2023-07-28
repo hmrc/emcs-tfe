@@ -26,7 +26,6 @@ import scala.xml.Elem
 
 trait CreateMovementFixtures extends BaseFixtures
   with TraderModelFixtures
-  with ConsignorTraderModelFixtures
   with MovementGuaranteeFixtures
   with TransportDetailsFixtures
   with ChRISResponsesFixture {
@@ -413,29 +412,24 @@ trait CreateMovementFixtures extends BaseFixtures
     import CaMAttributesFixtures._
     import BodyEadEsadFixtures._
     import ComplementConsigneeTraderFixtures._
-    import ConsigneeTraderFixtures._
-    import DeliveryPlaceTraderFixtures._
     import DocumentCertificateFixtures._
     import EadEsadDraftFixtures._
-    import FirstTransporterTraderFixtures._
     import HeaderEadEsadFixtures._
     import OfficeFixtures._
-    import PlaceOfDispatchTraderFixtures._
-    import TransportArrangerTraderFixtures._
     import TransportModeFixtures._
     lazy val createMovementModelMax: CreateMovementModel = CreateMovementModel(
       movementType = UKtoUK,
       attributes = attributesModelMax,
-      consigneeTrader = Some(consigneeTraderModel),
-      consignorTrader = consignorTraderModel,
-      placeOfDispatchTrader = Some(placeOfDispatchTraderModel),
+      consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
+      consignorTrader = maxTraderModel(ConsignorTrader),
+      placeOfDispatchTrader = Some(maxTraderModel(PlaceOfDispatchTrader)),
       dispatchImportOffice = Some(officeModel),
       complementConsigneeTrader = Some(complementConsigneeTraderModelMax),
-      deliveryPlaceTrader = Some(deliveryPlaceTraderModel),
+      deliveryPlaceTrader = Some(maxTraderModel(DeliveryPlaceTrader)),
       deliveryPlaceCustomsOffice = Some(officeModel),
       competentAuthorityDispatchOffice = officeModel,
-      transportArrangerTrader = Some(transportArrangerTraderModel),
-      firstTransporterTrader = Some(firstTransporterTraderModel),
+      transportArrangerTrader = Some(maxTraderModel(TransportTrader)),
+      firstTransporterTrader = Some(maxTraderModel(TransportTrader)),
       documentCertificate = Some(Seq(documentCertificateModelMax, documentCertificateModelMin)),
       headerEadEsad = headerEadEsadModel,
       transportMode = transportModeModelMax,
@@ -448,7 +442,7 @@ trait CreateMovementFixtures extends BaseFixtures
       movementType = UKtoUK,
       attributes = attributesModelMin,
       consigneeTrader = None,
-      consignorTrader = consignorTraderModel,
+      consignorTrader = maxTraderModel(ConsignorTrader),
       placeOfDispatchTrader = None,
       dispatchImportOffice = None,
       complementConsigneeTrader = None,
@@ -469,16 +463,16 @@ trait CreateMovementFixtures extends BaseFixtures
     lazy val createMovementModelMultipleCountryCodes: CreateMovementModel = CreateMovementModel(
       movementType = UKtoUK,
       attributes = attributesModelMax,
-      consigneeTrader = Some(consigneeTraderModel.copy(traderId = Some("CT000001"))),
-      consignorTrader = consignorTraderModel,
-      placeOfDispatchTrader = Some(placeOfDispatchTraderModel.copy(traderId = Some("PD000001"))),
+      consigneeTrader = Some(maxTraderModel(ConsignorTrader).copy(traderExciseNumber = Some("CT000001"))),
+      consignorTrader = maxTraderModel(ConsignorTrader),
+      placeOfDispatchTrader = Some(maxTraderModel(PlaceOfDispatchTrader).copy(traderExciseNumber = Some("PD000001"))),
       dispatchImportOffice = Some(officeModel),
       complementConsigneeTrader = Some(complementConsigneeTraderModelMax.copy(memberStateCode = "CC000001")),
-      deliveryPlaceTrader = Some(deliveryPlaceTraderModel.copy(traderId = Some("DP000001"))),
+      deliveryPlaceTrader = Some(maxTraderModel(DeliveryPlaceTrader).copy(traderExciseNumber = Some("DP000001"))),
       deliveryPlaceCustomsOffice = Some(officeModel),
       competentAuthorityDispatchOffice = officeModel,
-      transportArrangerTrader = Some(transportArrangerTraderModel),
-      firstTransporterTrader = Some(firstTransporterTraderModel),
+      transportArrangerTrader = Some(maxTraderModel(TransportTrader)),
+      firstTransporterTrader = Some(maxTraderModel(TransportTrader)),
       documentCertificate = Some(Seq(documentCertificateModelMax, documentCertificateModelMin)),
       headerEadEsad = headerEadEsadModel,
       transportMode = transportModeModelMax,
@@ -490,16 +484,28 @@ trait CreateMovementFixtures extends BaseFixtures
 
     lazy val createMovementXmlMax: Elem = <urn:SubmittedDraftOfEADESAD>
       {attributesXmlMax}
-      {consigneeTraderXml}
-      {consignorTraderModelXML}
-      {placeOfDispatchTraderXml}
+      <urn:ConsigneeTrader language="en">
+        {maxTraderModelXML(ConsigneeTrader)}
+      </urn:ConsigneeTrader>
+      <urn:ConsignorTrader language="en">
+        {maxTraderModelXML(ConsignorTrader)}
+      </urn:ConsignorTrader>
+      <urn:PlaceOfDispatchTrader language="en">
+        {maxTraderModelXML(PlaceOfDispatchTrader)}
+      </urn:PlaceOfDispatchTrader>
       <urn:DispatchImportOffice>{officeXml}</urn:DispatchImportOffice>
       {complementConsigneeTraderXmlMax}
-      {deliveryPlaceTraderXml}
+      <urn:DeliveryPlaceTrader language="en">
+        {maxTraderModelXML(DeliveryPlaceTrader)}
+      </urn:DeliveryPlaceTrader>
       <urn:DeliveryPlaceCustomsOffice>{officeXml}</urn:DeliveryPlaceCustomsOffice>
       <urn:CompetentAuthorityDispatchOffice>{officeXml}</urn:CompetentAuthorityDispatchOffice>
-      {transportArrangerTraderXml}
-      {firstTransporterTraderXml}
+      <urn:TransportArrangerTrader language="en">
+        {maxTraderModelXML(TransportTrader)}
+      </urn:TransportArrangerTrader>
+      <urn:FirstTransporterTrader language="en">
+        {maxTraderModelXML(TransportTrader)}
+      </urn:FirstTransporterTrader>
       {documentCertificateXmlMax}
       {documentCertificateXmlMin}
       {headerEadEsadXml}
@@ -512,7 +518,9 @@ trait CreateMovementFixtures extends BaseFixtures
     </urn:SubmittedDraftOfEADESAD>
     lazy val createMovementXmlMin: Elem = <urn:SubmittedDraftOfEADESAD>
       {attributesXmlMin}
-      {consignorTraderModelXML}
+      <urn:ConsignorTrader language="en">
+        {maxTraderModelXML(ConsignorTrader)}
+      </urn:ConsignorTrader>
       <urn:CompetentAuthorityDispatchOffice>{officeXml}</urn:CompetentAuthorityDispatchOffice>
       {headerEadEsadXml}
       {transportModeXmlMin}
@@ -524,16 +532,16 @@ trait CreateMovementFixtures extends BaseFixtures
     lazy val createMovementJsonMax: JsObject = Json.obj(
       "movementType" -> UKtoUK.toString,
       "attributes" -> attributesJsonMax,
-      "consigneeTrader" -> consigneeTraderJson,
-      "consignorTrader" -> consignorTraderJson,
-      "placeOfDispatchTrader" -> placeOfDispatchTraderJson,
+      "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
+      "consignorTrader" -> maxTraderModelJson(ConsignorTrader),
+      "placeOfDispatchTrader" -> maxTraderModelJson(PlaceOfDispatchTrader),
       "dispatchImportOffice" -> officeJson,
       "complementConsigneeTrader" -> complementConsigneeTraderJsonMax,
-      "deliveryPlaceTrader" -> deliveryPlaceTraderJson,
+      "deliveryPlaceTrader" -> maxTraderModelJson(DeliveryPlaceTrader),
       "deliveryPlaceCustomsOffice" -> officeJson,
       "competentAuthorityDispatchOffice" -> officeJson,
-      "transportArrangerTrader" -> transportArrangerTraderJson,
-      "firstTransporterTrader" -> firstTransporterTraderJson,
+      "transportArrangerTrader" -> maxTraderModelJson(TransportTrader),
+      "firstTransporterTrader" -> maxTraderModelJson(TransportTrader),
       "documentCertificate" -> Json.arr(documentCertificateJsonMax, documentCertificateJsonMin),
       "headerEadEsad" -> headerEadEsadJson,
       "transportMode" -> transportModeJsonMax,
@@ -545,7 +553,7 @@ trait CreateMovementFixtures extends BaseFixtures
     lazy val createMovementJsonMin: JsObject = Json.obj(
       "movementType" -> UKtoUK.toString,
       "attributes" -> attributesJsonMin,
-      "consignorTrader" -> consignorTraderJson,
+      "consignorTrader" -> maxTraderModelJson(ConsignorTrader),
       "competentAuthorityDispatchOffice" -> officeJson,
       "headerEadEsad" -> headerEadEsadJson,
       "transportMode" -> transportModeJsonMin,

@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.{TraderModel, TransportDetailsModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common.{TraderModel, TransportDetailsModel, TransportTrader, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -34,10 +34,10 @@ case class SubmitChangeDestinationModel(
   def toXml(implicit request: UserRequest[_]): Elem =
     <urn:ChangeOfDestination>
       <urn:Attributes/>
-      {newTransportArrangerTrader.mapNodeSeq(trader => <urn:NewTransportArrangerTrader language="en">{trader.toXml}</urn:NewTransportArrangerTrader>)}
+      {newTransportArrangerTrader.mapNodeSeq(trader => <urn:NewTransportArrangerTrader language="en">{trader.toXml(TransportTrader)}</urn:NewTransportArrangerTrader>)}
       {updateEadEsad.toXml}
       {destinationChanged.toXml}
-      {newTransportArrangerTrader.mapNodeSeq(trader => <urn:NewTransporterTrader language="en">{trader.toXml}</urn:NewTransporterTrader>)}
+      {newTransporterTrader.mapNodeSeq(trader => <urn:NewTransporterTrader language="en">{trader.toXml(TransportTrader)}</urn:NewTransporterTrader>)}
       {transportDetails.mapNodeSeq(_.map(_.toXml))}
     </urn:ChangeOfDestination>
 }

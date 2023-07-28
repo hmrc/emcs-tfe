@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.changeDestination._
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.Hours
-import uk.gov.hmrc.emcstfe.models.common.{AddressModel, DestinationType, TraderModel, TransportArrangement}
+import uk.gov.hmrc.emcstfe.models.common._
 
 import scala.xml.Elem
 
@@ -99,13 +99,11 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures
 
   object DestinationChangedFixtures {
     import DeliveryPlaceCustomsOfficeFixtures._
-    import DeliveryPlaceTraderFixtures._
-    import NewConsigneeTraderFixtures._
 
     lazy val destinationChangedModelMax: DestinationChangedModel = DestinationChangedModel(
       destinationTypeCode = DestinationType.TemporaryCertifiedConsignee,
-      newConsigneeTrader = Some(newConsigneeTraderModelMax),
-      deliveryPlaceTrader = Some(deliveryPlaceTraderModel),
+      newConsigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
+      deliveryPlaceTrader = Some(maxTraderModel(DeliveryPlaceTrader)),
       deliveryPlaceCustomsOffice = Some(deliveryPlaceCustomsOfficeModel),
       movementGuarantee = Some(maxMovementGuaranteeModel)
     )
@@ -120,8 +118,12 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures
 
     lazy val destinationChangedXmlMax: Elem = <urn:DestinationChanged>
       <urn:DestinationTypeCode>10</urn:DestinationTypeCode>
-      {newConsigneeTraderXmlMax}
-      {deliveryPlaceTraderXml}
+      <urn:NewConsigneeTrader language="en">
+        {maxTraderModelXML(ConsigneeTrader)}
+      </urn:NewConsigneeTrader>
+      <urn:DeliveryPlaceTrader language="en">
+        {maxTraderModelXML(DeliveryPlaceTrader)}
+      </urn:DeliveryPlaceTrader>
       {deliveryPlaceCustomsOfficeXml}
       {maxMovementGuaranteeXml}
     </urn:DestinationChanged>
@@ -132,10 +134,10 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures
 
     lazy val destinationChangedJsonMax: JsObject = Json.obj(
       "destinationTypeCode" -> DestinationType.TemporaryCertifiedConsignee.toString,
-      "newConsigneeTrader" -> newConsigneeTraderJsonMax,
-      "deliveryPlaceTrader" -> deliveryPlaceTraderJson,
+      "newConsigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
+      "deliveryPlaceTrader" -> maxTraderModelJson(DeliveryPlaceTrader),
       "deliveryPlaceCustomsOffice" -> deliveryPlaceCustomsOfficeJson,
-      "movementGuarantee" -> maxMovementGuaranteeJson,
+      "movementGuarantee" -> maxMovementGuaranteeJson
     )
 
     lazy val destinationChangedJsonMin: JsObject = Json.obj(
@@ -143,54 +145,15 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures
     )
   }
 
-  object NewTransporterTraderFixtures {
-    lazy val newTransporterTraderModelMax: TraderModel = TraderModel(
-      referenceOfTaxWarehouse = None,
-      vatNumber = Some("number"),
-      traderExciseNumber = None,
-      traderId = None,
-      traderName = Some("name"),
-      address = Some(AddressModel(
-        street = Some("street"),
-        streetNumber = Some("street number"),
-        postcode = Some("a postcode"),
-        city = Some("a city")
-      )),
-      eoriNumber = None
-    )
-
-    lazy val newTransporterTraderXmlMax: Elem = <urn:NewTransporterTrader language="en">
-      <urn:VatNumber>number</urn:VatNumber>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>street number</urn:StreetNumber>
-      <urn:Postcode>a postcode</urn:Postcode>
-      <urn:City>a city</urn:City>
-    </urn:NewTransporterTrader>
-
-    lazy val newTransporterTraderJsonMax: JsObject = Json.obj(
-      "vatNumber" -> "number",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "street" -> "street",
-        "streetNumber" -> "street number",
-        "postcode" -> "a postcode",
-        "city" -> "a city"
-      )
-    )
-  }
-
   object SubmitChangeDestinationFixtures {
     import DestinationChangedFixtures._
-    import NewTransportArrangerTraderFixtures._
-    import NewTransporterTraderFixtures._
     import UpdateEadEsadFixtures._
 
     lazy val submitChangeDestinationModelMax: SubmitChangeDestinationModel = SubmitChangeDestinationModel(
-      newTransportArrangerTrader = Some(newTransportArrangerTraderModelMax),
+      newTransportArrangerTrader = Some(maxTraderModel(TransportTrader)),
       updateEadEsad = updateEadEsadModelMax,
       destinationChanged = destinationChangedModelMax,
-      newTransporterTrader = Some(newTransporterTraderModelMax),
+      newTransporterTrader = Some(maxTraderModel(TransportTrader)),
       transportDetails = Some(Seq(maxTransportDetailsModel, maxTransportDetailsModel))
     )
 
@@ -204,10 +167,14 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures
 
     lazy val submitChangeDestinationXmlMax: Elem = <urn:ChangeOfDestination>
       <urn:Attributes />
-      {newTransportArrangerTraderXmlMax}
+      <urn:NewTransportArrangerTrader language="en">
+        {maxTraderModelXML(TransportTrader)}
+      </urn:NewTransportArrangerTrader>
       {updateEadEsadXmlMax}
       {destinationChangedXmlMax}
-      {newTransporterTraderXmlMax}
+      <urn:NewTransporterTrader language="en">
+        {maxTraderModelXML(TransportTrader)}
+      </urn:NewTransporterTrader>
       {maxTransportDetailsXml}
       {maxTransportDetailsXml}
     </urn:ChangeOfDestination>
@@ -219,10 +186,10 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures
     </urn:ChangeOfDestination>
 
     lazy val submitChangeDestinationJsonMax: JsObject = Json.obj(
-      "newTransportArrangerTrader" -> newTransportArrangerTraderJsonMax,
+      "newTransportArrangerTrader" -> maxTraderModelJson(TransportTrader),
       "updateEadEsad" -> updateEadEsadJsonMax,
       "destinationChanged" -> destinationChangedJsonMax,
-      "newTransporterTrader" -> newTransporterTraderJsonMax,
+      "newTransporterTrader" -> maxTraderModelJson(TransportTrader),
       "transportDetails" -> Json.arr(maxTransportDetailsJson, maxTransportDetailsJson)
     )
 

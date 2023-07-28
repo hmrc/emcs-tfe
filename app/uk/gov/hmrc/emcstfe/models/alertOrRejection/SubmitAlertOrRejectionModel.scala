@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.{ExciseMovementModel, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel, TraderModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import java.time.LocalDate
@@ -37,7 +37,7 @@ case class SubmitAlertOrRejectionModel(consigneeTrader: Option[TraderModel],
       <urn:Attributes/>
       {consigneeTrader.mapNodeSeq(trader =>
         <urn:ConsigneeTrader language="en">
-          {trader.toXml}
+          {trader.toXml(ConsigneeTrader)}
         </urn:ConsigneeTrader>
       )}
       {exciseMovement.toXml}

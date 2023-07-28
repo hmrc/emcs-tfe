@@ -24,25 +24,38 @@ class AddressModelSpec extends UnitSpec with AddressModelFixtures {
 
   "AddressModel" must {
 
-    "for the maximum number of fields" must {
+    Seq(
+      ConsigneeTrader,
+      ConsignorTrader,
+      PlaceOfDispatchTrader,
+      DeliveryPlaceTrader,
+      TransportTrader,
+      GuarantorTrader
+    ).foreach { traderType =>
 
-      "be possible to serialise and de-serialise to/from JSON" in {
-        Json.toJson(maxAddressModel).as[AddressModel] shouldBe maxAddressModel
-      }
+      s"for trader type of $traderType" when {
 
-      "write to XML" in {
-        maxAddressModel.toXml shouldBe maxAddressModelXML
-      }
-    }
+        "for the maximum number of fields" must {
 
-    "for the minimum number of fields" must {
+          "be possible to serialise and de-serialise to/from JSON" in {
+            Json.toJson(maxAddressModel).as[AddressModel] shouldBe maxAddressModel
+          }
 
-      "be possible to serialise and de-serialise to/from JSON" in {
-        Json.toJson(minAddressModel).as[AddressModel] shouldBe minAddressModel
-      }
+          "write to XML" in {
+            maxAddressModel.toXml(traderType) shouldBe maxAddressModelXML(traderType)
+          }
+        }
 
-      "write to XML" in {
-        minAddressModel.toXml shouldBe minAddressModelXML
+        "for the minimum number of fields" must {
+
+          "be possible to serialise and de-serialise to/from JSON" in {
+            Json.toJson(minAddressModel).as[AddressModel] shouldBe minAddressModel
+          }
+
+          "write to XML" in {
+            minAddressModel.toXml(traderType) shouldBe minAddressModelXML
+          }
+        }
       }
     }
   }

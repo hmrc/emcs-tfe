@@ -20,7 +20,7 @@ import cats.implicits.catsSyntaxTuple12Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, DestinationType, JourneyTime, TraderModel}
+import uk.gov.hmrc.emcstfe.models.common._
 
 case class GetMovementResponse(arc: String,
                                sequenceNumber: Int,
@@ -29,7 +29,7 @@ case class GetMovementResponse(arc: String,
                                deliveryPlaceTrader: Option[TraderModel],
                                localReferenceNumber: String,
                                eadStatus: String,
-                               consignorTrader: ConsignorTraderModel,
+                               consignorTrader: TraderModel,
                                dateOfDispatch: String,
                                journeyTime: String,
                                items: Seq[MovementItem],
@@ -57,11 +57,11 @@ object GetMovementResponse {
     arc.read[String],
     sequenceNumber.read[Int],
     destinationTypeCode.read[DestinationType](DestinationType.xmlReads(DestinationType.enumerable)),
-    consigneeTrader.read[Option[TraderModel]].map(model => if(model.exists(_.isEmpty)) None else model),
-    deliveryPlaceTrader.read[Option[TraderModel]].map(model => if(model.exists(_.isEmpty)) None else model),
+    consigneeTrader.read[Option[TraderModel]](TraderModel.xmlReads(ConsigneeTrader).optional).map(model => if(model.exists(_.isEmpty)) None else model),
+    deliveryPlaceTrader.read[Option[TraderModel]](TraderModel.xmlReads(DeliveryPlaceTrader).optional).map(model => if(model.exists(_.isEmpty)) None else model),
     localReferenceNumber.read[String],
     eadStatus.read[String],
-    consignorTrader.read[ConsignorTraderModel](ConsignorTraderModel.xmlReads),
+    consignorTrader.read[TraderModel](TraderModel.xmlReads(ConsignorTrader)),
     dateOfDispatch.read[String],
     journeyTime.read[JourneyTime].map(_.toString),
     items.read[Seq[MovementItem]](strictReadSeq),

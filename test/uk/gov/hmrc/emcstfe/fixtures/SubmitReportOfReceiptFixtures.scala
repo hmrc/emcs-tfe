@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{PartiallyRefused, Satisfactory}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.TaxWarehouse
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.Excess
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, DeliveryPlaceTrader}
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
 import java.time.LocalDate
@@ -35,8 +36,8 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
     arc = testArc,
     destinationType = TaxWarehouse,
     sequenceNumber = 1,
-    consigneeTrader = Some(maxTraderModel),
-    deliveryPlaceTrader = Some(maxTraderModel.copy(eoriNumber = None)),
+    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
+    deliveryPlaceTrader = Some(maxTraderModel(DeliveryPlaceTrader)),
     destinationOffice = destinationOfficeId,
     dateOfArrival = arrivalDate,
     acceptMovement = PartiallyRefused,
@@ -51,31 +52,14 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes/>
       <urn:ConsigneeTrader language="en">
-        <urn:ReferenceOfTaxWarehouse>reference</urn:ReferenceOfTaxWarehouse>
-        <urn:VatNumber>number</urn:VatNumber>
-        <urn:TraderExciseNumber>excise number</urn:TraderExciseNumber>
-        <urn:Traderid>{traderId}</urn:Traderid>
-        <urn:TraderName>name</urn:TraderName>
-        <urn:StreetName>street</urn:StreetName>
-        <urn:StreetNumber>number</urn:StreetNumber>
-        <urn:Postcode>postcode</urn:Postcode>
-        <urn:City>city</urn:City>
-        <urn:EoriNumber>eori</urn:EoriNumber>
+        {maxTraderModelXML(ConsigneeTrader)}
       </urn:ConsigneeTrader>
       <urn:ExciseMovement>
         <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>
         <urn:SequenceNumber>1</urn:SequenceNumber>
       </urn:ExciseMovement>
       <urn:DeliveryPlaceTrader language="en">
-        <urn:ReferenceOfTaxWarehouse>reference</urn:ReferenceOfTaxWarehouse>
-        <urn:VatNumber>number</urn:VatNumber>
-        <urn:TraderExciseNumber>excise number</urn:TraderExciseNumber>
-        <urn:Traderid>{traderId}</urn:Traderid>
-        <urn:TraderName>name</urn:TraderName>
-        <urn:StreetName>street</urn:StreetName>
-        <urn:StreetNumber>number</urn:StreetNumber>
-        <urn:Postcode>postcode</urn:Postcode>
-        <urn:City>city</urn:City>
+        {maxTraderModelXML(DeliveryPlaceTrader)}
       </urn:DeliveryPlaceTrader>
       <urn:DestinationOffice>
         <urn:ReferenceNumber>{destinationOfficeId}</urn:ReferenceNumber>

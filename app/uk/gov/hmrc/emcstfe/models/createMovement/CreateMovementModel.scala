@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, MovementGuaranteeModel, MovementType, TraderModel, TransportDetailsModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -27,7 +27,7 @@ case class CreateMovementModel(
                                 movementType: MovementType,
                                 attributes: AttributesModel,
                                 consigneeTrader: Option[TraderModel],
-                                consignorTrader: ConsignorTraderModel,
+                                consignorTrader: TraderModel,
                                 placeOfDispatchTrader: Option[TraderModel],
                                 dispatchImportOffice: Option[OfficeModel],
                                 complementConsigneeTrader: Option[ComplementConsigneeTraderModel],
@@ -46,16 +46,16 @@ case class CreateMovementModel(
                               ) extends XmlBaseModel with XmlWriterUtils {
   def toXml(implicit request: UserRequest[_]): Elem = <urn:SubmittedDraftOfEADESAD>
     {attributes.toXml}
-    {consigneeTrader.mapNodeSeq(trader => <urn:ConsigneeTrader language="en">{trader.toXml}</urn:ConsigneeTrader>)}
-    {consignorTrader.toXml}
-    {placeOfDispatchTrader.mapNodeSeq(trader => <urn:PlaceOfDispatchTrader language="en">{trader.toXml}</urn:PlaceOfDispatchTrader>)}
+    {consigneeTrader.mapNodeSeq(trader => <urn:ConsigneeTrader language="en">{trader.toXml(ConsigneeTrader)}</urn:ConsigneeTrader>)}
+    <urn:ConsignorTrader language="en">{consignorTrader.toXml(ConsignorTrader)}</urn:ConsignorTrader>
+    {placeOfDispatchTrader.mapNodeSeq(trader => <urn:PlaceOfDispatchTrader language="en">{trader.toXml(PlaceOfDispatchTrader)}</urn:PlaceOfDispatchTrader>)}
     {dispatchImportOffice.mapNodeSeq(office => <urn:DispatchImportOffice>{office.toXml}</urn:DispatchImportOffice>)}
     {complementConsigneeTrader.mapNodeSeq(_.toXml)}
-    {deliveryPlaceTrader.mapNodeSeq(trader => <urn:DeliveryPlaceTrader language="en">{trader.toXml}</urn:DeliveryPlaceTrader>)}
+    {deliveryPlaceTrader.mapNodeSeq(trader => <urn:DeliveryPlaceTrader language="en">{trader.toXml(DeliveryPlaceTrader)}</urn:DeliveryPlaceTrader>)}
     {deliveryPlaceCustomsOffice.mapNodeSeq(office => <urn:DeliveryPlaceCustomsOffice>{office.toXml}</urn:DeliveryPlaceCustomsOffice>)}
     <urn:CompetentAuthorityDispatchOffice>{competentAuthorityDispatchOffice.toXml}</urn:CompetentAuthorityDispatchOffice>
-    {transportArrangerTrader.mapNodeSeq(trader => <urn:TransportArrangerTrader language="en">{trader.toXml}</urn:TransportArrangerTrader>)}
-    {firstTransporterTrader.mapNodeSeq(trader => <urn:FirstTransporterTrader language="en">{trader.toXml}</urn:FirstTransporterTrader>)}
+    {transportArrangerTrader.mapNodeSeq(trader => <urn:TransportArrangerTrader language="en">{trader.toXml(TransportTrader)}</urn:TransportArrangerTrader>)}
+    {firstTransporterTrader.mapNodeSeq(trader => <urn:FirstTransporterTrader language="en">{trader.toXml(TransportTrader)}</urn:FirstTransporterTrader>)}
     {documentCertificate.mapNodeSeq(_.map(_.toXml))}
     {headerEadEsad.toXml}
     {transportMode.toXml}

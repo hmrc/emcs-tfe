@@ -24,11 +24,11 @@ import scala.xml.Elem
 
 case class MovementGuaranteeModel(
                                    guarantorTypeCode: GuarantorType,
-                                   guarantorTrader: Option[Seq[GuarantorTraderModel]]
+                                   guarantorTrader: Option[Seq[TraderModel]]
                                  ) extends XmlBaseModel with XmlWriterUtils {
   def toXml(implicit request: UserRequest[_]): Elem = <urn:MovementGuarantee>
     <urn:GuarantorTypeCode>{guarantorTypeCode.toString}</urn:GuarantorTypeCode>
-    {guarantorTrader.mapNodeSeq(_.map(trader => <urn:GuarantorTrader language="en">{trader.toXml}</urn:GuarantorTrader>))}
+    {guarantorTrader.mapNodeSeq(_.map(trader => <urn:GuarantorTrader language="en">{trader.toXml(GuarantorTrader)}</urn:GuarantorTrader>))}
   </urn:MovementGuarantee>
 }
 

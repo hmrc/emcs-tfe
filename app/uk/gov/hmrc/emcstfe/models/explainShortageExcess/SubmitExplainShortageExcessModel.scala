@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, ExciseMovementModel, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -26,7 +26,7 @@ import scala.xml.Elem
 case class SubmitExplainShortageExcessModel(attributes: AttributesModel,
                                             consigneeTrader: Option[TraderModel],
                                             exciseMovement: ExciseMovementModel,
-                                            consignorTrader: Option[ConsignorTraderModel],
+                                            consignorTrader: Option[TraderModel],
                                             analysis: Option[AnalysisModel],
                                             bodyAnalysis: Option[Seq[BodyAnalysisModel]]
                                            ) extends XmlBaseModel with XmlWriterUtils {
@@ -35,12 +35,16 @@ case class SubmitExplainShortageExcessModel(attributes: AttributesModel,
     <urn:ExplanationOnReasonForShortage>
       {attributes.toXml}
       {consigneeTrader.mapNodeSeq(trader =>
-      <urn:ConsigneeTrader language="en">
-        {trader.toXml}
-      </urn:ConsigneeTrader>
-    )}
+        <urn:ConsigneeTrader language="en">
+          {trader.toXml(ConsigneeTrader)}
+        </urn:ConsigneeTrader>
+      )}
       {exciseMovement.toXml}
-      {consignorTrader.mapNodeSeq(_.toXml)}
+      {consignorTrader.mapNodeSeq(trader =>
+        <urn:ConsignorTrader language="en">
+          {trader.toXml(ConsignorTrader)}
+        </urn:ConsignorTrader>
+      )}
       {analysis.mapNodeSeq(_.toXml)}
       {bodyAnalysis.mapNodeSeq(_.map(_.toXml))}
     </urn:ExplanationOnReasonForShortage>

@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
-import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, ConsigneeTrader, DeliveryPlaceTrader, DestinationType, TraderModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import java.time.LocalDate
@@ -48,7 +48,7 @@ case class SubmitReportOfReceiptModel(arc: String,
       <urn:Attributes/>
       {consigneeTrader.mapNodeSeq { ct =>
         <urn:ConsigneeTrader language="en">
-          {ct.toXml}
+          {ct.toXml(ConsigneeTrader)}
         </urn:ConsigneeTrader>
       }}
       <urn:ExciseMovement>
@@ -61,7 +61,7 @@ case class SubmitReportOfReceiptModel(arc: String,
       </urn:ExciseMovement>
       {deliveryPlaceTrader.mapNodeSeq { dt =>
         <urn:DeliveryPlaceTrader language="en">
-          {dt.toXml}
+          {dt.toXml(DeliveryPlaceTrader)}
         </urn:DeliveryPlaceTrader>
       }}
       <urn:DestinationOffice>

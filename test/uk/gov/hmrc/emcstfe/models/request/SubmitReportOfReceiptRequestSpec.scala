@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
+import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, Export, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -79,8 +80,8 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
       val model =
         maxSubmitReportOfReceiptModel
           .copy(arc = "01DE0000012345")
-          .copy(consigneeTrader = Some(maxTraderModel.copy(traderId = Some("FR0000123456"))))
-          .copy(deliveryPlaceTrader = Some(maxTraderModel.copy(traderId = Some("IT0000123456"))))
+          .copy(consigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("FR0000123456"))))
+          .copy(deliveryPlaceTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("IT0000123456"))))
 
       "have the correct MessageSender" when {
 

@@ -222,7 +222,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
           s"return country code $placeOfDispatchTraderCountryCode from placeOfDispatchTrader" in {
 
-            requestWithMovement(movementType).messageSenderCountryCode() shouldBe placeOfDispatchTraderCountryCode
+            requestWithMovement(movementType).messageSenderCountryCode() shouldBe Some(placeOfDispatchTraderCountryCode)
           }
         }
 
@@ -230,7 +230,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
           s"return country code GB" in {
 
-            requestWithMovement(movementType, hasPlaceOfDispatch = false).messageSenderCountryCode() shouldBe Constants.GB
+            requestWithMovement(movementType, hasPlaceOfDispatch = false).messageSenderCountryCode() shouldBe None
           }
         }
       }
@@ -240,7 +240,7 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
 
       s"return country code $consignorTraderCountryCode from consignorTrader" in {
 
-        requestWithMovement(MovementType.ImportDirectExport).messageSenderCountryCode() shouldBe consignorTraderCountryCode
+        requestWithMovement(MovementType.ImportDirectExport).messageSenderCountryCode() shouldBe Some(consignorTraderCountryCode)
       }
     }
   }
@@ -337,26 +337,28 @@ class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtur
           destinationType = destinationType
         ))
         .copy(consigneeTrader = CreateMovementFixtures.createMovementModelMax.consigneeTrader.map(
-          _.copy(traderId = Some(consigneeTraderCountryCode))
+          _.copy(traderExciseNumber = Some(consigneeTraderCountryCode))
         ))
         .copy(complementConsigneeTrader = CreateMovementFixtures.createMovementModelMax.complementConsigneeTrader.map(
           _.copy(memberStateCode = complementConsigneeTraderCountryCode)
         ))
         .copy(deliveryPlaceTrader = CreateMovementFixtures.createMovementModelMax.deliveryPlaceTrader.map(
-          _.copy(traderId = Some(deliveryPlaceTraderCountryCode))
+          _.copy(traderExciseNumber = Some(deliveryPlaceTraderCountryCode))
         ))
         .copy(deliveryPlaceCustomsOffice = CreateMovementFixtures.createMovementModelMax.deliveryPlaceCustomsOffice.map(
           _.copy(referenceNumber = deliveryPlaceCustomsOfficeCountryCode)
         ))
         .copy(consignorTrader = CreateMovementFixtures.createMovementModelMax.consignorTrader
-          .copy(traderExciseNumber = consignorTraderCountryCode)
+          .copy(traderExciseNumber = Some(consignorTraderCountryCode))
         )
 
     SubmitCreateMovementRequest(
-      if(!hasPlaceOfDispatch) request else {
+      if(hasPlaceOfDispatch) {
         request.copy(placeOfDispatchTrader = CreateMovementFixtures.createMovementModelMax.placeOfDispatchTrader.map(
-          _.copy(traderId = Some(placeOfDispatchTraderCountryCode))
+          _.copy(traderExciseNumber = Some(placeOfDispatchTraderCountryCode))
         ))
+      } else {
+        request.copy(placeOfDispatchTrader = None)
       }
     )
   }

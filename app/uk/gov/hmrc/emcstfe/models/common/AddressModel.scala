@@ -29,12 +29,26 @@ case class AddressModel(streetNumber: Option[String],
 
   val isEmpty = streetNumber.isEmpty && street.isEmpty && postcode.isEmpty && city.isEmpty
 
-  def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
-    {street.map(x => <urn:StreetName>{x}</urn:StreetName>)},
-    {streetNumber.map(x => <urn:StreetNumber>{x}</urn:StreetNumber>)},
-    {postcode.map(x => <urn:Postcode>{x}</urn:Postcode>)},
-    {city.map(x => <urn:City>{x}</urn:City>)}
-  ).flatten)
+  def toXml(traderType: TraderModelType): NodeSeq = NodeSeq.fromSeq(
+    {
+      Seq(
+        street.map(x => <urn:StreetName>{x}</urn:StreetName>),
+        streetNumber.map(x => <urn:StreetNumber>{x}</urn:StreetNumber>)
+      ) ++ {
+        if(traderType == GuarantorTrader) {
+          Seq(
+            city.map(x => <urn:City>{x}</urn:City>),
+            postcode.map(x => <urn:Postcode>{x}</urn:Postcode>)
+          )
+        } else {
+          Seq(
+            postcode.map(x => <urn:Postcode>{x}</urn:Postcode>),
+            city.map(x => <urn:City>{x}</urn:City>)
+          )
+        }
+      }
+    }.flatten
+  )
 }
 
 object AddressModel {
