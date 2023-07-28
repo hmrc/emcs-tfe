@@ -94,13 +94,25 @@ class SubmitCancellationOfMovementRequestSpec extends UnitSpec with SubmitCancel
           SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.GB"
         }
 
-        "the destination type is any other type" in {
-          val testModel = maxSubmitCancellationOfMovementModel.copy(
-            destinationType = TaxWarehouse,
-            consigneeTrader = Some(maxTraderModel.copy(traderId = Some("FR00001")))
-          )
+        "the destination type is any other type" when {
 
-          SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.FR"
+          "consignee trader exists, use traderId country code" in {
+            val testModel = maxSubmitCancellationOfMovementModel.copy(
+              destinationType = TaxWarehouse,
+              consigneeTrader = Some(maxTraderModel.copy(traderId = Some("FR00001")))
+            )
+
+            SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.FR"
+          }
+
+          "consignee trader is None, default to GB" in {
+            val testModel = maxSubmitCancellationOfMovementModel.copy(
+              destinationType = TaxWarehouse,
+              consigneeTrader = None
+            )
+
+            SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.GB"
+          }
         }
       }
 
