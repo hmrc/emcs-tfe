@@ -43,22 +43,22 @@ case class BodyEadEsadModel(
                              wineProduct: Option[WineProductModel]
                            ) extends XmlBaseModel with XmlWriterUtils {
   def toXml(implicit request: UserRequest[_]): Elem = <urn:BodyEadEsad>
-    <BodyRecordUniqueReference>{bodyRecordUniqueReference}</BodyRecordUniqueReference>
-    <ExciseProductCode>{exciseProductCode}</ExciseProductCode>
-    <CnCode>{cnCode}</CnCode>
-    <Quantity>{quantity}</Quantity>
-    <GrossMass>{grossMass}</GrossMass>
-    <NetMass>{netMass}</NetMass>
-    {alcoholicStrengthByVolumeInPercentage.mapNodeSeq(value => <AlcoholicStrengthByVolumeInPercentage>{value}</AlcoholicStrengthByVolumeInPercentage>)}
-    {degreePlato.mapNodeSeq(value => <DegreePlato>{value}</DegreePlato>)}
-    {fiscalMark.mapNodeSeq(value => <FiscalMark language="en">{value}</FiscalMark>)}
-    {fiscalMarkUsedFlag.mapNodeSeq(value => <FiscalMarkUsedFlag>{value.toFlag}</FiscalMarkUsedFlag>)}
-    {designationOfOrigin.mapNodeSeq(value => <DesignationOfOrigin language="en">{value}</DesignationOfOrigin>)}
-    {sizeOfProducer.mapNodeSeq(value => <SizeOfProducer>{value}</SizeOfProducer>)}
-    {density.mapNodeSeq(value => <Density>{value}</Density>)}
-    {commercialDescription.mapNodeSeq(value => <CommercialDescription language="en">{value}</CommercialDescription>)}
-    {brandNameOfProducts.mapNodeSeq(value => <BrandNameOfProducts language="en">{value}</BrandNameOfProducts>)}
-    {maturationPeriodOrAgeOfProducts.mapNodeSeq(value => <MaturationPeriodOrAgeOfProducts language="en">{value}</MaturationPeriodOrAgeOfProducts>)}
+    <urn:BodyRecordUniqueReference>{bodyRecordUniqueReference.toString}</urn:BodyRecordUniqueReference>
+    <urn:ExciseProductCode>{exciseProductCode}</urn:ExciseProductCode>
+    <urn:CnCode>{cnCode}</urn:CnCode>
+    <urn:Quantity>{quantity}</urn:Quantity>
+    <urn:GrossMass>{grossMass}</urn:GrossMass>
+    <urn:NetMass>{netMass}</urn:NetMass>
+    {alcoholicStrengthByVolumeInPercentage.mapNodeSeq(value => <urn:AlcoholicStrengthByVolumeInPercentage>{value}</urn:AlcoholicStrengthByVolumeInPercentage>)}
+    {degreePlato.mapNodeSeq(value => <urn:DegreePlato>{value}</urn:DegreePlato>)}
+    {fiscalMark.mapNodeSeq(value => <urn:FiscalMark language="en">{value}</urn:FiscalMark>)}
+    {fiscalMarkUsedFlag.mapNodeSeq(value => <urn:FiscalMarkUsedFlag>{value.toFlag}</urn:FiscalMarkUsedFlag>)}
+    {designationOfOrigin.mapNodeSeq(value => <urn:DesignationOfOrigin language="en">{value}</urn:DesignationOfOrigin>)}
+    {sizeOfProducer.mapNodeSeq(value => <urn:SizeOfProducer>{value}</urn:SizeOfProducer>)}
+    {density.mapNodeSeq(value => <urn:Density>{value}</urn:Density>)}
+    {commercialDescription.mapNodeSeq(value => <urn:CommercialDescription language="en">{value}</urn:CommercialDescription>)}
+    {brandNameOfProducts.mapNodeSeq(value => <urn:BrandNameOfProducts language="en">{value}</urn:BrandNameOfProducts>)}
+    {maturationPeriodOrAgeOfProducts.mapNodeSeq(value => <urn:MaturationPeriodOrAgeOfProducts language="en">{value}</urn:MaturationPeriodOrAgeOfProducts>)}
     {packages.map(_.toXml)}
     {wineProduct.mapNodeSeq(_.toXml)}
   </urn:BodyEadEsad>

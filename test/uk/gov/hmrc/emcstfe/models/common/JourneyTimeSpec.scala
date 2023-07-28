@@ -109,8 +109,17 @@ class JourneyTimeSpec extends UnitSpec {
   }
 
   "toDownstream" should {
+
+    "return the correct value for Hours (single digit)" in {
+      Hours("1").toDownstream shouldBe "H01"
+    }
+
     "return the correct value for Hours" in {
       Hours("20").toDownstream shouldBe "H20"
+    }
+
+    "return the correct value for Days (single digit)" in {
+      Days("1").toDownstream shouldBe "D01"
     }
 
     "return the correct value for Days" in {

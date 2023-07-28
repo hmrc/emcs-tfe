@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.models.common
 import com.lucidchart.open.xtract.{ParseError, ParseFailure, ParseSuccess, XmlReader}
 import play.api.libs.json._
 
+import scala.util.Try
 import scala.xml.NodeSeq
 
 sealed trait JourneyTime {
@@ -41,8 +42,8 @@ object JourneyTime {
 
   implicit val reads: Reads[JourneyTime] = {
     case JsString(value) => value.split(" ").toList match {
-      case value :: "hours" :: Nil => JsSuccess(Hours(value))
-      case value :: "days" :: Nil => JsSuccess(Days(value))
+      case value :: "hours" :: Nil if Try(value.toInt).isSuccess => JsSuccess(Hours(value))
+      case value :: "days" :: Nil if Try(value.toInt).isSuccess => JsSuccess(Days(value))
       case other => JsError(s"Could not parse JourneyTime from JSON, received: '${other.mkString(" ")}'")
     }
     case other => JsError(s"Value is not a String: $other")
@@ -53,12 +54,12 @@ object JourneyTime {
   case class Hours(time: String) extends JourneyTime {
     override def toString: String = s"$time hours"
 
-    def toDownstream: String = s"H$time"
+    def toDownstream: String = s"H${"%02d".format(time.toInt)}"
   }
 
   case class Days(time: String) extends JourneyTime {
     override def toString: String = s"$time days"
 
-    def toDownstream: String = s"D$time"
+    def toDownstream: String = s"D${"%02d".format(time.toInt)}"
   }
 }
