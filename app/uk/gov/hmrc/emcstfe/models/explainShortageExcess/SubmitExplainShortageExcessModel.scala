@@ -17,10 +17,11 @@
 package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{ExciseMovementModel, TraderModel, XmlBaseModel}
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, ExciseMovementModel, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class SubmitExplainShortageExcessModel(attributes: AttributesModel,
                                             consigneeTrader: Option[TraderModel],
@@ -28,24 +29,20 @@ case class SubmitExplainShortageExcessModel(attributes: AttributesModel,
                                             consignorTrader: Option[ConsignorTraderModel],
                                             analysis: Option[AnalysisModel],
                                             bodyAnalysis: Option[Seq[BodyAnalysisModel]]
-                                           ) extends XmlBaseModel {
+                                           ) extends XmlBaseModel with XmlWriterUtils {
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:ExplanationOnReasonForShortage>
       {attributes.toXml}
-      {consigneeTrader.map(trader =>
+      {consigneeTrader.mapNodeSeq(trader =>
       <urn:ConsigneeTrader language="en">
         {trader.toXml}
       </urn:ConsigneeTrader>
-    ).getOrElse(NodeSeq.Empty)}
+    )}
       {exciseMovement.toXml}
-      {consignorTrader.map(trader =>
-      <urn:ConsignorTrader language="en">
-        {trader.toXml}
-      </urn:ConsignorTrader>
-    ).getOrElse(NodeSeq.Empty)}
-      {analysis.map(_.toXml).getOrElse(NodeSeq.Empty)}
-      {bodyAnalysis.map(_.map(_.toXml)).getOrElse(NodeSeq.Empty)}
+      {consignorTrader.mapNodeSeq(_.toXml)}
+      {analysis.mapNodeSeq(_.toXml)}
+      {bodyAnalysis.mapNodeSeq(_.map(_.toXml))}
     </urn:ExplanationOnReasonForShortage>
 }
 

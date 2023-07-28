@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitExplainShortageExcessFixtures, TraderModelFixtures}
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{SubmitterType, TraderModel}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.AttributesModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -30,7 +28,6 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
 
   import SubmitExplainShortageExcessFixtures._
 
-  implicit val userRequest = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
   val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax)
 
   "requestBody" should {
@@ -53,7 +50,7 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
             </MetaData>
           </soapenv:Header>
           <soapenv:Body>
-            <urn:IE871 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+            <urn:IE871 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.01">
               <urn:Header>
                 <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
                 <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>
@@ -150,15 +147,21 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
     }
   }
 
-  "action" should {
+  ".action" should {
     "be correct" in {
       request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitreasonforshortageportal"
     }
   }
 
-  "shouldExtractFromSoap" should {
+  ".shouldExtractFromSoap" should {
     "be correct" in {
       request.shouldExtractFromSoap shouldBe false
+    }
+  }
+
+  ".exciseRegistrationNumber" should {
+    "be correct" in {
+      request.exciseRegistrationNumber shouldBe testErn
     }
   }
 }

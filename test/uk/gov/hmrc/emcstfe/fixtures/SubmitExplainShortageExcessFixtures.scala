@@ -17,13 +17,12 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.models.common.{AddressModel, ExciseMovementModel, SubmitterType, TraderModel}
+import uk.gov.hmrc.emcstfe.models.common.{ExciseMovementModel, SubmitterType}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, AttributesModel, BodyAnalysisModel, SubmitExplainShortageExcessModel}
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
 
 import scala.xml.Elem
 
-trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
+trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with TraderModelFixtures with ConsignorTraderModelFixtures {
 
   object AttributesFixtures {
     val attributesModel: AttributesModel = AttributesModel(
@@ -36,44 +35,6 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
 
     val attributesJson: JsObject = Json.obj(
       "submitterType" -> "1"
-    )
-  }
-
-  object ConsigneeTraderFixtures {
-    val consigneeTraderModel: TraderModel = TraderModel(
-      vatNumber = None,
-      traderExciseNumber = None,
-      traderId = Some("id"),
-      traderName = Some("name"),
-      address = Some(AddressModel(
-        streetNumber = Some("number"),
-        street = Some("street"),
-        postcode = Some("a postcode"),
-        city = Some("a city")
-      )),
-      eoriNumber = Some("eori")
-    )
-
-    val consigneeTraderXml: Elem = <urn:ConsigneeTrader language="en">
-      <urn:Traderid>id</urn:Traderid>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>number</urn:StreetNumber>
-      <urn:Postcode>a postcode</urn:Postcode>
-      <urn:City>a city</urn:City>
-      <urn:EoriNumber>eori</urn:EoriNumber>
-    </urn:ConsigneeTrader>
-
-    val consigneeTraderJson: JsObject = Json.obj(
-      "traderId" -> "id",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "streetNumber" -> "number",
-        "street" -> "street",
-        "postcode" -> "a postcode",
-        "city" -> "a city",
-      ),
-      "eoriNumber" -> "eori"
     )
   }
 
@@ -91,39 +52,6 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
     val exciseMovementJson: JsObject = Json.obj(
       "arc" -> "01DE0000012345",
       "sequenceNumber" -> 1
-    )
-  }
-
-  object ConsignorTraderFixtures {
-    val consignorTraderModel: ConsignorTraderModel = ConsignorTraderModel(
-      traderExciseNumber = "excise number",
-      traderName = "name",
-      address = AddressModel(
-        streetNumber = Some("number"),
-        street = Some("street"),
-        postcode = Some("a postcode"),
-        city = Some("a city")
-      )
-    )
-
-    val consignorTraderXml: Elem = <urn:ConsignorTrader language="en">
-      <urn:TraderExciseNumber>excise number</urn:TraderExciseNumber>
-      <urn:TraderName>name</urn:TraderName>
-      <urn:StreetName>street</urn:StreetName>
-      <urn:StreetNumber>number</urn:StreetNumber>
-      <urn:Postcode>a postcode</urn:Postcode>
-      <urn:City>a city</urn:City>
-    </urn:ConsignorTrader>
-
-    val consignorTraderJson: JsObject = Json.obj(
-      "traderExciseNumber" -> "excise number",
-      "traderName" -> "name",
-      "address" -> Json.obj(
-        "streetNumber" -> "number",
-        "street" -> "street",
-        "postcode" -> "a postcode",
-        "city" -> "a city",
-      )
     )
   }
 
@@ -191,7 +119,6 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
     import AttributesFixtures._
     import BodyAnalysisFixtures._
     import ConsigneeTraderFixtures._
-    import ConsignorTraderFixtures._
     import ExciseMovementFixtures._
 
     val submitExplainShortageExcessModelMax: SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
@@ -216,7 +143,7 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture {
       {attributesXml}
       {consigneeTraderXml}
       {exciseMovementXml}
-      {consignorTraderXml}
+      {consignorTraderModelXML}
       {analysisXml}
       {bodyAnalysisXmlMax}
       {bodyAnalysisXmlMin}

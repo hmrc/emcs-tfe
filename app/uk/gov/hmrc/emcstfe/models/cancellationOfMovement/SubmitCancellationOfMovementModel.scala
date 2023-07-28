@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.cancellationOfMovement
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, ExciseMovementModel, TraderModel, XmlBaseModel}
 
 import java.time.LocalDate
@@ -30,7 +31,7 @@ case class SubmitCancellationOfMovementModel(dateAndTimeOfValidationOfCancellati
                                              memberStateCode: String
                                             ) extends XmlBaseModel {
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:CancellationOfEAD>
       <urn:Attributes/>
       <urn:ExciseMovementEad>

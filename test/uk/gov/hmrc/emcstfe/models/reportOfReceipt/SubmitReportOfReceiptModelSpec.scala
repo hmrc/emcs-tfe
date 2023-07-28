@@ -16,14 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-import scala.xml.Utility.trim
-
-class SubmitReportOfReceiptModelSpec extends UnitSpec with SubmitReportOfReceiptFixtures {
+class SubmitReportOfReceiptModelSpec extends XmlModelBaseSpec with SubmitReportOfReceiptFixtures {
 
   "SubmitReportOfReceiptModel" must {
 
@@ -34,26 +32,18 @@ class SubmitReportOfReceiptModelSpec extends UnitSpec with SubmitReportOfReceipt
       maxSubmitReportOfReceiptModel.copy(acceptMovement = PartiallyRefused).globalConclusion shouldBe 4
     }
 
-    "for the maximum number of fields" must {
+    testJsonToModelToXml(
+      "max fields",
+      Json.toJson(maxSubmitReportOfReceiptModel).as[JsObject],
+      maxSubmitReportOfReceiptModel,
+      maxSubmitReportOfReceiptModelXML
+    )
 
-      "be possible to serialise and de-serialise to/from JSON" in {
-        Json.toJson(maxSubmitReportOfReceiptModel).as[SubmitReportOfReceiptModel] shouldBe maxSubmitReportOfReceiptModel
-      }
-
-      "write to XML" in {
-        trim(maxSubmitReportOfReceiptModel.toXml).toString shouldBe trim(maxSubmitReportOfReceiptModelXML).toString
-      }
-    }
-
-    "for the minimum number of fields" must {
-
-      "be possible to serialise and de-serialise to/from JSON" in {
-        Json.toJson(minSubmitReportOfReceiptModel).as[SubmitReportOfReceiptModel] shouldBe minSubmitReportOfReceiptModel
-      }
-
-      "write to XML" in {
-        trim(minSubmitReportOfReceiptModel.toXml).toString shouldBe trim(minSubmitReportOfReceiptModelXML).toString
-      }
-    }
+    testJsonToModelToXml(
+      "min fields",
+      Json.toJson(minSubmitReportOfReceiptModel).as[JsObject],
+      minSubmitReportOfReceiptModel,
+      minSubmitReportOfReceiptModelXML
+    )
   }
 }

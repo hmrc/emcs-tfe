@@ -46,6 +46,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
   with SubmitExplainShortageExcessFixtures
   with SubmitAlertOrRejectionFixtures
   with SubmitCancellationOfMovementFixtures
+  with CreateMovementFixtures
   with MockMetricsService {
 
   override def afterEach(): Unit = {
@@ -185,20 +186,23 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     }
   }
 
-  "submitDraftMovementChrisSOAPRequest" should {
-    val submitDraftMovementRequest = SubmitDraftMovementRequest("", "", submitDraftMovementRequestBody)
+  "submitCreateMovementChrisSOAPRequest" should {
+
+    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+    val submitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax)
+
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(submitDraftMovementRequest.metricName)
+        MockMetricsService.chrisTimer(submitCreateMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
-          body = submitDraftMovementRequest.requestBody,
+          body = submitCreateMovementRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitCreateMovementRequest.action}""""
           )
         )
           .returns(Future.successful(Right(chrisSuccessResponse)))
@@ -206,7 +210,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe Right(chrisSuccessResponse)
+        await(connector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](submitCreateMovementRequest)) shouldBe Right(chrisSuccessResponse)
       }
     }
     "return a Left" when {
@@ -214,42 +218,42 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(submitDraftMovementRequest.metricName)
+        MockMetricsService.chrisTimer(submitCreateMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
-          body = submitDraftMovementRequest.requestBody,
+          body = submitCreateMovementRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitCreateMovementRequest.action}""""
           )
         ).returns(Future.successful(response))
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](submitCreateMovementRequest)) shouldBe response
       }
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(submitDraftMovementRequest.metricName)
+        MockMetricsService.chrisTimer(submitCreateMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
           url = s"$baseUrl/ChRIS/EMCS/SubmitDraftMovementPortal/3",
-          body = submitDraftMovementRequest.requestBody,
+          body = submitCreateMovementRequest.requestBody,
           headers = Seq(
             HeaderNames.ACCEPT -> "application/soap+xml",
-            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitDraftMovementRequest.action}""""
+            HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${submitCreateMovementRequest.action}""""
           )
         ).returns(Future.successful(response))
 
         MockXmlUtils.prepareXmlForSubmission()
           .returns(Right(""))
 
-        await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](submitCreateMovementRequest)) shouldBe response
       }
       "cannot prepare XML for submission" in new Test {
         val response: Either[ErrorResponse, String] = Left(MarkPlacementError)
@@ -258,7 +262,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
         MockXmlUtils.prepareXmlForSubmission()
           .returns(response)
 
-        await(connector.submitDraftMovementChrisSOAPRequest[ChRISSuccessResponse](submitDraftMovementRequest)) shouldBe response
+        await(connector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](submitCreateMovementRequest)) shouldBe response
       }
     }
   }

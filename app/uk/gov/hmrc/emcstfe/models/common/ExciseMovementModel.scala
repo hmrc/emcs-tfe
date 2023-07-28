@@ -17,12 +17,13 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 
 import scala.xml.Elem
 
 case class ExciseMovementModel(arc: String,
                                sequenceNumber: Int) extends XmlBaseModel {
-  def toXml: Elem = <urn:ExciseMovement>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:ExciseMovement>
     <urn:AdministrativeReferenceCode>{arc}</urn:AdministrativeReferenceCode>
     <urn:SequenceNumber>{sequenceNumber}</urn:SequenceNumber>
   </urn:ExciseMovement>

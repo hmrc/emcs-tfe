@@ -57,13 +57,13 @@ class ChrisConnector @Inject()(val http: HttpClient,
         postString(http, url, preparedXml, request)(ec, headerCarrier, chrisHttpParser.modelFromXmlHttpReads(request.shouldExtractFromSoap))
     }
 
-  def submitDraftMovementChrisSOAPRequest[A](request: ChrisRequest)
+  def submitCreateMovementChrisSOAPRequest[A](request: ChrisRequest)
                                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
-    prepareXMLAndSubmit(appConfig.urlSubmitDraftMovementPortal(), request, "submitDraftMovementChrisSOAPRequest")
+    prepareXMLAndSubmit(appConfig.urlSubmitCreateMovement(), request, "submitCreateMovementChrisSOAPRequest")
 
   def submitReportOfReceiptChrisSOAPRequest[A](request: ChrisRequest)
                                               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
-    prepareXMLAndSubmit(appConfig.urlSubmitReportofReceiptPortal(), request, "submitReportOfReceiptChrisSOAPRequest")
+    prepareXMLAndSubmit(appConfig.urlSubmitReportOfReceipt(), request, "submitReportOfReceiptChrisSOAPRequest")
 
   def submitExplainDelayChrisSOAPRequest[A](request: ChrisRequest)
                                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =

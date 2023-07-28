@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
@@ -26,7 +24,6 @@ import scala.xml.XML
 
 class SubmitExplainDelayRequestSpec extends UnitSpec with SubmitExplainDelayFixtures {
 
-  implicit val userRequest = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
   val request = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
 
   "requestBody" should {
@@ -49,7 +46,7 @@ class SubmitExplainDelayRequestSpec extends UnitSpec with SubmitExplainDelayFixt
             </MetaData>
           </soapenv:Header>
           <soapenv:Body>
-            <urn:IE837 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+            <urn:IE837 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.01">
               <urn:Header>
                 <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
                 <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>
@@ -90,15 +87,21 @@ class SubmitExplainDelayRequestSpec extends UnitSpec with SubmitExplainDelayFixt
     }
   }
 
-  "action" should {
+  ".action" should {
     "be correct" in {
       request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitexplaindelaytodeliveryportal"
     }
   }
 
-  "shouldExtractFromSoap" should {
+  ".shouldExtractFromSoap" should {
     "be set to `false`" in {
       request.shouldExtractFromSoap shouldBe false
+    }
+  }
+
+  ".exciseRegistrationNumber" should {
+    "be correct" in {
+      request.exciseRegistrationNumber shouldBe testErn
     }
   }
 }

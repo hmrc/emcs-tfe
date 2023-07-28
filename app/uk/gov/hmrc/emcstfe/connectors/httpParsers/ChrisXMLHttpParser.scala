@@ -31,26 +31,12 @@ import scala.xml.{NodeSeq, XML}
 @Singleton
 class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
 
-  def modelFromXmlHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
-    logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
-    response.status match {
-      case OK =>
-        Try(XML.loadString(response.body)) match {
-          case Failure(exception) =>
-            logger.warn("[rawXMLHttpReads] Unable to read response body as XML", exception)
-            Left(XmlValidationError)
-          case Success(xml) =>
-            if(shouldExtractFromSoap) {
-              soapUtils.extractFromSoap(xml) flatMap { xmlBody =>
-                handleParseResult(XmlReader.of[A].read(xmlBody))
-              }
-            } else handleParseResult(XmlReader.of[A].read(xml))
-        }
-      case status =>
-        logger.warn(s"[rawXMLHttpReads] Unexpected status from chris: $status")
-        Left(UnexpectedDownstreamResponseError)
+  def modelFromXmlHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] =
+    rawXMLHttpReads(shouldExtractFromSoap).map  {
+      case Right(value) =>
+        handleParseResult(XmlReader.of[A].read(value))
+      case Left(error) => Left(error)
     }
-  }
 
   def rawXMLHttpReads(shouldExtractFromSoap: Boolean): HttpReads[Either[ErrorResponse, NodeSeq]] = (_: String, _: String, response: HttpResponse) => {
     logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")

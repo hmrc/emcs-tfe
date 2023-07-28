@@ -19,11 +19,10 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement._
-
-import scala.xml.NodeSeq
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 case class UnsatisfactoryModel(reason: WrongWithMovement,
-                               additionalInformation: Option[String]) {
+                               additionalInformation: Option[String]) extends XmlWriterUtils {
 
   val reasonMapping = reason match {
     case Other => 0
@@ -35,10 +34,8 @@ case class UnsatisfactoryModel(reason: WrongWithMovement,
 
   val toXml =
     <urn:UnsatisfactoryReason>
-      <urn:UnsatisfactoryReasonCode>
-        {reasonMapping}
-      </urn:UnsatisfactoryReasonCode>
-      {additionalInformation.map(x => <urn:ComplementaryInformation language="en">{x}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+      <urn:UnsatisfactoryReasonCode>{reasonMapping}</urn:UnsatisfactoryReasonCode>
+      {additionalInformation.mapNodeSeq(x => <urn:ComplementaryInformation language="en">{x}</urn:ComplementaryInformation>)}
     </urn:UnsatisfactoryReason>
 }
 

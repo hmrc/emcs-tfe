@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, Export, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -27,7 +25,6 @@ import scala.xml.XML
 
 class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfReceiptFixtures {
 
-  implicit val userRequest = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
   val request = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
   "requestBody" should {
@@ -50,7 +47,7 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
             </MetaData>
           </soapenv:Header>
           <soapenv:Body>
-            <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+            <urn:IE818 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
               <urn:Header>
                 <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
                 <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>
@@ -180,15 +177,21 @@ class SubmitReportOfReceiptRequestSpec extends UnitSpec with SubmitReportOfRecei
     }
   }
 
-  "action" should {
+  ".action" should {
     "be correct" in {
       request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitreportofreceiptportal"
     }
   }
 
-  "shouldExtractFromSoap" should {
+  ".shouldExtractFromSoap" should {
     "be correct" in {
       request.shouldExtractFromSoap shouldBe false
+    }
+  }
+
+  ".exciseRegistrationNumber" should {
+    "be correct" in {
+      request.exciseRegistrationNumber shouldBe testErn
     }
   }
 }

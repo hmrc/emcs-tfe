@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.{JsError, JsNull, JsString, JsSuccess, Json}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.{Days, Hours, JourneyTimeParseFailure}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -32,6 +32,39 @@ class JourneyTimeSpec extends UnitSpec {
 
     "write a Days model to JSON" in {
       Json.toJson[JourneyTime](Days("40")) shouldBe JsString("40 days")
+    }
+  }
+
+  ".reads" should {
+
+    "successfully read a JourneyTime item" when {
+
+      "response is in Hours" in {
+        val json = JsString("30 hours")
+
+        JourneyTime.reads.reads(json) shouldBe JsSuccess(Hours("30"))
+      }
+
+      "response is in Days" in {
+        val json = JsString("30 days")
+
+        JourneyTime.reads.reads(json) shouldBe JsSuccess(Days("30"))
+      }
+    }
+
+    "fail to read JourneyTime" when {
+
+      "not in Hours/Days format" in {
+        val json = JsString("30")
+
+        JourneyTime.reads.reads(json) shouldBe JsError("Could not parse JourneyTime from JSON, received: '30'")
+      }
+
+      "not a String" in {
+        val json = JsNull
+
+        JourneyTime.reads.reads(json) shouldBe JsError("Value is not a String: null")
+      }
     }
   }
 
@@ -60,7 +93,7 @@ class JourneyTimeSpec extends UnitSpec {
 
         val xml: Elem = <JourneyTime>30</JourneyTime>
 
-        JourneyTime.xmlReads.read(xml) shouldBe ParseFailure(JourneyTimeParseFailure("Could not parse JourneyTime, received: '30'"))
+        JourneyTime.xmlReads.read(xml) shouldBe ParseFailure(JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: '30'"))
       }
     }
   }
@@ -72,6 +105,16 @@ class JourneyTimeSpec extends UnitSpec {
 
     "return the correct value for Days" in {
       Days("20").toString shouldBe "20 days"
+    }
+  }
+
+  "toDownstream" should {
+    "return the correct value for Hours" in {
+      Hours("20").toDownstream shouldBe "H20"
+    }
+
+    "return the correct value for Days" in {
+      Days("20").toDownstream shouldBe "D20"
     }
   }
 }

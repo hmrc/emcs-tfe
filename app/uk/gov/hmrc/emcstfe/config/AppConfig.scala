@@ -56,10 +56,10 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
 
-  def urlSubmitDraftMovementPortal(): String =
+  def urlSubmitCreateMovement(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitDraftMovementPortal/3"
 
-  def urlSubmitReportofReceiptPortal(): String =
+  def urlSubmitReportOfReceipt(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
 
   def urlSubmitExplainDelay(): String =

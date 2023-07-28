@@ -16,54 +16,27 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
 
 case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
-                                    (implicit request: UserRequest[_]) extends ChrisRequest {
+                                    (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {
   override def exciseRegistrationNumber: String = request.ern
 
   private val arcCountryCode = body.arc.substring(2, 4)
   private val ernCountryCode = exciseRegistrationNumber.substring(0, 2)
 
-  val messageRecipient = NDEA ++ arcCountryCode
-  val messageSender: String = NDEA ++ ernCountryCode
-
-  val soapRequest =
-    <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-      <soapenv:Header>
-        <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
-          <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
-          <ns:VendorID>1259</ns:VendorID>
-          <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
-          <ns:ServiceID>1138</ns:ServiceID>
-          <ns:ServiceMessageType>HMRC-EMCS-IE837-DIRECT</ns:ServiceMessageType>
-        </ns:Info>
-        <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-          <CredentialID>{request.credId}</CredentialID>
-          <Identifier>{exciseRegistrationNumber}</Identifier>
-        </MetaData>
-      </soapenv:Header>
-      <soapenv:Body>
-        <urn:IE837 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
-          <urn:Header>
-            <urn1:MessageSender>{messageSender}</urn1:MessageSender>
-            <urn1:MessageRecipient>{messageRecipient}</urn1:MessageRecipient>
-            <urn1:DateOfPreparation>{preparedDate.toString}</urn1:DateOfPreparation>
-            <urn1:TimeOfPreparation>{preparedTime.toString}</urn1:TimeOfPreparation>
-            <urn1:MessageIdentifier>{messageUUID}</urn1:MessageIdentifier>
-            <urn1:CorrelationIdentifier>{correlationUUID}</urn1:CorrelationIdentifier>
-          </urn:Header>
-          <urn:Body>
-            {body.toXml}
-          </urn:Body>
-        </urn:IE837>
-      </soapenv:Body>
-    </soapenv:Envelope>
+  val messageRecipient = Constants.NDEA ++ arcCountryCode
+  val messageSender: String = Constants.NDEA ++ ernCountryCode
 
   override def requestBody: String =
-    s"""<?xml version='1.0' encoding='UTF-8'?>
-       |${soapRequest.toString}""".stripMargin
+    withSoapEnvelope(
+      body = body,
+      messageNumber = 837,
+      messageSender = messageSender,
+      messageRecipient = messageRecipient
+    ).toString()
 
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitexplaindelaytodeliveryportal"
 

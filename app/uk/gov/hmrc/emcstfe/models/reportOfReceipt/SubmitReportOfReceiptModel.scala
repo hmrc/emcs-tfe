@@ -17,11 +17,13 @@
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
-import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType, TraderModel}
+import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import java.time.LocalDate
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 case class SubmitReportOfReceiptModel(arc: String,
                                       sequenceNumber: Int,
@@ -32,7 +34,7 @@ case class SubmitReportOfReceiptModel(arc: String,
                                       dateOfArrival: LocalDate,
                                       acceptMovement: AcceptMovement,
                                       individualItems: Seq[ReceiptedItemsModel],
-                                      otherInformation: Option[String]) {
+                                      otherInformation: Option[String]) extends XmlBaseModel with XmlWriterUtils {
 
   val globalConclusion = acceptMovement match {
     case Satisfactory => 1
@@ -41,14 +43,14 @@ case class SubmitReportOfReceiptModel(arc: String,
     case PartiallyRefused => 4
   }
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes/>
-      {consigneeTrader.map { ct =>
+      {consigneeTrader.mapNodeSeq { ct =>
         <urn:ConsigneeTrader language="en">
           {ct.toXml}
         </urn:ConsigneeTrader>
-      }.getOrElse(NodeSeq.Empty)}
+      }}
       <urn:ExciseMovement>
         <urn:AdministrativeReferenceCode>
           {arc}
@@ -57,11 +59,11 @@ case class SubmitReportOfReceiptModel(arc: String,
           {sequenceNumber}
         </urn:SequenceNumber>
       </urn:ExciseMovement>
-      {deliveryPlaceTrader.map { dt =>
+      {deliveryPlaceTrader.mapNodeSeq { dt =>
         <urn:DeliveryPlaceTrader language="en">
           {dt.toXml}
         </urn:DeliveryPlaceTrader>
-      }.getOrElse(NodeSeq.Empty)}
+      }}
       <urn:DestinationOffice>
         <urn:ReferenceNumber>
           {destinationOffice}
@@ -74,7 +76,7 @@ case class SubmitReportOfReceiptModel(arc: String,
         <urn:GlobalConclusionOfReceipt>
           {globalConclusion}
         </urn:GlobalConclusionOfReceipt>
-        {otherInformation.map(x => <urn:ComplementaryInformation language="en">{x}</urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+        {otherInformation.mapNodeSeq(x => <urn:ComplementaryInformation language="en">{x}</urn:ComplementaryInformation>)}
       </urn:ReportOfReceiptExport>
       {individualItems.map(_.toXml)}
     </urn:AcceptedOrRejectedReportOfReceiptExport>

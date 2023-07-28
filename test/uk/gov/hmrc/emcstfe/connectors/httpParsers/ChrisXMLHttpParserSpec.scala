@@ -95,7 +95,7 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovement
             EmptyError(GetMovementResponse.consignorTrader \\ "TraderExciseNumber"),
             EmptyError(GetMovementResponse.consignorTrader \\ "TraderName"),
             EmptyError(GetMovementResponse.dateOfDispatch),
-            JourneyTimeParseFailure("Could not parse JourneyTime, received: ''")
+            JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''")
           )))
         }
       }

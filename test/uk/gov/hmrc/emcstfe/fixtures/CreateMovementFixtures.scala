@@ -1,0 +1,559 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.emcstfe.fixtures
+
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.TaxWarehouse
+import uk.gov.hmrc.emcstfe.models.common.MovementType.UKtoUK
+import uk.gov.hmrc.emcstfe.models.common._
+import uk.gov.hmrc.emcstfe.models.createMovement._
+
+import scala.xml.Elem
+
+trait CreateMovementFixtures extends BaseFixtures
+  with TraderModelFixtures
+  with ConsignorTraderModelFixtures
+  with MovementGuaranteeFixtures
+  with TransportDetailsFixtures
+  with ChRISResponsesFixture {
+
+  object CaMAttributesFixtures {
+    lazy val attributesModelMax: AttributesModel = AttributesModel(
+      submissionMessageType = SubmissionMessageType.DutyPaidB2B,
+      deferredSubmissionFlag = Some(true)
+    )
+    lazy val attributesModelMin: AttributesModel = AttributesModel(
+      submissionMessageType = SubmissionMessageType.Standard,
+      deferredSubmissionFlag = None
+    )
+    lazy val attributesXmlMax: Elem = <urn:Attributes>
+      <urn:SubmissionMessageType>3</urn:SubmissionMessageType>
+      <urn:DeferredSubmissionFlag>1</urn:DeferredSubmissionFlag>
+    </urn:Attributes>
+    lazy val attributesXmlMin: Elem = <urn:Attributes>
+      <urn:SubmissionMessageType>1</urn:SubmissionMessageType>
+    </urn:Attributes>
+    lazy val attributesJsonMax: JsObject = Json.obj(
+      "submissionMessageType" -> "3",
+      "deferredSubmissionFlag" -> true
+    )
+    lazy val attributesJsonMin: JsObject = Json.obj(
+      "submissionMessageType" -> "1"
+    )
+  }
+
+
+  object OfficeFixtures {
+    lazy val officeModel: OfficeModel = OfficeModel(
+      referenceNumber = "number"
+    )
+    lazy val officeXml: Elem = <urn:ReferenceNumber>number</urn:ReferenceNumber>
+    lazy val officeJson: JsObject = Json.obj(
+      "referenceNumber" -> "number"
+    )
+  }
+
+  object ComplementConsigneeTraderFixtures {
+    lazy val complementConsigneeTraderModelMax: ComplementConsigneeTraderModel = ComplementConsigneeTraderModel(
+      memberStateCode = "code",
+      serialNumberOfCertificateOfExemption = Some("number")
+    )
+    lazy val complementConsigneeTraderModelMin: ComplementConsigneeTraderModel = ComplementConsigneeTraderModel(
+      memberStateCode = "code",
+      serialNumberOfCertificateOfExemption = None
+    )
+    lazy val complementConsigneeTraderXmlMax: Elem = <urn:ComplementConsigneeTrader>
+      <urn:MemberStateCode>code</urn:MemberStateCode>
+      <urn:SerialNumberOfCertificateOfExemption>number</urn:SerialNumberOfCertificateOfExemption>
+    </urn:ComplementConsigneeTrader>
+    lazy val complementConsigneeTraderXmlMin: Elem = <urn:ComplementConsigneeTrader>
+      <urn:MemberStateCode>code</urn:MemberStateCode>
+    </urn:ComplementConsigneeTrader>
+    lazy val complementConsigneeTraderJsonMax: JsObject = Json.obj(
+      "memberStateCode" -> "code",
+      "serialNumberOfCertificateOfExemption" -> "number"
+    )
+    lazy val complementConsigneeTraderJsonMin: JsObject = Json.obj(
+      "memberStateCode" -> "code"
+    )
+  }
+
+  object DocumentCertificateFixtures {
+    lazy val documentCertificateModelMax: DocumentCertificateModel = DocumentCertificateModel(
+      documentType = Some("type"),
+      documentReference = Some("document reference"),
+      documentDescription = Some("description"),
+      referenceOfDocument = Some("reference of document"),
+    )
+    lazy val documentCertificateModelMin: DocumentCertificateModel = DocumentCertificateModel(
+      documentType = None,
+      documentReference = None,
+      documentDescription = None,
+      referenceOfDocument = None
+    )
+    lazy val documentCertificateXmlMax: Elem = <urn:DocumentCertificate>
+      <urn:DocumentType>type</urn:DocumentType>
+      <urn:DocumentReference>document reference</urn:DocumentReference>
+      <urn:DocumentDescription language="en">description</urn:DocumentDescription>
+      <urn:ReferenceOfDocument language="en">reference of document</urn:ReferenceOfDocument>
+    </urn:DocumentCertificate>
+    lazy val documentCertificateXmlMin: Elem = <urn:DocumentCertificate></urn:DocumentCertificate>
+    lazy val documentCertificateJsonMax: JsObject = Json.obj(
+      "documentType" -> "type",
+      "documentReference" -> "document reference",
+      "documentDescription" -> "description",
+      "referenceOfDocument" -> "reference of document"
+    )
+    lazy val documentCertificateJsonMin: JsObject = Json.obj()
+  }
+
+  object HeaderEadEsadFixtures {
+    lazy val headerEadEsadModel: HeaderEadEsadModel = HeaderEadEsadModel(
+      destinationType = TaxWarehouse,
+      journeyTime = JourneyTime.Hours("3"),
+      transportArrangement = TransportArrangement.OwnerOfGoods
+    )
+    lazy val headerEadEsadXml: Elem = <urn:HeaderEadEsad>
+      <urn:DestinationTypeCode>{TaxWarehouse.toString}</urn:DestinationTypeCode>
+      <urn:JourneyTime>H3</urn:JourneyTime>
+      <urn:TransportArrangement>{TransportArrangement.OwnerOfGoods.toString}</urn:TransportArrangement>
+    </urn:HeaderEadEsad>
+    lazy val headerEadEsadJson: JsObject = Json.obj(
+      "destinationType" -> TaxWarehouse.toString,
+      "journeyTime" -> "3 hours",
+      "transportArrangement" -> TransportArrangement.OwnerOfGoods.toString
+    )
+  }
+
+  object TransportModeFixtures {
+    lazy val transportModeModelMax: TransportModeModel = TransportModeModel(
+      transportModeCode = "code",
+      complementaryInformation = Some("info")
+    )
+    lazy val transportModeModelMin: TransportModeModel = TransportModeModel(
+      transportModeCode = "code",
+      complementaryInformation = None
+    )
+    lazy val transportModeXmlMax: Elem = <urn:TransportMode>
+      <urn:TransportModeCode>code</urn:TransportModeCode>
+      <urn:ComplementaryInformation language="en">info</urn:ComplementaryInformation>
+    </urn:TransportMode>
+    lazy val transportModeXmlMin: Elem = <urn:TransportMode>
+      <urn:TransportModeCode>code</urn:TransportModeCode>
+    </urn:TransportMode>
+    lazy val transportModeJsonMax: JsObject = Json.obj(
+      "transportModeCode" -> "code",
+      "complementaryInformation" -> "info"
+    )
+    lazy val transportModeJsonMin: JsObject = Json.obj(
+      "transportModeCode" -> "code"
+    )
+  }
+
+  object PackageFixtures {
+    lazy val packageModelMax: PackageModel = PackageModel(
+      kindOfPackages = "kind",
+      numberOfPackages = Some(1),
+      shippingMarks = Some("marks"),
+      commercialSealIdentification = Some("id"),
+      sealInformation = Some("info")
+    )
+    lazy val packageModelMin: PackageModel = PackageModel(
+      kindOfPackages = "kind",
+      numberOfPackages = None,
+      shippingMarks = None,
+      commercialSealIdentification = None,
+      sealInformation = None
+    )
+    lazy val packageXmlMax: Elem = <urn:Package>
+      <urn:KindOfPackages>kind</urn:KindOfPackages>
+      <urn:NumberOfPackages>1</urn:NumberOfPackages>
+      <urn:ShippingMarks>marks</urn:ShippingMarks>
+      <urn:CommercialSealIdentification>id</urn:CommercialSealIdentification>
+      <urn:SealInformation language="en">info</urn:SealInformation>
+    </urn:Package>
+    lazy val packageXmlMin: Elem = <urn:Package>
+      <urn:KindOfPackages>kind</urn:KindOfPackages>
+    </urn:Package>
+    lazy val packageJsonMax: JsObject = Json.obj(
+      "kindOfPackages" -> "kind",
+      "numberOfPackages" -> 1,
+      "shippingMarks" -> "marks",
+      "commercialSealIdentification" -> "id",
+      "sealInformation" -> "info"
+    )
+    lazy val packageJsonMin: JsObject = Json.obj(
+      "kindOfPackages" -> "kind"
+    )
+  }
+
+  object WineProductFixtures {
+    lazy val wineProductModelMax: WineProductModel = WineProductModel(
+      wineProductCategory = "1",
+      wineGrowingZoneCode = Some("zone"),
+      thirdCountryOfOrigin = Some("country"),
+      otherInformation = Some("info"),
+      wineOperations = Some(Seq("op 1", "op 2"))
+    )
+    lazy val wineProductModelMin: WineProductModel = WineProductModel(
+      wineProductCategory = "1",
+      wineGrowingZoneCode = None,
+      thirdCountryOfOrigin = None,
+      otherInformation = None,
+      wineOperations = None
+    )
+    lazy val wineProductXmlMax: Elem = <urn:WineProduct>
+      <urn:WineProductCategory>1</urn:WineProductCategory>
+      <urn:WineGrowingZoneCode>zone</urn:WineGrowingZoneCode>
+      <urn:ThirdCountryOfOrigin>country</urn:ThirdCountryOfOrigin>
+      <urn:OtherInformation language="en">info</urn:OtherInformation>
+      <urn:WineOperation>op 1</urn:WineOperation>
+      <urn:WineOperation>op 2</urn:WineOperation>
+    </urn:WineProduct>
+    lazy val wineProductXmlMin: Elem = <urn:WineProduct>
+      <urn:WineProductCategory>1</urn:WineProductCategory>
+    </urn:WineProduct>
+    lazy val wineProductJsonMax: JsObject = Json.obj(
+      "wineProductCategory" -> "1",
+      "wineGrowingZoneCode" -> "zone",
+      "thirdCountryOfOrigin" -> "country",
+      "otherInformation" -> "info",
+      "wineOperations" -> Json.arr("op 1", "op 2")
+    )
+    lazy val wineProductJsonMin: JsObject = Json.obj(
+      "wineProductCategory" -> "1"
+    )
+  }
+
+  object BodyEadEsadFixtures {
+    import PackageFixtures._
+    import WineProductFixtures._
+
+    lazy val bodyEadEsadModelMax: BodyEadEsadModel = BodyEadEsadModel(
+      bodyRecordUniqueReference = 1,
+      exciseProductCode = "epc",
+      cnCode = "cn",
+      quantity = 1.1,
+      grossMass = 1.2,
+      netMass = 1.3,
+      alcoholicStrengthByVolumeInPercentage = Some(1.4),
+      degreePlato = Some(1.5),
+      fiscalMark = Some("mark"),
+      fiscalMarkUsedFlag = Some(false),
+      designationOfOrigin = Some("destination"),
+      sizeOfProducer = Some(1),
+      density = Some(1.6),
+      commercialDescription = Some("description"),
+      brandNameOfProducts = Some("name"),
+      maturationPeriodOrAgeOfProducts = Some("age"),
+      packages = Seq(packageModelMax, packageModelMin),
+      wineProduct = Some(wineProductModelMax)
+    )
+    lazy val bodyEadEsadModelMin: BodyEadEsadModel = BodyEadEsadModel(
+      bodyRecordUniqueReference = 1,
+      exciseProductCode = "epc",
+      cnCode = "cn",
+      quantity = 1.1,
+      grossMass = 1.2,
+      netMass = 1.3,
+      alcoholicStrengthByVolumeInPercentage = None,
+      degreePlato = None,
+      fiscalMark = None,
+      fiscalMarkUsedFlag = None,
+      designationOfOrigin = None,
+      sizeOfProducer = None,
+      density = None,
+      commercialDescription = None,
+      brandNameOfProducts = None,
+      maturationPeriodOrAgeOfProducts = None,
+      packages = Seq(packageModelMin),
+      wineProduct = None
+    )
+    lazy val bodyEadEsadXmlMax: Elem = <urn:BodyEadEsad>
+      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
+      <ExciseProductCode>epc</ExciseProductCode>
+      <CnCode>cn</CnCode>
+      <Quantity>1.1</Quantity>
+      <GrossMass>1.2</GrossMass>
+      <NetMass>1.3</NetMass>
+      <AlcoholicStrengthByVolumeInPercentage>1.4</AlcoholicStrengthByVolumeInPercentage>
+      <DegreePlato>1.5</DegreePlato>
+      <FiscalMark language="en">mark</FiscalMark>
+      <FiscalMarkUsedFlag>0</FiscalMarkUsedFlag>
+      <DesignationOfOrigin language="en">destination</DesignationOfOrigin>
+      <SizeOfProducer>1</SizeOfProducer>
+      <Density>1.6</Density>
+      <CommercialDescription language="en">description</CommercialDescription>
+      <BrandNameOfProducts language="en">name</BrandNameOfProducts>
+      <MaturationPeriodOrAgeOfProducts language="en">age</MaturationPeriodOrAgeOfProducts>
+      {packageXmlMax}
+      {packageXmlMin}
+      {wineProductXmlMax}
+    </urn:BodyEadEsad>
+    lazy val bodyEadEsadXmlMin: Elem = <urn:BodyEadEsad>
+      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
+      <ExciseProductCode>epc</ExciseProductCode>
+      <CnCode>cn</CnCode>
+      <Quantity>1.1</Quantity>
+      <GrossMass>1.2</GrossMass>
+      <NetMass>1.3</NetMass>
+      {packageXmlMin}
+    </urn:BodyEadEsad>
+    lazy val bodyEadEsadJsonMax: JsObject = Json.obj(
+      "bodyRecordUniqueReference" -> 1,
+      "exciseProductCode" -> "epc",
+      "cnCode" -> "cn",
+      "quantity" -> 1.1,
+      "grossMass" -> 1.2,
+      "netMass" -> 1.3,
+      "alcoholicStrengthByVolumeInPercentage" -> 1.4,
+      "degreePlato" -> 1.5,
+      "fiscalMark" -> "mark",
+      "fiscalMarkUsedFlag" -> false,
+      "designationOfOrigin" -> "destination",
+      "sizeOfProducer" -> 1,
+      "density" -> 1.6,
+      "commercialDescription" -> "description",
+      "brandNameOfProducts" -> "name",
+      "maturationPeriodOrAgeOfProducts" -> "age",
+      "packages" -> Json.arr(packageJsonMax, packageJsonMin),
+      "wineProduct" -> wineProductJsonMax
+    )
+    lazy val bodyEadEsadJsonMin: JsObject = Json.obj(
+      "bodyRecordUniqueReference" -> 1,
+      "exciseProductCode" -> "epc",
+      "cnCode" -> "cn",
+      "quantity" -> 1.1,
+      "grossMass" -> 1.2,
+      "netMass" -> 1.3,
+      "packages" -> Json.arr(packageJsonMin)
+    )
+  }
+
+  object ImportSadFixtures {
+    lazy val importSadModel: ImportSadModel = ImportSadModel(
+      importSadNumber = "number"
+    )
+    lazy val importSadXml: Elem = <urn:ImportSad>
+      <urn:ImportSadNumber>number</urn:ImportSadNumber>
+    </urn:ImportSad>
+    lazy val importSadJson: JsObject = Json.obj(
+      "importSadNumber" -> "number"
+    )
+  }
+
+  object EadEsadDraftFixtures {
+    import ImportSadFixtures._
+    lazy val eadEsadDraftModelMax: EadEsadDraftModel = EadEsadDraftModel(
+      localReferenceNumber = "lrn",
+      invoiceNumber = "number",
+      invoiceDate = Some("inv date"),
+      originTypeCode = OriginType.TaxWarehouse,
+      dateOfDispatch = "date",
+      timeOfDispatch = Some("time"),
+      importSad = Some(Seq(importSadModel, importSadModel))
+    )
+    lazy val eadEsadDraftModelMin: EadEsadDraftModel = EadEsadDraftModel(
+      localReferenceNumber = "lrn",
+      invoiceNumber = "number",
+      invoiceDate = None,
+      originTypeCode = OriginType.DutyPaid,
+      dateOfDispatch = "date",
+      timeOfDispatch = None,
+      importSad = None
+    )
+    lazy val eadEsadDraftXmlMax: Elem = <urn:EadEsadDraft>
+      <urn:LocalReferenceNumber>lrn</urn:LocalReferenceNumber>
+      <urn:InvoiceNumber>number</urn:InvoiceNumber>
+      <urn:InvoiceDate>inv date</urn:InvoiceDate>
+      <urn:OriginTypeCode>{OriginType.TaxWarehouse.toString}</urn:OriginTypeCode>
+      <urn:DateOfDispatch>date</urn:DateOfDispatch>
+      <urn:TimeOfDispatch>time</urn:TimeOfDispatch>
+      {importSadXml}
+      {importSadXml}
+    </urn:EadEsadDraft>
+    lazy val eadEsadDraftXmlMin: Elem = <urn:EadEsadDraft>
+      <urn:LocalReferenceNumber>lrn</urn:LocalReferenceNumber>
+      <urn:InvoiceNumber>number</urn:InvoiceNumber>
+      <urn:OriginTypeCode>{OriginType.DutyPaid.toString}</urn:OriginTypeCode>
+      <urn:DateOfDispatch>date</urn:DateOfDispatch>
+    </urn:EadEsadDraft>
+    lazy val eadEsadDraftJsonMax: JsObject = Json.obj(
+      "localReferenceNumber" -> "lrn",
+      "invoiceNumber" -> "number",
+      "invoiceDate" -> "inv date",
+      "originTypeCode" -> OriginType.TaxWarehouse.toString,
+      "dateOfDispatch" -> "date",
+      "timeOfDispatch" -> "time",
+      "importSad" -> Json.arr(importSadJson, importSadJson)
+    )
+    lazy val eadEsadDraftJsonMin: JsObject = Json.obj(
+      "localReferenceNumber" -> "lrn",
+      "invoiceNumber" -> "number",
+      "originTypeCode" -> OriginType.DutyPaid.toString,
+      "dateOfDispatch" -> "date"
+    )
+  }
+
+  object CreateMovementFixtures {
+    import CaMAttributesFixtures._
+    import BodyEadEsadFixtures._
+    import ComplementConsigneeTraderFixtures._
+    import ConsigneeTraderFixtures._
+    import DeliveryPlaceTraderFixtures._
+    import DocumentCertificateFixtures._
+    import EadEsadDraftFixtures._
+    import FirstTransporterTraderFixtures._
+    import HeaderEadEsadFixtures._
+    import OfficeFixtures._
+    import PlaceOfDispatchTraderFixtures._
+    import TransportArrangerTraderFixtures._
+    import TransportModeFixtures._
+    lazy val createMovementModelMax: CreateMovementModel = CreateMovementModel(
+      movementType = UKtoUK,
+      attributes = attributesModelMax,
+      consigneeTrader = Some(consigneeTraderModel),
+      consignorTrader = consignorTraderModel,
+      placeOfDispatchTrader = Some(placeOfDispatchTraderModel),
+      dispatchImportOffice = Some(officeModel),
+      complementConsigneeTrader = Some(complementConsigneeTraderModelMax),
+      deliveryPlaceTrader = Some(deliveryPlaceTraderModel),
+      deliveryPlaceCustomsOffice = Some(officeModel),
+      competentAuthorityDispatchOffice = officeModel,
+      transportArrangerTrader = Some(transportArrangerTraderModel),
+      firstTransporterTrader = Some(firstTransporterTraderModel),
+      documentCertificate = Some(Seq(documentCertificateModelMax, documentCertificateModelMin)),
+      headerEadEsad = headerEadEsadModel,
+      transportMode = transportModeModelMax,
+      movementGuarantee = maxMovementGuaranteeModel,
+      bodyEadEsad = Seq(bodyEadEsadModelMax, bodyEadEsadModelMin),
+      eadEsadDraft = eadEsadDraftModelMax,
+      transportDetails = Seq(maxTransportDetailsModel)
+    )
+    lazy val createMovementModelMin: CreateMovementModel = CreateMovementModel(
+      movementType = UKtoUK,
+      attributes = attributesModelMin,
+      consigneeTrader = None,
+      consignorTrader = consignorTraderModel,
+      placeOfDispatchTrader = None,
+      dispatchImportOffice = None,
+      complementConsigneeTrader = None,
+      deliveryPlaceTrader = None,
+      deliveryPlaceCustomsOffice = None,
+      competentAuthorityDispatchOffice = officeModel,
+      transportArrangerTrader = None,
+      firstTransporterTrader = None,
+      documentCertificate = None,
+      headerEadEsad = headerEadEsadModel,
+      transportMode = transportModeModelMin,
+      movementGuarantee = maxMovementGuaranteeModel,
+      bodyEadEsad = Seq(bodyEadEsadModelMin),
+      eadEsadDraft = eadEsadDraftModelMin,
+      transportDetails = Seq(maxTransportDetailsModel)
+    )
+
+    lazy val createMovementModelMultipleCountryCodes: CreateMovementModel = CreateMovementModel(
+      movementType = UKtoUK,
+      attributes = attributesModelMax,
+      consigneeTrader = Some(consigneeTraderModel.copy(traderId = Some("CT000001"))),
+      consignorTrader = consignorTraderModel,
+      placeOfDispatchTrader = Some(placeOfDispatchTraderModel.copy(traderId = Some("PD000001"))),
+      dispatchImportOffice = Some(officeModel),
+      complementConsigneeTrader = Some(complementConsigneeTraderModelMax.copy(memberStateCode = "CC000001")),
+      deliveryPlaceTrader = Some(deliveryPlaceTraderModel.copy(traderId = Some("DP000001"))),
+      deliveryPlaceCustomsOffice = Some(officeModel),
+      competentAuthorityDispatchOffice = officeModel,
+      transportArrangerTrader = Some(transportArrangerTraderModel),
+      firstTransporterTrader = Some(firstTransporterTraderModel),
+      documentCertificate = Some(Seq(documentCertificateModelMax, documentCertificateModelMin)),
+      headerEadEsad = headerEadEsadModel,
+      transportMode = transportModeModelMax,
+      movementGuarantee = maxMovementGuaranteeModel,
+      bodyEadEsad = Seq(bodyEadEsadModelMax, bodyEadEsadModelMin),
+      eadEsadDraft = eadEsadDraftModelMax,
+      transportDetails = Seq(maxTransportDetailsModel)
+    )
+
+    lazy val createMovementXmlMax: Elem = <urn:SubmittedDraftOfEADESAD>
+      {attributesXmlMax}
+      {consigneeTraderXml}
+      {consignorTraderModelXML}
+      {placeOfDispatchTraderXml}
+      <urn:DispatchImportOffice>{officeXml}</urn:DispatchImportOffice>
+      {complementConsigneeTraderXmlMax}
+      {deliveryPlaceTraderXml}
+      <urn:DeliveryPlaceCustomsOffice>{officeXml}</urn:DeliveryPlaceCustomsOffice>
+      <urn:CompetentAuthorityDispatchOffice>{officeXml}</urn:CompetentAuthorityDispatchOffice>
+      {transportArrangerTraderXml}
+      {firstTransporterTraderXml}
+      {documentCertificateXmlMax}
+      {documentCertificateXmlMin}
+      {headerEadEsadXml}
+      {transportModeXmlMax}
+      {maxMovementGuaranteeXml}
+      {bodyEadEsadXmlMax}
+      {bodyEadEsadXmlMin}
+      {eadEsadDraftXmlMax}
+      {maxTransportDetailsXml}
+    </urn:SubmittedDraftOfEADESAD>
+    lazy val createMovementXmlMin: Elem = <urn:SubmittedDraftOfEADESAD>
+      {attributesXmlMin}
+      {consignorTraderModelXML}
+      <urn:CompetentAuthorityDispatchOffice>{officeXml}</urn:CompetentAuthorityDispatchOffice>
+      {headerEadEsadXml}
+      {transportModeXmlMin}
+      {maxMovementGuaranteeXml}
+      {bodyEadEsadXmlMin}
+      {eadEsadDraftXmlMin}
+      {maxTransportDetailsXml}
+    </urn:SubmittedDraftOfEADESAD>
+    lazy val createMovementJsonMax: JsObject = Json.obj(
+      "movementType" -> UKtoUK.toString,
+      "attributes" -> attributesJsonMax,
+      "consigneeTrader" -> consigneeTraderJson,
+      "consignorTrader" -> consignorTraderJson,
+      "placeOfDispatchTrader" -> placeOfDispatchTraderJson,
+      "dispatchImportOffice" -> officeJson,
+      "complementConsigneeTrader" -> complementConsigneeTraderJsonMax,
+      "deliveryPlaceTrader" -> deliveryPlaceTraderJson,
+      "deliveryPlaceCustomsOffice" -> officeJson,
+      "competentAuthorityDispatchOffice" -> officeJson,
+      "transportArrangerTrader" -> transportArrangerTraderJson,
+      "firstTransporterTrader" -> firstTransporterTraderJson,
+      "documentCertificate" -> Json.arr(documentCertificateJsonMax, documentCertificateJsonMin),
+      "headerEadEsad" -> headerEadEsadJson,
+      "transportMode" -> transportModeJsonMax,
+      "movementGuarantee" -> maxMovementGuaranteeJson,
+      "bodyEadEsad" -> Json.arr(bodyEadEsadJsonMax, bodyEadEsadJsonMin),
+      "eadEsadDraft" -> eadEsadDraftJsonMax,
+      "transportDetails" -> Json.arr(maxTransportDetailsJson)
+    )
+    lazy val createMovementJsonMin: JsObject = Json.obj(
+      "movementType" -> UKtoUK.toString,
+      "attributes" -> attributesJsonMin,
+      "consignorTrader" -> consignorTraderJson,
+      "competentAuthorityDispatchOffice" -> officeJson,
+      "headerEadEsad" -> headerEadEsadJson,
+      "transportMode" -> transportModeJsonMin,
+      "movementGuarantee" -> maxMovementGuaranteeJson,
+      "bodyEadEsad" -> Json.arr(bodyEadEsadJsonMin),
+      "eadEsadDraft" -> eadEsadDraftJsonMin,
+      "transportDetails" -> Json.arr(maxTransportDetailsJson)
+    )
+  }
+
+}

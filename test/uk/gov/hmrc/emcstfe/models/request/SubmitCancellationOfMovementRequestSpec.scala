@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitCancellationOfMovementFixtures
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{ExemptedOrganisations, TaxWarehouse}
 import uk.gov.hmrc.emcstfe.models.common.ExciseMovementModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -28,7 +26,6 @@ import scala.xml.XML
 
 class SubmitCancellationOfMovementRequestSpec extends UnitSpec with SubmitCancellationOfMovementFixtures {
 
-  implicit val userRequest = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
   val request = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
 
   "requestBody" should {

@@ -1452,7 +1452,7 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |		</mov:currentMovement>
             |	</mov:movementView>""".stripMargin)
 
-        GetMovementResponse.xmlReader.read(noJourneyTimeXML) shouldBe ParseFailure(JourneyTimeParseFailure("Could not parse JourneyTime, received: ''"))
+        GetMovementResponse.xmlReader.read(noJourneyTimeXML) shouldBe ParseFailure(JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''"))
       }
     }
   }

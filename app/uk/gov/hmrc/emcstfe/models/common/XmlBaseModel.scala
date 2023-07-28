@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+
 import scala.xml.Elem
 
 trait XmlBaseModel {
-  def toXml: Elem
+  def toXml(implicit request: UserRequest[_]): Elem
 }

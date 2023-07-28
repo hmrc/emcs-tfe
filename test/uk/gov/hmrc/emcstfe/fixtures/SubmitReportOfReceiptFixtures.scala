@@ -51,6 +51,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes/>
       <urn:ConsigneeTrader language="en">
+        <urn:ReferenceOfTaxWarehouse>reference</urn:ReferenceOfTaxWarehouse>
         <urn:VatNumber>number</urn:VatNumber>
         <urn:TraderExciseNumber>excise number</urn:TraderExciseNumber>
         <urn:Traderid>{traderId}</urn:Traderid>
@@ -66,6 +67,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
         <urn:SequenceNumber>1</urn:SequenceNumber>
       </urn:ExciseMovement>
       <urn:DeliveryPlaceTrader language="en">
+        <urn:ReferenceOfTaxWarehouse>reference</urn:ReferenceOfTaxWarehouse>
         <urn:VatNumber>number</urn:VatNumber>
         <urn:TraderExciseNumber>excise number</urn:TraderExciseNumber>
         <urn:Traderid>{traderId}</urn:Traderid>

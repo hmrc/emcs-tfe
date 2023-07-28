@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
-
-import scala.xml.NodeSeq
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.emcstfe.models.common.ConsignorTraderModel
 
 trait ConsignorTraderModelFixtures extends BaseFixtures with AddressModelFixtures {
 
@@ -26,18 +25,23 @@ trait ConsignorTraderModelFixtures extends BaseFixtures with AddressModelFixture
 
   val mandatoryAddressModelXMLForConsignor = maxAddressModelXML
 
-
-  val consignorTraderModel = ConsignorTraderModel(
+  lazy val consignorTraderModel = ConsignorTraderModel(
     traderExciseNumber = "GB0000000012346",
     traderName = "name",
     address = mandatoryAddressModelForConsignor
   )
 
-  val consignorTraderModelXML =
-    NodeSeq.fromSeq(Seq(
-      <urn:TraderExciseNumber>GB0000000012346</urn:TraderExciseNumber>,
-      <urn:TraderName>name</urn:TraderName>,
-      mandatoryAddressModelXMLForConsignor
-    ).flatten)
+  lazy val consignorTraderModelXML =
+    <urn:ConsignorTrader language="en">
+      <urn:TraderExciseNumber>GB0000000012346</urn:TraderExciseNumber>
+      <urn:TraderName>name</urn:TraderName>
+      {mandatoryAddressModelXMLForConsignor}
+    </urn:ConsignorTrader>
+
+  lazy val consignorTraderJson: JsObject = Json.obj(
+    "traderExciseNumber" -> "GB0000000012346",
+    "traderName" -> "name",
+    "address" -> maxAddressModelJson
+  )
 
 }

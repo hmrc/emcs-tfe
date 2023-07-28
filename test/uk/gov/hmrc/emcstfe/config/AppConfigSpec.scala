@@ -38,8 +38,8 @@ class AppConfigSpec extends UnitSpec with FeatureSwitching {
         "must return to the legacy URL" in {
           enable(UseChrisStub)
           config.urlEMCSApplicationService() shouldBe s"http://localhost:8308/ChRISOSB/EMCS/EMCSApplicationService/2"
-          config.urlSubmitDraftMovementPortal() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
-          config.urlSubmitReportofReceiptPortal() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+          config.urlSubmitCreateMovement() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
+          config.urlSubmitReportOfReceipt() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
         }
       }
 
@@ -48,8 +48,8 @@ class AppConfigSpec extends UnitSpec with FeatureSwitching {
         "must return to the new URL" in {
           disable(UseChrisStub)
           config.urlEMCSApplicationService() shouldBe s"http://localhost:8308/ChRISOSB/EMCS/EMCSApplicationService/2"
-          config.urlSubmitDraftMovementPortal() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
-          config.urlSubmitReportofReceiptPortal() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+          config.urlSubmitCreateMovement() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
+          config.urlSubmitReportOfReceipt() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
         }
       }
     }

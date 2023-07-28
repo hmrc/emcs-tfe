@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{ExemptedOrganisations, Export}
@@ -32,12 +33,12 @@ case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovemen
     body.destinationType match {
       case Export => arcCountryCode
       case ExemptedOrganisations => body.memberStateCode
-      case _ => body.consigneeTrader.flatMap(_.countryCode).getOrElse(GB)
+      case _ => body.consigneeTrader.flatMap(_.countryCode).getOrElse(Constants.GB)
     }
 
-  val messageRecipient: String = NDEA ++ messageRecipientSuffix
+  val messageRecipient: String = Constants.NDEA ++ messageRecipientSuffix
 
-  val messageSender: String = NDEA ++ arcCountryCode
+  val messageSender: String = Constants.NDEA ++ arcCountryCode
 
   val soapRequest: Elem =
     <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">

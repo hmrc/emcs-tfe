@@ -17,8 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
-import uk.gov.hmrc.emcstfe.models.common.{AddressModel, TraderModel}
-import uk.gov.hmrc.emcstfe.models.reportOfReceipt.ConsignorTraderModel
+import uk.gov.hmrc.emcstfe.models.common.{AddressModel, ConsignorTraderModel, TraderModel}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
 trait GetMovementIfChangedFixture extends BaseFixtures {
@@ -494,6 +493,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
     sequenceNumber = 1,
     destinationType = Export,
     consigneeTrader = Some(TraderModel(
+      referenceOfTaxWarehouse = None,
       vatNumber = None,
       traderExciseNumber = None,
       traderId = Some("GB11100000002"),
@@ -507,6 +507,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures {
       eoriNumber = None
     )),
     deliveryPlaceTrader = Some(TraderModel(
+      referenceOfTaxWarehouse = None,
       vatNumber = None,
       traderExciseNumber = None,
       traderId = Some("GB11100000003"),
