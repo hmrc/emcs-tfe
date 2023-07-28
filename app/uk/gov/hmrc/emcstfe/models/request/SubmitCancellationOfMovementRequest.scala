@@ -47,43 +47,27 @@ case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovemen
           <ns:VendorID>1259</ns:VendorID>
           <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
           <ns:ServiceID>1138</ns:ServiceID>
-          <ns:ServiceMessageType>HMRC-EMCS-IE819-DIRECT</ns:ServiceMessageType>
+          <ns:ServiceMessageType>HMRC-EMCS-IE810-DIRECT</ns:ServiceMessageType>
         </ns:Info>
         <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-          <CredentialID>
-            {request.credId}
-          </CredentialID>
-          <Identifier>
-            {exciseRegistrationNumber}
-          </Identifier>
+          <CredentialID>{request.credId}</CredentialID>
+          <Identifier>{exciseRegistrationNumber}</Identifier>
         </MetaData>
       </soapenv:Header>
       <soapenv:Body>
-        <urn:IE819 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+        <urn:IE810 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
           <urn:Header>
-            <urn1:MessageSender>
-              {messageSender}
-            </urn1:MessageSender>
-            <urn1:MessageRecipient>
-              {messageRecipient}
-            </urn1:MessageRecipient>
-            <urn1:DateOfPreparation>
-              {preparedDate.toString}
-            </urn1:DateOfPreparation>
-            <urn1:TimeOfPreparation>
-              {preparedTime.toString}
-            </urn1:TimeOfPreparation>
-            <urn1:MessageIdentifier>
-              {messageUUID}
-            </urn1:MessageIdentifier>
-            <urn1:CorrelationIdentifier>
-              {correlationUUID}
-            </urn1:CorrelationIdentifier>
+            <urn1:MessageSender>{messageSender}</urn1:MessageSender>
+            <urn1:MessageRecipient>{messageRecipient}</urn1:MessageRecipient>
+            <urn1:DateOfPreparation>{preparedDate.toString}</urn1:DateOfPreparation>
+            <urn1:TimeOfPreparation>{preparedTime.toString}</urn1:TimeOfPreparation>
+            <urn1:MessageIdentifier>{messageUUID}</urn1:MessageIdentifier>
+            <urn1:CorrelationIdentifier>{correlationUUID}</urn1:CorrelationIdentifier>
           </urn:Header>
           <urn:Body>
             {body.toXml}
           </urn:Body>
-        </urn:IE819>
+        </urn:IE810>
       </soapenv:Body>
     </soapenv:Envelope>
 

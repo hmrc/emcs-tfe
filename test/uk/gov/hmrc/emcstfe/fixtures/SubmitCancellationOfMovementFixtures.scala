@@ -78,39 +78,23 @@ trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISRespon
   val maxSubmitCancellationOfMovementModelXml: Elem =
     <urn:CancellationOfEAD>
       <urn:Attributes/>
-      <urn:DateAndTimeOfValidationOfCancellation>
-        2023-01-01
-      </urn:DateAndTimeOfValidationOfCancellation>
       <urn:ExciseMovementEad>
-        <urn:AdministrativeReferenceCode>
-          {testArc}
-        </urn:AdministrativeReferenceCode>
+        <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>
       </urn:ExciseMovementEad>
       <urn:Cancellation>
-        <urn:CancellationReasonCode>
-          {TypingError.toString}
-        </urn:CancellationReasonCode>
-        <urn:ComplementaryInformation language="en">
-          test cancellation reason
-        </urn:ComplementaryInformation>
+        <urn:CancellationReasonCode>{TypingError.toString}</urn:CancellationReasonCode>
+        <urn:ComplementaryInformation language="en">test cancellation reason</urn:ComplementaryInformation>
       </urn:Cancellation>
     </urn:CancellationOfEAD>
 
   val minSubmitCancellationOfMovementModelXml: Elem =
     <urn:CancellationOfEAD>
       <urn:Attributes/>
-      <urn:DateAndTimeOfValidationOfCancellation>
-        2023-01-01
-      </urn:DateAndTimeOfValidationOfCancellation>
       <urn:ExciseMovementEad>
-        <urn:AdministrativeReferenceCode>
-          {testArc}
-        </urn:AdministrativeReferenceCode>
+        <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>
       </urn:ExciseMovementEad>
       <urn:Cancellation>
-        <urn:CancellationReasonCode>
-          {TypingError.toString}
-        </urn:CancellationReasonCode>
+        <urn:CancellationReasonCode>{TypingError.toString}</urn:CancellationReasonCode>
       </urn:Cancellation>
     </urn:CancellationOfEAD>
 

@@ -24,13 +24,11 @@ import scala.xml.{Elem, NodeSeq}
 case class CancellationReasonModel(reason: CancellationReasonType,
                                    complementaryInformation: Option[String]) extends XmlBaseModel {
   def toXml: Elem = <urn:Cancellation>
-    <urn:CancellationReasonCode>
-      {reason}
-    </urn:CancellationReasonCode>
-    {complementaryInformation.map(info =>
-      <urn:ComplementaryInformation language="en">
-      {info}
-    </urn:ComplementaryInformation>).getOrElse(NodeSeq.Empty)}
+    <urn:CancellationReasonCode>{reason}</urn:CancellationReasonCode>
+    {complementaryInformation.map{
+      info =>
+        <urn:ComplementaryInformation language="en">{info}</urn:ComplementaryInformation>
+    }.getOrElse(NodeSeq.Empty)}
   </urn:Cancellation>
 }
 

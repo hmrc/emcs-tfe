@@ -33,23 +33,15 @@ case class SubmitCancellationOfMovementModel(dateAndTimeOfValidationOfCancellati
   def toXml: Elem =
     <urn:CancellationOfEAD>
       <urn:Attributes/>
-      <urn:DateAndTimeOfValidationOfCancellation>
-        {dateAndTimeOfValidationOfCancellation.toString}
-      </urn:DateAndTimeOfValidationOfCancellation>
       <urn:ExciseMovementEad>
-        <urn:AdministrativeReferenceCode>
-          {exciseMovement.arc}
-        </urn:AdministrativeReferenceCode>
+        <urn:AdministrativeReferenceCode>{exciseMovement.arc}</urn:AdministrativeReferenceCode>
       </urn:ExciseMovementEad>
       <urn:Cancellation>
-        <urn:CancellationReasonCode>
-          {cancellationReason.reason.toString}
-        </urn:CancellationReasonCode>
-        {cancellationReason.complementaryInformation.map{ info =>
-        <urn:ComplementaryInformation language="en">
-          {info}
-        </urn:ComplementaryInformation>
-      }.getOrElse(NodeSeq.Empty)}
+        <urn:CancellationReasonCode>{cancellationReason.reason.toString}</urn:CancellationReasonCode>
+        {cancellationReason.complementaryInformation.map {
+          info =>
+            <urn:ComplementaryInformation language="en">{info}</urn:ComplementaryInformation>
+        }.getOrElse(NodeSeq.Empty)}
       </urn:Cancellation>
     </urn:CancellationOfEAD>
 
