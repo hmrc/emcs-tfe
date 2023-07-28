@@ -1,4 +1,5 @@
 import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
+import scoverage.ScoverageKeys
 
 lazy val ItTest = config("it") extend Test
 
@@ -13,8 +14,9 @@ lazy val microservice = Project("emcs-tfe", file("."))
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
-    routesImport += "uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions"
-  )
+    routesImport += "uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions",
+    ScoverageKeys.coverageMinimumStmtTotal := 95,
+)
   .configs(ItTest)
   .settings(inConfig(ItTest)(Defaults.itSettings ++ headerSettings(ItTest) ++ automateHeaderSettings(ItTest)): _*)
   .settings(

@@ -24,8 +24,8 @@ import uk.gov.hmrc.emcstfe.models.common.AddressModel
 import scala.xml.NodeSeq
 
 case class ConsignorTraderModel(traderExciseNumber: String,
-                       traderName: String,
-                       address: AddressModel) {
+                                traderName: String,
+                                address: AddressModel) {
 
   def toXml: NodeSeq = NodeSeq.fromSeq(Seq(
     Seq(<urn:TraderExciseNumber>{traderExciseNumber}</urn:TraderExciseNumber>),

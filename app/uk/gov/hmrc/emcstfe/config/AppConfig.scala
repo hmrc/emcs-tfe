@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.config
 
 import play.api.Configuration
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{UseChrisStub, FeatureSwitching}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
@@ -73,4 +73,7 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def urlSubmitAlertOrRejection(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitAlertOrRejectionMovementPortal/2"
+
+  def urlCancellationOfMovement(): String =
+    chrisBaseUrl + "/ChRIS/EMCS/SubmitCancellationPortal/3"
 }

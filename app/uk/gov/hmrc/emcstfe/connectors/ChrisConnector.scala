@@ -43,10 +43,10 @@ class ChrisConnector @Inject()(val http: HttpClient,
 
   def postChrisSOAPRequest(request: ChrisRequest)
                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, NodeSeq]] =
-      postString(http, appConfig.urlEMCSApplicationService(), request.requestBody, request)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(request.shouldExtractFromSoap))
+    postString(http, appConfig.urlEMCSApplicationService(), request.requestBody, request)(ec, headerCarrier, chrisHttpParser.rawXMLHttpReads(request.shouldExtractFromSoap))
 
   private def prepareXMLAndSubmit[A](url: String, request: ChrisRequest, callingMethod: String)
-                                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+                                    (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
     soapUtils.prepareXmlForSubmission(XML.loadString(request.requestBody)) match {
       case Left(errorResponse) => Future.successful(Left(errorResponse))
       case Right(preparedXml) =>
@@ -74,10 +74,14 @@ class ChrisConnector @Inject()(val http: HttpClient,
     prepareXMLAndSubmit(appConfig.urlSubmitChangeDestination(), request, "submitChangeDestinationChrisSOAPRequest")
 
   def submitExplainShortageExcessChrisSOAPRequest[A](request: ChrisRequest)
-                                                (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+                                                    (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
     prepareXMLAndSubmit(appConfig.urlSubmitExplainShortageExcess(), request, "submitExplainShortageExcessChrisSOAPRequest")
 
   def submitAlertOrRejectionChrisSOAPRequest[A](request: ChrisRequest)
-                                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+                                               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
     prepareXMLAndSubmit(appConfig.urlSubmitAlertOrRejection(), request, "submitAlertOrRejectionChrisSOAPRequest")
+
+  def submitCancellationOfMovementChrisSOAPRequest[A](request: ChrisRequest)
+                                                     (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, xmlRds: XmlReader[A]): Future[Either[ErrorResponse, A]] =
+    prepareXMLAndSubmit(appConfig.urlCancellationOfMovement(), request, "submitCancellationOfMovementChrisSOAPRequest")
 }
