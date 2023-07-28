@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{OriginType, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -30,7 +31,7 @@ case class EadEsadDraftModel(
                               timeOfDispatch: Option[String],
                               importSad: Option[Seq[ImportSadModel]]
                             ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:EadEsadDraft>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:EadEsadDraft>
     <urn:LocalReferenceNumber>{localReferenceNumber}</urn:LocalReferenceNumber>
     <urn:InvoiceNumber>{invoiceNumber}</urn:InvoiceNumber>
     {invoiceDate.mapNodeSeq(value => <urn:InvoiceDate>{value}</urn:InvoiceDate>)}

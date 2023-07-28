@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -25,7 +26,7 @@ case class TransportModeModel(
                                transportModeCode: String,
                                complementaryInformation: Option[String]
                              ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:TransportMode>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:TransportMode>
     <urn:TransportModeCode>{transportModeCode}</urn:TransportModeCode>
     {complementaryInformation.mapNodeSeq(value => <urn:ComplementaryInformation language="en">{value}</urn:ComplementaryInformation>)}
   </urn:TransportMode>

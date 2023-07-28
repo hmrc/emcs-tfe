@@ -19,16 +19,17 @@ package uk.gov.hmrc.emcstfe.models.common
 import cats.implicits.catsSyntaxTuple3Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 
 import scala.xml.Elem
 
 case class ConsignorTraderModel(traderExciseNumber: String,
                                 traderName: String,
-                                address: AddressModel) {
+                                address: AddressModel) extends XmlBaseModel {
 
   lazy val countryCode: String = traderExciseNumber.substring(0, 2).toUpperCase
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:ConsignorTrader language="en">
       <urn:TraderExciseNumber>{traderExciseNumber}</urn:TraderExciseNumber>
       <urn:TraderName>{traderName}</urn:TraderName>

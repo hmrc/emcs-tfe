@@ -17,7 +17,8 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.common.{TraderModel, XmlBaseModel, TransportDetailsModel}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.{TraderModel, TransportDetailsModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -30,7 +31,7 @@ case class SubmitChangeDestinationModel(
                                           transportDetails: Option[Seq[TransportDetailsModel]]
                                          ) extends XmlBaseModel with XmlWriterUtils {
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:ChangeOfDestination>
       <urn:Attributes/>
       {newTransportArrangerTrader.mapNodeSeq(trader => <urn:NewTransportArrangerTrader language="en">{trader.toXml}</urn:NewTransportArrangerTrader>)}

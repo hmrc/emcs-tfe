@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -27,7 +28,7 @@ case class DocumentCertificateModel(
                                      documentDescription: Option[String],
                                      referenceOfDocument: Option[String],
                                    ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:DocumentCertificate>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:DocumentCertificate>
     {documentType.mapNodeSeq(x => <urn:DocumentType>{x}</urn:DocumentType>)}
     {documentReference.mapNodeSeq(x => <urn:DocumentReference>{x}</urn:DocumentReference>)}
     {documentDescription.mapNodeSeq(x => <urn:DocumentDescription language="en">{x}</urn:DocumentDescription>)}

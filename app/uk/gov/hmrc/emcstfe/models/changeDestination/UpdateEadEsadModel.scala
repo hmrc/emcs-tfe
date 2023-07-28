@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{JourneyTime, TransportArrangement, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -33,7 +34,7 @@ case class UpdateEadEsadModel(
                                complementaryInformation: Option[String]
                              ) extends XmlBaseModel with XmlWriterUtils {
 
-  def toXml: Elem = <urn:UpdateEadEsad>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:UpdateEadEsad>
     <urn:AdministrativeReferenceCode>{administrativeReferenceCode}</urn:AdministrativeReferenceCode>
     {journeyTime.mapNodeSeq(value => <urn:JourneyTime>{value.toDownstream}</urn:JourneyTime>)}
     {changedTransportArrangement.mapNodeSeq(value => <urn:ChangedTransportArrangement>{value.toString}</urn:ChangedTransportArrangement>)}

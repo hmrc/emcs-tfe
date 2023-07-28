@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
 import scala.xml.Elem
@@ -24,7 +25,7 @@ import scala.xml.Elem
 case class DeliveryPlaceCustomsOfficeModel(
                                             referenceNumber: String
                                           ) extends XmlBaseModel {
-  def toXml: Elem = <urn:DeliveryPlaceCustomsOffice>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:DeliveryPlaceCustomsOffice>
     <urn:ReferenceNumber>{referenceNumber}</urn:ReferenceNumber>
   </urn:DeliveryPlaceCustomsOffice>
 }

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -25,7 +26,7 @@ case class MovementGuaranteeModel(
                                    guarantorTypeCode: GuarantorType,
                                    guarantorTrader: Option[Seq[GuarantorTraderModel]]
                                  ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:MovementGuarantee>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:MovementGuarantee>
     <urn:GuarantorTypeCode>{guarantorTypeCode.toString}</urn:GuarantorTypeCode>
     {guarantorTrader.mapNodeSeq(_.map(trader => <urn:GuarantorTrader language="en">{trader.toXml}</urn:GuarantorTrader>))}
   </urn:MovementGuarantee>

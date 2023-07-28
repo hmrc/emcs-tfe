@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, ExciseMovementModel, TraderModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -30,7 +31,7 @@ case class SubmitExplainShortageExcessModel(attributes: AttributesModel,
                                             bodyAnalysis: Option[Seq[BodyAnalysisModel]]
                                            ) extends XmlBaseModel with XmlWriterUtils {
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:ExplanationOnReasonForShortage>
       {attributes.toXml}
       {consigneeTrader.mapNodeSeq(trader =>

@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.ExciseMovementModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -27,7 +25,6 @@ import scala.xml.XML
 
 class SubmitAlertOrRejectionRequestSpec extends UnitSpec with SubmitAlertOrRejectionFixtures {
 
-  implicit val userRequest = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
   val request = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
 
   "requestBody" should {
@@ -50,7 +47,7 @@ class SubmitAlertOrRejectionRequestSpec extends UnitSpec with SubmitAlertOrRejec
             </MetaData>
           </soapenv:Header>
           <soapenv:Body>
-            <urn:IE819 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+            <urn:IE819 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.01">
               <urn:Header>
                 <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
                 <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>
@@ -74,7 +71,7 @@ class SubmitAlertOrRejectionRequestSpec extends UnitSpec with SubmitAlertOrRejec
           </soapenv:Body>
         </soapenv:Envelope>
 
-      trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+      trim(XML.loadString(request.requestBody)).toString() shouldBe trim(expectedSoapRequest).toString()
     }
 
     "for the MessageSender and MessageRecipient headers" when {
@@ -98,15 +95,21 @@ class SubmitAlertOrRejectionRequestSpec extends UnitSpec with SubmitAlertOrRejec
     }
   }
 
-  "action" should {
+  ".action" should {
     "be correct" in {
       request.action shouldBe "http://www.hmrc.gov.uk/emcs/SubmitAlertOrRejectionMovementPortal"
     }
   }
 
-  "shouldExtractFromSoap" should {
+  ".shouldExtractFromSoap" should {
     "be set to `false`" in {
       request.shouldExtractFromSoap shouldBe false
+    }
+  }
+
+  ".exciseRegistrationNumber" should {
+    "be correct" in {
+      request.exciseRegistrationNumber shouldBe testErn
     }
   }
 }

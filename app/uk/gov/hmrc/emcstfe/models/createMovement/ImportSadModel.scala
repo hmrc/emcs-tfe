@@ -17,12 +17,13 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
 import scala.xml.Elem
 
 case class ImportSadModel(importSadNumber: String) extends XmlBaseModel {
-  def toXml: Elem = <urn:ImportSad>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:ImportSad>
     <urn:ImportSadNumber>{importSadNumber}</urn:ImportSadNumber>
   </urn:ImportSad>
 }

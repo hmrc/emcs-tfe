@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.explainDelay
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.SubmitterType
+import uk.gov.hmrc.emcstfe.models.common.{SubmitterType, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -28,9 +28,9 @@ case class SubmitExplainDelayModel(arc: String,
                                    submitterType: SubmitterType,
                                    delayType: DelayType,
                                    delayReasonType: DelayReasonType,
-                                   additionalInformation: Option[String]) extends XmlWriterUtils {
+                                   additionalInformation: Option[String]) extends XmlBaseModel with XmlWriterUtils {
 
-  def toXml(implicit request: UserRequest[_]): Elem =
+  override def toXml(implicit request: UserRequest[_]): Elem =
     <urn:ExplanationOnDelayForDelivery>
       <urn:Attributes>
         <urn:SubmitterIdentification>{request.ern}</urn:SubmitterIdentification>

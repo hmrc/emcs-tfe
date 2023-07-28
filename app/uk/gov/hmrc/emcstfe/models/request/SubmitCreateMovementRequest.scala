@@ -31,15 +31,17 @@ case class SubmitCreateMovementRequest(body: CreateMovementModel)
   val messageRecipient = Constants.NDEA ++ messageRecipientCountryCode()
   val messageSender: String = Constants.NDEA ++ messageSenderCountryCode()
 
-  val soapRequest = envelope(body, 815, messageSender, messageRecipient)
-
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
 
   override def shouldExtractFromSoap: Boolean = false
 
   override def requestBody: String =
-    s"""<?xml version='1.0' encoding='UTF-8'?>
-       |${soapRequest.toString}""".stripMargin
+    withSoapEnvelope(
+      body = body,
+      messageNumber = 815,
+      messageSender = messageSender,
+      messageRecipient = messageRecipient
+    ).toString()
 
   override def metricName = "create-movement"
 

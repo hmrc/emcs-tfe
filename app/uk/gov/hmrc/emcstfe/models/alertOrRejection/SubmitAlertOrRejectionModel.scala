@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{ExciseMovementModel, TraderModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -31,7 +32,7 @@ case class SubmitAlertOrRejectionModel(consigneeTrader: Option[TraderModel],
                                        alertOrRejectionReasons: Option[Seq[AlertOrRejectionReasonModel]]
                                       ) extends XmlBaseModel with XmlWriterUtils {
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:AlertOrRejectionOfEADESAD>
       <urn:Attributes/>
       {consigneeTrader.mapNodeSeq(trader =>

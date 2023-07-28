@@ -17,13 +17,14 @@
 package uk.gov.hmrc.emcstfe.models.cancellationOfMovement
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
 import scala.xml.{Elem, NodeSeq}
 
 case class CancellationReasonModel(reason: CancellationReasonType,
                                    complementaryInformation: Option[String]) extends XmlBaseModel {
-  def toXml: Elem = <urn:Cancellation>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:Cancellation>
     <urn:CancellationReasonCode>{reason}</urn:CancellationReasonCode>
     {complementaryInformation.map{
       info =>

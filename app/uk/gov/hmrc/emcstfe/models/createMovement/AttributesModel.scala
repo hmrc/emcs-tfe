@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -26,7 +27,7 @@ case class AttributesModel(
                             submissionMessageType: SubmissionMessageType,
                             deferredSubmissionFlag: Option[Boolean]
                           ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:Attributes>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:Attributes>
     <urn:SubmissionMessageType>{submissionMessageType.toString}</urn:SubmissionMessageType>
     {deferredSubmissionFlag.mapNodeSeq(bool => <urn:DeferredSubmissionFlag>{bool.toFlag}</urn:DeferredSubmissionFlag>)}
   </urn:Attributes>

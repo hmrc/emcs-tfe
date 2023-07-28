@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
 import scala.xml.Elem
@@ -25,7 +26,7 @@ case class AnalysisModel(
                           dateOfAnalysis: String,
                           globalExplanation: String
                         ) extends XmlBaseModel {
-  def toXml: Elem = <urn:Analysis>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:Analysis>
     <urn:DateOfAnalysis>{dateOfAnalysis}</urn:DateOfAnalysis>
     <urn:GlobalExplanation language="en">{globalExplanation}</urn:GlobalExplanation>
   </urn:Analysis>

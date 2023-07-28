@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -28,7 +29,7 @@ case class PackageModel(
                          commercialSealIdentification: Option[String],
                          sealInformation: Option[String]
                        ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:Package>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:Package>
     <urn:KindOfPackages>{kindOfPackages}</urn:KindOfPackages>
     {numberOfPackages.mapNodeSeq(value => <urn:NumberOfPackages>{value}</urn:NumberOfPackages>)}
     {shippingMarks.mapNodeSeq(value => <urn:ShippingMarks>{value}</urn:ShippingMarks>)}

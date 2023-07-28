@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.createMovement
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -28,7 +29,7 @@ case class WineProductModel(
                              otherInformation: Option[String],
                              wineOperations: Option[Seq[String]]
                            ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:WineProduct>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:WineProduct>
     <urn:WineProductCategory>{wineProductCategory}</urn:WineProductCategory>
     {wineGrowingZoneCode.mapNodeSeq(value => <urn:WineGrowingZoneCode>{value}</urn:WineGrowingZoneCode>)}
     {thirdCountryOfOrigin.mapNodeSeq(value => <urn:ThirdCountryOfOrigin>{value}</urn:ThirdCountryOfOrigin>)}

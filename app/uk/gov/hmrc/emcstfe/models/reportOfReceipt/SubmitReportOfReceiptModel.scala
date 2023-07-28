@@ -17,8 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
-import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType, TraderModel}
+import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType, TraderModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import java.time.LocalDate
@@ -33,7 +34,7 @@ case class SubmitReportOfReceiptModel(arc: String,
                                       dateOfArrival: LocalDate,
                                       acceptMovement: AcceptMovement,
                                       individualItems: Seq[ReceiptedItemsModel],
-                                      otherInformation: Option[String]) extends XmlWriterUtils {
+                                      otherInformation: Option[String]) extends XmlBaseModel with XmlWriterUtils {
 
   val globalConclusion = acceptMovement match {
     case Satisfactory => 1
@@ -42,7 +43,7 @@ case class SubmitReportOfReceiptModel(arc: String,
     case PartiallyRefused => 4
   }
 
-  def toXml: Elem =
+  def toXml(implicit request: UserRequest[_]): Elem =
     <urn:AcceptedOrRejectedReportOfReceiptExport>
       <urn:Attributes/>
       {consigneeTrader.mapNodeSeq { ct =>

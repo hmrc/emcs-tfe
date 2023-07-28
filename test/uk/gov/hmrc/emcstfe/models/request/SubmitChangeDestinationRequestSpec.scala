@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitChangeDestinationFixtures, TraderModelFixtures}
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -33,7 +31,6 @@ class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDesti
   import SubmitChangeDestinationFixtures._
   import UpdateEadEsadFixtures._
 
-  implicit val userRequest = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
   val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
 
   "requestBody" should {
@@ -56,7 +53,7 @@ class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDesti
             </MetaData>
           </soapenv:Header>
           <soapenv:Body>
-            <urn:IE813 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+            <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01">
               <urn:Header>
                 <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
                 <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>
@@ -141,15 +138,21 @@ class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDesti
     }
   }
 
-  "action" should {
+  ".action" should {
     "be correct" in {
       request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitchangeofdestinationportal"
     }
   }
 
-  "shouldExtractFromSoap" should {
+  ".shouldExtractFromSoap" should {
     "be correct" in {
       request.shouldExtractFromSoap shouldBe false
+    }
+  }
+
+  ".exciseRegistrationNumber" should {
+    "be correct" in {
+      request.exciseRegistrationNumber shouldBe testErn
     }
   }
 }

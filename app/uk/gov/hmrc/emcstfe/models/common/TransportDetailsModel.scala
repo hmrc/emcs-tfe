@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
@@ -28,7 +29,7 @@ case class TransportDetailsModel(
                                   complementaryInformation: Option[String],
                                   sealInformation: Option[String],
                                 ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:TransportDetails>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:TransportDetails>
     <urn:TransportUnitCode>{transportUnitCode}</urn:TransportUnitCode>
     {identityOfTransportUnits.mapNodeSeq(value => <urn:IdentityOfTransportUnits>{value}</urn:IdentityOfTransportUnits>)}
     {commercialSealIdentification.mapNodeSeq(value => <urn:CommercialSealIdentification>{value}</urn:CommercialSealIdentification>)}

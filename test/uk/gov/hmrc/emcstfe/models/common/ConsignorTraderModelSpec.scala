@@ -16,21 +16,17 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.fixtures.ConsignorTraderModelFixtures
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
 
-class ConsignorTraderModelSpec extends UnitSpec with ConsignorTraderModelFixtures {
+class ConsignorTraderModelSpec extends XmlModelBaseSpec with ConsignorTraderModelFixtures {
 
-  "ConsignorTraderModel" must {
-
-    "be possible to serialise and de-serialise to/from JSON" in {
-      Json.toJson(consignorTraderModel).as[ConsignorTraderModel] shouldBe consignorTraderModel
-    }
-
-    "write to XML" in {
-      consignorTraderModel.toXml shouldBe consignorTraderModelXML
-    }
-  }
+  testJsonToModelToXml(
+    "max fields",
+    Json.toJson(consignorTraderModel).as[JsObject],
+    consignorTraderModel,
+    consignorTraderModelXML
+  )
 
 }

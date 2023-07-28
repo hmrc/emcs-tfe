@@ -32,16 +32,12 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.support.UnitSpec
-import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.config.Constants
+import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementType}
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtures {
-
-  lazy implicit val userRequest: UserRequest[_] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
 
   val consigneeTraderCountryCode = "AA"
   val placeOfDispatchTraderCountryCode = "BB"

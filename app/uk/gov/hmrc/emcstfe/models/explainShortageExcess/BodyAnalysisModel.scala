@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -28,7 +29,7 @@ case class BodyAnalysisModel(
                               explanation: String,
                               actualQuantity: Option[BigDecimal]
                             ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:BodyAnalysis>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:BodyAnalysis>
     <urn:ExciseProductCode>{exciseProductCode}</urn:ExciseProductCode>
     <urn:BodyRecordUniqueReference>{bodyRecordUniqueReference}</urn:BodyRecordUniqueReference>
     <urn:Explanation language="en">{explanation}</urn:Explanation>

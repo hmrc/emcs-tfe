@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.createMovement
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{ConsignorTraderModel, MovementGuaranteeModel, MovementType, TraderModel, TransportDetailsModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -43,7 +44,7 @@ case class CreateMovementModel(
                                 eadEsadDraft: EadEsadDraftModel,
                                 transportDetails: Seq[TransportDetailsModel],
                               ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:SubmittedDraftOfEADESAD>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:SubmittedDraftOfEADESAD>
     {attributes.toXml}
     {consigneeTrader.mapNodeSeq(trader => <urn:ConsigneeTrader language="en">{trader.toXml}</urn:ConsigneeTrader>)}
     {consignorTrader.toXml}

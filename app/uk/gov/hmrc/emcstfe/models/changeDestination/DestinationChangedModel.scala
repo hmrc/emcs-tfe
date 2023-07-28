@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.changeDestination
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementGuaranteeModel, TraderModel, XmlBaseModel}
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -29,7 +30,7 @@ case class DestinationChangedModel(
                                     deliveryPlaceCustomsOffice: Option[DeliveryPlaceCustomsOfficeModel],
                                     movementGuarantee: Option[MovementGuaranteeModel]
                                   ) extends XmlBaseModel with XmlWriterUtils {
-  def toXml: Elem = <urn:DestinationChanged>
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:DestinationChanged>
     <urn:DestinationTypeCode>{destinationTypeCode.toString}</urn:DestinationTypeCode>
     {newConsigneeTrader.mapNodeSeq(trader => <urn:NewConsigneeTrader language="en">{trader.toXml}</urn:NewConsigneeTrader>)}
     {deliveryPlaceTrader.mapNodeSeq(trader => <urn:DeliveryPlaceTrader language="en">{trader.toXml}</urn:DeliveryPlaceTrader>)}
