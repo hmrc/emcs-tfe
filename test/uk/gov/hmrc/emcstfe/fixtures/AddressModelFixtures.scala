@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.models.common.AddressModel
+import uk.gov.hmrc.emcstfe.models.common.{AddressModel, GuarantorTrader, TraderModelType}
 
 import scala.xml.NodeSeq
 
@@ -30,13 +30,25 @@ trait AddressModelFixtures extends BaseFixtures {
     city = Some("city")
   )
 
-  val maxAddressModelXML: NodeSeq =
-    NodeSeq.fromSeq(Seq(
-      <urn:StreetName>street</urn:StreetName>,
-      <urn:StreetNumber>number</urn:StreetNumber>,
-      <urn:Postcode>postcode</urn:Postcode>,
-      <urn:City>city</urn:City>
-    ))
+  def maxAddressModelXML(traderType: TraderModelType): NodeSeq =
+    NodeSeq.fromSeq(
+      Seq(
+        <urn:StreetName>street</urn:StreetName>,
+        <urn:StreetNumber>number</urn:StreetNumber>
+      ) ++ {
+        if (traderType == GuarantorTrader) {
+          Seq(
+            <urn:City>city</urn:City>,
+            <urn:Postcode>postcode</urn:Postcode>
+          )
+        } else {
+          Seq(
+            <urn:Postcode>postcode</urn:Postcode>,
+            <urn:City>city</urn:City>
+          )
+        }
+      }
+    )
 
   val maxAddressModelJson: JsObject = Json.obj(
     "streetNumber" -> "number",

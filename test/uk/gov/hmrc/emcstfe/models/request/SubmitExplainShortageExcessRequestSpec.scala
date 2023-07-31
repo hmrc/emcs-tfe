@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitExplainShortageExcessFixtures, TraderModelFixtures}
-import uk.gov.hmrc.emcstfe.models.common.{SubmitterType, TraderModel}
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, SubmitterType, TraderModel}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.AttributesModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -81,7 +81,7 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
 
       val idErn = "FR0000123456"
       val idArc = "01DE0000012345"
-      val defaultConsigneeTraderModel = ConsigneeTraderFixtures.consigneeTraderModel.copy(traderId = Some(idErn))
+      val defaultConsigneeTraderModel = maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some(idErn))
 
       def model(submitterType: SubmitterType, consigneeTrader: Option[TraderModel] = Some(defaultConsigneeTraderModel)) =
         submitExplainShortageExcessModelMax
@@ -111,7 +111,7 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
               request.messageRecipient shouldBe "NDEA.GB"
             }
             "ConsigneeTrader Traderid is not defined" in {
-              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderId = None))))
+              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderExciseNumber = None))))
               request.messageRecipient shouldBe "NDEA.GB"
             }
           }
@@ -132,7 +132,7 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
               request.messageSender shouldBe "NDEA.GB"
             }
             "ConsigneeTrader Traderid is not defined" in {
-              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderId = None))))
+              val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderExciseNumber = None))))
               request.messageSender shouldBe "NDEA.GB"
             }
           }

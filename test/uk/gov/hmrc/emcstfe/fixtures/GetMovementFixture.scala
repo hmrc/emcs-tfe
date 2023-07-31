@@ -17,12 +17,12 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
-import uk.gov.hmrc.emcstfe.models.common.{AddressModel, ConsignorTraderModel, TraderModel}
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
-trait GetMovementFixture extends BaseFixtures {
-  lazy val getMovementResponseBody: String = """<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
+trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
+  lazy val getMovementResponseBody: String = s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                                |    <mov:currentMovement>
                                                |      <mov:status>Accepted</mov:status>
                                                |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
@@ -37,29 +37,17 @@ trait GetMovementFixture extends BaseFixtures {
                                                |        <body:Body>
                                                |          <body:EADESADContainer>
                                                |            <body:ConsigneeTrader language="en">
-                                               |              <body:Traderid>GB11100000002</body:Traderid>
-                                               |              <body:TraderName>Current 801 Consignee</body:TraderName>
-                                               |              <body:StreetName>Aardvark Avenue 253</body:StreetName>
-                                               |              <body:Postcode>SY1 3BQ</body:Postcode>
-                                               |              <body:City>Shrewsbury</body:City>
+                                               |              ${maxTraderModelXML(ConsigneeTrader)}
                                                |            </body:ConsigneeTrader>
                                                |            <body:ExciseMovement>
                                                |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
                                                |              <body:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</body:DateAndTimeOfValidationOfEadEsad>
                                                |            </body:ExciseMovement>
                                                |            <body:ConsignorTrader language="en">
-                                               |              <body:TraderExciseNumber>GB12345GTR144</body:TraderExciseNumber>
-                                               |              <body:TraderName>Current 801 Consignor</body:TraderName>
-                                               |              <body:StreetName>Main101</body:StreetName>
-                                               |              <body:Postcode>ZZ78</body:Postcode>
-                                               |              <body:City>Zeebrugge</body:City>
+                                               |              ${maxTraderModelXML(ConsignorTrader)}
                                                |            </body:ConsignorTrader>
                                                |            <body:PlaceOfDispatchTrader language="en">
-                                               |              <body:ReferenceOfTaxWarehouse>GB12345GTR143</body:ReferenceOfTaxWarehouse>
-                                               |              <body:TraderName>Current 801 Dispatcher</body:TraderName>
-                                               |              <body:StreetName>Psiristreet 59</body:StreetName>
-                                               |              <body:Postcode>45690</body:Postcode>
-                                               |              <body:City>Athens</body:City>
+                                               |              ${maxTraderModelXML(PlaceOfDispatchTrader)}
                                                |            </body:PlaceOfDispatchTrader>
                                                |            <body:DeliveryPlaceCustomsOffice>
                                                |              <body:ReferenceNumber>FR000003</body:ReferenceNumber>
@@ -68,11 +56,7 @@ trait GetMovementFixture extends BaseFixtures {
                                                |              <body:ReferenceNumber>GB000002</body:ReferenceNumber>
                                                |            </body:CompetentAuthorityDispatchOffice>
                                                |            <body:FirstTransporterTrader language="en">
-                                               |              <body:VatNumber>GB32445345</body:VatNumber>
-                                               |              <body:TraderName>Current 801 FirstTransporter</body:TraderName>
-                                               |              <body:StreetName>Kerkstraat 55</body:StreetName>
-                                               |              <body:Postcode>9000</body:Postcode>
-                                               |              <body:City>Gent</body:City>
+                                               |              ${maxTraderModelXML(TransportTrader)}
                                                |            </body:FirstTransporterTrader>
                                                |            <body:DocumentCertificate>
                                                |              <body:DocumentDescription language="en">Test</body:DocumentDescription>
@@ -203,29 +187,17 @@ trait GetMovementFixture extends BaseFixtures {
                                                |        <body:Body>
                                                |          <body:EADESADContainer>
                                                |            <body:ConsigneeTrader language="en">
-                                               |              <body:Traderid>GB11100000002</body:Traderid>
-                                               |              <body:TraderName>Original 801 Consignee</body:TraderName>
-                                               |              <body:StreetName>Evangelismus Avenue 253</body:StreetName>
-                                               |              <body:Postcode>45690</body:Postcode>
-                                               |              <body:City>Athens</body:City>
+                                               |              ${maxTraderModelXML(ConsigneeTrader)}
                                                |            </body:ConsigneeTrader>
                                                |            <body:ExciseMovement>
                                                |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
                                                |              <body:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</body:DateAndTimeOfValidationOfEadEsad>
                                                |            </body:ExciseMovement>
                                                |            <body:ConsignorTrader language="en">
-                                               |              <body:TraderExciseNumber>GB12345GTR144</body:TraderExciseNumber>
-                                               |              <body:TraderName>Original 801 Consignor</body:TraderName>
-                                               |              <body:StreetName>Montoyerstreet 101</body:StreetName>
-                                               |              <body:Postcode>1000</body:Postcode>
-                                               |              <body:City>Brussels</body:City>
+                                               |              ${maxTraderModelXML(ConsignorTrader)}
                                                |            </body:ConsignorTrader>
                                                |            <body:PlaceOfDispatchTrader language="en">
-                                               |              <body:ReferenceOfTaxWarehouse>GB12345GTR143</body:ReferenceOfTaxWarehouse>
-                                               |              <body:TraderName>Original 801 DispatchTrader</body:TraderName>
-                                               |              <body:StreetName>Psiristreet 59</body:StreetName>
-                                               |              <body:Postcode>45690</body:Postcode>
-                                               |              <body:City>Athens</body:City>
+                                               |              ${maxTraderModelXML(PlaceOfDispatchTrader)}
                                                |            </body:PlaceOfDispatchTrader>
                                                |            <body:DeliveryPlaceCustomsOffice>
                                                |              <body:ReferenceNumber>FR000003</body:ReferenceNumber>
@@ -234,11 +206,7 @@ trait GetMovementFixture extends BaseFixtures {
                                                |              <body:ReferenceNumber>GB000002</body:ReferenceNumber>
                                                |            </body:CompetentAuthorityDispatchOffice>
                                                |            <body:FirstTransporterTrader language="en">
-                                               |              <body:VatNumber>GB32445345</body:VatNumber>
-                                               |              <body:TraderName>Original 801 FirstTransporter</body:TraderName>
-                                               |              <body:StreetName>Kerkstraat 55</body:StreetName>
-                                               |              <body:Postcode>9000</body:Postcode>
-                                               |              <body:City>Gent</body:City>
+                                               |              ${maxTraderModelXML(TransportTrader)}
                                                |            </body:FirstTransporterTrader>
                                                |            <body:DocumentCertificate>
                                                |              <body:DocumentDescription language="en">Test</body:DocumentDescription>
@@ -468,33 +436,11 @@ trait GetMovementFixture extends BaseFixtures {
     arc = "13AB7778889991ABCDEF9",
     sequenceNumber = 1,
     destinationType = Export,
-    consigneeTrader = Some(TraderModel(
-      referenceOfTaxWarehouse = None,
-      vatNumber = None,
-      traderExciseNumber = None,
-      traderId = Some("GB11100000002"),
-      traderName = Some("Current 801 Consignee"),
-      address = Some(AddressModel(
-        streetNumber = None,
-        street = Some("Aardvark Avenue 253"),
-        postcode = Some("SY1 3BQ"),
-        city = Some("Shrewsbury")
-      )),
-      eoriNumber = None
-    )),
+    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     deliveryPlaceTrader = None,
     localReferenceNumber = "EN",
     eadStatus = "Accepted",
-    consignorTrader = ConsignorTraderModel(
-      traderExciseNumber = "GB12345GTR144",
-      traderName = "Current 801 Consignor",
-      address = AddressModel(
-        streetNumber = None,
-        street = Some("Main101"),
-        postcode = Some("ZZ78"),
-        city = Some("Zeebrugge")
-      )
-    ),
+    consignorTrader = maxTraderModel(ConsignorTrader),
     dateOfDispatch = "2008-11-20",
     journeyTime = "20 days",
     items = Seq(
@@ -583,26 +529,10 @@ trait GetMovementFixture extends BaseFixtures {
     "arc" -> "13AB7778889991ABCDEF9",
     "sequenceNumber" -> 1,
     "destinationType" -> "6",
-    "consigneeTrader" -> Json.obj(fields =
-      "traderId" -> "GB11100000002",
-      "traderName" -> "Current 801 Consignee",
-      "address" -> Json.obj(
-        "street" -> "Aardvark Avenue 253",
-        "postcode" -> "SY1 3BQ",
-        "city" -> "Shrewsbury"
-      )
-    ),
+    "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
     "localReferenceNumber" -> "EN",
     "eadStatus" -> "Accepted",
-    "consignorTrader" -> Json.obj(fields =
-      "traderExciseNumber" -> "GB12345GTR144",
-      "traderName" -> "Current 801 Consignor",
-      "address" -> Json.obj(
-        "street" -> "Main101",
-        "postcode" -> "ZZ78",
-        "city" -> "Zeebrugge"
-      )
-    ),
+    "consignorTrader" -> maxTraderModelJson(ConsignorTrader),
     "dateOfDispatch" -> "2008-11-20",
     "journeyTime" -> "20 days",
     "items" -> Json.arr(

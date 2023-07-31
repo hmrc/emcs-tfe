@@ -19,14 +19,14 @@ package uk.gov.hmrc.emcstfe.fixtures
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType._
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.{AlertOrRejectionReasonModel, SubmitAlertOrRejectionModel}
-import uk.gov.hmrc.emcstfe.models.common.ExciseMovementModel
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
 
 import java.time.LocalDate
 
 trait SubmitAlertOrRejectionFixtures extends BaseFixtures with TraderModelFixtures with ChRISResponsesFixture {
 
   val maxSubmitAlertOrRejectionModel = SubmitAlertOrRejectionModel(
-    consigneeTrader = Some(maxTraderModel),
+    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     exciseMovement = ExciseMovementModel(testArc, 1),
     destinationOffice = testDestinationOffice,
     dateOfAlertOrRejection = LocalDate.of(2023, 7, 24),
@@ -45,7 +45,7 @@ trait SubmitAlertOrRejectionFixtures extends BaseFixtures with TraderModelFixtur
 
   val maxSubmitAlertOrRejectionModelJson =
     Json.obj(
-      "consigneeTrader" -> maxTraderModelJson,
+      "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
       "exciseMovement" -> Json.obj(
         "arc" -> testArc,
         "sequenceNumber" -> 1
@@ -68,7 +68,7 @@ trait SubmitAlertOrRejectionFixtures extends BaseFixtures with TraderModelFixtur
     <urn:AlertOrRejectionOfEADESAD>
       <urn:Attributes/>
       <urn:ConsigneeTrader language="en">
-        {maxTraderModelXML}
+        {maxTraderModelXML(ConsigneeTrader)}
       </urn:ConsigneeTrader>
       <urn:ExciseMovement>
         <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>

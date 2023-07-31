@@ -16,17 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
-import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.fixtures.ConsignorTraderModelFixtures
-import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
-
-class ConsignorTraderModelSpec extends XmlModelBaseSpec with ConsignorTraderModelFixtures {
-
-  testJsonToModelToXml(
-    "max fields",
-    Json.toJson(consignorTraderModel).as[JsObject],
-    consignorTraderModel,
-    consignorTraderModelXML
-  )
-
-}
+sealed trait TraderModelType
+case object ConsigneeTrader extends TraderModelType
+case object ConsignorTrader extends TraderModelType
+case object PlaceOfDispatchTrader extends TraderModelType
+case object DeliveryPlaceTrader extends TraderModelType
+case object TransportTrader extends TraderModelType
+case object GuarantorTrader extends TraderModelType

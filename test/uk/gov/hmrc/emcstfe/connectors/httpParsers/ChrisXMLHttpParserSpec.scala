@@ -92,8 +92,6 @@ class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovement
             EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
             EmptyError(GetMovementResponse.localReferenceNumber),
             EmptyError(GetMovementResponse.eadStatus),
-            EmptyError(GetMovementResponse.consignorTrader \\ "TraderExciseNumber"),
-            EmptyError(GetMovementResponse.consignorTrader \\ "TraderName"),
             EmptyError(GetMovementResponse.dateOfDispatch),
             JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''")
           )))

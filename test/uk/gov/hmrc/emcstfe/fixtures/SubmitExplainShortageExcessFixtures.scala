@@ -17,12 +17,12 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.models.common.{ExciseMovementModel, SubmitterType}
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, ExciseMovementModel, SubmitterType}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, AttributesModel, BodyAnalysisModel, SubmitExplainShortageExcessModel}
 
 import scala.xml.Elem
 
-trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with TraderModelFixtures with ConsignorTraderModelFixtures {
+trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with TraderModelFixtures {
 
   object AttributesFixtures {
     val attributesModel: AttributesModel = AttributesModel(
@@ -118,14 +118,13 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
     import AnalysisFixtures._
     import AttributesFixtures._
     import BodyAnalysisFixtures._
-    import ConsigneeTraderFixtures._
     import ExciseMovementFixtures._
 
     val submitExplainShortageExcessModelMax: SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
       attributes = attributesModel,
-      consigneeTrader = Some(consigneeTraderModel),
+      consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
       exciseMovement = exciseMovementModel,
-      consignorTrader = Some(consignorTraderModel),
+      consignorTrader = Some(maxTraderModel(ConsignorTrader)),
       analysis = Some(analysisModel),
       bodyAnalysis = Some(Seq(bodyAnalysisModelMax, bodyAnalysisModelMin))
     )
@@ -141,9 +140,13 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
 
     val submitExplainShortageExcessXmlMax: Elem = <urn:ExplanationOnReasonForShortage>
       {attributesXml}
-      {consigneeTraderXml}
+      <urn:ConsigneeTrader language="en">
+        {maxTraderModelXML(ConsigneeTrader)}
+      </urn:ConsigneeTrader>
       {exciseMovementXml}
-      {consignorTraderModelXML}
+      <urn:ConsignorTrader language="en">
+        {maxTraderModelXML(ConsignorTrader)}
+      </urn:ConsignorTrader>
       {analysisXml}
       {bodyAnalysisXmlMax}
       {bodyAnalysisXmlMin}
@@ -156,9 +159,9 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
 
     val submitExplainShortageExcessJsonMax: JsObject = Json.obj(
       "attributes" -> attributesJson,
-      "consigneeTrader" -> consigneeTraderJson,
+      "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
       "exciseMovement" -> exciseMovementJson,
-      "consignorTrader" -> consignorTraderJson,
+      "consignorTrader" -> maxTraderModelJson(ConsignorTrader),
       "analysis" -> analysisJson,
       "bodyAnalysis" -> Json.arr(bodyAnalysisJsonMax, bodyAnalysisJsonMin)
     )

@@ -29,7 +29,7 @@ case class SubmitCreateMovementRequest(body: CreateMovementModel)
   override def exciseRegistrationNumber: String = request.ern
 
   val messageRecipient = Constants.NDEA ++ messageRecipientCountryCode()
-  val messageSender: String = Constants.NDEA ++ messageSenderCountryCode()
+  val messageSender: String = Constants.NDEA ++ messageSenderCountryCode().getOrElse(Constants.GB)
 
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
 
@@ -67,10 +67,10 @@ case class SubmitCreateMovementRequest(body: CreateMovementModel)
     }).getOrElse(Constants.GB)
   }
 
-  private[request] def messageSenderCountryCode(): String =
+  private[request] def messageSenderCountryCode(): Option[String] =
     body.movementType match {
       case UKtoUK | UKtoEU | DirectExport | IndirectExport =>
-        body.placeOfDispatchTrader.flatMap(_.countryCode).getOrElse(Constants.GB)
+        body.placeOfDispatchTrader.flatMap(_.countryCode)
       case _ =>
         body.consignorTrader.countryCode
     }

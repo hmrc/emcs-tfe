@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitChangeDestinationFixtures, TraderModelFixtures}
+import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -27,7 +28,6 @@ class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDesti
 
   import DeliveryPlaceCustomsOfficeFixtures._
   import DestinationChangedFixtures._
-  import NewConsigneeTraderFixtures._
   import SubmitChangeDestinationFixtures._
   import UpdateEadEsadFixtures._
 
@@ -86,7 +86,7 @@ class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDesti
         submitChangeDestinationModelMax
           .copy(updateEadEsad = updateEadEsadModelMax.copy(administrativeReferenceCode = "01DE0000012345"))
           .copy(destinationChanged = destinationChangedModelMax.copy(
-            newConsigneeTrader = Some(newConsigneeTraderModelMax.copy(traderId = Some("FR0000123456"))),
+            newConsigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("FR0000123456"))),
             deliveryPlaceCustomsOffice = Some(deliveryPlaceCustomsOfficeModel.copy(referenceNumber = "IT0000123456"))
           ))
 

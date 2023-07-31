@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
-import uk.gov.hmrc.emcstfe.models.common.ExciseMovementModel
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
@@ -81,7 +81,7 @@ class SubmitAlertOrRejectionRequestSpec extends UnitSpec with SubmitAlertOrRejec
       "have the correct MessageSender" when {
 
         "consignee trader exists" in {
-          SubmitAlertOrRejectionRequest(model.copy(consigneeTrader = Some(maxTraderModel.copy(traderId = Some("FR00001"))))).messageSender shouldBe "NDEA.FR"
+          SubmitAlertOrRejectionRequest(model.copy(consigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("FR00001"))))).messageSender shouldBe "NDEA.FR"
         }
 
         "consignee trader DOES NOT exist" in {

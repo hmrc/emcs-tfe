@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitCancellationOfMovementFixtures
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{ExemptedOrganisations, TaxWarehouse}
-import uk.gov.hmrc.emcstfe.models.common.ExciseMovementModel
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.xml.Utility.trim
@@ -88,7 +88,7 @@ class SubmitCancellationOfMovementRequestSpec extends UnitSpec with SubmitCancel
           "consignee trader exists, use traderId country code" in {
             val testModel = maxSubmitCancellationOfMovementModel.copy(
               destinationType = TaxWarehouse,
-              consigneeTrader = Some(maxTraderModel.copy(traderId = Some("FR00001")))
+              consigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("FR00001")))
             )
 
             SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.FR"

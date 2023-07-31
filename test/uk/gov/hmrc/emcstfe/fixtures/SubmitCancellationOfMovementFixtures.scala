@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.CancellationReasonType.TypingError
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.{CancellationReasonModel, SubmitCancellationOfMovementModel}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
-import uk.gov.hmrc.emcstfe.models.common.ExciseMovementModel
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
 
 import java.time.LocalDate
 import scala.xml.Elem
@@ -31,7 +31,7 @@ trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISRespon
     dateAndTimeOfValidationOfCancellation = LocalDate.of(2023, 1, 1),
     exciseMovement = ExciseMovementModel(testArc, 1),
     cancellationReason = CancellationReasonModel(TypingError, Some("test cancellation reason")),
-    consigneeTrader = Some(maxTraderModel),
+    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     destinationType = Export,
     memberStateCode = "GB"
   )
@@ -40,7 +40,7 @@ trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISRespon
     dateAndTimeOfValidationOfCancellation = LocalDate.of(2023, 1, 1),
     exciseMovement = ExciseMovementModel(testArc, 1),
     cancellationReason = CancellationReasonModel(TypingError, None),
-    consigneeTrader = Some(maxTraderModel),
+    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     destinationType = Export,
     memberStateCode = "GB"
   )
@@ -57,7 +57,7 @@ trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISRespon
         "reason" -> TypingError.toString,
         "complementaryInformation" -> "test cancellation reason"
       ),
-    "consigneeTrader" -> maxTraderModelJson,
+    "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
     "destinationType" -> Export.toString,
     "memberStateCode" -> "GB"
   )
@@ -70,7 +70,7 @@ trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISRespon
         "sequenceNumber" -> 1
       ),
     "cancellationReason" -> Json.obj("reason" -> TypingError.toString),
-    "consigneeTrader" -> maxTraderModelJson,
+    "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
     "destinationType" -> Export.toString,
     "memberStateCode" -> "GB"
   )

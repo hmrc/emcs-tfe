@@ -16,39 +16,51 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
-import play.api.libs.json.Json
+import com.lucidchart.open.xtract.{ParseSuccess, XmlReader}
 import uk.gov.hmrc.emcstfe.fixtures.TraderModelFixtures
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 class TraderModelSpec extends UnitSpec with TraderModelFixtures {
 
-  "TraderModel" must {
+  "TraderModel" when {
 
-    "for the maximum number of fields" must {
+    Seq(
+      ConsigneeTrader,
+      ConsignorTrader,
+      PlaceOfDispatchTrader,
+      DeliveryPlaceTrader,
+      TransportTrader,
+      GuarantorTrader
+    ).foreach { traderType =>
 
-      "be possible to serialise and de-serialise to/from JSON" in {
-        Json.toJson(maxTraderModel).as[TraderModel] shouldBe maxTraderModel
+      s".toXml($traderType)" must {
+
+        "for the Max model" must {
+
+          "output the expected XML" in {
+            maxTraderModel(traderType).toXml(traderType) shouldBe maxTraderModelXML(traderType)
+          }
+        }
+
+        "for the Min model" must {
+
+          "output the expected XML" in {
+            minTraderModel.toXml(traderType) shouldBe minTraderModelXML
+          }
+        }
       }
 
-      "write to XML" in {
-        maxTraderModel.toXml shouldBe maxTraderModelXML
-      }
-    }
+      s"when reading from XML for $traderType" must {
 
-    "for the minimum number of fields" must {
-
-      "be possible to serialise and de-serialise to/from JSON" in {
-        Json.toJson(minTraderModel).as[TraderModel] shouldBe minTraderModel
-      }
-
-      "write to XML" in {
-        minTraderModel.toXml shouldBe minTraderModelXML
+        "construct the model as expected" in {
+          XmlReader.of[TraderModel](TraderModel.xmlReads(traderType)).read(maxTraderModelXML(traderType)) shouldBe ParseSuccess(maxTraderModel(traderType))
+        }
       }
     }
 
     "calculate countryCode" when {
       "traderId.length >= 2" in {
-        maxTraderModel.countryCode shouldBe Some("GB")
+        maxTraderModel(ConsigneeTrader).countryCode shouldBe Some("GB")
       }
     }
 
@@ -57,7 +69,7 @@ class TraderModelSpec extends UnitSpec with TraderModelFixtures {
         minTraderModel.countryCode shouldBe None
       }
       "traderId.length < 2" in {
-        maxTraderModel.copy(traderId = Some("a")).countryCode shouldBe None
+        maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("a")).countryCode shouldBe None
       }
     }
   }
