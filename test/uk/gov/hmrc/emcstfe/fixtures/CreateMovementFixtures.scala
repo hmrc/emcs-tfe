@@ -129,7 +129,7 @@ trait CreateMovementFixtures extends BaseFixtures
     )
     lazy val headerEadEsadXml: Elem = <urn:HeaderEadEsad>
       <urn:DestinationTypeCode>{TaxWarehouse.toString}</urn:DestinationTypeCode>
-      <urn:JourneyTime>H3</urn:JourneyTime>
+      <urn:JourneyTime>H03</urn:JourneyTime>
       <urn:TransportArrangement>{TransportArrangement.OwnerOfGoods.toString}</urn:TransportArrangement>
     </urn:HeaderEadEsad>
     lazy val headerEadEsadJson: JsObject = Json.obj(
@@ -284,33 +284,33 @@ trait CreateMovementFixtures extends BaseFixtures
       wineProduct = None
     )
     lazy val bodyEadEsadXmlMax: Elem = <urn:BodyEadEsad>
-      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
-      <ExciseProductCode>epc</ExciseProductCode>
-      <CnCode>cn</CnCode>
-      <Quantity>1.1</Quantity>
-      <GrossMass>1.2</GrossMass>
-      <NetMass>1.3</NetMass>
-      <AlcoholicStrengthByVolumeInPercentage>1.4</AlcoholicStrengthByVolumeInPercentage>
-      <DegreePlato>1.5</DegreePlato>
-      <FiscalMark language="en">mark</FiscalMark>
-      <FiscalMarkUsedFlag>0</FiscalMarkUsedFlag>
-      <DesignationOfOrigin language="en">destination</DesignationOfOrigin>
-      <SizeOfProducer>1</SizeOfProducer>
-      <Density>1.6</Density>
-      <CommercialDescription language="en">description</CommercialDescription>
-      <BrandNameOfProducts language="en">name</BrandNameOfProducts>
-      <MaturationPeriodOrAgeOfProducts language="en">age</MaturationPeriodOrAgeOfProducts>
+      <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
+      <urn:ExciseProductCode>epc</urn:ExciseProductCode>
+      <urn:CnCode>cn</urn:CnCode>
+      <urn:Quantity>1.1</urn:Quantity>
+      <urn:GrossMass>1.2</urn:GrossMass>
+      <urn:NetMass>1.3</urn:NetMass>
+      <urn:AlcoholicStrengthByVolumeInPercentage>1.4</urn:AlcoholicStrengthByVolumeInPercentage>
+      <urn:DegreePlato>1.5</urn:DegreePlato>
+      <urn:FiscalMark language="en">mark</urn:FiscalMark>
+      <urn:FiscalMarkUsedFlag>0</urn:FiscalMarkUsedFlag>
+      <urn:DesignationOfOrigin language="en">destination</urn:DesignationOfOrigin>
+      <urn:SizeOfProducer>1</urn:SizeOfProducer>
+      <urn:Density>1.6</urn:Density>
+      <urn:CommercialDescription language="en">description</urn:CommercialDescription>
+      <urn:BrandNameOfProducts language="en">name</urn:BrandNameOfProducts>
+      <urn:MaturationPeriodOrAgeOfProducts language="en">age</urn:MaturationPeriodOrAgeOfProducts>
       {packageXmlMax}
       {packageXmlMin}
       {wineProductXmlMax}
     </urn:BodyEadEsad>
     lazy val bodyEadEsadXmlMin: Elem = <urn:BodyEadEsad>
-      <BodyRecordUniqueReference>1</BodyRecordUniqueReference>
-      <ExciseProductCode>epc</ExciseProductCode>
-      <CnCode>cn</CnCode>
-      <Quantity>1.1</Quantity>
-      <GrossMass>1.2</GrossMass>
-      <NetMass>1.3</NetMass>
+      <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
+      <urn:ExciseProductCode>epc</urn:ExciseProductCode>
+      <urn:CnCode>cn</urn:CnCode>
+      <urn:Quantity>1.1</urn:Quantity>
+      <urn:GrossMass>1.2</urn:GrossMass>
+      <urn:NetMass>1.3</urn:NetMass>
       {packageXmlMin}
     </urn:BodyEadEsad>
     lazy val bodyEadEsadJsonMax: JsObject = Json.obj(
