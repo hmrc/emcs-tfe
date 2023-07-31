@@ -40,6 +40,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def explainDelayUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.explainDelayUserAnswers.TTL"))
   def explainDelayUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.explainDelayUserAnswers.replaceIndexes")
 
+  def explainShortageOrExcessUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.explainShortageOrExcessUserAnswers.TTL"))
+  def explainShortageOrExcessUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.explainShortageOrExcessUserAnswers.replaceIndexes")
+
   def getMovementTTL(): Duration = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
   def getMovementReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.getMovement.replaceIndexes")
 
