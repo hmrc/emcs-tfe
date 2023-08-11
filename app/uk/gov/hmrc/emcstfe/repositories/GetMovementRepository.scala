@@ -16,13 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
-import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.utils.{Logging, TimeMachine}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -52,8 +50,6 @@ class GetMovementRepository @Inject()(
       ),
       IndexModel(
         Indexes.compoundIndex(
-          Indexes.ascending("internalId"),
-          Indexes.ascending("ern"),
           Indexes.ascending("arc")
         ),
         IndexOptions().name("uniqueIdx")
@@ -64,55 +60,24 @@ class GetMovementRepository @Inject()(
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  private def by(internalId: String, ern: String, arc: String): Bson =
-    Filters.and(
-      Filters.equal("internalId", internalId),
-      Filters.equal("ern", ern),
-      Filters.equal("arc", arc)
-    )
+  private def by(arc: String): Bson =
+    Filters.equal("arc", arc)
 
-  def keepAlive(internalId: String, ern: String, arc: String): Future[Boolean] =
+  def get(arc: String): Future[Option[GetMovementMongoResponse]] =
     collection
-      .updateOne(
-        filter = by(internalId: String, ern: String, arc: String),
+      .findOneAndUpdate(
+        filter = by(arc),
         update = Updates.set("lastUpdated", time.instant()),
+        options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
+      )
+      .headOption()
+
+  def set(answers: GetMovementMongoResponse): Future[GetMovementMongoResponse] =
+    collection
+      .findOneAndReplace(
+        filter      = by(answers.arc),
+        replacement = answers copy (lastUpdated = time.instant()),
+        options     = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       )
       .toFuture()
-      .map(_ => true)
-
-  def get(internalId: String, ern: String, arc: String): Future[Option[GetMovementMongoResponse]] =
-    keepAlive(internalId, ern, arc).flatMap {
-      _ =>
-        collection
-          .find(by(internalId, ern, arc))
-          .headOption()
-    }
-
-  def set(answers: GetMovementMongoResponse): Future[Either[ErrorResponse, Boolean]] = {
-
-    val updatedAnswers = answers copy (lastUpdated = time.instant())
-
-    collection
-      .replaceOne(
-        filter      = by(updatedAnswers.internalId, updatedAnswers.ern, updatedAnswers.arc),
-        replacement = updatedAnswers,
-        options     = ReplaceOptions().upsert(true)
-      )
-      .toFuture()
-      .map(_ => Right(true))
-  }
-
-  def clear(internalId: String, ern: String, arc: String): Future[Boolean] =
-    collection
-      .deleteOne(by(internalId, ern, arc))
-      .toFuture()
-      .map(_ => true)
-
-  def removeAll(): Future[Unit] = {
-    logger.info("Clearing all movements")
-    collection
-      .deleteMany(BsonDocument())
-      .toFuture()
-      .map(_ => logger.info("Clearing all movements succeeded"))
-  }
 }

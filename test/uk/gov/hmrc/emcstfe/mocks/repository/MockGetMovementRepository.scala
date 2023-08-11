@@ -21,7 +21,6 @@ import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.repositories.GetMovementRepository
 
 import scala.concurrent.Future
@@ -31,14 +30,11 @@ trait MockGetMovementRepository extends MockitoSugar {
   lazy val mockRepo: GetMovementRepository = mock[GetMovementRepository]
 
   object MockGetMovementRepository {
-    def set(): OngoingStubbing[Future[Either[ErrorResponse, Boolean]]] =
+    def set(): OngoingStubbing[Future[GetMovementMongoResponse]] =
       when(mockRepo.set(any()))
 
-    def get(ern: String, arc: String): OngoingStubbing[Future[Option[GetMovementMongoResponse]]] =
-      when(mockRepo.get(any(), eqTo(ern), eqTo(arc)))
-
-    def clear(ern: String, arc: String): OngoingStubbing[Future[Boolean]] =
-      when(mockRepo.clear(any(), eqTo(ern), eqTo(arc)))
+    def get(arc: String): OngoingStubbing[Future[Option[GetMovementMongoResponse]]] =
+      when(mockRepo.get(eqTo(arc)))
   }
 }
 

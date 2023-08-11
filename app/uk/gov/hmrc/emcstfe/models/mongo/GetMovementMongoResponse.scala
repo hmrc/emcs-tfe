@@ -22,28 +22,20 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-case class GetMovementMongoResponse(
-                                internalId: String,
-                                ern: String,
-                                arc: String,
-                                data: JsValue,
-                                lastUpdated: Instant = Instant.now
-                             )
+case class GetMovementMongoResponse(arc: String,
+                                    data: JsValue,
+                                    lastUpdated: Instant = Instant.now)
 
 object GetMovementMongoResponse {
 
 
   val reads: Reads[GetMovementMongoResponse] = (
-    (__ \ "internalId").read[String] and
-      (__ \ "ern").read[String] and
       (__ \ "arc").read[String] and
       (__ \ "data").read[JsValue] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     )(GetMovementMongoResponse.apply _)
 
   val writes: OWrites[GetMovementMongoResponse] = (
-    (__ \ "internalId").write[String] and
-      (__ \ "ern").write[String] and
       (__ \ "arc").write[String] and
       (__ \ "data").write[JsValue] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)

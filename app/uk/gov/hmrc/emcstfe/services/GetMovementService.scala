@@ -45,7 +45,7 @@ class GetMovementService @Inject()(
                                     val config: AppConfig,
                                   ) extends Logging {
   def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
-    repository.get(request.internalId, request.ern, getMovementRequest.arc).flatMap {
+    repository.get(getMovementRequest.arc).flatMap {
       case Some(value) =>
         logger.info("[getMovement] Matching movement found, calling GetMovementIfChanged")
         if (forceFetchNew) {
@@ -138,11 +138,11 @@ class GetMovementService @Inject()(
 
         resString <- EitherT.fromEither[Future](xmlUtils.trimWhitespaceFromXml(res))
 
-        getMovementMongoResponse = chrisResponse.map(_ => GetMovementMongoResponse(request.internalId, request.ern, getMovementRequest.arc, JsString(resString.toString())))
+        getMovementMongoResponse = chrisResponse.map(_ => GetMovementMongoResponse(getMovementRequest.arc, JsString(resString.toString())))
 
         getMovementMongoResponseRight <- EitherT.fromEither[Future](getMovementMongoResponse)
 
-        _ <- EitherT(repository.set(getMovementMongoResponseRight).recover(recovery))
+        _ <- EitherT.right(repository.set(getMovementMongoResponseRight).recover(recovery))
 
         value <- EitherT.fromEither[Future](handleParseResult(XmlReader.of[GetMovementResponse].read(res)))
       } yield {
