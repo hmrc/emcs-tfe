@@ -30,7 +30,6 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class GetMovementRepositorySpec extends IntegrationBaseSpec

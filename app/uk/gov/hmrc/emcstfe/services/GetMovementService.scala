@@ -22,7 +22,6 @@ import com.lucidchart.open.xtract.XmlReader
 import play.api.libs.json.{JsString, JsValue}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, XmlParseError}
@@ -44,7 +43,7 @@ class GetMovementService @Inject()(
                                     xmlUtils: XmlUtils,
                                     val config: AppConfig,
                                   ) extends Logging {
-  def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(getMovementRequest.arc).flatMap {
       case Some(value) =>
         logger.info("[getMovement] Matching movement found, calling GetMovementIfChanged")
@@ -59,7 +58,7 @@ class GetMovementService @Inject()(
     }
   }
 
-  private[services] def getMovementIfChanged(getMovementRequest: GetMovementRequest, repositoryResult: GetMovementMongoResponse)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  private[services] def getMovementIfChanged(getMovementRequest: GetMovementRequest, repositoryResult: GetMovementMongoResponse)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
     val chrisResponseFutureRaw: Future[Either[ErrorResponse, NodeSeq]] = {
       Try {
         XML.loadString(repositoryResult.data.as[String])
@@ -121,7 +120,7 @@ class GetMovementService @Inject()(
       handleParseResult(XmlReader.of[GetMovementResponse].read(value))
   }
 
-  private[services] def getNewMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  private[services] def getNewMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
     val chrisResponseF: Future[Either[ErrorResponse, NodeSeq]] = connector.postChrisSOAPRequest(getMovementRequest)
 
     chrisResponseF.flatMap {
@@ -130,7 +129,7 @@ class GetMovementService @Inject()(
     }
   }
 
-  private[services] def storeAndReturn(chrisResponse: Either[ErrorResponse, NodeSeq])(getMovementRequest: GetMovementRequest)(implicit ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  private[services] def storeAndReturn(chrisResponse: Either[ErrorResponse, NodeSeq])(getMovementRequest: GetMovementRequest)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
 
     val responseAfterStoringInMongo: EitherT[Future, ErrorResponse, GetMovementResponse] = {
       for {

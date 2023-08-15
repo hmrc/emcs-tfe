@@ -27,7 +27,7 @@ import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MinifyXmlError, MongoError, SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MinifyXmlError, SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import scala.concurrent.Future
