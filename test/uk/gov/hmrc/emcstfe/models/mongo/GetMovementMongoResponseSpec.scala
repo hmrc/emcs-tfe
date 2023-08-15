@@ -29,16 +29,12 @@ class GetMovementMongoResponseSpec extends UnitSpec with GetMovementFixture {
   val instant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
   val model = GetMovementMongoResponse(
-    internalId = testInternalId,
-    ern = testErn,
     arc = testArc,
     data = JsString(getMovementResponseBody),
     lastUpdated = instant
   )
 
   val json = Json.obj(
-    "internalId" -> testInternalId,
-    "ern" -> testErn,
     "arc" -> testArc,
     "data" -> getMovementResponseBody,
     "lastUpdated" -> Json.toJson(instant)(MongoJavatimeFormats.instantWrites)

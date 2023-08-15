@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import org.mongodb.scala.bson.BsonDocument
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
@@ -35,7 +36,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
   val repository: GetMovementRepository = inject[GetMovementRepository]
 
   override def beforeEach(): Unit = {
-    await(repository.removeAll())
+    await(repository.collection.deleteMany(BsonDocument()).toFuture())
   }
 
   private trait Test {
@@ -139,7 +140,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
                    |</tns:Envelope>""".stripMargin))
             }
 
-            await(repository.set(GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody))))
+            await(repository.set(GetMovementMongoResponse(testArc, JsString(getMovementResponseBody))))
 
             val response: WSResponse = await(request().get())
             response.status shouldBe Status.OK
@@ -155,7 +156,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
               DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementIfChangedHeaders, Status.OK, XML.loadString(getMovementIfChangedWithChangeSoapWrapper))
             }
 
-            await(repository.set(GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementIfChangedResponseBody))))
+            await(repository.set(GetMovementMongoResponse(testArc, JsString(getMovementIfChangedResponseBody))))
 
             val response: WSResponse = await(request().get())
             response.status shouldBe Status.OK
@@ -238,7 +239,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
               AuthStub.authorised()
             }
 
-            await(repository.set(GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody))))
+            await(repository.set(GetMovementMongoResponse(testArc, JsString(getMovementResponseBody))))
 
             val response: WSResponse = await(request().get())
             response.status shouldBe Status.OK

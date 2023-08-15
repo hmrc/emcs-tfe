@@ -43,7 +43,7 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = GetMovementMongoResponse(testInternalId, testErn, testArc, JsString(getMovementResponseBody), Instant.ofEpochSecond(1))
+  private val userAnswers = GetMovementMongoResponse(testArc, JsString(getMovementResponseBody), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[AppConfig]
   (() => mockAppConfig.getMovementTTL(): Duration)
@@ -68,15 +68,9 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
       val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
       val setResult     = repository.set(userAnswers).futureValue
-      val updatedRecord = find(
-        Filters.and(
-          Filters.equal("internalId", userAnswers.internalId),
-          Filters.equal("ern", userAnswers.ern),
-          Filters.equal("arc", userAnswers.arc)
-        )
-      ).futureValue.headOption.value
+      val updatedRecord = find(Filters.equal("arc", userAnswers.arc)).futureValue.headOption.value
 
-      setResult shouldBe Right(true)
+      setResult shouldBe expectedResult
       updatedRecord shouldBe expectedResult
     }
   }
@@ -89,7 +83,7 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
 
         insert(userAnswers).futureValue
 
-        val result         = repository.get(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
+        val result         = repository.get(userAnswers.arc).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
         result.value shouldBe expectedResult
@@ -100,59 +94,7 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
 
       "return None" in {
 
-        repository.get(userAnswers.internalId, userAnswers.ern, "wrongArc").futureValue shouldBe None
-      }
-    }
-  }
-
-  ".clear" must {
-
-    "remove a record" in {
-
-      insert(userAnswers).futureValue
-
-      val result = repository.clear(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
-
-      result shouldBe true
-      repository.get(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue shouldBe None
-    }
-
-    "return true when there is no record to remove" in {
-      val result = repository.clear(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
-
-      result shouldBe true
-    }
-  }
-
-  ".keepAlive" when {
-
-    "there is a record for this id" must {
-
-      "update its lastUpdated to `now` and return true" in {
-
-        insert(userAnswers).futureValue
-
-        val result = repository.keepAlive(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
-
-        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instantNow)
-
-        result shouldBe true
-        val updatedAnswers = find(
-          Filters.and(
-            Filters.equal("internalId", userAnswers.internalId),
-            Filters.equal("ern", userAnswers.ern),
-            Filters.equal("arc", userAnswers.arc)
-          )
-        ).futureValue.headOption.value
-        updatedAnswers shouldBe expectedUpdatedAnswers
-      }
-    }
-
-    "there is no record for this id" must {
-
-      "return true" in {
-
-        repository.keepAlive(userAnswers.internalId, userAnswers.ern, "wrongArc").futureValue shouldBe true
+        repository.get("wrongArc").futureValue shouldBe None
       }
     }
   }

@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsString, JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
+import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
 
 trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
@@ -605,5 +606,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     ),
     "numberOfItems" -> 2
   )
+
+  val getMovementMongoResponse = GetMovementMongoResponse(testArc, JsString(getMovementResponseBody))
 
 }
