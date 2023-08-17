@@ -47,6 +47,10 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def cancelAMovementUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.cancelAMovementUserAnswers.replaceIndexes")
 
+  def changeDestinationUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.changeDestinationUserAnswers.TTL"))
+
+  def changeDestinationUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.changeDestinationUserAnswers.replaceIndexes")
+
   def getMovementTTL(): Duration = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
   def getMovementReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.getMovement.replaceIndexes")
 
