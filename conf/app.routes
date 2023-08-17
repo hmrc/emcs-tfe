@@ -36,3 +36,7 @@ DELETE        /user-answers/explain-shortage-or-excess/:ern/:arc          uk.gov
 GET           /user-answers/cancel-movement/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.CancelMovementUserAnswersController.get(ern, arc)
 PUT           /user-answers/cancel-movement/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.CancelMovementUserAnswersController.set(ern, arc)
 DELETE        /user-answers/cancel-movement/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.CancelMovementUserAnswersController.clear(ern, arc)
+
+GET           /user-answers/change-destination/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ChangeDestinationUserAnswersController.get(ern, arc)
+PUT           /user-answers/change-destination/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ChangeDestinationUserAnswersController.set(ern, arc)
+DELETE        /user-answers/change-destination/:ern/:arc          uk.gov.hmrc.emcstfe.controllers.ChangeDestinationUserAnswersController.clear(ern, arc)
