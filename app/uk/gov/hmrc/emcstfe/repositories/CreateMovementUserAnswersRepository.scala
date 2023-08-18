@@ -48,27 +48,26 @@ class CreateMovementUserAnswersRepository @Inject()(mongoComponent: MongoCompone
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  private def by(internalId: String, ern: String, lrn: String): Bson =
+  private def by(ern: String, lrn: String): Bson =
     Filters.and(
-      Filters.equal("internalId", internalId),
       Filters.equal("ern", ern),
       Filters.equal("lrn", lrn)
     )
 
-  def keepAlive(internalId: String, ern: String, lrn: String): Future[Boolean] =
+  def keepAlive(ern: String, lrn: String): Future[Boolean] =
     collection
       .updateOne(
-        filter = by(internalId: String, ern: String, lrn: String),
+        filter = by(ern: String, lrn: String),
         update = Updates.set("lastUpdated", time.instant()),
       )
       .toFuture()
       .map(_ => true)
 
-  def get(internalId: String, ern: String, lrn: String): Future[Option[CreateMovementUserAnswers]] =
-    keepAlive(internalId, ern, lrn).flatMap {
+  def get(ern: String, lrn: String): Future[Option[CreateMovementUserAnswers]] =
+    keepAlive(ern, lrn).flatMap {
       _ =>
         collection
-          .find(by(internalId, ern, lrn))
+          .find(by(ern, lrn))
           .headOption()
     }
 
@@ -78,7 +77,7 @@ class CreateMovementUserAnswersRepository @Inject()(mongoComponent: MongoCompone
 
     collection
       .replaceOne(
-        filter = by(updatedAnswers.internalId, updatedAnswers.ern, updatedAnswers.lrn),
+        filter = by(updatedAnswers.ern, updatedAnswers.lrn),
         replacement = updatedAnswers,
         options = ReplaceOptions().upsert(true)
       )
@@ -86,9 +85,9 @@ class CreateMovementUserAnswersRepository @Inject()(mongoComponent: MongoCompone
       .map(_ => true)
   }
 
-  def clear(internalId: String, ern: String, lrn: String): Future[Boolean] =
+  def clear(ern: String, lrn: String): Future[Boolean] =
     collection
-      .deleteOne(by(internalId, ern, lrn))
+      .deleteOne(by(ern, lrn))
       .toFuture()
       .map(_ => true)
 }
@@ -103,7 +102,6 @@ object CreateMovementUserAnswersRepository {
     ),
     IndexModel(
       Indexes.compoundIndex(
-        Indexes.ascending("internalId"),
         Indexes.ascending("ern"),
         Indexes.ascending("lrn")
       ),

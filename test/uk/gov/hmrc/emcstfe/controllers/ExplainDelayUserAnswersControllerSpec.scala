@@ -40,7 +40,7 @@ class ExplainDelayUserAnswersControllerSpec extends UnitSpec with MockExplainDel
     FakeUserAllowListAction
   )
 
-  val userAnswers = ExplainDelayUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers = ExplainDelayUserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   "GET /user-answers/explain-delay/:ern/:arc" should {
     s"return $OK (OK)" when {

@@ -21,6 +21,7 @@ import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.ChangeDestinationUserAnswers
+import uk.gov.hmrc.emcstfe.repositories.ChangeDestinationUserAnswersRepository.mongoIndexes
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -29,6 +30,7 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -40,21 +42,7 @@ class ChangeDestinationUserAnswersRepository @Inject()(mongoComponent: MongoComp
     collectionName = "change-destination-user-answers",
     mongoComponent = mongoComponent,
     domainFormat = ChangeDestinationUserAnswers.format,
-    indexes = Seq(
-      IndexModel(
-        Indexes.ascending("lastUpdated"),
-        IndexOptions()
-          .name("lastUpdatedIdx")
-          .expireAfter(appConfig.changeDestinationUserAnswersTTL().toSeconds, TimeUnit.SECONDS)
-      ),
-      IndexModel(
-        Indexes.compoundIndex(
-          Indexes.ascending("ern"),
-          Indexes.ascending("arc")
-        ),
-        IndexOptions().name("uniqueIdx")
-      )
-    ),
+    indexes = mongoIndexes(appConfig.changeDestinationUserAnswersTTL()),
     replaceIndexes = appConfig.changeDestinationUserAnswersReplaceIndexes()
   ) {
 
@@ -102,4 +90,21 @@ class ChangeDestinationUserAnswersRepository @Inject()(mongoComponent: MongoComp
       .deleteOne(by(ern, arc))
       .toFuture()
       .map(_ => true)
+}
+object ChangeDestinationUserAnswersRepository {
+  def mongoIndexes(timeToLive: Duration): Seq[IndexModel] = Seq(
+    IndexModel(
+      Indexes.ascending("lastUpdated"),
+      IndexOptions()
+        .name("lastUpdatedIdx")
+        .expireAfter(timeToLive.toSeconds, TimeUnit.SECONDS)
+    ),
+    IndexModel(
+      Indexes.compoundIndex(
+        Indexes.ascending("ern"),
+        Indexes.ascending("lrn")
+      ),
+      IndexOptions().name("uniqueIdx")
+    )
+  )
 }

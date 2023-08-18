@@ -40,7 +40,7 @@ class CancelMovementUserAnswersControllerSpec extends UnitSpec with MockCancelMo
     FakeUserAllowListAction
   )
 
-  val userAnswers = CancelMovementUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers = CancelMovementUserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   "GET /user-answers/cancel-movement/:ern/:arc" should {
     s"return $OK (OK)" when {

@@ -22,16 +22,14 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-final case class CancelMovementUserAnswers(internalId: String,
-                                            ern: String,
-                                            arc: String,
-                                            data: JsObject,
-                                            lastUpdated: Instant)
+final case class CancelMovementUserAnswers(ern: String,
+                                           arc: String,
+                                           data: JsObject,
+                                           lastUpdated: Instant)
 
 object CancelMovementUserAnswers {
 
   val reads: Reads[CancelMovementUserAnswers] = (
-    (__ \ "internalId").read[String] and
       (__ \ "ern").read[String] and
       (__ \ "arc").read[String] and
       (__ \ "data").read[JsObject] and
@@ -39,7 +37,6 @@ object CancelMovementUserAnswers {
     )(CancelMovementUserAnswers.apply _)
 
   val writes: OWrites[CancelMovementUserAnswers] = (
-    (__ \ "internalId").write[String] and
       (__ \ "ern").write[String] and
       (__ \ "arc").write[String] and
       (__ \ "data").write[JsObject] and
