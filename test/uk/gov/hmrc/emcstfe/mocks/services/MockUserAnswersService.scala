@@ -18,21 +18,21 @@ package uk.gov.hmrc.emcstfe.mocks.services
 
 import org.scalamock.handlers.{CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.emcstfe.models.mongo.ChangeDestinationUserAnswers
+import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.services.ChangeDestinationUserAnswersService
+import uk.gov.hmrc.emcstfe.services.BaseUserAnswersService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockChangeDestinationUserAnswersService extends MockFactory {
+trait MockUserAnswersService extends MockFactory {
 
-  lazy val mockService: ChangeDestinationUserAnswersService = mock[ChangeDestinationUserAnswersService]
+  val mockService: BaseUserAnswersService
 
   object MockUserAnswers {
-    def set(answers: ChangeDestinationUserAnswers): CallHandler2[ChangeDestinationUserAnswers, ExecutionContext, Future[Either[ErrorResponse, ChangeDestinationUserAnswers]]] =
-      (mockService.set(_: ChangeDestinationUserAnswers)(_: ExecutionContext)).expects(answers, *)
+    def set(answers: UserAnswers): CallHandler2[UserAnswers, ExecutionContext, Future[Either[ErrorResponse, UserAnswers]]] =
+      (mockService.set(_: UserAnswers)(_: ExecutionContext)).expects(answers, *)
 
-    def get(ern: String, arc: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Option[ChangeDestinationUserAnswers]]]] =
+    def get(ern: String, arc: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Option[UserAnswers]]]] =
       (mockService.get( _: String, _: String)(_: ExecutionContext)).expects(ern, arc, *)
 
     def clear(ern: String, arc: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =

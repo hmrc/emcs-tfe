@@ -16,23 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.models.mongo.ChangeDestinationUserAnswers
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.repositories.ChangeDestinationUserAnswersRepository
-import uk.gov.hmrc.emcstfe.utils.Logging
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
 
-@Singleton
-class ChangeDestinationUserAnswersService @Inject()(repo: ChangeDestinationUserAnswersRepository) extends Logging {
-
-  def get(ern: String, arc: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[ChangeDestinationUserAnswers]]] =
-    repo.get(ern: String, arc: String).map(answers => Right(answers)).recover(recovery)
-
-  def set(answers: ChangeDestinationUserAnswers)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, ChangeDestinationUserAnswers]] =
-    repo.set(answers).map(_ => Right(answers)).recover(recovery)
-
-  def clear(ern: String, arc: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
-    repo.clear(ern: String, arc: String).map(Right(_)).recover(recovery)
-}
+class ChangeDestinationUserAnswersService @Inject()(override val repo: ChangeDestinationUserAnswersRepository) extends BaseUserAnswersService

@@ -18,18 +18,18 @@ package uk.gov.hmrc.emcstfe.repositories
 
 import scala.concurrent.duration.Duration
 
-class ChangeDestinationUserAnswersRepositorySpec extends BaseUserAnswersRepositorySpec {
+class AlertRejectionUserAnswersRepositorySpec extends BaseUserAnswersRepositorySpec {
 
-  (() => mockAppConfig.changeDestinationUserAnswersTTL(): Duration)
+  (() => mockAppConfig.alertRejectionUserAnswersTTL(): Duration)
     .expects()
     .returns(Duration("1seconds"))
     .anyNumberOfTimes()
-  (() => mockAppConfig.changeDestinationUserAnswersReplaceIndexes(): Boolean)
+  (() => mockAppConfig.alertRejectionUserAnswersReplaceIndexes(): Boolean)
     .expects()
     .returns(true)
     .anyNumberOfTimes()
 
-  protected override val repository = new ChangeDestinationUserAnswersRepository()(
+  protected override val repository = new AlertRejectionUserAnswersRepository()(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
     time           = timeMachine,

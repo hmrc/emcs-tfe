@@ -20,20 +20,20 @@ import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.emcstfe.models.mongo.ChangeDestinationUserAnswers
-import uk.gov.hmrc.emcstfe.repositories.ChangeDestinationUserAnswersRepository
+import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
+import uk.gov.hmrc.emcstfe.repositories.BaseUserAnswersRepository
 
 import scala.concurrent.Future
 
-trait MockChangeDestinationUserAnswersRepository extends MockitoSugar  {
+trait MockUserAnswersRepository extends MockitoSugar  {
 
-  lazy val mockRepo: ChangeDestinationUserAnswersRepository = mock[ChangeDestinationUserAnswersRepository]
+  val mockRepo: BaseUserAnswersRepository
 
   object MockUserAnswers {
-    def set(answers: ChangeDestinationUserAnswers): OngoingStubbing[Future[Boolean]] =
+    def set(answers: UserAnswers): OngoingStubbing[Future[Boolean]] =
       when(mockRepo.set(eqTo(answers)))
 
-    def get(ern: String, arc: String): OngoingStubbing[Future[Option[ChangeDestinationUserAnswers]]] =
+    def get(ern: String, arc: String): OngoingStubbing[Future[Option[UserAnswers]]] =
       when(mockRepo.get(eqTo(ern), eqTo(arc)))
 
     def clear(ern: String, arc: String): OngoingStubbing[Future[Boolean]] =

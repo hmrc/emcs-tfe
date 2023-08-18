@@ -18,14 +18,14 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.test.Helpers
 import uk.gov.hmrc.emcstfe.controllers.actions.FakeUserAllowListAction
-import uk.gov.hmrc.emcstfe.services.ChangeDestinationUserAnswersService
+import uk.gov.hmrc.emcstfe.services.AlertRejectionUserAnswersService
 
-class ChangeDestinationUserAnswersControllerSpec extends BaseUserAnswersControllerSpec {
+class AlertRejectionUserAnswersControllerSpec extends BaseUserAnswersControllerSpec {
 
-  override val route = s"/user-answers/change-destination/$testErn/$testArc"
+  override val route = s"/user-answers/alert-or-rejection/$testErn/$testArc"
 
-  override val mockService: ChangeDestinationUserAnswersService = mock[ChangeDestinationUserAnswersService]
-  override val controller = new ChangeDestinationUserAnswersController(
+  override val mockService: AlertRejectionUserAnswersService = mock[AlertRejectionUserAnswersService]
+  override val controller = new AlertRejectionUserAnswersController(
     Helpers.stubControllerComponents(),
     mockService,
     FakeSuccessAuthAction,

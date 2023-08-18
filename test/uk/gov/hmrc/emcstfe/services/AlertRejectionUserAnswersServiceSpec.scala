@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.repositories.ChangeDestinationUserAnswersRepository
+import uk.gov.hmrc.emcstfe.repositories.AlertRejectionUserAnswersRepository
 import org.scalatestplus.mockito.MockitoSugar.{mock => mokitoMock}
 
-class ChangeDestinationUserAnswersServiceSpec extends BaseUserAnswersServiceSpec {
+class AlertRejectionUserAnswersServiceSpec extends BaseUserAnswersServiceSpec {
 
-  override val mockRepo: ChangeDestinationUserAnswersRepository = mokitoMock[ChangeDestinationUserAnswersRepository]
-  val service: ChangeDestinationUserAnswersService = new ChangeDestinationUserAnswersService(mockRepo)
+  override val mockRepo: AlertRejectionUserAnswersRepository = mokitoMock[AlertRejectionUserAnswersRepository]
+  val service: AlertRejectionUserAnswersService = new AlertRejectionUserAnswersService(mockRepo)
+
 }
