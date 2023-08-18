@@ -40,7 +40,7 @@ class ReportReceiptUserAnswersControllerSpec extends UnitSpec with MockReportRec
     FakeUserAllowListAction
   )
 
-  val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers = ReportReceiptUserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   "GET /user-answers/report-receipt/:ern/:arc" should {
     s"return $OK (OK)" when {

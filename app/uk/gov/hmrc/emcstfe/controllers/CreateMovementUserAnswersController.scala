@@ -33,30 +33,34 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
                                                     override val userAllowList: UserAllowListAction
                                                    )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
-  def get(ern: String, lrn: String): Action[AnyContent] = authorisedUserRequest(ern) {
-    implicit request =>
-      createMovementUserAnswersService.get(request.internalId, ern, lrn) map {
-        case Right(Some(answers)) => Ok(Json.toJson(answers))
-        case Right(None) => NoContent
-        case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
-      }
-  }
-
-  def set(ern: String, lrn: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) {
-    implicit request =>
-      withJsonBody[CreateMovementUserAnswers] { answers =>
-        createMovementUserAnswersService.set(answers) map {
-          case Right(answers) => Ok(Json.toJson(answers))
+  def get(ern: String, lrn: String): Action[AnyContent] =
+    authorisedUserRequest(ern) {
+      implicit request =>
+        createMovementUserAnswersService.get(ern, lrn) map {
+          case Right(Some(answers)) => Ok(Json.toJson(answers))
+          case Right(None) => NoContent
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
         }
-      }
-  }
+    }
 
-  def clear(ern: String, arc: String): Action[AnyContent] = authorisedUserRequest(ern) {
-    implicit request =>
-      createMovementUserAnswersService.clear(request.internalId, ern, arc) map {
-        case Right(_) => NoContent
-        case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
-      }
-  }
+  def set(ern: String, lrn: String): Action[JsValue] =
+    authorisedUserSubmissionRequest(ern) {
+      implicit request =>
+        withJsonBody[CreateMovementUserAnswers] {
+          answers =>
+            createMovementUserAnswersService.set(answers) map {
+              case Right(answers) => Ok(Json.toJson(answers))
+              case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
+            }
+        }
+    }
+
+  def clear(ern: String, arc: String): Action[AnyContent] =
+    authorisedUserRequest(ern) {
+      implicit request =>
+        createMovementUserAnswersService.clear(ern, arc) map {
+          case Right(_) => NoContent
+          case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
+        }
+    }
 }

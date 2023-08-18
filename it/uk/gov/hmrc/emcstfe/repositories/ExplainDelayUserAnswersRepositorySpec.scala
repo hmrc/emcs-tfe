@@ -43,7 +43,7 @@ class ExplainDelayUserAnswersRepositorySpec extends IntegrationBaseSpec
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = ExplainDelayUserAnswers(testInternalId, testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswers = ExplainDelayUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[AppConfig]
   (() => mockAppConfig.explainDelayUserAnswersTTL(): Duration)
@@ -70,7 +70,6 @@ class ExplainDelayUserAnswersRepositorySpec extends IntegrationBaseSpec
       val setResult     = repository.set(userAnswers).futureValue
       val updatedRecord = find(
         Filters.and(
-          Filters.equal("internalId", userAnswers.internalId),
           Filters.equal("ern", userAnswers.ern),
           Filters.equal("arc", userAnswers.arc)
         )
@@ -89,7 +88,7 @@ class ExplainDelayUserAnswersRepositorySpec extends IntegrationBaseSpec
 
         insert(userAnswers).futureValue
 
-        val result         = repository.get(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
+        val result         = repository.get(userAnswers.ern, userAnswers.arc).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
         result.value shouldBe expectedResult
@@ -100,7 +99,7 @@ class ExplainDelayUserAnswersRepositorySpec extends IntegrationBaseSpec
 
       "return None" in {
 
-        repository.get(userAnswers.internalId, userAnswers.ern, "wrongArc").futureValue shouldBe None
+        repository.get(userAnswers.ern, "wrongArc").futureValue shouldBe None
       }
     }
   }
@@ -111,14 +110,14 @@ class ExplainDelayUserAnswersRepositorySpec extends IntegrationBaseSpec
 
       insert(userAnswers).futureValue
 
-      val result = repository.clear(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
+      val result = repository.clear(userAnswers.ern, userAnswers.arc).futureValue
 
       result shouldBe true
-      repository.get(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue shouldBe None
+      repository.get(userAnswers.ern, userAnswers.arc).futureValue shouldBe None
     }
 
     "return true when there is no record to remove" in {
-      val result = repository.clear(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
+      val result = repository.clear(userAnswers.ern, userAnswers.arc).futureValue
 
       result shouldBe true
     }
@@ -132,14 +131,13 @@ class ExplainDelayUserAnswersRepositorySpec extends IntegrationBaseSpec
 
         insert(userAnswers).futureValue
 
-        val result = repository.keepAlive(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
+        val result = repository.keepAlive(userAnswers.ern, userAnswers.arc).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instantNow)
 
         result shouldBe true
         val updatedAnswers = find(
           Filters.and(
-            Filters.equal("internalId", userAnswers.internalId),
             Filters.equal("ern", userAnswers.ern),
             Filters.equal("arc", userAnswers.arc)
           )
@@ -152,7 +150,7 @@ class ExplainDelayUserAnswersRepositorySpec extends IntegrationBaseSpec
 
       "return true" in {
 
-        repository.keepAlive(userAnswers.internalId, userAnswers.ern, "wrongArc").futureValue shouldBe true
+        repository.keepAlive(userAnswers.ern, "wrongArc").futureValue shouldBe true
       }
     }
   }

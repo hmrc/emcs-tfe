@@ -29,7 +29,6 @@ class CreateMovementUserAnswersSpec extends UnitSpec with BaseFixtures {
   val instant: Instant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
   val userAnswersModel: CreateMovementUserAnswers = CreateMovementUserAnswers(
-    internalId = testInternalId,
     ern = testErn,
     lrn = testLrn,
     data = Json.obj(
@@ -39,7 +38,6 @@ class CreateMovementUserAnswersSpec extends UnitSpec with BaseFixtures {
   )
 
   val userAnswersJson: JsObject = Json.obj(
-    "internalId" -> testInternalId,
     "ern" -> testErn,
     "lrn" -> testLrn,
     "data" -> Json.obj(

@@ -22,29 +22,26 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-final case class ExplainDelayUserAnswers(internalId: String,
-                                          ern: String,
-                                          arc: String,
-                                          data: JsObject,
-                                          lastUpdated: Instant)
+final case class ExplainDelayUserAnswers(ern: String,
+                                         arc: String,
+                                         data: JsObject,
+                                         lastUpdated: Instant)
 
 object ExplainDelayUserAnswers {
 
   val reads: Reads[ExplainDelayUserAnswers] = (
-    (__ \ "internalId").read[String] and
       (__ \ "ern").read[String] and
       (__ \ "arc").read[String] and
       (__ \ "data").read[JsObject] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-    ) (ExplainDelayUserAnswers.apply _)
+    )(ExplainDelayUserAnswers.apply _)
 
   val writes: OWrites[ExplainDelayUserAnswers] = (
-    (__ \ "internalId").write[String] and
       (__ \ "ern").write[String] and
       (__ \ "arc").write[String] and
       (__ \ "data").write[JsObject] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    ) (unlift(ExplainDelayUserAnswers.unapply))
+    )(unlift(ExplainDelayUserAnswers.unapply))
 
   implicit val format: OFormat[ExplainDelayUserAnswers] = OFormat(reads, writes)
 }

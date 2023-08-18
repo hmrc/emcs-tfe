@@ -33,7 +33,7 @@ import java.time.temporal.ChronoUnit
 
 class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
-  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testInternalId, testErn, testLrn, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testLrn, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   def uri: String = s"/user-answers/create-movement/$testErn/$testLrn"
 
@@ -145,7 +145,7 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
           response.header("Content-Type") shouldBe Some("application/json")
           removeLastUpdated(response.json) shouldBe removeLastUpdated(Json.toJson(userAnswers))
 
-          await(mongoRepo.get(testInternalId, testErn, testLrn)).map(_.data) shouldBe Some(userAnswers.data)
+          await(mongoRepo.get(testErn, testLrn)).map(_.data) shouldBe Some(userAnswers.data)
         }
 
         "existing data exists so the mongo entry is updated" in new Test {
@@ -164,7 +164,7 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
           response.header("Content-Type") shouldBe Some("application/json")
           removeLastUpdated(response.json) shouldBe removeLastUpdated(Json.toJson(updatedAnswers))
 
-          await(mongoRepo.get(testInternalId, testErn, testLrn)).map(_.data) shouldBe Some(updatedAnswers.data)
+          await(mongoRepo.get(testErn, testLrn)).map(_.data) shouldBe Some(updatedAnswers.data)
         }
       }
     }
@@ -208,7 +208,7 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
 
           response.status shouldBe NO_CONTENT
 
-          await(mongoRepo.get(testInternalId, testErn, testLrn)) shouldBe None
+          await(mongoRepo.get(testErn, testLrn)) shouldBe None
         }
 
         "existing data exists so the mongo entry is removed" in new Test {
@@ -218,13 +218,13 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
           }
 
           await(mongoRepo.set(userAnswers))
-          await(mongoRepo.get(testInternalId, testErn, testLrn)).map(_.data) shouldBe Some(userAnswers.data)
+          await(mongoRepo.get(testErn, testLrn)).map(_.data) shouldBe Some(userAnswers.data)
 
           val response: WSResponse = await(request().delete())
 
           response.status shouldBe NO_CONTENT
 
-          await(mongoRepo.get(testInternalId, testErn, testLrn)) shouldBe None
+          await(mongoRepo.get(testErn, testLrn)) shouldBe None
         }
       }
     }

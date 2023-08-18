@@ -21,6 +21,7 @@ import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
+import uk.gov.hmrc.emcstfe.repositories.GetMovementRepository.mongoIndexes
 import uk.gov.hmrc.emcstfe.utils.{Logging, TimeMachine}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -29,32 +30,19 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetMovementRepository @Inject()(
-                                                    mongoComponent: MongoComponent,
-                                                    appConfig: AppConfig,
-                                                    time: TimeMachine
-                                                  )(implicit ec: ExecutionContext)
+class GetMovementRepository @Inject()(mongoComponent: MongoComponent,
+                                      appConfig: AppConfig,
+                                      time: TimeMachine
+                                     )(implicit ec: ExecutionContext)
   extends PlayMongoRepository[GetMovementMongoResponse](
     collectionName = "get-movement-response",
     mongoComponent = mongoComponent,
-    domainFormat   = GetMovementMongoResponse.format,
-    indexes        = Seq(
-      IndexModel(
-        Indexes.ascending("lastUpdated"),
-        IndexOptions()
-          .name("lastUpdatedIdx")
-          .expireAfter(appConfig.getMovementTTL().toSeconds, TimeUnit.SECONDS)
-      ),
-      IndexModel(
-        Indexes.compoundIndex(
-          Indexes.ascending("arc")
-        ),
-        IndexOptions().name("uniqueIdx")
-      )
-    ),
+    domainFormat = GetMovementMongoResponse.format,
+    indexes = mongoIndexes(appConfig.getMovementTTL()),
     replaceIndexes = appConfig.getMovementReplaceIndexes()
   ) with Logging {
 
@@ -75,9 +63,27 @@ class GetMovementRepository @Inject()(
   def set(answers: GetMovementMongoResponse): Future[GetMovementMongoResponse] =
     collection
       .findOneAndReplace(
-        filter      = by(answers.arc),
+        filter = by(answers.arc),
         replacement = answers copy (lastUpdated = time.instant()),
-        options     = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       )
       .toFuture()
+}
+
+object GetMovementRepository {
+  def mongoIndexes(ttl: Duration): Seq[IndexModel] =
+    Seq(
+      IndexModel(
+        Indexes.ascending("lastUpdated"),
+        IndexOptions()
+          .name("lastUpdatedIdx")
+          .expireAfter(ttl.toSeconds, TimeUnit.SECONDS)
+      ),
+      IndexModel(
+        Indexes.compoundIndex(
+          Indexes.ascending("arc")
+        ),
+        IndexOptions().name("uniqueIdx")
+      )
+    )
 }

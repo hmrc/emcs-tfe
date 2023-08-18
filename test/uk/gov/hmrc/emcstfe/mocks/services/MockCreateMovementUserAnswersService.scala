@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import org.scalamock.handlers.{CallHandler2, CallHandler4}
+import org.scalamock.handlers.{CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
@@ -32,11 +32,11 @@ trait MockCreateMovementUserAnswersService extends MockFactory  {
     def set(answers: CreateMovementUserAnswers): CallHandler2[CreateMovementUserAnswers, ExecutionContext, Future[Either[ErrorResponse, CreateMovementUserAnswers]]] =
       (mockService.set(_: CreateMovementUserAnswers)(_: ExecutionContext)).expects(answers, *)
 
-    def get(ern: String, lrn: String): CallHandler4[String, String, String, ExecutionContext, Future[Either[ErrorResponse, Option[CreateMovementUserAnswers]]]] =
-      (mockService.get(_: String, _: String, _: String)(_: ExecutionContext)).expects(*, ern, lrn, *)
+    def get(ern: String, lrn: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Option[CreateMovementUserAnswers]]]] =
+      (mockService.get(_: String, _: String)(_: ExecutionContext)).expects(ern, lrn, *)
 
-    def clear(ern: String, lrn: String): CallHandler4[String, String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
-      (mockService.clear(_: String, _: String, _: String)(_: ExecutionContext)).expects(*, ern, lrn, *)
+    def clear(ern: String, lrn: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
+      (mockService.clear(_: String, _: String)(_: ExecutionContext)).expects(ern, lrn, *)
   }
 }
 

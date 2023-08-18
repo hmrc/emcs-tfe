@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.mocks.repository
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,10 +34,10 @@ trait MockCreateMovementUserAnswersRepository extends MockitoSugar  {
       when(mockRepo.set(eqTo(answers)))
 
     def get(ern: String, lrn: String): OngoingStubbing[Future[Option[CreateMovementUserAnswers]]] =
-      when(mockRepo.get(any(), eqTo(ern), eqTo(lrn)))
+      when(mockRepo.get(eqTo(ern), eqTo(lrn)))
 
     def clear(ern: String, lrn: String): OngoingStubbing[Future[Boolean]] =
-      when(mockRepo.clear(any(), eqTo(ern), eqTo(lrn)))
+      when(mockRepo.clear(eqTo(ern), eqTo(lrn)))
   }
 }
 

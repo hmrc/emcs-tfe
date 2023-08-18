@@ -40,7 +40,7 @@ class ExplainShortageOrExcessUserAnswersControllerSpec extends UnitSpec with Moc
     FakeUserAllowListAction
   )
 
-  val userAnswers = ExplainShortageOrExcessUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers = ExplainShortageOrExcessUserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   "GET /user-answers/explain-shortage-or-excess/:ern/:arc" should {
     s"return $OK (OK)" when {

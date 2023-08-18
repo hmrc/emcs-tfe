@@ -29,7 +29,6 @@ class ReportReceiptUserAnswersSpec extends UnitSpec with BaseFixtures {
   val instant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
   val userAnswersModel = ReportReceiptUserAnswers(
-    internalId = testInternalId,
     ern = testErn,
     arc = testArc,
     data = Json.obj(
@@ -39,7 +38,6 @@ class ReportReceiptUserAnswersSpec extends UnitSpec with BaseFixtures {
   )
 
   val userAnswersJson = Json.obj(
-    "internalId" -> testInternalId,
     "ern" -> testErn,
     "arc" -> testArc,
     "data" -> Json.obj(

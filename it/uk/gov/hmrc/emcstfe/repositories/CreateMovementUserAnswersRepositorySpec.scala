@@ -43,7 +43,7 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = CreateMovementUserAnswers(testInternalId, testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswers = CreateMovementUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[AppConfig]
   (() => mockAppConfig.createMovementUserAnswersTTL(): Duration)
@@ -70,7 +70,6 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
       val setResult     = repository.set(userAnswers).futureValue
       val updatedRecord = find(
         Filters.and(
-          Filters.equal("internalId", userAnswers.internalId),
           Filters.equal("ern", userAnswers.ern),
           Filters.equal("lrn", userAnswers.lrn)
         )
@@ -89,7 +88,7 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
 
         insert(userAnswers).futureValue
 
-        val result         = repository.get(userAnswers.internalId, userAnswers.ern, userAnswers.lrn).futureValue
+        val result         = repository.get(userAnswers.ern, userAnswers.lrn).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
         result.value shouldBe expectedResult
@@ -100,7 +99,7 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
 
       "return None" in {
 
-        repository.get(userAnswers.internalId, userAnswers.ern, "wrongLrn").futureValue shouldBe None
+        repository.get(userAnswers.ern, "wrongLrn").futureValue shouldBe None
       }
     }
   }
@@ -111,14 +110,14 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
 
       insert(userAnswers).futureValue
 
-      val result = repository.clear(userAnswers.internalId, userAnswers.ern, userAnswers.lrn).futureValue
+      val result = repository.clear(userAnswers.ern, userAnswers.lrn).futureValue
 
       result shouldBe true
-      repository.get(userAnswers.internalId, userAnswers.ern, userAnswers.lrn).futureValue shouldBe None
+      repository.get(userAnswers.ern, userAnswers.lrn).futureValue shouldBe None
     }
 
     "return true when there is no record to remove" in {
-      val result = repository.clear(userAnswers.internalId, userAnswers.ern, userAnswers.lrn).futureValue
+      val result = repository.clear(userAnswers.ern, userAnswers.lrn).futureValue
 
       result shouldBe true
     }
@@ -132,14 +131,13 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
 
         insert(userAnswers).futureValue
 
-        val result = repository.keepAlive(userAnswers.internalId, userAnswers.ern, userAnswers.lrn).futureValue
+        val result = repository.keepAlive(userAnswers.ern, userAnswers.lrn).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instantNow)
 
         result shouldBe true
         val updatedAnswers = find(
           Filters.and(
-            Filters.equal("internalId", userAnswers.internalId),
             Filters.equal("ern", userAnswers.ern),
             Filters.equal("lrn", userAnswers.lrn)
           )
@@ -152,7 +150,7 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
 
       "return true" in {
 
-        repository.keepAlive(userAnswers.internalId, userAnswers.ern, "wrongLrn").futureValue shouldBe true
+        repository.keepAlive(userAnswers.ern, "wrongLrn").futureValue shouldBe true
       }
     }
   }

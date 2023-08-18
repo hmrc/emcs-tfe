@@ -27,12 +27,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ReportReceiptUserAnswersService @Inject()(repo: ReportReceiptUserAnswersRepository) extends Logging {
 
-  def get(internalId: String, ern: String, arc: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[ReportReceiptUserAnswers]]] =
-    repo.get(internalId: String, ern: String, arc: String).map(answers => Right(answers)).recover(recovery)
+  def get(ern: String, arc: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[ReportReceiptUserAnswers]]] =
+    repo.get(ern, arc).map(answers => Right(answers)).recover(recovery)
 
   def set(answers: ReportReceiptUserAnswers)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, ReportReceiptUserAnswers]] =
     repo.set(answers).map(_ => Right(answers)).recover(recovery)
 
-  def clear(internalId: String, ern: String, arc: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
-    repo.clear(internalId: String, ern: String, arc: String).map(Right(_)).recover(recovery)
+  def clear(ern: String, arc: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
+    repo.clear(ern, arc).map(Right(_)).recover(recovery)
 }

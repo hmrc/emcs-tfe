@@ -33,7 +33,7 @@ import java.time.temporal.ChronoUnit
 
 class ReportReceiptUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
-  val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers = ReportReceiptUserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   def uri: String = s"/user-answers/report-receipt/$testErn/$testArc"
 
@@ -145,7 +145,7 @@ class ReportReceiptUserAnswersIntegrationSpec extends IntegrationBaseSpec with G
           response.header("Content-Type") shouldBe Some("application/json")
           removeLastUpdated(response.json) shouldBe removeLastUpdated(Json.toJson(userAnswers))
 
-          await(mongoRepo.get(testInternalId, testErn, testArc)).map(_.data) shouldBe Some(userAnswers.data)
+          await(mongoRepo.get(testErn, testArc)).map(_.data) shouldBe Some(userAnswers.data)
         }
 
         "existing data exists so the mongo entry is updated" in new Test {
@@ -164,7 +164,7 @@ class ReportReceiptUserAnswersIntegrationSpec extends IntegrationBaseSpec with G
           response.header("Content-Type") shouldBe Some("application/json")
           removeLastUpdated(response.json) shouldBe removeLastUpdated(Json.toJson(updatedAnswers))
 
-          await(mongoRepo.get(testInternalId, testErn, testArc)).map(_.data) shouldBe Some(updatedAnswers.data)
+          await(mongoRepo.get(testErn, testArc)).map(_.data) shouldBe Some(updatedAnswers.data)
         }
       }
     }
@@ -208,7 +208,7 @@ class ReportReceiptUserAnswersIntegrationSpec extends IntegrationBaseSpec with G
 
           response.status shouldBe NO_CONTENT
 
-          await(mongoRepo.get(testInternalId, testErn, testArc)) shouldBe None
+          await(mongoRepo.get(testErn, testArc)) shouldBe None
         }
 
         "existing data exists so the mongo entry is removed" in new Test {
@@ -218,13 +218,13 @@ class ReportReceiptUserAnswersIntegrationSpec extends IntegrationBaseSpec with G
           }
 
           await(mongoRepo.set(userAnswers))
-          await(mongoRepo.get(testInternalId, testErn, testArc)).map(_.data) shouldBe Some(userAnswers.data)
+          await(mongoRepo.get(testErn, testArc)).map(_.data) shouldBe Some(userAnswers.data)
 
           val response: WSResponse = await(request().delete())
 
           response.status shouldBe NO_CONTENT
 
-          await(mongoRepo.get(testInternalId, testErn, testArc)) shouldBe None
+          await(mongoRepo.get(testErn, testArc)) shouldBe None
         }
       }
     }

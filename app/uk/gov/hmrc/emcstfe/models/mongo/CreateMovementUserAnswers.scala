@@ -22,8 +22,7 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-final case class CreateMovementUserAnswers(internalId: String,
-                                           ern: String,
+final case class CreateMovementUserAnswers(ern: String,
                                            lrn: String,
                                            data: JsObject,
                                            lastUpdated: Instant)
@@ -31,7 +30,6 @@ final case class CreateMovementUserAnswers(internalId: String,
 object CreateMovementUserAnswers {
 
   val reads: Reads[CreateMovementUserAnswers] = (
-    (__ \ "internalId").read[String] and
       (__ \ "ern").read[String] and
       (__ \ "lrn").read[String] and
       (__ \ "data").read[JsObject] and
@@ -39,7 +37,6 @@ object CreateMovementUserAnswers {
     )(CreateMovementUserAnswers.apply _)
 
   val writes: OWrites[CreateMovementUserAnswers] = (
-    (__ \ "internalId").write[String] and
       (__ \ "ern").write[String] and
       (__ \ "lrn").write[String] and
       (__ \ "data").write[JsObject] and

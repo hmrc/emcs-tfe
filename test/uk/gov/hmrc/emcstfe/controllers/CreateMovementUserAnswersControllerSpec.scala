@@ -41,7 +41,7 @@ class CreateMovementUserAnswersControllerSpec extends UnitSpec with MockCreateMo
   )
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testInternalId, testErn, testLrn, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+    CreateMovementUserAnswers(testErn, testLrn, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   "GET /user-answers/create-movement/:ern/:lrn" should {
     s"return $OK (OK)" when {

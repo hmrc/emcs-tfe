@@ -22,8 +22,7 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-final case class ExplainShortageOrExcessUserAnswers(internalId: String,
-                                                    ern: String,
+final case class ExplainShortageOrExcessUserAnswers(ern: String,
                                                     arc: String,
                                                     data: JsObject,
                                                     lastUpdated: Instant)
@@ -31,7 +30,6 @@ final case class ExplainShortageOrExcessUserAnswers(internalId: String,
 object ExplainShortageOrExcessUserAnswers {
 
   val reads: Reads[ExplainShortageOrExcessUserAnswers] = (
-    (__ \ "internalId").read[String] and
       (__ \ "ern").read[String] and
       (__ \ "arc").read[String] and
       (__ \ "data").read[JsObject] and
@@ -39,7 +37,6 @@ object ExplainShortageOrExcessUserAnswers {
     )(ExplainShortageOrExcessUserAnswers.apply _)
 
   val writes: OWrites[ExplainShortageOrExcessUserAnswers] = (
-    (__ \ "internalId").write[String] and
       (__ \ "ern").write[String] and
       (__ \ "arc").write[String] and
       (__ \ "data").write[JsObject] and
