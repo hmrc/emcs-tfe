@@ -20,7 +20,7 @@ import org.scalamock.handlers.{CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.services.BaseUserAnswersService
+import uk.gov.hmrc.emcstfe.services.userAnswers.BaseUserAnswersService
 
 import scala.concurrent.{ExecutionContext, Future}
 

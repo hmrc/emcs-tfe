@@ -1,0 +1,29 @@
+# microservice specific routes
+
+GET           /report-receipt/:ern/:arc                uk.gov.hmrc.emcstfe.controllers.userAnswers.ReportReceiptUserAnswersController.get(ern, arc)
+PUT           /report-receipt/:ern/:arc                uk.gov.hmrc.emcstfe.controllers.userAnswers.ReportReceiptUserAnswersController.set(ern, arc)
+DELETE        /report-receipt/:ern/:arc                uk.gov.hmrc.emcstfe.controllers.userAnswers.ReportReceiptUserAnswersController.clear(ern, arc)
+
+GET           /create-movement/:ern/:lrn               uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.get(ern, lrn)
+PUT           /create-movement/:ern/:lrn               uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.set(ern, lrn)
+DELETE        /create-movement/:ern/:lrn               uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.clear(ern, lrn)
+
+DELETE        /explain-delay/:ern/:arc                 uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainDelayUserAnswersController.clear(ern, arc)
+GET           /explain-delay/:ern/:arc                 uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainDelayUserAnswersController.get(ern, arc)
+PUT           /explain-delay/:ern/:arc                 uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainDelayUserAnswersController.set(ern, arc)
+
+GET           /explain-shortage-or-excess/:ern/:arc    uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainShortageOrExcessUserAnswersController.get(ern, arc)
+PUT           /explain-shortage-or-excess/:ern/:arc    uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainShortageOrExcessUserAnswersController.set(ern, arc)
+DELETE        /explain-shortage-or-excess/:ern/:arc    uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainShortageOrExcessUserAnswersController.clear(ern, arc)
+
+GET           /cancel-movement/:ern/:arc               uk.gov.hmrc.emcstfe.controllers.userAnswers.CancelMovementUserAnswersController.get(ern, arc)
+PUT           /cancel-movement/:ern/:arc               uk.gov.hmrc.emcstfe.controllers.userAnswers.CancelMovementUserAnswersController.set(ern, arc)
+DELETE        /cancel-movement/:ern/:arc               uk.gov.hmrc.emcstfe.controllers.userAnswers.CancelMovementUserAnswersController.clear(ern, arc)
+
+GET           /change-destination/:ern/:arc            uk.gov.hmrc.emcstfe.controllers.userAnswers.ChangeDestinationUserAnswersController.get(ern, arc)
+PUT           /change-destination/:ern/:arc            uk.gov.hmrc.emcstfe.controllers.userAnswers.ChangeDestinationUserAnswersController.set(ern, arc)
+DELETE        /change-destination/:ern/:arc            uk.gov.hmrc.emcstfe.controllers.userAnswers.ChangeDestinationUserAnswersController.clear(ern, arc)
+
+GET           /alert-or-rejection/:ern/:arc            uk.gov.hmrc.emcstfe.controllers.userAnswers.AlertRejectionUserAnswersController.get(ern, arc)
+PUT           /alert-or-rejection/:ern/:arc            uk.gov.hmrc.emcstfe.controllers.userAnswers.AlertRejectionUserAnswersController.set(ern, arc)
+DELETE        /alert-or-rejection/:ern/:arc            uk.gov.hmrc.emcstfe.controllers.userAnswers.AlertRejectionUserAnswersController.clear(ern, arc)
