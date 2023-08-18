@@ -27,7 +27,7 @@ import scala.concurrent.Future
 
 trait MockUserAnswersRepository extends MockitoSugar  {
 
-  val mockRepo: BaseUserAnswersRepository
+  val mockRepo: BaseUserAnswersRepository = mock[BaseUserAnswersRepository]
 
   object MockUserAnswers {
     def set(answers: UserAnswers): OngoingStubbing[Future[Boolean]] =

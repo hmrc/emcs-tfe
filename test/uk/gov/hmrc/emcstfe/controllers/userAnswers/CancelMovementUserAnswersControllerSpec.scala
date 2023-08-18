@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
-import play.api.test.Helpers
-import uk.gov.hmrc.emcstfe.controllers.actions.FakeUserAllowListAction
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.CancelMovementUserAnswersService
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class CancelMovementUserAnswersControllerSpec extends BaseUserAnswersControllerSpec {
+class CancelMovementUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override val route = s"/user-answers/cancel-movement/$testErn/$testArc"
+  "CancelMovementUserAnswersController" must {
 
-  override val mockService: CancelMovementUserAnswersService = mock[CancelMovementUserAnswersService]
-  override val controller = new CancelMovementUserAnswersController(
-    Helpers.stubControllerComponents(),
-    mockService,
-    FakeSuccessAuthAction,
-    FakeUserAllowListAction
-  )
+    "have the correct service injected" in {
+
+      val controller = app.injector.instanceOf[CancelMovementUserAnswersController]
+      val service = app.injector.instanceOf[CancelMovementUserAnswersService]
+
+      controller.userAnswersService.getClass shouldBe service.getClass
+    }
+  }
 }

@@ -16,12 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.services.userAnswers
 
-import org.scalatestplus.mockito.MockitoSugar.{mock => mokitoMock}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.repositories.ReportReceiptUserAnswersRepository
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class ReportReceiptUserAnswersServiceSpec extends BaseUserAnswersServiceSpec {
+class ReportReceiptUserAnswersServiceSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override val mockRepo: ReportReceiptUserAnswersRepository = mokitoMock[ReportReceiptUserAnswersRepository]
-  val service: ReportReceiptUserAnswersService = new ReportReceiptUserAnswersService(mockRepo)
+  "ReportReceiptUserAnswersService" must {
 
+    "have the correct repo injected" in {
+
+      val service = app.injector.instanceOf[ReportReceiptUserAnswersService]
+      val repo = app.injector.instanceOf[ReportReceiptUserAnswersRepository]
+
+      service.repo shouldBe repo
+    }
+  }
 }

@@ -18,24 +18,34 @@ package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
+import play.api.mvc.ControllerComponents
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
-import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction, FakeUserAllowListAction, UserAllowListAction}
 import uk.gov.hmrc.emcstfe.mocks.services.MockUserAnswersService
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
+import uk.gov.hmrc.emcstfe.services.userAnswers.BaseUserAnswersService
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseUserAnswersControllerSpec extends UnitSpec
+class BaseUserAnswersControllerSpec extends UnitSpec
   with MockUserAnswersService
   with FakeAuthAction {
 
-  val route: String
-  val controller: BaseUserAnswersController
+  val route: String = "/test/route"
+  val _ec = ec
+
+  val controller: BaseUserAnswersController = new BaseUserAnswersController {
+    override val controllerComponents: ControllerComponents = Helpers.stubControllerComponents()
+    override val userAnswersService: BaseUserAnswersService = mockService
+    override val auth: AuthAction = FakeSuccessAuthAction
+    override val userAllowList: UserAllowListAction = FakeUserAllowListAction
+    override implicit val ec: ExecutionContext = _ec
+  }
 
   private val fakeRequest = FakeRequest("GET", route)
 

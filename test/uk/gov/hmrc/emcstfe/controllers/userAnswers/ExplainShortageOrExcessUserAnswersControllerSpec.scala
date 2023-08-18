@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
-import play.api.test.Helpers
-import uk.gov.hmrc.emcstfe.controllers.actions.FakeUserAllowListAction
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.ExplainShortageOrExcessUserAnswersService
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class ExplainShortageOrExcessUserAnswersControllerSpec extends BaseUserAnswersControllerSpec {
+class ExplainShortageOrExcessUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override val route = s"/user-answers/explain-shortage-or-excess/$testErn/$testArc"
+  "ExplainShortageOrExcessUserAnswersController" must {
 
-  override val mockService: ExplainShortageOrExcessUserAnswersService = mock[ExplainShortageOrExcessUserAnswersService]
-  override val controller = new ExplainShortageOrExcessUserAnswersController(
-    Helpers.stubControllerComponents(),
-    mockService,
-    FakeSuccessAuthAction,
-    FakeUserAllowListAction
-  )
+    "have the correct service injected" in {
+
+      val controller = app.injector.instanceOf[ExplainShortageOrExcessUserAnswersController]
+      val service = app.injector.instanceOf[ExplainShortageOrExcessUserAnswersService]
+
+      controller.userAnswersService.getClass shouldBe service.getClass
+    }
+  }
 }

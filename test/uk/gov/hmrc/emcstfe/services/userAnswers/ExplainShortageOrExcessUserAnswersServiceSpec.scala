@@ -16,12 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.services.userAnswers
 
-import org.scalatestplus.mockito.MockitoSugar.{mock => mokitoMock}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.repositories.ExplainShortageOrExcessUserAnswersRepository
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class ExplainShortageOrExcessUserAnswersServiceSpec extends BaseUserAnswersServiceSpec {
+class ExplainShortageOrExcessUserAnswersServiceSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override val mockRepo: ExplainShortageOrExcessUserAnswersRepository = mokitoMock[ExplainShortageOrExcessUserAnswersRepository]
-  val service: ExplainShortageOrExcessUserAnswersService = new ExplainShortageOrExcessUserAnswersService(mockRepo)
+  "ExplainShortageOrExcessUserAnswersService" must {
 
+    "have the correct repo injected" in {
+
+      val service = app.injector.instanceOf[ExplainShortageOrExcessUserAnswersService]
+      val repo = app.injector.instanceOf[ExplainShortageOrExcessUserAnswersRepository]
+
+      service.repo shouldBe repo
+    }
+  }
 }

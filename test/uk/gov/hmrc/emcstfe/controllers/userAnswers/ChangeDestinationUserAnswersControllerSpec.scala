@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
-import play.api.test.Helpers
-import uk.gov.hmrc.emcstfe.controllers.actions.FakeUserAllowListAction
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.ChangeDestinationUserAnswersService
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class ChangeDestinationUserAnswersControllerSpec extends BaseUserAnswersControllerSpec {
+class ChangeDestinationUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override val route = s"/user-answers/change-destination/$testErn/$testArc"
+  "ChangeDestinationUserAnswersController" must {
 
-  override val mockService: ChangeDestinationUserAnswersService = mock[ChangeDestinationUserAnswersService]
-  override val controller = new ChangeDestinationUserAnswersController(
-    Helpers.stubControllerComponents(),
-    mockService,
-    FakeSuccessAuthAction,
-    FakeUserAllowListAction
-  )
+    "have the correct service injected" in {
+
+      val controller = app.injector.instanceOf[ChangeDestinationUserAnswersController]
+      val service = app.injector.instanceOf[ChangeDestinationUserAnswersService]
+
+      controller.userAnswersService.getClass shouldBe service.getClass
+    }
+  }
 }

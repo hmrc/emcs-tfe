@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait MockUserAnswersService extends MockFactory {
 
-  val mockService: BaseUserAnswersService
+  val mockService: BaseUserAnswersService = mock[BaseUserAnswersService]
 
   object MockUserAnswers {
     def set(answers: UserAnswers): CallHandler2[UserAnswers, ExecutionContext, Future[Either[ErrorResponse, UserAnswers]]] =

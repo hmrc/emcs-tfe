@@ -32,20 +32,28 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.duration.Duration
 
-trait BaseUserAnswersRepositorySpec extends IntegrationBaseSpec
-    with DefaultPlayMongoRepositorySupport[UserAnswers]
-    with MockFactory
-    with OptionValues
-    with IntegrationPatience
-    with ScalaFutures
-    with BaseFixtures {
+class BaseUserAnswersRepositorySpec extends IntegrationBaseSpec
+  with DefaultPlayMongoRepositorySupport[UserAnswers]
+  with MockFactory
+  with OptionValues
+  with IntegrationPatience
+  with ScalaFutures
+  with BaseFixtures {
 
   val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   val userAnswers = UserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
   val timeMachine: TimeMachine = () => instantNow
   val mockAppConfig = mock[AppConfig]
 
-  protected override val repository: BaseUserAnswersRepository
+  protected override val repository: BaseUserAnswersRepository = new BaseUserAnswersRepository(
+    collectionName = "test-user-answers",
+    ttl = Duration("5 seconds"),
+    replaceIndexes = true
+  )(
+    mongoComponent = mongoComponent,
+    time = timeMachine,
+    ec = ec
+  )
 
   ".set" must {
 

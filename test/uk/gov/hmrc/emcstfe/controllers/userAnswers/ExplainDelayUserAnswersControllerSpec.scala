@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
-import play.api.test.Helpers
-import uk.gov.hmrc.emcstfe.controllers.actions.FakeUserAllowListAction
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.ExplainDelayUserAnswersService
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class ExplainDelayUserAnswersControllerSpec extends BaseUserAnswersControllerSpec {
+class ExplainDelayUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override val route = s"/user-answers/explain-delay/$testErn/$testArc"
+  "ExplainDelayUserAnswersController" must {
 
-  override val mockService: ExplainDelayUserAnswersService = mock[ExplainDelayUserAnswersService]
-  override val controller = new ExplainDelayUserAnswersController(
-    Helpers.stubControllerComponents(),
-    mockService,
-    FakeSuccessAuthAction,
-    FakeUserAllowListAction
-  )
+    "have the correct service injected" in {
+
+      val controller = app.injector.instanceOf[ExplainDelayUserAnswersController]
+      val service = app.injector.instanceOf[ExplainDelayUserAnswersService]
+
+      controller.userAnswersService.getClass shouldBe service.getClass
+    }
+  }
 }

@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
-import play.api.test.Helpers
-import uk.gov.hmrc.emcstfe.controllers.actions.FakeUserAllowListAction
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.AlertRejectionUserAnswersService
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class AlertRejectionUserAnswersControllerSpec extends BaseUserAnswersControllerSpec {
+class AlertRejectionUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override val route = s"/user-answers/alert-or-rejection/$testErn/$testArc"
+  "AlertRejectionUserAnswersController" must {
 
-  override val mockService: AlertRejectionUserAnswersService = mock[AlertRejectionUserAnswersService]
-  override val controller = new AlertRejectionUserAnswersController(
-    Helpers.stubControllerComponents(),
-    mockService,
-    FakeSuccessAuthAction,
-    FakeUserAllowListAction
-  )
+    "have the correct service injected" in {
+
+      val controller = app.injector.instanceOf[AlertRejectionUserAnswersController]
+      val service = app.injector.instanceOf[AlertRejectionUserAnswersService]
+
+      controller.userAnswersService.getClass shouldBe service.getClass
+    }
+  }
 }

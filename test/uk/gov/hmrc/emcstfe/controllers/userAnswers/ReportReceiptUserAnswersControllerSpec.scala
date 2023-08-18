@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
-import play.api.test.Helpers
-import uk.gov.hmrc.emcstfe.controllers.actions.FakeUserAllowListAction
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.ReportReceiptUserAnswersService
+import uk.gov.hmrc.emcstfe.support.UnitSpec
 
-class ReportReceiptUserAnswersControllerSpec extends BaseUserAnswersControllerSpec {
+class ReportReceiptUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override val route = s"/user-answers/report-receipt/$testErn/$testArc"
+  "ReportReceiptUserAnswersController" must {
 
-  override val mockService: ReportReceiptUserAnswersService = mock[ReportReceiptUserAnswersService]
-  override val controller = new ReportReceiptUserAnswersController(
-    Helpers.stubControllerComponents(),
-    mockService,
-    FakeSuccessAuthAction,
-    FakeUserAllowListAction
-  )
+    "have the correct service injected" in {
+
+      val controller = app.injector.instanceOf[ReportReceiptUserAnswersController]
+      val service = app.injector.instanceOf[ReportReceiptUserAnswersService]
+
+      controller.userAnswersService.getClass shouldBe service.getClass
+    }
+  }
 }
