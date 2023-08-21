@@ -33,17 +33,22 @@ import java.time.temporal.ChronoUnit
 import scala.concurrent.duration.Duration
 
 class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
-    with DefaultPlayMongoRepositorySupport[ReportReceiptUserAnswers]
-    with MockFactory
-    with OptionValues
-    with IntegrationPatience
-    with ScalaFutures
-    with BaseFixtures {
+  with DefaultPlayMongoRepositorySupport[ReportReceiptUserAnswers]
+  with MockFactory
+  with OptionValues
+  with IntegrationPatience
+  with ScalaFutures
+  with BaseFixtures {
 
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  val data = Json.obj("foo" -> "bar")
+  val userAnswers = ReportReceiptUserAnswers(testInternalId, testErn, testArc, data, Instant.ofEpochSecond(1))
+
+  implicit object ErnOrdering extends Ordering[ReportReceiptUserAnswers] {
+    def compare(a: ReportReceiptUserAnswers, b: ReportReceiptUserAnswers): Int = a.ern compare b.ern
+  }
 
   private val mockAppConfig = mock[AppConfig]
   (() => mockAppConfig.reportReceiptUserAnswersTTL(): Duration)
@@ -57,8 +62,8 @@ class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
 
   protected override val repository = new ReportReceiptUserAnswersRepository(
     mongoComponent = mongoComponent,
-    appConfig      = mockAppConfig,
-    time           = timeMachine
+    appConfig = mockAppConfig,
+    time = timeMachine
   )
 
   ".set" must {
@@ -67,7 +72,7 @@ class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
 
       val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
-      val setResult     = repository.set(userAnswers).futureValue
+      val setResult = repository.set(userAnswers).futureValue
       val updatedRecord = find(
         Filters.and(
           Filters.equal("internalId", userAnswers.internalId),
@@ -89,7 +94,7 @@ class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
 
         insert(userAnswers).futureValue
 
-        val result         = repository.get(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
+        val result = repository.get(userAnswers.internalId, userAnswers.ern, userAnswers.arc).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
         result.value shouldBe expectedResult
@@ -153,6 +158,71 @@ class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
       "return true" in {
 
         repository.keepAlive(userAnswers.internalId, userAnswers.ern, "wrongArc").futureValue shouldBe true
+      }
+    }
+  }
+
+  ".removeAllButLatestForEachErnAndArc" when {
+    "only one ern/arc combo is in the database" must {
+      "remove all results so only one is left" in {
+        insert(userAnswers).futureValue
+        insert(userAnswers.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow)).futureValue
+
+        val allItemsBeforeUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsBeforeUpdate.length shouldBe 2
+
+        repository.removeAllButLatestForEachErnAndArc().futureValue
+
+        val allItemsAfterFirstUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsAfterFirstUpdate.length shouldBe 1
+        allItemsAfterFirstUpdate.head.data shouldBe data ++ Json.obj("baz" -> "beans")
+
+        insert(userAnswers.copy(lastUpdated = instantNow.plusSeconds(3))).futureValue
+        repository.retrieveAllDocumentsInCollection().futureValue.length shouldBe 2
+
+        repository.removeAllButLatestForEachErnAndArc().futureValue
+
+        val allItemsAfterSecondUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsAfterSecondUpdate.length shouldBe 1
+        allItemsAfterSecondUpdate.head.data shouldBe data
+      }
+    }
+
+    "multiple ern/arc combos are in the database" must {
+      "remove all results so only one is left for each ern/arc combo" in {
+        // ern/arc combo 1
+        insert(userAnswers).futureValue
+        insert(userAnswers.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow)).futureValue
+
+        // ern/arc combo 2
+        val userAnswers2 = ReportReceiptUserAnswers(testInternalId, "GBWK000001235", testArc, data, Instant.ofEpochSecond(1))
+        insert(userAnswers2).futureValue
+        insert(userAnswers2.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow)).futureValue
+
+        val allItemsBeforeUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsBeforeUpdate.length shouldBe 4
+
+        repository.removeAllButLatestForEachErnAndArc().futureValue
+
+        val allItemsAfterFirstUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsAfterFirstUpdate.length shouldBe 2
+        allItemsAfterFirstUpdate.sorted shouldBe Seq(
+          userAnswers.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow),
+          userAnswers2.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow),
+        ).sorted
+
+        insert(userAnswers.copy(lastUpdated = instantNow.plusSeconds(3))).futureValue
+        insert(userAnswers2.copy(lastUpdated = instantNow.plusSeconds(3))).futureValue
+        repository.retrieveAllDocumentsInCollection().futureValue.length shouldBe 4
+
+        repository.removeAllButLatestForEachErnAndArc().futureValue
+
+        val allItemsAfterSecondUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsAfterSecondUpdate.length shouldBe 2
+        allItemsAfterSecondUpdate.sorted shouldBe Seq(
+          userAnswers.copy(lastUpdated = instantNow.plusSeconds(3)),
+          userAnswers2.copy(lastUpdated = instantNow.plusSeconds(3)),
+        ).sorted
       }
     }
   }
