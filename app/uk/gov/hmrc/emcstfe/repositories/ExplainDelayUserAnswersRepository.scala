@@ -16,96 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
-import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model._
-import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.models.mongo.ExplainDelayUserAnswers
-import uk.gov.hmrc.emcstfe.repositories.ExplainDelayUserAnswersRepository.mongoIndexes
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-import java.time.Instant
-import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class ExplainDelayUserAnswersRepository @Inject()(mongoComponent: MongoComponent,
+class ExplainDelayUserAnswersRepository @Inject()(implicit mongoComponent: MongoComponent,
                                                   appConfig: AppConfig,
-                                                  time: TimeMachine
-                                                 )(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[ExplainDelayUserAnswers](
+                                                  time: TimeMachine,
+                                                  ec: ExecutionContext)
+  extends BaseUserAnswersRepository(
     collectionName = "explain-delay-user-answers",
-    mongoComponent = mongoComponent,
-    domainFormat = ExplainDelayUserAnswers.format,
-    indexes = mongoIndexes(appConfig.explainDelayUserAnswersTTL()),
+    ttl = appConfig.explainDelayUserAnswersTTL(),
     replaceIndexes = appConfig.explainDelayUserAnswersReplaceIndexes()
-  ) {
-
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
-
-  private def by(ern: String, arc: String): Bson =
-    Filters.and(
-      Filters.equal("ern", ern),
-      Filters.equal("arc", arc)
-    )
-
-  def keepAlive(ern: String, arc: String): Future[Boolean] =
-    collection
-      .updateOne(
-        filter = by(ern: String, arc: String),
-        update = Updates.set("lastUpdated", time.instant()),
-      )
-      .toFuture()
-      .map(_ => true)
-
-  def get(ern: String, arc: String): Future[Option[ExplainDelayUserAnswers]] =
-    keepAlive(ern, arc).flatMap {
-      _ =>
-        collection
-          .find(by(ern, arc))
-          .headOption()
-    }
-
-  def set(answers: ExplainDelayUserAnswers): Future[Boolean] = {
-
-    val updatedAnswers = answers copy (lastUpdated = time.instant())
-
-    collection
-      .replaceOne(
-        filter = by(updatedAnswers.ern, updatedAnswers.arc),
-        replacement = updatedAnswers,
-        options = ReplaceOptions().upsert(true)
-      )
-      .toFuture()
-      .map(_ => true)
-  }
-
-  def clear(ern: String, arc: String): Future[Boolean] =
-    collection
-      .deleteOne(by(ern, arc))
-      .toFuture()
-      .map(_ => true)
-}
-
-object ExplainDelayUserAnswersRepository {
-  def mongoIndexes(timeToLive: Duration): Seq[IndexModel] = Seq(
-    IndexModel(
-      Indexes.ascending("lastUpdated"),
-      IndexOptions()
-        .name("lastUpdatedIdx")
-        .expireAfter(timeToLive.toSeconds, TimeUnit.SECONDS)
-    ),
-    IndexModel(
-      Indexes.compoundIndex(
-        Indexes.ascending("ern"),
-        Indexes.ascending("lrn")
-      ),
-      IndexOptions().name("uniqueIdx")
-    )
   )
-}

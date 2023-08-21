@@ -23,7 +23,7 @@ import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
-import uk.gov.hmrc.emcstfe.models.mongo.ReportReceiptUserAnswers
+import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.repositories.ReportReceiptUserAnswersRepository
 import uk.gov.hmrc.emcstfe.stubs.AuthStub
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
@@ -33,7 +33,7 @@ import java.time.temporal.ChronoUnit
 
 class ReportReceiptUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
-  val userAnswers = ReportReceiptUserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers = UserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   def uri: String = s"/user-answers/report-receipt/$testErn/$testArc"
 

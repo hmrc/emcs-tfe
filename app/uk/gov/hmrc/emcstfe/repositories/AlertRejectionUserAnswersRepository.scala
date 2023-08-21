@@ -24,12 +24,12 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ReportReceiptUserAnswersRepository @Inject()(implicit mongoComponent: MongoComponent,
-                                                   appConfig: AppConfig,
-                                                   time: TimeMachine,
-                                                   ec: ExecutionContext)
+class AlertRejectionUserAnswersRepository @Inject()(implicit mongoComponent: MongoComponent,
+                                                    appConfig: AppConfig,
+                                                    time: TimeMachine,
+                                                    ec: ExecutionContext)
   extends BaseUserAnswersRepository(
-    collectionName = "report-receipt-user-answers",
-    ttl = appConfig.reportReceiptUserAnswersTTL(),
-    replaceIndexes = appConfig.reportReceiptUserAnswersReplaceIndexes()
+    collectionName = "alert-rejection-user-answers",
+    ttl = appConfig.alertRejectionUserAnswersTTL(),
+    replaceIndexes = appConfig.alertRejectionUserAnswersReplaceIndexes()
   )
