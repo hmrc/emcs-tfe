@@ -35,7 +35,7 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
 
   def get(ern: String, lrn: String): Action[AnyContent] =
     authorisedUserRequest(ern) {
-      implicit request =>
+      _ =>
         createMovementUserAnswersService.get(ern, lrn) map {
           case Right(Some(answers)) => Ok(Json.toJson(answers))
           case Right(None) => NoContent
@@ -57,7 +57,7 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
 
   def clear(ern: String, arc: String): Action[AnyContent] =
     authorisedUserRequest(ern) {
-      implicit request =>
+      _ =>
         createMovementUserAnswersService.clear(ern, arc) map {
           case Right(_) => NoContent
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))

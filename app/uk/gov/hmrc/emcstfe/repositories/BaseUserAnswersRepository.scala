@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.repositories
 
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
+import org.mongodb.scala.result.DeleteResult
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
@@ -81,6 +82,37 @@ class BaseUserAnswersRepository(collectionName: String,
       update = Updates.set("lastUpdated", time.instant()),
       options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
     ).headOption()
+
+  def retrieveAllDocumentsInCollection(): Future[Seq[UserAnswers]] = collection
+    .find()
+    .toFuture()
+
+  def removeAllButLatestForEachErnAndArc(): Future[Boolean] = {
+    val futureResults: Future[Seq[Boolean]] = retrieveAllDocumentsInCollection().flatMap {
+      items =>
+        val deleteAndReinsertResults: Seq[Future[Boolean]] = items
+          .groupBy(item => (item.ern, item.arc))
+          .map {
+            case (_, userAnswers) => userAnswers.maxBy(_.lastUpdated)
+          }
+          .map {
+            userAnswers =>
+              val deleteResultForUserAnswers: Future[DeleteResult] = collection
+                .deleteMany(by(userAnswers.ern, userAnswers.arc))
+                .toFuture()
+
+              deleteResultForUserAnswers
+                .flatMap {
+                  _ =>
+                    collection.insertOne(userAnswers).toFuture().map(_ => true)
+                }
+          }.toSeq
+
+        Future.sequence(deleteAndReinsertResults)
+    }
+
+    futureResults.map(_ => true)
+  }
 
   def set(answers: UserAnswers): Future[Boolean] = {
 

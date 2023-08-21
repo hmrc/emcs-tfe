@@ -4,19 +4,19 @@
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/emcs-tfe.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%highlight(%.-4level)] %message %replace(exception=[%xException]){'^exception=\[\]$',''} %date{ISO8601} %n</pattern>
+            <pattern>[%highlight(%.-4level)] %date{ISO8601} %message %replace(exception=[%xException]){'^exception=\[\]$',''} %n</pattern>
         </encoder>
     </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%highlight(%.-4level)] %message %replace(exception=[%xException]){'^exception=\[\]$',''} %date{ISO8601} %n</pattern>
+            <pattern>[%highlight(%.-4level)] %date{ISO8601} %message %replace(exception=[%xException]){'^exception=\[\]$',''} %n</pattern>
         </encoder>
     </appender>
 
     <appender name="STDOUT_IGNORE_NETTY" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%highlight(%.-4level)] %message %replace(exception=[%xException]){'^exception=\[\]$',''} %date{ISO8601} %n</pattern>
+            <pattern>[%highlight(%.-4level)] %date{ISO8601} %message %replace(exception=[%xException]){'^exception=\[\]$',''} %n</pattern>
         </encoder>
     </appender>
 

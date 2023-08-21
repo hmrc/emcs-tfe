@@ -41,9 +41,14 @@ class BaseUserAnswersRepositorySpec extends IntegrationBaseSpec
   with BaseFixtures {
 
   val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
-  val userAnswers = UserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  val data = Json.obj("foo" -> "bar")
+  val userAnswers = UserAnswers(testErn, testArc, data, Instant.ofEpochSecond(1))
   val timeMachine: TimeMachine = () => instantNow
   val mockAppConfig = mock[AppConfig]
+
+  implicit object ErnOrdering extends Ordering[UserAnswers] {
+    def compare(a: UserAnswers, b: UserAnswers): Int = a.ern compare b.ern
+  }
 
   protected override val repository: BaseUserAnswersRepository = new BaseUserAnswersRepository(
     collectionName = "test-user-answers",
@@ -145,6 +150,71 @@ class BaseUserAnswersRepositorySpec extends IntegrationBaseSpec
       "return true" in {
 
         repository.keepAlive(userAnswers.ern, "wrongArc").futureValue shouldBe true
+      }
+    }
+  }
+
+  ".removeAllButLatestForEachErnAndArc" when {
+    "only one ern/arc combo is in the database" must {
+      "remove all results so only one is left" in {
+        insert(userAnswers).futureValue
+        insert(userAnswers.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow)).futureValue
+
+        val allItemsBeforeUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsBeforeUpdate.length shouldBe 2
+
+        repository.removeAllButLatestForEachErnAndArc().futureValue
+
+        val allItemsAfterFirstUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsAfterFirstUpdate.length shouldBe 1
+        allItemsAfterFirstUpdate.head.data shouldBe data ++ Json.obj("baz" -> "beans")
+
+        insert(userAnswers.copy(lastUpdated = instantNow.plusSeconds(3))).futureValue
+        repository.retrieveAllDocumentsInCollection().futureValue.length shouldBe 2
+
+        repository.removeAllButLatestForEachErnAndArc().futureValue
+
+        val allItemsAfterSecondUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsAfterSecondUpdate.length shouldBe 1
+        allItemsAfterSecondUpdate.head.data shouldBe data
+      }
+    }
+
+    "multiple ern/arc combos are in the database" must {
+      "remove all results so only one is left for each ern/arc combo" in {
+        // ern/arc combo 1
+        insert(userAnswers).futureValue
+        insert(userAnswers.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow)).futureValue
+
+        // ern/arc combo 2
+        val userAnswers2 = UserAnswers("GBWK000001235", testArc, data, Instant.ofEpochSecond(1))
+        insert(userAnswers2).futureValue
+        insert(userAnswers2.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow)).futureValue
+
+        val allItemsBeforeUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsBeforeUpdate.length shouldBe 4
+
+        repository.removeAllButLatestForEachErnAndArc().futureValue
+
+        val allItemsAfterFirstUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsAfterFirstUpdate.length shouldBe 2
+        allItemsAfterFirstUpdate.sorted shouldBe Seq(
+          userAnswers.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow),
+          userAnswers2.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow),
+        ).sorted
+
+        insert(userAnswers.copy(lastUpdated = instantNow.plusSeconds(3))).futureValue
+        insert(userAnswers2.copy(lastUpdated = instantNow.plusSeconds(3))).futureValue
+        repository.retrieveAllDocumentsInCollection().futureValue.length shouldBe 4
+
+        repository.removeAllButLatestForEachErnAndArc().futureValue
+
+        val allItemsAfterSecondUpdate = repository.retrieveAllDocumentsInCollection().futureValue
+        allItemsAfterSecondUpdate.length shouldBe 2
+        allItemsAfterSecondUpdate.sorted shouldBe Seq(
+          userAnswers.copy(lastUpdated = instantNow.plusSeconds(3)),
+          userAnswers2.copy(lastUpdated = instantNow.plusSeconds(3)),
+        ).sorted
       }
     }
   }

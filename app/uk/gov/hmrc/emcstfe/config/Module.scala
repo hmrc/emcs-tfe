@@ -28,5 +28,7 @@ class Module extends AbstractModule {
     bind(classOf[AuthAction]).to(classOf[AuthActionImpl]).asEagerSingleton()
     bind(classOf[UserAllowListAction]).to(classOf[UserAllowListActionImpl]).asEagerSingleton()
     bind(classOf[TimeMachine]).to(classOf[TimeMachineImpl])
+    bind(classOf[AppStartupJobs]).to(classOf[AppStartupJobsImpl]).asEagerSingleton()
+    bind(classOf[Startup]).asEagerSingleton()
   }
 }
