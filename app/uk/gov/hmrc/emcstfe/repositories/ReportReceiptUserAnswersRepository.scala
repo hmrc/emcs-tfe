@@ -18,10 +18,11 @@ package uk.gov.hmrc.emcstfe.repositories
 
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
+import org.mongodb.scala.result.DeleteResult
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.ReportReceiptUserAnswers
-import uk.gov.hmrc.emcstfe.utils.TimeMachine
+import uk.gov.hmrc.emcstfe.utils.{Logging, TimeMachine}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -40,8 +41,8 @@ class ReportReceiptUserAnswersRepository @Inject()(
   extends PlayMongoRepository[ReportReceiptUserAnswers](
     collectionName = "report-receipt-user-answers",
     mongoComponent = mongoComponent,
-    domainFormat   = ReportReceiptUserAnswers.format,
-    indexes        = Seq(
+    domainFormat = ReportReceiptUserAnswers.format,
+    indexes = Seq(
       IndexModel(
         Indexes.ascending("lastUpdated"),
         IndexOptions()
@@ -55,16 +56,29 @@ class ReportReceiptUserAnswersRepository @Inject()(
           Indexes.ascending("arc")
         ),
         IndexOptions().name("uniqueIdx")
+      ),
+      IndexModel(
+        Indexes.compoundIndex(
+          Indexes.ascending("ern"),
+          Indexes.ascending("arc")
+        ),
+        IndexOptions().name("nonUniqueIdx").unique(false)
       )
     ),
     replaceIndexes = appConfig.reportReceiptUserAnswersReplaceIndexes()
-  ) {
+  ) with Logging {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
   private def by(internalId: String, ern: String, arc: String): Bson =
     Filters.and(
       Filters.equal("internalId", internalId),
+      Filters.equal("ern", ern),
+      Filters.equal("arc", arc)
+    )
+
+  private def by(ern: String, arc: String): Bson =
+    Filters.and(
       Filters.equal("ern", ern),
       Filters.equal("arc", arc)
     )
@@ -86,15 +100,48 @@ class ReportReceiptUserAnswersRepository @Inject()(
           .headOption()
     }
 
+  def retrieveAllDocumentsInCollection(): Future[Seq[ReportReceiptUserAnswers]] = collection
+    .find()
+    .toFuture()
+
+  def removeAllButLatestForEachErnAndArc(): Future[Boolean] = {
+    logger.info("Removing all but latest document for each ERN and ARC")
+    val futureResults: Future[Seq[Boolean]] = retrieveAllDocumentsInCollection().flatMap {
+      items =>
+        val deleteAndReinsertResults: Seq[Future[Boolean]] = items
+          .groupBy(item => (item.ern, item.arc))
+          .map {
+            case (_, userAnswers) => userAnswers.maxBy(_.lastUpdated)
+          }
+          .map {
+            userAnswers =>
+              val deleteResultForUserAnswers: Future[DeleteResult] = collection
+                .deleteMany(by(userAnswers.ern, userAnswers.arc))
+                .toFuture()
+
+              deleteResultForUserAnswers
+                .flatMap {
+                  deleteResult =>
+                    logger.info(s"Deleted ${deleteResult.getDeletedCount} item(s) for ERN: [${userAnswers.ern}] and ARC: [${userAnswers.arc}], adding latest back...")
+                    collection.insertOne(userAnswers).toFuture().map(_ => true)
+                }
+          }.toSeq
+
+        Future.sequence(deleteAndReinsertResults)
+    }
+
+    futureResults.map(_ => true)
+  }
+
   def set(answers: ReportReceiptUserAnswers): Future[Boolean] = {
 
     val updatedAnswers = answers copy (lastUpdated = time.instant())
 
     collection
       .replaceOne(
-        filter      = by(updatedAnswers.internalId, updatedAnswers.ern, updatedAnswers.arc),
+        filter = by(updatedAnswers.internalId, updatedAnswers.ern, updatedAnswers.arc),
         replacement = updatedAnswers,
-        options     = ReplaceOptions().upsert(true)
+        options = ReplaceOptions().upsert(true)
       )
       .toFuture()
       .map(_ => true)
