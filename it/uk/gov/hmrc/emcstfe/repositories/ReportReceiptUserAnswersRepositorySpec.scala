@@ -198,9 +198,10 @@ class ReportReceiptUserAnswersRepositorySpec extends IntegrationBaseSpec
         val userAnswers2 = ReportReceiptUserAnswers(testInternalId, "GBWK000001235", testArc, data, Instant.ofEpochSecond(1))
         insert(userAnswers2).futureValue
         insert(userAnswers2.copy(data = data ++ Json.obj("baz" -> "beans"), lastUpdated = instantNow)).futureValue
+        insert(userAnswers2.copy(data = data ++ Json.obj("wiz" -> "eggs"), lastUpdated = Instant.ofEpochSecond(1))).futureValue
 
         val allItemsBeforeUpdate = repository.retrieveAllDocumentsInCollection().futureValue
-        allItemsBeforeUpdate.length shouldBe 4
+        allItemsBeforeUpdate.length shouldBe 5
 
         repository.removeAllButLatestForEachErnAndArc().futureValue
 

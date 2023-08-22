@@ -107,25 +107,40 @@ class ReportReceiptUserAnswersRepository @Inject()(
   def removeAllButLatestForEachErnAndArc(): Future[Boolean] = {
     logger.info("Removing all but latest document for each ERN and ARC")
     val futureResults: Future[Seq[Boolean]] = retrieveAllDocumentsInCollection().flatMap {
-      items =>
-        val deleteAndReinsertResults: Seq[Future[Boolean]] = items
+      documents =>
+        val totalNumberOfDocuments = documents.length
+        val latestAnswerForEachErnArcCombination: Seq[ReportReceiptUserAnswers] = documents
           .groupBy(item => (item.ern, item.arc))
           .map {
             case (_, userAnswers) => userAnswers.maxBy(_.lastUpdated)
-          }
-          .map {
-            userAnswers =>
-              val deleteResultForUserAnswers: Future[DeleteResult] = collection
-                .deleteMany(by(userAnswers.ern, userAnswers.arc))
-                .toFuture()
-
-              deleteResultForUserAnswers
-                .flatMap {
-                  deleteResult =>
-                    logger.info(s"Deleted ${deleteResult.getDeletedCount} item(s) for ERN: [${userAnswers.ern}] and ARC: [${userAnswers.arc}], adding latest back...")
-                    collection.insertOne(userAnswers).toFuture().map(_ => true)
-                }
           }.toSeq
+
+        val totalNumberOfDocumentsToBeReinserted = latestAnswerForEachErnArcCombination.length
+
+        val numberOfDocumentsDeleted = totalNumberOfDocuments - totalNumberOfDocumentsToBeReinserted
+
+        val deleteAndReinsertResults: Seq[Future[Boolean]] = latestAnswerForEachErnArcCombination.map {
+          userAnswers =>
+            val deleteResultForUserAnswers: Future[DeleteResult] = collection
+              .deleteMany(by(userAnswers.ern, userAnswers.arc))
+              .toFuture()
+
+            deleteResultForUserAnswers
+              .flatMap {
+                deleteResult =>
+                  logger.info(s"Deleted ${deleteResult.getDeletedCount} item(s) for ERN: [${userAnswers.ern}] and ARC: [${userAnswers.arc}], adding latest back...")
+                  collection.insertOne(userAnswers).toFuture().map(_ => true)
+              }
+        }
+
+        logger.info(
+          s"""Deleting duplicates
+             |-------------------
+             |Number of documents in database: $totalNumberOfDocuments
+             |Number of documents to keep: $totalNumberOfDocumentsToBeReinserted
+             |Number of documents to delete: $numberOfDocumentsDeleted
+             |Actual number of documents kept: ${deleteAndReinsertResults.length}
+             |""".stripMargin)
 
         Future.sequence(deleteAndReinsertResults)
     }
