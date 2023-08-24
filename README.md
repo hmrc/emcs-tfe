@@ -133,6 +133,29 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 </details>
 
 <details>
+<summary>Change Destination
+
+**`POST`** /change-destination/:ern/:arc</summary>
+
+**Request Body**: [SubmitChangeDestinationExcess Model](app/uk/gov/hmrc/emcstfe/models/changeDestination/SubmitChangeDestinationModel.scala)
+
+### Responses
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
 <summary>Explain Shortage or Excess
 
 **`POST`** /explain-shortage-excess/:ern/:arc</summary>
@@ -156,11 +179,34 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 </details>
 
 <details>
-<summary>Change Destination
+<summary>Cancel a movement
 
-**`POST`** /change-destination/:ern/:arc</summary>
+**`POST`** /cancel-movement/:ern/:arc</summary>
 
-**Request Body**: [SubmitChangeDestinationExcess Model](app/uk/gov/hmrc/emcstfe/models/changeDestination/SubmitChangeDestinationModel.scala)
+**Request Body**: [SubmitCancellationOfMovement Model](app/uk/gov/hmrc/emcstfe/models/cancellationOfMovement/SubmitCancellationOfMovementModel.scala)
+
+### Responses
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Create a movement
+
+**`POST`** /create-movement/:ern/:arc</summary>
+
+**Request Body**: [CreateMovement Model](app/uk/gov/hmrc/emcstfe/models/createMovement/CreateMovementModel.scala)
 
 ### Responses
 
@@ -193,7 +239,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK) _(when data is found for supplied ern and arc)_
 
-**Body**: [ReportReceiptUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ReportReceiptUserAnswers.scala)
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
 
 **Status**: 204 (NO_CONTENT) _(when NO data is found)_
 
@@ -215,13 +261,13 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
 
-**Request Body**: [ReportReceiptUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ReportReceiptUserAnswers.scala)
+**Request Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
 
 #### Success Response(s)
 
 **Status**: 200 (OK)
 
-**Body**: [ReportReceiptUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ReportReceiptUserAnswers.scala)
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
 
 #### Error Response(s)
 
@@ -230,7 +276,7 @@ This method is idempotent, in the sense that if no data exists it will be create
 **Body**:
 
 ```
-"Invalid ReportReceiptUserAnswers payload " + JsonValidation Errors
+"Invalid UserAnswers payload " + JsonValidation Errors
 ```
 
 **Status**: 500 (ISE)
@@ -243,86 +289,6 @@ This method is idempotent, in the sense that if no data exists it will be create
 <summary>Remove Report Receipt Frontend UserAnswers for the ERN and ARC supplied
 
 **`DELETE`** /user-answers/report-receipt/:ern/:arc</summary>
-
-This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
-
-#### Success Response(s)
-
-**Status**: 204 (NO_CONTENT)
-
-**Body**: n/a
-
-#### Error Response(s)
-
-**Status**: 500 (ISE)
-
-**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
-
-</details>
-
----
-
-#### Explain Delay Frontend
-
-<details>
-<summary>Retrieve Explain Delay Frontend UserAnswers for the ERN and ARC supplied
-
-**`GET`** /user-answers/explain-delay/:ern/:arc</summary>
-
-#### Success Response(s)
-
-**Status**: 200 (OK) _(when data is found for supplied ern and arc)_
-
-**Body**: [ExplainDelayUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ExplainDelayUserAnswers.scala)
-
-**Status**: 204 (NO_CONTENT) _(when NO data is found)_
-
-**Body**: n/a
-
-
-#### Error Response(s)
-
-**Status**: 500 (ISE)
-
-**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
-
-</details>
-
-<details>
-<summary>Store Explain Delay Frontend UserAnswers for the ERN and ARC supplied
-
-**`PUT`** /user-answers/explain-delay/:ern/:arc</summary>
-
-This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
-
-**Request Body**: [ExplainDelayUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ExplainDelayUserAnswers.scala)
-
-#### Success Response(s)
-
-**Status**: 200 (OK)
-
-**Body**: [ExplainDelayUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/ExplainDelayUserAnswers.scala)
-
-#### Error Response(s)
-
-**Status**: 400 (BAD_REQUEST)
-
-**Body**:
-
-```
-"Invalid ExplainDelayUserAnswers payload " + JsonValidation Errors
-```
-
-**Status**: 500 (ISE)
-
-**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
-
-</details>
-
-<details>
-<summary>Remove Explain Delay Frontend UserAnswers for the ERN and ARC supplied
-
-**`DELETE`** /user-answers/explain-delay/:ern/:arc</summary>
 
 This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
 
@@ -403,6 +369,406 @@ This method is idempotent, in the sense that if no data exists it will be create
 <summary>Remove Create Movement Frontend UserAnswers for the ERN and LRN supplied
 
 **`DELETE`** /user-answers/create-movement/:ern/:lrn</summary>
+
+This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
+
+#### Success Response(s)
+
+**Status**: 204 (NO_CONTENT)
+
+**Body**: n/a
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+---
+
+#### Explain Delay Frontend
+
+<details>
+<summary>Retrieve Explain Delay Frontend UserAnswers for the ERN and ARC supplied
+
+**`GET`** /user-answers/explain-delay/:ern/:arc</summary>
+
+#### Success Response(s)
+
+**Status**: 200 (OK) _(when data is found for supplied ern and arc)_
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+**Status**: 204 (NO_CONTENT) _(when NO data is found)_
+
+**Body**: n/a
+
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Store Explain Delay Frontend UserAnswers for the ERN and ARC supplied
+
+**`PUT`** /user-answers/explain-delay/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
+
+**Request Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Error Response(s)
+
+**Status**: 400 (BAD_REQUEST)
+
+**Body**:
+
+```
+"Invalid UserAnswers payload " + JsonValidation Errors
+```
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Remove Explain Delay Frontend UserAnswers for the ERN and ARC supplied
+
+**`DELETE`** /user-answers/explain-delay/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
+
+#### Success Response(s)
+
+**Status**: 204 (NO_CONTENT)
+
+**Body**: n/a
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+---
+
+#### Explain Shortage or Excess Frontend
+
+<details>
+<summary>Retrieve Explain Shortage or Excess Frontend UserAnswers for the ERN and ARC supplied
+
+**`GET`** /user-answers/explain-shortage-or-excess/:ern/:arc</summary>
+
+#### Success Response(s)
+
+**Status**: 200 (OK) _(when data is found for supplied ern and arc)_
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+**Status**: 204 (NO_CONTENT) _(when NO data is found)_
+
+**Body**: n/a
+
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Store Explain Shortage or Excess Frontend UserAnswers for the ERN and ARC supplied
+
+**`PUT`** /user-answers/explain-shortage-or-excess/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
+
+**Request Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Error Response(s)
+
+**Status**: 400 (BAD_REQUEST)
+
+**Body**:
+
+```
+"Invalid UserAnswers payload " + JsonValidation Errors
+```
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Remove Explain Shortage or Excess Frontend UserAnswers for the ERN and ARC supplied
+
+**`DELETE`** /user-answers/explain-shortage-or-excess/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
+
+#### Success Response(s)
+
+**Status**: 204 (NO_CONTENT)
+
+**Body**: n/a
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+---
+
+#### Cancel Movement Frontend
+
+<details>
+<summary>Retrieve Cancel Movement Frontend UserAnswers for the ERN and ARC supplied
+
+**`GET`** /user-answers/cancel-movement/:ern/:arc</summary>
+
+#### Success Response(s)
+
+**Status**: 200 (OK) _(when data is found for supplied ern and arc)_
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+**Status**: 204 (NO_CONTENT) _(when NO data is found)_
+
+**Body**: n/a
+
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Store Cancel Movement Frontend UserAnswers for the ERN and ARC supplied
+
+**`PUT`** /user-answers/cancel-movement/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
+
+**Request Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Error Response(s)
+
+**Status**: 400 (BAD_REQUEST)
+
+**Body**:
+
+```
+"Invalid UserAnswers payload " + JsonValidation Errors
+```
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Remove Cancel Movement Frontend UserAnswers for the ERN and ARC supplied
+
+**`DELETE`** /user-answers/cancel-movement/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
+
+#### Success Response(s)
+
+**Status**: 204 (NO_CONTENT)
+
+**Body**: n/a
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+---
+
+#### Change Destination Frontend
+
+<details>
+<summary>Retrieve Change Destination Frontend UserAnswers for the ERN and ARC supplied
+
+**`GET`** /user-answers/change-destination/:ern/:arc</summary>
+
+#### Success Response(s)
+
+**Status**: 200 (OK) _(when data is found for supplied ern and arc)_
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+**Status**: 204 (NO_CONTENT) _(when NO data is found)_
+
+**Body**: n/a
+
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Store Change Destination Frontend UserAnswers for the ERN and ARC supplied
+
+**`PUT`** /user-answers/change-destination/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
+
+**Request Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Error Response(s)
+
+**Status**: 400 (BAD_REQUEST)
+
+**Body**:
+
+```
+"Invalid UserAnswers payload " + JsonValidation Errors
+```
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Remove Change Destination Frontend UserAnswers for the ERN and ARC supplied
+
+**`DELETE`** /user-answers/change-destination/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
+
+#### Success Response(s)
+
+**Status**: 204 (NO_CONTENT)
+
+**Body**: n/a
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+---
+
+#### Alert or Rejection Frontend
+
+<details>
+<summary>Retrieve Alert or Rejection Frontend UserAnswers for the ERN and ARC supplied
+
+**`GET`** /user-answers/alert-or-rejection/:ern/:arc</summary>
+
+#### Success Response(s)
+
+**Status**: 200 (OK) _(when data is found for supplied ern and arc)_
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+**Status**: 204 (NO_CONTENT) _(when NO data is found)_
+
+**Body**: n/a
+
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Store Alert or Rejection Frontend UserAnswers for the ERN and ARC supplied
+
+**`PUT`** /user-answers/alert-or-rejection/:ern/:arc</summary>
+
+This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
+
+**Request Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: [UserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/UserAnswers.scala)
+
+#### Error Response(s)
+
+**Status**: 400 (BAD_REQUEST)
+
+**Body**:
+
+```
+"Invalid UserAnswers payload " + JsonValidation Errors
+```
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Remove Alert or Rejection Frontend UserAnswers for the ERN and ARC supplied
+
+**`DELETE`** /user-answers/alert-or-rejection/:ern/:arc</summary>
 
 This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
 
