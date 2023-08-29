@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper, UserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
 import uk.gov.hmrc.emcstfe.services.SubmitAlertOrRejectionService
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -29,10 +29,9 @@ import scala.concurrent.ExecutionContext
 
 @Singleton()
 class SubmitAlertOrRejectionController @Inject()(cc: ControllerComponents,
-                                             service: SubmitAlertOrRejectionService,
-                                             override val auth: AuthAction,
-                                             override val userAllowList: UserAllowListAction
-                                            )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
+                                                 service: SubmitAlertOrRejectionService,
+                                                 override val auth: AuthAction
+                                                )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
 
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitAlertOrRejectionModel] {

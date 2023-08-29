@@ -21,7 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction, FakeUserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitExplainDelayService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
@@ -33,7 +33,7 @@ class SubmitExplainDelayControllerSpec extends UnitSpec with MockSubmitExplainDe
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/explain-delay").withBody(Json.toJson(maxSubmitExplainDelayModel))
-    val controller = new SubmitExplainDelayController(Helpers.stubControllerComponents(), mockService, authAction, FakeUserAllowListAction)
+    val controller = new SubmitExplainDelayController(Helpers.stubControllerComponents(), mockService, authAction)
   }
 
   s"POST ${routes.SubmitExplainDelayController.submit(testErn, testArc)}" when {

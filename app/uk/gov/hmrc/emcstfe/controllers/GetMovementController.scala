@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper, UserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.services.GetMovementService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -29,8 +29,7 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class GetMovementController @Inject()(cc: ControllerComponents,
                                       service: GetMovementService,
-                                      override val auth: AuthAction,
-                                      override val userAllowList: UserAllowListAction
+                                      override val auth: AuthAction
                                      )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
   def getMovement(exciseRegistrationNumber: String, arc: String, forceFetchNew: Boolean = false): Action[AnyContent] = authorisedUserRequest(exciseRegistrationNumber) { implicit request =>

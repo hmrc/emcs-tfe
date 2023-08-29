@@ -21,7 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction, FakeUserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitChangeDestinationService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
@@ -35,7 +35,7 @@ class SubmitChangeDestinationControllerSpec extends UnitSpec with MockSubmitChan
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/change-destination").withBody(Json.toJson(submitChangeDestinationModelMax))
-    val controller = new SubmitChangeDestinationController(Helpers.stubControllerComponents(), mockService, authAction, FakeUserAllowListAction)
+    val controller = new SubmitChangeDestinationController(Helpers.stubControllerComponents(), mockService, authAction)
   }
 
   s"POST ${routes.SubmitChangeDestinationController.submit(testErn, testArc)}" when {

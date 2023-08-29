@@ -20,7 +20,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.actions.{FakeAuthAction, FakeUserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
 import uk.gov.hmrc.emcstfe.mocks.services.MockGetMovementListService
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementListRequest, GetMovementListSearchOptions}
@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class GetMovementListControllerSpec extends UnitSpec with MockGetMovementListService with GetMovementListFixture with FakeAuthAction {
 
   private val fakeRequest = FakeRequest("GET", "/movement/:ern/:arc")
-  private val controller = new GetMovementListController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction, FakeUserAllowListAction)
+  private val controller = new GetMovementListController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
   private val searchOptions = GetMovementListSearchOptions()
   private val getMovementListRequest = GetMovementListRequest(testErn, searchOptions)

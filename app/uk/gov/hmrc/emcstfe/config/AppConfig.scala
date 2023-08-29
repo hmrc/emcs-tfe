@@ -55,12 +55,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def getMovementTTL(): Duration = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
   def getMovementReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.getMovement.replaceIndexes")
 
-  // user-allow-list config
-  private def userAllowListService: String = servicesConfig.baseUrl("user-allow-list")
-  def userAllowListBaseUrl: String = s"$userAllowListService/user-allow-list"
-  def allowListEnabled: Boolean = configuration.get[Boolean]("features.allowListEnabled")
-  def internalAuthToken: String = configuration.get[String]("internal-auth.token")
-
   def getFeatureSwitchValue(feature: String): Boolean = configuration.get[Boolean](feature)
 
   def chrisBaseUrl: String = if(isEnabled(UseChrisStub)) chrisStubUrl else chrisUrl

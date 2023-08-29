@@ -21,7 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction, FakeUserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitExplainShortageExcessService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
@@ -35,7 +35,7 @@ class SubmitExplainShortageExcessControllerSpec extends UnitSpec with MockSubmit
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/explain-shortage-excess").withBody(Json.toJson(submitExplainShortageExcessModelMax))
-    val controller = new SubmitExplainShortageExcessController(Helpers.stubControllerComponents(), mockService, authAction, FakeUserAllowListAction)
+    val controller = new SubmitExplainShortageExcessController(Helpers.stubControllerComponents(), mockService, authAction)
   }
 
   s"POST ${routes.SubmitExplainShortageExcessController.submit(testErn, testArc)}" when {

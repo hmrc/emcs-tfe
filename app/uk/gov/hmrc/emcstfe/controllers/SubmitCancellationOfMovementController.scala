@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper, UserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
 import uk.gov.hmrc.emcstfe.services.SubmitCancellationOfMovementService
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -30,9 +30,8 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class SubmitCancellationOfMovementController @Inject()(cc: ControllerComponents,
                                                        service: SubmitCancellationOfMovementService,
-                                                       override val auth: AuthAction,
-                                                       override val userAllowList: UserAllowListAction)
-                                                      (implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
+                                                       override val auth: AuthAction
+                                                      )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
 
   def submit(ern: String, arc: String): Action[JsValue] =
     authorisedUserSubmissionRequest(ern) {
