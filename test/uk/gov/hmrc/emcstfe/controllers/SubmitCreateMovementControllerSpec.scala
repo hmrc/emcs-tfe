@@ -21,7 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction, FakeUserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitCreateMovementService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
@@ -33,7 +33,7 @@ class SubmitCreateMovementControllerSpec extends UnitSpec with MockSubmitCreateM
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/create-movement").withBody(Json.toJson(CreateMovementFixtures.createMovementModelMax))
-    val controller = new SubmitCreateMovementController(Helpers.stubControllerComponents(), mockService, authAction, FakeUserAllowListAction)
+    val controller = new SubmitCreateMovementController(Helpers.stubControllerComponents(), mockService, authAction)
   }
 
   s"POST ${routes.SubmitCreateMovementController.submit(testErn, testLrn)}" when {

@@ -52,8 +52,6 @@ class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
 
         implicit val req = request
 
-
-
         authorised().retrieve(Retrievals.affinityGroup and Retrievals.allEnrolments and Retrievals.internalId and Retrievals.credentials) {
 
           case Some(Organisation) ~ enrolments ~ Some(internalId) ~ Some(credentials) =>

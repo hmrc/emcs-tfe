@@ -26,9 +26,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class MetricsService @Inject()(metrics: Metrics) extends Logging {
 
   def chrisTimer(metricName: String): Timer = metrics.defaultRegistry.timer(s"$metricName.timer")
-  lazy val userAllowListTimer: Timer = metrics.defaultRegistry.timer(s"user-allow-list.check.timer")
 
   def rorStatusCounter(status: String) = metrics.defaultRegistry.counter(s"report-receipt.status-count.$status")
+
   lazy val rorSatisfactoryCount = rorStatusCounter("satisfactory")
   lazy val rorUnsatisfactoryCount = rorStatusCounter("unsatisfactory")
   lazy val rorPartiallyRefused = rorStatusCounter("partially-refused")

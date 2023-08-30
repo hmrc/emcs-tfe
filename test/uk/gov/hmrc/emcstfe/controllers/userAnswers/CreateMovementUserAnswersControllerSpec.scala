@@ -20,7 +20,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.emcstfe.controllers.actions.{FakeAuthAction, FakeUserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
 import uk.gov.hmrc.emcstfe.mocks.services.MockCreateMovementUserAnswersService
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
@@ -36,8 +36,7 @@ class CreateMovementUserAnswersControllerSpec extends UnitSpec with MockCreateMo
   private val controller = new CreateMovementUserAnswersController(
     Helpers.stubControllerComponents(),
     mockService,
-    FakeSuccessAuthAction,
-    FakeUserAllowListAction
+    FakeSuccessAuthAction
   )
 
   val userAnswers: CreateMovementUserAnswers =

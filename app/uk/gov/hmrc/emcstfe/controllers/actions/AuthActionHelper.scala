@@ -25,11 +25,10 @@ import scala.concurrent.Future
 trait AuthActionHelper extends BaseControllerHelpers {
 
   val auth: AuthAction
-  val userAllowList: UserAllowListAction
 
   def authorisedUserRequest(ern: String)(block: UserRequest[_] => Future[Result]): Action[AnyContent] =
-    (auth(ern) andThen userAllowList).async(block)
+    auth(ern).async(block)
 
   def authorisedUserSubmissionRequest(ern: String)(block: UserRequest[JsValue] => Future[Result]): Action[JsValue] =
-    (auth(ern) andThen userAllowList).async(parse.json)(block)
+    auth(ern).async(parse.json)(block)
 }

@@ -19,9 +19,9 @@ package uk.gov.hmrc.emcstfe.controllers.userAnswers
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
-import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction, FakeUserAllowListAction, UserAllowListAction}
+import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.mocks.services.MockUserAnswersService
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
@@ -43,7 +43,6 @@ class BaseUserAnswersControllerSpec extends UnitSpec
     override val controllerComponents: ControllerComponents = Helpers.stubControllerComponents()
     override val userAnswersService: BaseUserAnswersService = mockService
     override val auth: AuthAction = FakeSuccessAuthAction
-    override val userAllowList: UserAllowListAction = FakeUserAllowListAction
     override implicit val ec: ExecutionContext = _ec
   }
 

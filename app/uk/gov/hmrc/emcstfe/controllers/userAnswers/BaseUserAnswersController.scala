@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper, UserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.services.userAnswers.BaseUserAnswersService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendBaseController
@@ -30,7 +30,6 @@ trait BaseUserAnswersController extends BackendBaseController with AuthActionHel
   val controllerComponents: ControllerComponents
   val userAnswersService: BaseUserAnswersService
   val auth: AuthAction
-  val userAllowList: UserAllowListAction
   implicit val ec: ExecutionContext
 
   def get(ern: String, arc: String): Action[AnyContent] = authorisedUserRequest(ern) { _ =>

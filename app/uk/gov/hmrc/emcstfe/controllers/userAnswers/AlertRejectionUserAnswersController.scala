@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
 import play.api.mvc.ControllerComponents
-import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, UserAllowListAction}
+import uk.gov.hmrc.emcstfe.controllers.actions.AuthAction
 import uk.gov.hmrc.emcstfe.services.userAnswers.AlertRejectionUserAnswersService
 
 import javax.inject.Inject
@@ -25,6 +25,5 @@ import scala.concurrent.ExecutionContext
 
 class AlertRejectionUserAnswersController @Inject()(val controllerComponents: ControllerComponents,
                                                     val userAnswersService: AlertRejectionUserAnswersService,
-                                                    val auth: AuthAction,
-                                                    val userAllowList: UserAllowListAction)
-                                                   (implicit val ec: ExecutionContext) extends BaseUserAnswersController
+                                                    val auth: AuthAction
+                                                   )(implicit val ec: ExecutionContext) extends BaseUserAnswersController
