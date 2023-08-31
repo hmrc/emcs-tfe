@@ -17,27 +17,18 @@
 package uk.gov.hmrc.emcstfe.repositories
 
 import org.mongodb.scala.model.Filters
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.OptionValues
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import play.api.libs.json.JsString
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
-import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
-import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.duration.Duration
 
-class GetMovementRepositorySpec extends IntegrationBaseSpec
-    with DefaultPlayMongoRepositorySupport[GetMovementMongoResponse]
-    with MockFactory
-    with OptionValues
-    with IntegrationPatience
-    with ScalaFutures
+class GetMovementRepositorySpec
+  extends RepositoryBaseSpec[GetMovementMongoResponse]
     with GetMovementFixture {
 
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
@@ -57,8 +48,8 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
 
   protected override val repository = new GetMovementRepository(
     mongoComponent = mongoComponent,
-    appConfig      = mockAppConfig,
-    time           = timeMachine
+    appConfig = mockAppConfig,
+    time = timeMachine
   )
 
   ".set" must {
@@ -67,7 +58,7 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
 
       val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
-      val setResult     = repository.set(userAnswers).futureValue
+      val setResult = repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("arc", userAnswers.arc)).futureValue.headOption.value
 
       setResult shouldBe expectedResult
@@ -83,7 +74,7 @@ class GetMovementRepositorySpec extends IntegrationBaseSpec
 
         insert(userAnswers).futureValue
 
-        val result         = repository.get(userAnswers.arc).futureValue
+        val result = repository.get(userAnswers.arc).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
         result.value shouldBe expectedResult

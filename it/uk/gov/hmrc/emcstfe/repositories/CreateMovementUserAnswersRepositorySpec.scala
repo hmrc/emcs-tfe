@@ -17,28 +17,16 @@
 package uk.gov.hmrc.emcstfe.repositories
 
 import org.mongodb.scala.model.Filters
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.OptionValues
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
-import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
-import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.duration.Duration
 
-class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
-    with DefaultPlayMongoRepositorySupport[CreateMovementUserAnswers]
-    with MockFactory
-    with OptionValues
-    with IntegrationPatience
-    with ScalaFutures
-    with BaseFixtures {
+class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateMovementUserAnswers] {
 
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
@@ -57,8 +45,8 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
 
   protected override val repository = new CreateMovementUserAnswersRepository(
     mongoComponent = mongoComponent,
-    appConfig      = mockAppConfig,
-    time           = timeMachine
+    appConfig = mockAppConfig,
+    time = timeMachine
   )
 
   ".set" must {
@@ -67,7 +55,7 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
 
       val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
-      val setResult     = repository.set(userAnswers).futureValue
+      val setResult = repository.set(userAnswers).futureValue
       val updatedRecord = find(
         Filters.and(
           Filters.equal("ern", userAnswers.ern),
@@ -88,7 +76,7 @@ class CreateMovementUserAnswersRepositorySpec extends IntegrationBaseSpec
 
         insert(userAnswers).futureValue
 
-        val result         = repository.get(userAnswers.ern, userAnswers.lrn).futureValue
+        val result = repository.get(userAnswers.ern, userAnswers.lrn).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
         result.value shouldBe expectedResult
