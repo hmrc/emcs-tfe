@@ -40,6 +40,9 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |            <body:ConsigneeTrader language="en">
                                                |              ${maxTraderModelXML(ConsigneeTrader)}
                                                |            </body:ConsigneeTrader>
+                                               |            <body:ComplementConsigneeTrader>
+                                               |              <MemberStateCode>GB</MemberStateCode>
+                                               |            </body:ComplementConsigneeTrader>
                                                |            <body:ExciseMovement>
                                                |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
                                                |              <body:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</body:DateAndTimeOfValidationOfEadEsad>
@@ -438,6 +441,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     sequenceNumber = 1,
     destinationType = Export,
     consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
+    memberStateCode = Some("GB"),
     deliveryPlaceTrader = None,
     localReferenceNumber = "EN",
     eadStatus = "Accepted",
@@ -531,6 +535,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     "sequenceNumber" -> 1,
     "destinationType" -> "6",
     "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
+    "memberStateCode" -> "GB",
     "localReferenceNumber" -> "EN",
     "eadStatus" -> "Accepted",
     "consignorTrader" -> maxTraderModelJson(ConsignorTrader),

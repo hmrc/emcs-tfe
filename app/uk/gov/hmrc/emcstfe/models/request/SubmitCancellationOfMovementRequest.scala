@@ -32,7 +32,7 @@ case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovemen
   private val messageRecipientSuffix: String =
     body.destinationType match {
       case Export => arcCountryCode
-      case ExemptedOrganisations => body.memberStateCode
+      case ExemptedOrganisations => body.memberStateCode.getOrElse(Constants.GB)
       case _ => body.consigneeTrader.flatMap(_.countryCode).getOrElse(Constants.GB)
     }
 

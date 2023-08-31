@@ -22,31 +22,27 @@ import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.{CancellationReasonMode
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
 
-import java.time.LocalDate
 import scala.xml.Elem
 
 trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISResponsesFixture with TraderModelFixtures {
 
   val maxSubmitCancellationOfMovementModel: SubmitCancellationOfMovementModel = SubmitCancellationOfMovementModel(
-    dateAndTimeOfValidationOfCancellation = LocalDate.of(2023, 1, 1),
     exciseMovement = ExciseMovementModel(testArc, 1),
     cancellationReason = CancellationReasonModel(TypingError, Some("test cancellation reason")),
     consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     destinationType = Export,
-    memberStateCode = "GB"
+    memberStateCode = Some("GB")
   )
 
   val minSubmitCancellationOfMovementModel: SubmitCancellationOfMovementModel = SubmitCancellationOfMovementModel(
-    dateAndTimeOfValidationOfCancellation = LocalDate.of(2023, 1, 1),
     exciseMovement = ExciseMovementModel(testArc, 1),
     cancellationReason = CancellationReasonModel(TypingError, None),
     consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     destinationType = Export,
-    memberStateCode = "GB"
+    memberStateCode = Some("GB")
   )
 
   val maxSubmitCancellationOfMovementModelJson: JsObject = Json.obj(
-    "dateAndTimeOfValidationOfCancellation" -> "2023-01-01",
     "exciseMovement" ->
       Json.obj(
         "arc" -> testArc,
@@ -63,7 +59,6 @@ trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISRespon
   )
 
   val minSubmitCancellationOfMovementModelJson: JsObject = Json.obj(
-    "dateAndTimeOfValidationOfCancellation" -> "2023-01-01",
     "exciseMovement" ->
       Json.obj(
         "arc" -> testArc,

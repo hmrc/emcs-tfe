@@ -458,6 +458,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
     sequenceNumber = 1,
     destinationType = Export,
     consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
+    memberStateCode = None,
     deliveryPlaceTrader = Some(maxTraderModel(DeliveryPlaceTrader)),
     localReferenceNumber = "EN",
     eadStatus = "Beans",

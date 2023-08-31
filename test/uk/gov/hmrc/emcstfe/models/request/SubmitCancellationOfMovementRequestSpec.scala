@@ -77,10 +77,19 @@ class SubmitCancellationOfMovementRequestSpec extends UnitSpec with SubmitCancel
           SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.DE"
         }
 
-        "the destination type is ExemptedOrganisations" in {
-          val testModel = maxSubmitCancellationOfMovementModel.copy(destinationType = ExemptedOrganisations)
+        "the destination type is ExemptedOrganisations" when {
 
-          SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.GB"
+          "memberStateCode exists" in {
+            val testModel = maxSubmitCancellationOfMovementModel.copy(destinationType = ExemptedOrganisations, memberStateCode = Some("FR"))
+
+            SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.FR"
+          }
+
+          "memberStateCode does NOT exists" in {
+            val testModel = maxSubmitCancellationOfMovementModel.copy(destinationType = ExemptedOrganisations, memberStateCode = None)
+
+            SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.GB"
+          }
         }
 
         "the destination type is any other type" when {

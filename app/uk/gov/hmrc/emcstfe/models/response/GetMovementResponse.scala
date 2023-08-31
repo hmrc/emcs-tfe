@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple12Semigroupal
+import cats.implicits.catsSyntaxTuple13Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -26,6 +26,7 @@ case class GetMovementResponse(arc: String,
                                sequenceNumber: Int,
                                destinationType: DestinationType,
                                consigneeTrader: Option[TraderModel],
+                               memberStateCode: Option[String],
                                deliveryPlaceTrader: Option[TraderModel],
                                localReferenceNumber: String,
                                eadStatus: String,
@@ -52,12 +53,14 @@ object GetMovementResponse {
   val deliveryPlaceTrader: XPath = EADESADContainer \\ "DeliveryPlaceTrader"
   val items: XPath = EADESADContainer \ "BodyEadEsad"
   val numberOfItems: XPath = EADESADContainer \\ "BodyEadEsad" \\ "CnCode"
+  val memberStateCode: XPath = EADESADContainer \ "ComplementConsigneeTrader" \ "MemberStateCode"
 
   implicit val xmlReader: XmlReader[GetMovementResponse] = (
     arc.read[String],
     sequenceNumber.read[Int],
     destinationTypeCode.read[DestinationType](DestinationType.xmlReads(DestinationType.enumerable)),
     consigneeTrader.read[Option[TraderModel]](TraderModel.xmlReads(ConsigneeTrader).optional).map(model => if(model.exists(_.isEmpty)) None else model),
+    memberStateCode.read[Option[String]],
     deliveryPlaceTrader.read[Option[TraderModel]](TraderModel.xmlReads(DeliveryPlaceTrader).optional).map(model => if(model.exists(_.isEmpty)) None else model),
     localReferenceNumber.read[String],
     eadStatus.read[String],
