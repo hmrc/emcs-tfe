@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
+import com.google.inject.ImplementedBy
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
@@ -33,18 +34,25 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
+@ImplementedBy(classOf[GetMovementRepositoryImpl])
+trait GetMovementRepository {
+  def get(arc: String): Future[Option[GetMovementMongoResponse]]
+
+  def set(answers: GetMovementMongoResponse): Future[GetMovementMongoResponse]
+}
+
 @Singleton
-class GetMovementRepository @Inject()(mongoComponent: MongoComponent,
-                                      appConfig: AppConfig,
-                                      time: TimeMachine
-                                     )(implicit ec: ExecutionContext)
+class GetMovementRepositoryImpl @Inject()(mongoComponent: MongoComponent,
+                                          appConfig: AppConfig,
+                                          time: TimeMachine
+                                         )(implicit ec: ExecutionContext)
   extends PlayMongoRepository[GetMovementMongoResponse](
     collectionName = "get-movement-response",
     mongoComponent = mongoComponent,
     domainFormat = GetMovementMongoResponse.format,
     indexes = mongoIndexes(appConfig.getMovementTTL()),
     replaceIndexes = appConfig.getMovementReplaceIndexes()
-  ) with Logging {
+  ) with GetMovementRepository with Logging {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 

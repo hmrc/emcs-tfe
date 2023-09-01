@@ -38,9 +38,6 @@ trait IntegrationBaseSpec
 
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
-  val testTtl = "1 seconds"
-  val testReplaceIndexes = true
-
   def servicesConfig: Map[String, _] = Map(
     "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
     "microservice.services.chris.port" -> WireMockHelper.wireMockPort,

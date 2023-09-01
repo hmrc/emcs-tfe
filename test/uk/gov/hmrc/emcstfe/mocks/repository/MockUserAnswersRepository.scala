@@ -16,28 +16,26 @@
 
 package uk.gov.hmrc.emcstfe.mocks.repository
 
-import org.mockito.ArgumentMatchers.{eq => eqTo}
-import org.mockito.Mockito.when
-import org.mockito.stubbing.OngoingStubbing
-import org.specs2.mock.Mockito.mock
+import org.scalamock.handlers.{CallHandler1, CallHandler2}
+import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.repositories.BaseUserAnswersRepository
 
 import scala.concurrent.Future
 
-trait MockUserAnswersRepository {
+trait MockUserAnswersRepository extends MockFactory {
 
-  val mockRepo: BaseUserAnswersRepository = mock[BaseUserAnswersRepository]
+  lazy val mockRepo: BaseUserAnswersRepository = mock[BaseUserAnswersRepository]
 
-  object MockUserAnswers {
-    def set(answers: UserAnswers): OngoingStubbing[Future[Boolean]] =
-      when(mockRepo.set(eqTo(answers)))
+  object MockRepository {
+    def set(answers: UserAnswers): CallHandler1[UserAnswers, Future[Boolean]] =
+      (mockRepo.set(_: UserAnswers)).expects(answers)
 
-    def get(ern: String, arc: String): OngoingStubbing[Future[Option[UserAnswers]]] =
-      when(mockRepo.get(eqTo(ern), eqTo(arc)))
+    def get(ern: String, arc: String): CallHandler2[String, String, Future[Option[UserAnswers]]] =
+      (mockRepo.get(_: String, _: String)).expects(ern, arc)
 
-    def clear(ern: String, arc: String): OngoingStubbing[Future[Boolean]] =
-      when(mockRepo.clear(eqTo(ern), eqTo(arc)))
+    def clear(ern: String, arc: String): CallHandler2[String, String, Future[Boolean]] =
+      (mockRepo.clear(_: String, _: String)).expects(ern, arc)
   }
 }
 

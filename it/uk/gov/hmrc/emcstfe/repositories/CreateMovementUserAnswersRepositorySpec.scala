@@ -31,7 +31,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
   private val userAnswers = CreateMovementUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
-  protected override val repository = new CreateMovementUserAnswersRepository(
+  protected override val repository = new CreateMovementUserAnswersRepositoryImpl(
     mongoComponent = mongoComponent,
     appConfig = mockAppConfig,
     time = timeMachine

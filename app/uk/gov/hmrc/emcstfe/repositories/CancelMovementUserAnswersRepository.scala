@@ -28,7 +28,7 @@ class CancelMovementUserAnswersRepository @Inject()(implicit mongoComponent: Mon
                                                     appConfig: AppConfig,
                                                     time: TimeMachine,
                                                     ec: ExecutionContext)
-  extends BaseUserAnswersRepository(
+  extends BaseUserAnswersRepositoryImpl(
     collectionName = "cancel-movement-user-answers",
     ttl = appConfig.cancelAMovementUserAnswersTTL(),
     replaceIndexes = appConfig.cancelAMovementUserAnswersReplaceIndexes()

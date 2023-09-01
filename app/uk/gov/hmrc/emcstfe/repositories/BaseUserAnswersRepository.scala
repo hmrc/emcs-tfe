@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
+import com.google.inject.ImplementedBy
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
@@ -30,12 +31,23 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
-class BaseUserAnswersRepository(collectionName: String,
-                                ttl: Duration,
-                                replaceIndexes: Boolean)
-                               (implicit mongoComponent: MongoComponent,
-                                time: TimeMachine,
-                                ec: ExecutionContext)
+@ImplementedBy(classOf[BaseUserAnswersRepositoryImpl])
+trait BaseUserAnswersRepository {
+  def keepAlive(ern: String, arc: String): Future[Boolean]
+
+  def get(ern: String, arc: String): Future[Option[UserAnswers]]
+
+  def set(answers: UserAnswers): Future[Boolean]
+
+  def clear(ern: String, arc: String): Future[Boolean]
+}
+
+class BaseUserAnswersRepositoryImpl(collectionName: String,
+                                    ttl: Duration,
+                                    replaceIndexes: Boolean)
+                                   (implicit mongoComponent: MongoComponent,
+                                    time: TimeMachine,
+                                    ec: ExecutionContext)
   extends PlayMongoRepository[UserAnswers](
     collectionName = collectionName,
     mongoComponent = mongoComponent,
@@ -56,7 +68,7 @@ class BaseUserAnswersRepository(collectionName: String,
       )
     ),
     replaceIndexes = replaceIndexes
-  ) {
+  ) with BaseUserAnswersRepository {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 

@@ -38,7 +38,7 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Right(Some(answers))" when {
       "UserAnswers are successfully returned from Mongo" in new Test {
 
-        MockUserAnswers.get(testErn, testLrn).thenReturn(Future.successful(Some(userAnswers)))
+        MockRepository.get(testErn, testLrn).returns(Future.successful(Some(userAnswers)))
         await(service.get(testErn, testLrn)) shouldBe Right(Some(userAnswers))
       }
     }
@@ -46,14 +46,14 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Right(None)" when {
       "UserAnswers are not found in Mongo" in new Test {
 
-        MockUserAnswers.get(testErn, testLrn).thenReturn(Future.successful(None))
+        MockRepository.get(testErn, testLrn).returns(Future.successful(None))
         await(service.get(testErn, testLrn)) shouldBe Right(None)
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockUserAnswers.get(testErn, testLrn).thenReturn(Future.failed(new Exception("bang")))
+        MockRepository.get(testErn, testLrn).returns(Future.failed(new Exception("bang")))
         await(service.get(testErn, testLrn)) shouldBe Left(MongoError("bang"))
       }
     }
@@ -63,14 +63,14 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Right(boolean)" when {
       "UserAnswers are successfully saved/updated in Mongo" in new Test {
 
-        MockUserAnswers.set(userAnswers).thenReturn(Future.successful(true))
+        MockRepository.set(userAnswers).returns(Future.successful(true))
         await(service.set(userAnswers)) shouldBe Right(userAnswers)
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockUserAnswers.set(userAnswers).thenReturn(Future.failed(new Exception("bang")))
+        MockRepository.set(userAnswers).returns(Future.failed(new Exception("bang")))
         await(service.set(userAnswers)) shouldBe Left(MongoError("bang"))
       }
     }
@@ -80,14 +80,14 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Right(boolean)" when {
       "UserAnswers are successfully saved/updated in Mongo" in new Test {
 
-        MockUserAnswers.clear(testErn, testLrn).thenReturn(Future.successful(true))
+        MockRepository.clear(testErn, testLrn).returns(Future.successful(true))
         await(service.clear(testErn, testLrn)) shouldBe Right(true)
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockUserAnswers.clear(testErn, testLrn).thenReturn(Future.failed(new Exception("bang")))
+        MockRepository.clear(testErn, testLrn).returns(Future.failed(new Exception("bang")))
         await(service.clear(testErn, testLrn)) shouldBe Left(MongoError("bang"))
       }
     }

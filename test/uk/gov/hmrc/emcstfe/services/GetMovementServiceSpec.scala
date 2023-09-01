@@ -52,7 +52,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
     "forceFetchNew = true" should {
       "return a Right" when {
         "retrieving from mongo returns nothing so a fresh call to GetMovement is made" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -60,14 +60,14 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
           MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-          MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse)
         }
         "retrieving from mongo returns a match so a fresh call to GetMovementIfChanged is made but there is no change" in new Test {
           MockGetMovementRepository
             .get(testArc)
-            .thenReturn(Future.successful(Some(getMovementMongoResponse)))
+            .returns(Future.successful(Some(getMovementMongoResponse)))
 
           MockConnector
             .postChrisSOAPRequest(getMovementIfChangedRequest)
@@ -76,7 +76,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse)
         }
         "retrieving from mongo returns a match so a fresh call to GetMovementIfChanged is made and there is a change" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(Some(getMovementMongoResponse)))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(Some(getMovementMongoResponse)))
 
           MockConnector
             .postChrisSOAPRequest(getMovementIfChangedRequest)
@@ -86,14 +86,14 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
           MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementIfChangedResponseBody))))
 
-          MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementIfChangedResponse)
         }
       }
       "return a Left" when {
         "GetMovement call is unsuccessful" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -102,7 +102,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Left(XmlValidationError)
         }
         "GetMovement call response cannot be extracted" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -111,7 +111,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Left(SoapExtractionError)
         }
         "repository.set fails with MongoException, still return the movement as doesn't matter if cache doesn't store" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -119,12 +119,12 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
           MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-          MockGetMovementRepository.set().thenReturn(Future.failed(new MongoException("Some error")))
+          MockGetMovementRepository.set().returns(Future.failed(new MongoException("Some error")))
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse)
         }
         "repository.set returns some other failed future, still return the movement as doesn't matter if cache doesn't store" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -132,7 +132,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
           MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-          MockGetMovementRepository.set().thenReturn(Future.failed(new Exception("Some error")))
+          MockGetMovementRepository.set().returns(Future.failed(new Exception("Some error")))
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse)
         }
@@ -141,7 +141,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
     "forceFetchNew = false" should {
       "fetch from downstream if Mongo returns no data" in new Test {
-        MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+        MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
@@ -149,7 +149,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
         await(service.getMovement(getMovementRequest, forceFetchNew = false)) shouldBe Right(getMovementResponse)
       }
@@ -157,7 +157,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
       "return the Mongo document if Mongo returns data" in new Test {
         MockGetMovementRepository
           .get(testArc)
-          .thenReturn(Future.successful(Some(getMovementMongoResponse)))
+          .returns(Future.successful(Some(getMovementMongoResponse)))
 
         await(service.getMovement(getMovementRequest, forceFetchNew = false)) shouldBe Right(getMovementResponse)
       }
@@ -182,7 +182,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
       "repository returns a success" in new Test {
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
         await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -196,14 +196,14 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
       "repository returns Mongo Exception, still return Right as doesn't matter if storage fails" in new Test {
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.failed(new MongoException("Some error")))
+        MockGetMovementRepository.set().returns(Future.failed(new MongoException("Some error")))
 
         await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
       "repository returns some other failed future, still return Right as doesn't matter if storage fails" in new Test {
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.failed(new Exception("Some error")))
+        MockGetMovementRepository.set().returns(Future.failed(new Exception("Some error")))
 
         await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -223,7 +223,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
         await(service.getNewMovement(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -251,7 +251,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
         await(service.getMovementIfChanged(getMovementRequest, getMovementIfChangedMongoResponse)) shouldBe Right(getMovementIfChangedResponse)
       }

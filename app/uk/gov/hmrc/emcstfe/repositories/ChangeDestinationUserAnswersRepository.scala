@@ -28,7 +28,7 @@ class ChangeDestinationUserAnswersRepository @Inject()(implicit mongoComponent: 
                                                        appConfig: AppConfig,
                                                        time: TimeMachine,
                                                        ec: ExecutionContext)
-  extends BaseUserAnswersRepository(
+  extends BaseUserAnswersRepositoryImpl(
     collectionName = "change-destination-user-answers",
     ttl = appConfig.changeDestinationUserAnswersTTL(),
     replaceIndexes = appConfig.changeDestinationUserAnswersReplaceIndexes()

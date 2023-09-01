@@ -34,7 +34,7 @@ class GetMovementRepositorySpec
 
   private val userAnswers = GetMovementMongoResponse(testArc, JsString(getMovementResponseBody), Instant.ofEpochSecond(1))
 
-  protected override val repository = new GetMovementRepository(
+  protected override val repository = new GetMovementRepositoryImpl(
     mongoComponent = mongoComponent,
     appConfig = mockAppConfig,
     time = timeMachine

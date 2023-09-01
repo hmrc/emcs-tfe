@@ -31,7 +31,7 @@ class BaseUserAnswersRepositorySpec extends RepositoryBaseSpec[UserAnswers] {
   val userAnswers = UserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
   val timeMachine: TimeMachine = () => instantNow
 
-  protected override val repository: BaseUserAnswersRepository = new BaseUserAnswersRepository(
+  protected override val repository: BaseUserAnswersRepositoryImpl = new BaseUserAnswersRepositoryImpl(
     collectionName = "test-user-answers",
     ttl = Duration(testTtl),
     replaceIndexes = testReplaceIndexes

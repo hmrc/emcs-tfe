@@ -16,25 +16,23 @@
 
 package uk.gov.hmrc.emcstfe.mocks.repository
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.when
-import org.mockito.stubbing.OngoingStubbing
-import org.specs2.mock.Mockito.mock
+import org.scalamock.handlers.CallHandler1
+import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.repositories.GetMovementRepository
 
 import scala.concurrent.Future
 
-trait MockGetMovementRepository {
+trait MockGetMovementRepository extends MockFactory {
 
   lazy val mockRepo: GetMovementRepository = mock[GetMovementRepository]
 
   object MockGetMovementRepository {
-    def set(): OngoingStubbing[Future[GetMovementMongoResponse]] =
-      when(mockRepo.set(any()))
+    def set(): CallHandler1[GetMovementMongoResponse, Future[GetMovementMongoResponse]] =
+      (mockRepo.set(_: GetMovementMongoResponse)).expects(*)
 
-    def get(arc: String): OngoingStubbing[Future[Option[GetMovementMongoResponse]]] =
-      when(mockRepo.get(eqTo(arc)))
+    def get(arc: String): CallHandler1[String, Future[Option[GetMovementMongoResponse]]] =
+      (mockRepo.get(_: String)).expects(arc)
   }
 }
 
