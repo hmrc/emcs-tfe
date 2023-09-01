@@ -6,10 +6,10 @@ object AppDependencies {
 
   val boostrapVersion   =  "7.21.0"
   val xtractVersion     =  "2.2.1"
-  val hmrcMongoVersion  =  "0.74.0"
+  val hmrcMongoVersion  =  "1.0.0"
   val scalamockVersion  =  "5.2.0"
   val catsCoreVersion   =  "2.3.1"
-  val scalatestVersion  =  "3.2.15"
+  val scalatestVersion  =  "3.2.16"
   val flexmarkVersion   =  "0.62.2"
 
   val compile: Seq[ModuleID] = Seq(
@@ -24,7 +24,7 @@ object AppDependencies {
     "org.scalamock"         %%  "scalamock"                     % scalamockVersion        % "test, it",
     "com.lucidchart"        %%  "xtract-testing"                % xtractVersion           % "test, it",
     "org.scalatest"         %%  "scalatest"                     % scalatestVersion        % "test, it",
-    "org.scalatestplus"     %%  "mockito-4-6"                   % s"$scalatestVersion.0"  % "test",
+    "org.scalatestplus"     %%  "mockito-4-11"                  % s"$scalatestVersion.0"  % "test",
     "com.vladsch.flexmark"  %   "flexmark-all"                  % flexmarkVersion         % "test",
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-test$playSuffix"    % hmrcMongoVersion        % "it"
   )
