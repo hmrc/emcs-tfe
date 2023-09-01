@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import uk.gov.hmrc.emcstfe.models.common.DestinationType._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class DestinationTypeSpec extends UnitSpec {
+class DestinationTypeSpec extends TestBaseSpec {
 
   "DestinationType" should {
 

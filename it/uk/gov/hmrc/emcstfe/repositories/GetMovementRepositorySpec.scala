@@ -18,14 +18,12 @@ package uk.gov.hmrc.emcstfe.repositories
 
 import org.mongodb.scala.model.Filters
 import play.api.libs.json.JsString
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import scala.concurrent.duration.Duration
 
 class GetMovementRepositorySpec
   extends RepositoryBaseSpec[GetMovementMongoResponse]
@@ -35,16 +33,6 @@ class GetMovementRepositorySpec
   private val timeMachine: TimeMachine = () => instantNow
 
   private val userAnswers = GetMovementMongoResponse(testArc, JsString(getMovementResponseBody), Instant.ofEpochSecond(1))
-
-  private val mockAppConfig = mock[AppConfig]
-  (() => mockAppConfig.getMovementTTL(): Duration)
-    .expects()
-    .returns(Duration("1seconds"))
-    .anyNumberOfTimes()
-  (() => mockAppConfig.getMovementReplaceIndexes(): Boolean)
-    .expects()
-    .returns(true)
-    .anyNumberOfTimes()
 
   protected override val repository = new GetMovementRepository(
     mongoComponent = mongoComponent,

@@ -22,11 +22,11 @@ import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitChangeDestinationServiceSpec extends UnitSpec with SubmitChangeDestinationFixtures {
+class SubmitChangeDestinationServiceSpec extends TestBaseSpec with SubmitChangeDestinationFixtures {
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 

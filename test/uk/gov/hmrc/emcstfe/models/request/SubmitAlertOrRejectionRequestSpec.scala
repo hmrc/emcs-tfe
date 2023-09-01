@@ -18,12 +18,12 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitAlertOrRejectionRequestSpec extends UnitSpec with SubmitAlertOrRejectionFixtures {
+class SubmitAlertOrRejectionRequestSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
 
   val request = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
 

@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.services.userAnswers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.repositories.ExplainDelayUserAnswersRepository
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class ExplainDelayUserAnswersServiceSpec extends UnitSpec with GuiceOneAppPerSuite {
+class ExplainDelayUserAnswersServiceSpec extends TestBaseSpec with GuiceOneAppPerSuite {
 
   "ExplainDelayUserAnswersService" must {
 

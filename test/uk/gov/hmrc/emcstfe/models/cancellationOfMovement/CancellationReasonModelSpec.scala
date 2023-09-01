@@ -17,11 +17,11 @@
 package uk.gov.hmrc.emcstfe.models.cancellationOfMovement
 
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.CancellationReasonType.TypingError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 
-class CancellationReasonModelSpec extends UnitSpec {
+class CancellationReasonModelSpec extends TestBaseSpec {
 
   "CancellationReasonModel" must {
     ".toXML" when {

@@ -26,13 +26,13 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval, ~}
 import uk.gov.hmrc.emcstfe.config.EnrolmentKeys
 import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthActionSpec extends UnitSpec with BaseFixtures {
+class AuthActionSpec extends TestBaseSpec with BaseFixtures {
 
   lazy val bodyParsers = app.injector.instanceOf[BodyParsers.Default]
   implicit lazy val messagesApi = app.injector.instanceOf[MessagesApi]

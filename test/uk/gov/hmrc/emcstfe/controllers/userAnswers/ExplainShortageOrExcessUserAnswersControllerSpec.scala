@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.ExplainShortageOrExcessUserAnswersService
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class ExplainShortageOrExcessUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
+class ExplainShortageOrExcessUserAnswersControllerSpec extends TestBaseSpec with GuiceOneAppPerSuite {
 
   "ExplainShortageOrExcessUserAnswersController" must {
 

@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class GetMovementListSearchOptionsSpec extends UnitSpec {
+class GetMovementListSearchOptionsSpec extends TestBaseSpec {
 
   val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions())
 

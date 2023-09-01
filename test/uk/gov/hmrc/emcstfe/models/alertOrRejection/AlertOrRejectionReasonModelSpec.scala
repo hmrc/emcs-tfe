@@ -17,11 +17,11 @@
 package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 
-class AlertOrRejectionReasonModelSpec extends UnitSpec {
+class AlertOrRejectionReasonModelSpec extends TestBaseSpec {
 
   "AlertOrRejectionReasonModel" must {
 

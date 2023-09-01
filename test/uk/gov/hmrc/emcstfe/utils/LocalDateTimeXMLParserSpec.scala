@@ -17,13 +17,13 @@
 package uk.gov.hmrc.emcstfe.utils
 
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader.LocalDateTimeParseFailure
 
 import java.time.LocalDateTime
 import scala.xml.Elem
 
-class LocalDateTimeXMLParserSpec extends UnitSpec {
+class LocalDateTimeXMLParserSpec extends TestBaseSpec {
 
   "LocalDateTimeXMLParser" must {
 

@@ -25,11 +25,11 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitReportOfReceiptService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitReportOfReceiptControllerSpec extends UnitSpec with MockSubmitReportOfReceiptService with SubmitReportOfReceiptFixtures with FakeAuthAction {
+class SubmitReportOfReceiptControllerSpec extends TestBaseSpec with MockSubmitReportOfReceiptService with SubmitReportOfReceiptFixtures with FakeAuthAction {
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/report-of-receipt").withBody(Json.toJson(maxSubmitReportOfReceiptModel))

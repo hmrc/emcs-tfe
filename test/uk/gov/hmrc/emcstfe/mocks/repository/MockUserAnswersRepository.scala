@@ -19,13 +19,13 @@ package uk.gov.hmrc.emcstfe.mocks.repository
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
-import org.scalatestplus.mockito.MockitoSugar
+import org.specs2.mock.Mockito.mock
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.repositories.BaseUserAnswersRepository
 
 import scala.concurrent.Future
 
-trait MockUserAnswersRepository extends MockitoSugar  {
+trait MockUserAnswersRepository {
 
   val mockRepo: BaseUserAnswersRepository = mock[BaseUserAnswersRepository]
 

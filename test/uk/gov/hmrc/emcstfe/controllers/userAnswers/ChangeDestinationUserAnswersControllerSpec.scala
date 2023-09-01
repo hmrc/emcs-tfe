@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.ChangeDestinationUserAnswersService
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class ChangeDestinationUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
+class ChangeDestinationUserAnswersControllerSpec extends TestBaseSpec with GuiceOneAppPerSuite {
 
   "ChangeDestinationUserAnswersController" must {
 

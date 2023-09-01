@@ -20,11 +20,11 @@ import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.utils.MockHMRCMarkUtil
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MarkCreationError, MarkPlacementError, MinifyXmlError, SoapExtractionError, XmlParseError}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.{Elem, NodeSeq, XML}
 
-class XmlUtilsSpec extends UnitSpec with GetMovementFixture with MockHMRCMarkUtil {
+class XmlUtilsSpec extends TestBaseSpec with GetMovementFixture with MockHMRCMarkUtil {
   trait Test {
     val xmlUtils = new XmlUtils(mockHMRCMarkUtil)
   }

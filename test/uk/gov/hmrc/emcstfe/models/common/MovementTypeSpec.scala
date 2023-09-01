@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import uk.gov.hmrc.emcstfe.models.common.MovementType._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class MovementTypeSpec extends UnitSpec {
+class MovementTypeSpec extends TestBaseSpec {
 
   "MovementType" should {
 

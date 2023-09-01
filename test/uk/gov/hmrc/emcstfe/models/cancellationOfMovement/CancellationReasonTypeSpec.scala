@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.models.cancellationOfMovement
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.CancellationReasonType._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class CancellationReasonTypeSpec extends UnitSpec with SubmitExplainDelayFixtures {
+class CancellationReasonTypeSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
 
   "CancellationReasonType" must {
 

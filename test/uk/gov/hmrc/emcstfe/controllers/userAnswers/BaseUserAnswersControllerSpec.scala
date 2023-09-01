@@ -26,13 +26,13 @@ import uk.gov.hmrc.emcstfe.mocks.services.MockUserAnswersService
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 import uk.gov.hmrc.emcstfe.services.userAnswers.BaseUserAnswersService
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.{ExecutionContext, Future}
 
-class BaseUserAnswersControllerSpec extends UnitSpec
+class BaseUserAnswersControllerSpec extends TestBaseSpec
   with MockUserAnswersService
   with FakeAuthAction {
 

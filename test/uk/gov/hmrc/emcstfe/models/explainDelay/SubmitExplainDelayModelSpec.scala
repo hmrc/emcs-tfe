@@ -20,11 +20,11 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 
-class SubmitExplainDelayModelSpec extends UnitSpec with SubmitExplainDelayFixtures {
+class SubmitExplainDelayModelSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
 
   implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
 

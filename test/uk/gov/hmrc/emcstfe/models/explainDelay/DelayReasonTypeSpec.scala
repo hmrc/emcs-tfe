@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.models.explainDelay
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class DelayReasonTypeSpec extends UnitSpec with SubmitExplainDelayFixtures {
+class DelayReasonTypeSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
 
   "DelayReasonType" must {
 

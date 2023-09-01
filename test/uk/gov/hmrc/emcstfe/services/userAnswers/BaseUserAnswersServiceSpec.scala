@@ -22,12 +22,12 @@ import uk.gov.hmrc.emcstfe.mocks.repository.MockUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 import uk.gov.hmrc.emcstfe.repositories.BaseUserAnswersRepository
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.Instant
 import scala.concurrent.Future
 
-class BaseUserAnswersServiceSpec extends UnitSpec with GetMovementListFixture with MockUserAnswersRepository {
+class BaseUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixture with MockUserAnswersRepository {
 
   val service = new BaseUserAnswersService {
     override val repo: BaseUserAnswersRepository = mockRepo

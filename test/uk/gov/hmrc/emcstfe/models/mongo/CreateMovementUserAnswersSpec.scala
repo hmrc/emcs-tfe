@@ -18,13 +18,13 @@ package uk.gov.hmrc.emcstfe.models.mongo
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class CreateMovementUserAnswersSpec extends UnitSpec with BaseFixtures {
+class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures {
 
   val instant: Instant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 

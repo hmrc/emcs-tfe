@@ -35,12 +35,12 @@ package uk.gov.hmrc.emcstfe.models.request
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementType}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitCreateMovementRequestSpec extends UnitSpec with CreateMovementFixtures {
+class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFixtures {
 
   val consigneeTraderCountryCode = "AA"
   val placeOfDispatchTraderCountryCode = "BB"

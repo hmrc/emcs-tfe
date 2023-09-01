@@ -26,11 +26,11 @@ import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitExplainShortageExcessService
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitExplainShortageExcessControllerSpec extends UnitSpec with MockSubmitExplainShortageExcessService with SubmitExplainShortageExcessFixtures with FakeAuthAction {
+class SubmitExplainShortageExcessControllerSpec extends TestBaseSpec with MockSubmitExplainShortageExcessService with SubmitExplainShortageExcessFixtures with FakeAuthAction {
 
   import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 

@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.utils
 
 import com.lucidchart.open.xtract._
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlParseError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class XmlResultParserSpec extends UnitSpec {
+class XmlResultParserSpec extends TestBaseSpec {
 
   ".handleParseResult" must {
 

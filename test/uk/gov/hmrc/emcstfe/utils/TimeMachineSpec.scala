@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.utils
 
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.Instant
 
-class TimeMachineSpec extends UnitSpec {
+class TimeMachineSpec extends TestBaseSpec {
 
   lazy val tardis = app.injector.instanceOf[TimeMachine]
 

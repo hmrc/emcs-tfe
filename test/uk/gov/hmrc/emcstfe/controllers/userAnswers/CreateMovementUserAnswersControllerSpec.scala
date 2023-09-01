@@ -24,13 +24,13 @@ import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
 import uk.gov.hmrc.emcstfe.mocks.services.MockCreateMovementUserAnswersService
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.Future
 
-class CreateMovementUserAnswersControllerSpec extends UnitSpec with MockCreateMovementUserAnswersService with FakeAuthAction {
+class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCreateMovementUserAnswersService with FakeAuthAction {
 
   private val fakeRequest = FakeRequest("GET", "/user-answers/create-movement/:ern/:lrn")
   private val controller = new CreateMovementUserAnswersController(

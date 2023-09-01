@@ -17,12 +17,12 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitExplainDelayRequestSpec extends UnitSpec with SubmitExplainDelayFixtures {
+class SubmitExplainDelayRequestSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
 
   val request = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
 

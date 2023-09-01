@@ -26,11 +26,11 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitAlertOrRejectionService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitAlertOrRejectionControllerSpec extends UnitSpec with MockSubmitAlertOrRejectionService with SubmitAlertOrRejectionFixtures with FakeAuthAction {
+class SubmitAlertOrRejectionControllerSpec extends TestBaseSpec with MockSubmitAlertOrRejectionService with SubmitAlertOrRejectionFixtures with FakeAuthAction {
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/explain-delay").withBody(Json.toJson(maxSubmitAlertOrRejectionModel))

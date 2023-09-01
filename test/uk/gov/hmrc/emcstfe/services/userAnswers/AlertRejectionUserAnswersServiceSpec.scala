@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.services.userAnswers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.repositories.AlertRejectionUserAnswersRepository
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class AlertRejectionUserAnswersServiceSpec extends UnitSpec with GuiceOneAppPerSuite {
+class AlertRejectionUserAnswersServiceSpec extends TestBaseSpec with GuiceOneAppPerSuite {
 
   "AlertRejectionUserAnswersService" must {
 

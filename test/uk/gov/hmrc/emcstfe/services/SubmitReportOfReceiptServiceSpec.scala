@@ -25,11 +25,11 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{Refused, Satisfactory, Unsatisfactory}
 import uk.gov.hmrc.emcstfe.models.request.SubmitReportOfReceiptRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitReportOfReceiptServiceSpec extends UnitSpec with SubmitReportOfReceiptFixtures with MockMetricsService {
+class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfReceiptFixtures with MockMetricsService {
   trait Test extends MockChrisConnector with MockAppConfig {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)

@@ -17,11 +17,11 @@
 package uk.gov.hmrc.emcstfe.config
 
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.duration.Duration
 
-class AppConfigSpec extends UnitSpec with FeatureSwitching {
+class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
 
   lazy val config = app.injector.instanceOf[AppConfig]
 

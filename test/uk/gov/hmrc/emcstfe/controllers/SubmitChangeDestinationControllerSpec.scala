@@ -25,11 +25,11 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitChangeDestinationService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitChangeDestinationControllerSpec extends UnitSpec with MockSubmitChangeDestinationService with SubmitChangeDestinationFixtures with FakeAuthAction {
+class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmitChangeDestinationService with SubmitChangeDestinationFixtures with FakeAuthAction {
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 

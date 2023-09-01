@@ -22,11 +22,11 @@ import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitAlertOrRejectionRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitAlertOrRejectionServiceSpec extends UnitSpec with SubmitAlertOrRejectionFixtures {
+class SubmitAlertOrRejectionServiceSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
   trait Test extends MockChrisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitAlertOrRejectionRequest: SubmitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)

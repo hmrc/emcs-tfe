@@ -25,11 +25,11 @@ import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.services.MockGetMovementService
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class GetMovementControllerSpec extends UnitSpec with MockGetMovementService with GetMovementFixture with FakeAuthAction {
+class GetMovementControllerSpec extends TestBaseSpec with MockGetMovementService with GetMovementFixture with FakeAuthAction {
 
   private val fakeRequest = FakeRequest("GET", "/movement/:ern/:arc")
   private val controller = new GetMovementController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)

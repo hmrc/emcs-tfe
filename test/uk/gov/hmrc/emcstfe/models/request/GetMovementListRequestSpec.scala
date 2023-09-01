@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.XML
 
-class GetMovementListRequestSpec extends UnitSpec {
+class GetMovementListRequestSpec extends TestBaseSpec {
 
   val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions())
 

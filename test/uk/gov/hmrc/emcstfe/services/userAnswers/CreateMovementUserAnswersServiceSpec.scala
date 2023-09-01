@@ -21,12 +21,12 @@ import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.Instant
 import scala.concurrent.Future
 
-class CreateMovementUserAnswersServiceSpec extends UnitSpec with GetMovementListFixture {
+class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixture {
   trait Test extends MockCreateMovementUserAnswersRepository {
     val service: CreateMovementUserAnswersService = new CreateMovementUserAnswersService(mockRepo)
   }
