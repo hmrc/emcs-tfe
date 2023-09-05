@@ -20,16 +20,13 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, ExciseMovementModel, TraderModel, XmlBaseModel}
 
-import java.time.LocalDate
 import scala.xml.{Elem, NodeSeq}
 
-case class SubmitCancellationOfMovementModel(dateAndTimeOfValidationOfCancellation: LocalDate,
-                                             exciseMovement: ExciseMovementModel,
+case class SubmitCancellationOfMovementModel(exciseMovement: ExciseMovementModel,
                                              cancellationReason: CancellationReasonModel,
                                              consigneeTrader: Option[TraderModel],
                                              destinationType: DestinationType,
-                                             memberStateCode: String
-                                            ) extends XmlBaseModel {
+                                             memberStateCode: Option[String]) extends XmlBaseModel {
 
   def toXml(implicit request: UserRequest[_]): Elem =
     <urn:CancellationOfEAD>

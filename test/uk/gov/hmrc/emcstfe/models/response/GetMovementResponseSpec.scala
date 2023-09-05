@@ -66,6 +66,9 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<urn:ConsigneeTrader language="en">
             |							${maxTraderModelXML(ConsigneeTrader)}
             |						</urn:ConsigneeTrader>
+            |           <body:ComplementConsigneeTrader>
+            |             <MemberStateCode>GB</MemberStateCode>
+            |           </body:ComplementConsigneeTrader>
             |						<urn:ExciseMovement>
             |							<urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
             |							<urn:DateAndTimeOfValidationOfEad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEad>
@@ -275,6 +278,9 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |            <urn:ConsigneeTrader language="en">
             |              ${maxTraderModelXML(ConsigneeTrader)}
             |            </urn:ConsigneeTrader>
+            |            <body:ComplementConsigneeTrader>
+            |              <MemberStateCode>GB</MemberStateCode>
+            |            </body:ComplementConsigneeTrader>
             |            <urn:ExciseMovement>
             |              <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
             |              <urn:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEadEsad>
@@ -434,6 +440,9 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |            <urn:ConsigneeTrader language="en">
             |              ${maxTraderModelXML(ConsigneeTrader)}
             |            </urn:ConsigneeTrader>
+            |            <body:ComplementConsigneeTrader>
+            |              <MemberStateCode>GB</MemberStateCode>
+            |            </body:ComplementConsigneeTrader>
             |            <urn:ExciseMovement>
             |              <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
             |              <urn:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEadEsad>
@@ -601,6 +610,9 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<urn:ConsigneeTrader language="en">
             |							${maxTraderModelXML(ConsigneeTrader)}
             |						</urn:ConsigneeTrader>
+            |           <body:ComplementConsigneeTrader>
+            |             <MemberStateCode>GB</MemberStateCode>
+            |           </body:ComplementConsigneeTrader>
             |						<urn:ExciseMovement>
             |							<urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
             |							<urn:DateAndTimeOfValidationOfEad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEad>
@@ -725,6 +737,9 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<urn:ConsigneeTrader language="en">
             |							${maxTraderModelXML(ConsigneeTrader)}
             |						</urn:ConsigneeTrader>
+            |           <body:ComplementConsigneeTrader>
+            |             <MemberStateCode>GB</MemberStateCode>
+            |           </body:ComplementConsigneeTrader>
             |						<urn:ExciseMovement>
             |							<urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
             |							<urn:DateAndTimeOfValidationOfEad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEad>
@@ -848,6 +863,9 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<urn:ConsigneeTrader language="en">
             |							${maxTraderModelXML(ConsigneeTrader)}
             |						</urn:ConsigneeTrader>
+            |           <body:ComplementConsigneeTrader>
+            |             <MemberStateCode>GB</MemberStateCode>
+            |           </body:ComplementConsigneeTrader>
             |						<urn:ExciseMovement>
             |							<urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
             |							<urn:DateAndTimeOfValidationOfEad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEad>
@@ -971,6 +989,9 @@ class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
             |						<urn:ConsigneeTrader language="en">
             |							${maxTraderModelXML(ConsigneeTrader)}
             |						</urn:ConsigneeTrader>
+            |           <body:ComplementConsigneeTrader>
+            |             <MemberStateCode>GB</MemberStateCode>
+            |           </body:ComplementConsigneeTrader>
             |						<urn:ExciseMovement>
             |							<urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
             |							<urn:DateAndTimeOfValidationOfEad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEad>
