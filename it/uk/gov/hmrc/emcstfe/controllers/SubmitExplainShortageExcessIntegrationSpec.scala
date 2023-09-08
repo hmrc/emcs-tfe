@@ -22,6 +22,7 @@ import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
@@ -54,7 +55,7 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(chrisSuccessSOAPResponseBody))
         }
 
-        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax))
+        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax(Consignor)))
         response.status shouldBe Status.OK
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe chrisSuccessJsonNoLRN
@@ -67,7 +68,7 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, <Message>Success!</Message>)
         }
 
-        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax))
+        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax(Consignor)))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(ChRISSuccessResponse.digestValue), EmptyError(ChRISSuccessResponse.receiptDateTime), EmptyError(ChRISSuccessResponse.digestValue))))
@@ -80,7 +81,7 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, responseBody)
         }
 
-        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax))
+        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax(Consignor)))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe Json.toJson(XmlValidationError)
@@ -99,7 +100,7 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
         }
 
-        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax))
+        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax(Consignor)))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)

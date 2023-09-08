@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.{Consignee, Consignor}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
@@ -32,21 +33,12 @@ case class SubmitExplainShortageExcessModel(attributes: AttributesModel,
                                            ) extends XmlBaseModel with XmlWriterUtils {
 
   def toXml(implicit request: UserRequest[_]): Elem =
-    <urn:ExplanationOnReasonForShortage>
-      {attributes.toXml}
-      {consigneeTrader.mapNodeSeq(trader =>
-        <urn:ConsigneeTrader language="en">
-          {trader.toXml(ConsigneeTrader)}
-        </urn:ConsigneeTrader>
-      )}
-      {exciseMovement.toXml}
-      {consignorTrader.mapNodeSeq(trader =>
-        <urn:ConsignorTrader language="en">
-          {trader.toXml(ConsignorTrader)}
-        </urn:ConsignorTrader>
-      )}
-      {analysis.mapNodeSeq(_.toXml)}
-      {bodyAnalysis.mapNodeSeq(_.map(_.toXml))}
+      <urn:ExplanationOnReasonForShortage>
+        {attributes.toXml}
+        {if (attributes.submitterType == Consignee)consigneeTrader.mapNodeSeq(trader => <urn:ConsigneeTrader language="en">{trader.toXml(ConsigneeTrader)}</urn:ConsigneeTrader>)}
+        {exciseMovement.toXml}
+        {if (attributes.submitterType == Consignor) consignorTrader.mapNodeSeq(trader => <urn:ConsignorTrader language="en">{trader.toXml(ConsignorTrader)}</urn:ConsignorTrader>)}
+        {analysis.mapNodeSeq(_.toXml)}{bodyAnalysis.mapNodeSeq(_.map(_.toXml))}
     </urn:ExplanationOnReasonForShortage>
 }
 

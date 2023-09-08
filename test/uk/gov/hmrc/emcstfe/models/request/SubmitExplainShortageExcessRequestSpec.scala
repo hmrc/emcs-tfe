@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitExplainShortageExcessFixtures, TraderModelFixtures}
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, SubmitterType, TraderModel}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.AttributesModel
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -28,53 +29,66 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
 
   import SubmitExplainShortageExcessFixtures._
 
-  val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax)
-
   "requestBody" should {
 
-    "generate the correct request XML" in {
+    "generate the correct request XML" when {
 
-      val expectedSoapRequest =
-        <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-          <soapenv:Header>
-            <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
-              <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
-              <ns:VendorID>1259</ns:VendorID>
-              <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
-              <ns:ServiceID>1138</ns:ServiceID>
-              <ns:ServiceMessageType>HMRC-EMCS-IE871-DIRECT</ns:ServiceMessageType>
-            </ns:Info>
-            <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-              <CredentialID>{testCredId}</CredentialID>
-              <Identifier>{testErn}</Identifier>
-            </MetaData>
-          </soapenv:Header>
-          <soapenv:Body>
-            <urn:IE871 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.01">
-              <urn:Header>
-                <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
-                <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>
-                <urn1:DateOfPreparation>
-                  {request.preparedDate.toString}
-                </urn1:DateOfPreparation>
-                <urn1:TimeOfPreparation>
-                  {request.preparedTime.toString}
-                </urn1:TimeOfPreparation>
-                <urn1:MessageIdentifier>
-                  {request.messageUUID}
-                </urn1:MessageIdentifier>
-                <urn1:CorrelationIdentifier>
-                  {request.correlationUUID}
-                </urn1:CorrelationIdentifier>
-              </urn:Header>
-              <urn:Body>
-                {submitExplainShortageExcessXmlMax}
-              </urn:Body>
-            </urn:IE871>
-          </soapenv:Body>
-        </soapenv:Envelope>
+      SubmitterType.values.foreach { submitter =>
 
-      trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+        s"the submitter type = ${submitter.getClass.getSimpleName}" in {
+          val submitterRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(submitter))
+
+          val expectedSoapRequest =
+            <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+              <soapenv:Header>
+                <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
+                  <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
+                  <ns:VendorID>1259</ns:VendorID>
+                  <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
+                  <ns:ServiceID>1138</ns:ServiceID>
+                  <ns:ServiceMessageType>HMRC-EMCS-IE871-DIRECT</ns:ServiceMessageType>
+                </ns:Info>
+                <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
+                  <CredentialID>
+                    {testCredId}
+                  </CredentialID>
+                  <Identifier>
+                    {testErn}
+                  </Identifier>
+                </MetaData>
+              </soapenv:Header>
+              <soapenv:Body>
+                <urn:IE871 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.01">
+                  <urn:Header>
+                    <urn1:MessageSender>
+                      {submitterRequest.messageSender}
+                    </urn1:MessageSender>
+                    <urn1:MessageRecipient>
+                      {submitterRequest.messageRecipient}
+                    </urn1:MessageRecipient>
+                    <urn1:DateOfPreparation>
+                      {submitterRequest.preparedDate.toString}
+                    </urn1:DateOfPreparation>
+                    <urn1:TimeOfPreparation>
+                      {submitterRequest.preparedTime.toString}
+                    </urn1:TimeOfPreparation>
+                    <urn1:MessageIdentifier>
+                      {submitterRequest.messageUUID}
+                    </urn1:MessageIdentifier>
+                    <urn1:CorrelationIdentifier>
+                      {submitterRequest.correlationUUID}
+                    </urn1:CorrelationIdentifier>
+                  </urn:Header>
+                  <urn:Body>
+                    {submitExplainShortageExcessXmlMax(submitter)}
+                  </urn:Body>
+                </urn:IE871>
+              </soapenv:Body>
+            </soapenv:Envelope>
+
+          trim(XML.loadString(submitterRequest.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+        }
+      }
     }
 
     "for the MessageSender and MessageRecipient headers" when {
@@ -84,7 +98,7 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
       val defaultConsigneeTraderModel = maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some(idErn))
 
       def model(submitterType: SubmitterType, consigneeTrader: Option[TraderModel] = Some(defaultConsigneeTraderModel)) =
-        submitExplainShortageExcessModelMax
+        submitExplainShortageExcessModelMax(submitterType)
           .copy(attributes = AttributesModel(submitterType))
           .copy(
             exciseMovement = ExciseMovementFixtures.exciseMovementModel.copy(arc = idArc),
@@ -144,24 +158,34 @@ class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplain
           }
         }
       }
-    }
-  }
 
-  ".action" should {
-    "be correct" in {
-      request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitreasonforshortageportal"
-    }
-  }
 
-  ".shouldExtractFromSoap" should {
-    "be correct" in {
-      request.shouldExtractFromSoap shouldBe false
-    }
-  }
+      ".action" should {
+        "be correct" in {
+          val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
+          request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitreasonforshortageportal"
+        }
+      }
 
-  ".exciseRegistrationNumber" should {
-    "be correct" in {
-      request.exciseRegistrationNumber shouldBe testErn
+      ".shouldExtractFromSoap" should {
+        "be correct" in {
+          val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
+          request.shouldExtractFromSoap shouldBe false
+        }
+      }
+
+      ".exciseRegistrationNumber" should {
+        "be correct" in {
+          val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
+          request.exciseRegistrationNumber shouldBe testErn
+        }
+
+
+      }
     }
   }
 }
+
+
+
+

@@ -18,14 +18,22 @@ package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.models.XmlModelBaseSpec
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.{Consignee, Consignor}
 
 class AttributesModelSpec extends XmlModelBaseSpec with SubmitExplainShortageExcessFixtures {
   import AttributesFixtures._
 
   testJsonToModelToXml(
-    scenario = "max fields",
-    json = attributesJson,
-    model = attributesModel,
-    xml = attributesXml
+    scenario = "Consignor max fields",
+    json = attributesJson(Consignor),
+    model = attributesModel(Consignor),
+    xml = attributesXml(Consignor)
+  )
+
+  testJsonToModelToXml(
+    scenario = "Consignee max fields",
+    json = attributesJson(Consignee),
+    model = attributesModel(Consignee),
+    xml = attributesXml(Consignee)
   )
 }

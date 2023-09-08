@@ -20,6 +20,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
@@ -32,7 +33,7 @@ class SubmitExplainShortageExcessServiceSpec extends UnitSpec with SubmitExplain
 
   trait Test extends MockChrisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax)
+    val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
     val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockConnector)
   }
 
@@ -44,7 +45,7 @@ class SubmitExplainShortageExcessServiceSpec extends UnitSpec with SubmitExplain
           Future.successful(Right(chrisSuccessResponse))
         )
 
-        await(service.submit(submitExplainShortageExcessModelMax)) shouldBe Right(chrisSuccessResponse)
+        await(service.submit(submitExplainShortageExcessModelMax(Consignor))) shouldBe Right(chrisSuccessResponse)
       }
     }
     "return a Left" when {
@@ -54,7 +55,7 @@ class SubmitExplainShortageExcessServiceSpec extends UnitSpec with SubmitExplain
           Future.successful(Left(XmlValidationError))
         )
 
-        await(service.submit(submitExplainShortageExcessModelMax)) shouldBe Left(XmlValidationError)
+        await(service.submit(submitExplainShortageExcessModelMax(Consignor))) shouldBe Left(XmlValidationError)
       }
     }
   }
