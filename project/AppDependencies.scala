@@ -4,7 +4,7 @@ object AppDependencies {
 
   val playSuffix        = s"-play-28"
 
-  val boostrapVersion   =  "7.21.0"
+  val boostrapVersion   =  "7.22.0"
   val xtractVersion     =  "2.2.1"
   val hmrcMongoVersion  =  "1.0.0"
   val scalamockVersion  =  "5.2.0"
