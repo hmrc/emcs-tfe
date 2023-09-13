@@ -24,6 +24,7 @@ import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitExplainShortageExcessService
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
@@ -34,7 +35,7 @@ class SubmitExplainShortageExcessControllerSpec extends UnitSpec with MockSubmit
   import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
   class Fixture(authAction: AuthAction) {
-    val fakeRequest = FakeRequest("POST", "/explain-shortage-excess").withBody(Json.toJson(submitExplainShortageExcessModelMax))
+    val fakeRequest = FakeRequest("POST", "/explain-shortage-excess").withBody(Json.toJson(submitExplainShortageExcessModelMax(Consignor)))
     val controller = new SubmitExplainShortageExcessController(Helpers.stubControllerComponents(), mockService, authAction)
   }
 
@@ -44,7 +45,7 @@ class SubmitExplainShortageExcessControllerSpec extends UnitSpec with MockSubmit
       s"return ${Status.OK} (OK)" when {
         "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-          MockService.submit(submitExplainShortageExcessModelMax).returns(Future.successful(Right(chrisSuccessResponse)))
+          MockService.submit(submitExplainShortageExcessModelMax(Consignor)).returns(Future.successful(Right(chrisSuccessResponse)))
 
           val result = controller.submit(testErn, testArc)(fakeRequest)
 
@@ -55,7 +56,7 @@ class SubmitExplainShortageExcessControllerSpec extends UnitSpec with MockSubmit
       s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
         "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
 
-          MockService.submit(submitExplainShortageExcessModelMax).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+          MockService.submit(submitExplainShortageExcessModelMax(Consignor)).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
           val result = controller.submit(testErn, testArc)(fakeRequest)
 

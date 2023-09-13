@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.{Consignee, Consignor}
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, ExciseMovementModel, SubmitterType}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, AttributesModel, BodyAnalysisModel, SubmitExplainShortageExcessModel}
 
@@ -25,16 +26,16 @@ import scala.xml.Elem
 trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with TraderModelFixtures {
 
   object AttributesFixtures {
-    val attributesModel: AttributesModel = AttributesModel(
-      submitterType = SubmitterType.Consignor
+    def attributesModel(submitterType: SubmitterType): AttributesModel = AttributesModel(
+      submitterType = submitterType
     )
 
-    val attributesXml: Elem = <urn:Attributes>
-      <urn:SubmitterType>1</urn:SubmitterType>
+    def attributesXml(submitterType: SubmitterType): Elem = <urn:Attributes>
+      <urn:SubmitterType>{submitterType}</urn:SubmitterType>
     </urn:Attributes>
 
-    val attributesJson: JsObject = Json.obj(
-      "submitterType" -> "1"
+    def attributesJson(submitterType: SubmitterType): JsObject = Json.obj(
+      "submitterType" -> s"$submitterType"
     )
   }
 
@@ -120,17 +121,17 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
     import BodyAnalysisFixtures._
     import ExciseMovementFixtures._
 
-    val submitExplainShortageExcessModelMax: SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
-      attributes = attributesModel,
-      consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
+    def submitExplainShortageExcessModelMax(submitterType: SubmitterType): SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
+      attributes = attributesModel(submitterType),
+      consigneeTrader = if (submitterType == Consignee) Some(maxTraderModel(ConsigneeTrader)) else None,
       exciseMovement = exciseMovementModel,
-      consignorTrader = Some(maxTraderModel(ConsignorTrader)),
+      consignorTrader = if (submitterType == Consignor) Some(maxTraderModel(ConsignorTrader)) else None,
       analysis = Some(analysisModel),
       bodyAnalysis = Some(Seq(bodyAnalysisModelMax, bodyAnalysisModelMin))
     )
 
-    val submitExplainShortageExcessModelMin: SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
-      attributes = attributesModel,
+    def submitExplainShortageExcessModelMin(submitterType: SubmitterType): SubmitExplainShortageExcessModel = SubmitExplainShortageExcessModel(
+      attributes = attributesModel(submitterType),
       consigneeTrader = None,
       exciseMovement = exciseMovementModel,
       consignorTrader = None,
@@ -138,36 +139,41 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
       bodyAnalysis = None
     )
 
-    val submitExplainShortageExcessXmlMax: Elem = <urn:ExplanationOnReasonForShortage>
-      {attributesXml}
-      <urn:ConsigneeTrader language="en">
-        {maxTraderModelXML(ConsigneeTrader)}
-      </urn:ConsigneeTrader>
-      {exciseMovementXml}
-      <urn:ConsignorTrader language="en">
-        {maxTraderModelXML(ConsignorTrader)}
-      </urn:ConsignorTrader>
-      {analysisXml}
-      {bodyAnalysisXmlMax}
-      {bodyAnalysisXmlMin}
-    </urn:ExplanationOnReasonForShortage>
+    def submitExplainShortageExcessXmlMax(submitterType: SubmitterType): Elem = {
+      <urn:ExplanationOnReasonForShortage>
+        {attributesXml(submitterType)}{if (submitterType == Consignee)
+        <urn:ConsigneeTrader language="en">
+          {maxTraderModelXML(ConsigneeTrader)}
+        </urn:ConsigneeTrader>}{exciseMovementXml}{if (submitterType == Consignor)
+        <urn:ConsignorTrader language="en">
+          {maxTraderModelXML(ConsignorTrader)}
+        </urn:ConsignorTrader>}{analysisXml}{bodyAnalysisXmlMax}{bodyAnalysisXmlMin}
+      </urn:ExplanationOnReasonForShortage>
+    }
 
-    val submitExplainShortageExcessXmlMin: Elem = <urn:ExplanationOnReasonForShortage>
-      {attributesXml}
+    def submitExplainShortageExcessXmlMin(submitterType: SubmitterType): Elem = <urn:ExplanationOnReasonForShortage>
+      {attributesXml(submitterType)}
       {exciseMovementXml}
     </urn:ExplanationOnReasonForShortage>
 
-    val submitExplainShortageExcessJsonMax: JsObject = Json.obj(
-      "attributes" -> attributesJson,
-      "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
-      "exciseMovement" -> exciseMovementJson,
-      "consignorTrader" -> maxTraderModelJson(ConsignorTrader),
-      "analysis" -> analysisJson,
-      "bodyAnalysis" -> Json.arr(bodyAnalysisJsonMax, bodyAnalysisJsonMin)
-    )
+    def submitExplainShortageExcessJsonMax(submitterType: SubmitterType): JsObject = {
+      val jsObject = Json.obj(
+        "attributes" -> attributesJson(submitterType),
+        "exciseMovement" -> exciseMovementJson,
+        "analysis" -> analysisJson,
+        "bodyAnalysis" -> Json.arr(bodyAnalysisJsonMax, bodyAnalysisJsonMin)
+      )
 
-    val submitExplainShortageExcessJsonMin: JsObject = Json.obj(
-      "attributes" -> attributesJson,
+      val traderDetails = submitterType match {
+        case Consignor => "consignorTrader" -> maxTraderModelJson(ConsignorTrader)
+        case Consignee => "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader)
+      }
+
+      jsObject + traderDetails
+    }
+
+    def submitExplainShortageExcessJsonMin(submitterType: SubmitterType): JsObject = Json.obj(
+      "attributes" -> attributesJson(submitterType),
       "exciseMovement" -> exciseMovementJson
     )
   }

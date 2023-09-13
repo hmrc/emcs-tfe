@@ -29,6 +29,7 @@ import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, UnexpectedDownstreamResponseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse, GetMovementResponse}
@@ -517,7 +518,7 @@ class ChrisConnectorSpec extends UnitSpec with Status with MimeTypes with Header
     import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax)
+    val submitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
 
     "return a Right" when {
       "downstream call is successful" in new Test {
