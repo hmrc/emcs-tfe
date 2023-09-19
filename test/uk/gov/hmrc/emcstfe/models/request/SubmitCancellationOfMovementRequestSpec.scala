@@ -47,7 +47,7 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
             </MetaData>
           </soapenv:Header>
           <soapenv:Body>
-            <urn:IE810 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.01">
+            <urn:IE810 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
               <urn:Header>
                 <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
                 <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>

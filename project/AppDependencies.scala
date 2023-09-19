@@ -5,10 +5,10 @@ object AppDependencies {
   val playSuffix        = s"-play-28"
 
   val boostrapVersion   =  "7.22.0"
-  val xtractVersion     =  "2.2.1"
-  val hmrcMongoVersion  =  "1.0.0"
+  val xtractVersion     =  "2.3.0"
+  val hmrcMongoVersion  =  "1.3.0"
   val scalamockVersion  =  "5.2.0"
-  val catsCoreVersion   =  "2.3.1"
+  val catsCoreVersion   =  "2.9.0"
   val flexmarkVersion   =  "0.62.2"
 
   val compile: Seq[ModuleID] = Seq(
@@ -26,6 +26,7 @@ object AppDependencies {
   )
 
   val overrides: Seq[ModuleID] = Seq(
-    "com.google.inject" %   "guice" % "5.1.0"
+    "com.google.inject"      % "guice"          % "5.1.0",
+    "org.scala-lang.modules" % "scala-xml_2.13" % "2.1.0",
   )
 }
