@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import uk.gov.hmrc.emcstfe.models.common.OriginType._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class OriginTypeSpec extends UnitSpec {
+class OriginTypeSpec extends TestBaseSpec {
 
   "OriginType" should {
 

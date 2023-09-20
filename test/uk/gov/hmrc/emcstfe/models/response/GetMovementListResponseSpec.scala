@@ -19,12 +19,12 @@ package uk.gov.hmrc.emcstfe.models.response
 import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess, __}
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader.LocalDateTimeParseFailure
 
 import scala.xml.{Elem, XML}
 
-class GetMovementListResponseSpec extends UnitSpec with GetMovementListFixture {
+class GetMovementListResponseSpec extends TestBaseSpec with GetMovementListFixture {
 
   "writes" should {
     "write a model to JSON" in {

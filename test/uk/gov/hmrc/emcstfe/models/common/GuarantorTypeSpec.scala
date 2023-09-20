@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import uk.gov.hmrc.emcstfe.models.common.GuarantorType._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class GuarantorTypeSpec extends UnitSpec {
+class GuarantorTypeSpec extends TestBaseSpec {
 
   "GuarantorType" should {
 

@@ -28,7 +28,7 @@ class ExplainShortageOrExcessUserAnswersRepository @Inject()(implicit mongoCompo
                                                              appConfig: AppConfig,
                                                              time: TimeMachine,
                                                              ec: ExecutionContext)
-  extends BaseUserAnswersRepository(
+  extends BaseUserAnswersRepositoryImpl(
     collectionName = "explain-shortage-or-excess-user-answers",
     ttl = appConfig.explainShortageOrExcessUserAnswersTTL(),
     replaceIndexes = appConfig.explainShortageOrExcessUserAnswersReplaceIndexes()

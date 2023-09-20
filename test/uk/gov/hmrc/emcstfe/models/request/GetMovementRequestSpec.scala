@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.XML
 
-class GetMovementRequestSpec extends UnitSpec {
+class GetMovementRequestSpec extends TestBaseSpec {
   val request = GetMovementRequest("My ERN", "My ARC")
 
   "requestBody" should {

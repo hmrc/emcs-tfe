@@ -20,12 +20,12 @@ import play.api.libs.json.{JsObject, Reads}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Elem
 import scala.xml.Utility.trim
 
-trait XmlModelBaseSpec extends UnitSpec {
+trait XmlModelBaseSpec extends TestBaseSpec {
   def testJsonToModelToXml[Model <: XmlBaseModel](scenario: String,
                                                   json: JsObject,
                                                   model: Model,

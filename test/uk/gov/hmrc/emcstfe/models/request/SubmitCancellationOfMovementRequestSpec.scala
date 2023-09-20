@@ -19,12 +19,12 @@ package uk.gov.hmrc.emcstfe.models.request
 import uk.gov.hmrc.emcstfe.fixtures.SubmitCancellationOfMovementFixtures
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{ExemptedOrganisations, TaxWarehouse}
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitCancellationOfMovementRequestSpec extends UnitSpec with SubmitCancellationOfMovementFixtures {
+class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCancellationOfMovementFixtures {
 
   val request = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
 

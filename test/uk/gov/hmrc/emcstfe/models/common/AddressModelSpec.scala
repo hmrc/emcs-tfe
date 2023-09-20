@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.AddressModelFixtures
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class AddressModelSpec extends UnitSpec with AddressModelFixtures {
+class AddressModelSpec extends TestBaseSpec with AddressModelFixtures {
 
   "AddressModel" must {
 

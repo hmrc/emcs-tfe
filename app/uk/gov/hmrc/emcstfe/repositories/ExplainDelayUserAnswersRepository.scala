@@ -28,7 +28,7 @@ class ExplainDelayUserAnswersRepository @Inject()(implicit mongoComponent: Mongo
                                                   appConfig: AppConfig,
                                                   time: TimeMachine,
                                                   ec: ExecutionContext)
-  extends BaseUserAnswersRepository(
+  extends BaseUserAnswersRepositoryImpl(
     collectionName = "explain-delay-user-answers",
     ttl = appConfig.explainDelayUserAnswersTTL(),
     replaceIndexes = appConfig.explainDelayUserAnswersReplaceIndexes()

@@ -28,12 +28,12 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MinifyXmlError, SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 import scala.xml.XML
 
-class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMovementIfChangedFixture {
+class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with GetMovementIfChangedFixture {
   trait Test extends MockChrisConnector with MockGetMovementRepository with MockXmlUtils with MockAppConfig {
     lazy val getMovementRequest: GetMovementRequest = GetMovementRequest(exciseRegistrationNumber = testErn, arc = testArc)
     lazy val getMovementIfChangedRequest: GetMovementIfChangedRequest = GetMovementIfChangedRequest(exciseRegistrationNumber = testErn, arc = testArc, sequenceNumber = "1", versionTransactionReference = "008")
@@ -52,7 +52,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
     "forceFetchNew = true" should {
       "return a Right" when {
         "retrieving from mongo returns nothing so a fresh call to GetMovement is made" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -60,14 +60,14 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
           MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-          MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse)
         }
         "retrieving from mongo returns a match so a fresh call to GetMovementIfChanged is made but there is no change" in new Test {
           MockGetMovementRepository
             .get(testArc)
-            .thenReturn(Future.successful(Some(getMovementMongoResponse)))
+            .returns(Future.successful(Some(getMovementMongoResponse)))
 
           MockConnector
             .postChrisSOAPRequest(getMovementIfChangedRequest)
@@ -76,7 +76,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse)
         }
         "retrieving from mongo returns a match so a fresh call to GetMovementIfChanged is made and there is a change" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(Some(getMovementMongoResponse)))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(Some(getMovementMongoResponse)))
 
           MockConnector
             .postChrisSOAPRequest(getMovementIfChangedRequest)
@@ -86,14 +86,14 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
           MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementIfChangedResponseBody))))
 
-          MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementIfChangedResponse)
         }
       }
       "return a Left" when {
         "GetMovement call is unsuccessful" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -102,7 +102,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Left(XmlValidationError)
         }
         "GetMovement call response cannot be extracted" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -111,7 +111,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Left(SoapExtractionError)
         }
         "repository.set fails with MongoException, still return the movement as doesn't matter if cache doesn't store" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -119,12 +119,12 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
           MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-          MockGetMovementRepository.set().thenReturn(Future.failed(new MongoException("Some error")))
+          MockGetMovementRepository.set().returns(Future.failed(new MongoException("Some error")))
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse)
         }
         "repository.set returns some other failed future, still return the movement as doesn't matter if cache doesn't store" in new Test {
-          MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+          MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockConnector
             .postChrisSOAPRequest(getMovementRequest)
@@ -132,7 +132,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
           MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-          MockGetMovementRepository.set().thenReturn(Future.failed(new Exception("Some error")))
+          MockGetMovementRepository.set().returns(Future.failed(new Exception("Some error")))
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse)
         }
@@ -141,7 +141,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
     "forceFetchNew = false" should {
       "fetch from downstream if Mongo returns no data" in new Test {
-        MockGetMovementRepository.get(testArc).thenReturn(Future.successful(None))
+        MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
         MockConnector
           .postChrisSOAPRequest(getMovementRequest)
@@ -149,7 +149,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
         await(service.getMovement(getMovementRequest, forceFetchNew = false)) shouldBe Right(getMovementResponse)
       }
@@ -157,7 +157,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
       "return the Mongo document if Mongo returns data" in new Test {
         MockGetMovementRepository
           .get(testArc)
-          .thenReturn(Future.successful(Some(getMovementMongoResponse)))
+          .returns(Future.successful(Some(getMovementMongoResponse)))
 
         await(service.getMovement(getMovementRequest, forceFetchNew = false)) shouldBe Right(getMovementResponse)
       }
@@ -182,7 +182,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
       "repository returns a success" in new Test {
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
         await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -196,14 +196,14 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
       "repository returns Mongo Exception, still return Right as doesn't matter if storage fails" in new Test {
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.failed(new MongoException("Some error")))
+        MockGetMovementRepository.set().returns(Future.failed(new MongoException("Some error")))
 
         await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
       "repository returns some other failed future, still return Right as doesn't matter if storage fails" in new Test {
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.failed(new Exception("Some error")))
+        MockGetMovementRepository.set().returns(Future.failed(new Exception("Some error")))
 
         await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -223,7 +223,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
         await(service.getNewMovement(getMovementRequest)) shouldBe Right(getMovementResponse)
       }
@@ -251,7 +251,7 @@ class GetMovementServiceSpec extends UnitSpec with GetMovementFixture with GetMo
 
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
-        MockGetMovementRepository.set().thenReturn(Future.successful(getMovementMongoResponse))
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
         await(service.getMovementIfChanged(getMovementRequest, getMovementIfChangedMongoResponse)) shouldBe Right(getMovementIfChangedResponse)
       }

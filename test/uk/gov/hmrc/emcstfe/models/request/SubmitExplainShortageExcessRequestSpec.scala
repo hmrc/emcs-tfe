@@ -20,12 +20,12 @@ import uk.gov.hmrc.emcstfe.fixtures.{SubmitExplainShortageExcessFixtures, Trader
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, SubmitterType, TraderModel}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.AttributesModel
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitExplainShortageExcessRequestSpec extends UnitSpec with SubmitExplainShortageExcessFixtures with TraderModelFixtures {
+class SubmitExplainShortageExcessRequestSpec extends TestBaseSpec with SubmitExplainShortageExcessFixtures with TraderModelFixtures {
 
   import SubmitExplainShortageExcessFixtures._
 

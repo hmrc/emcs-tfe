@@ -19,11 +19,11 @@ package uk.gov.hmrc.emcstfe.models.common
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
 import play.api.libs.json.{JsError, JsNull, JsString, JsSuccess, Json}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.{Days, Hours, JourneyTimeParseFailure}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Elem
 
-class JourneyTimeSpec extends UnitSpec {
+class JourneyTimeSpec extends TestBaseSpec {
 
   ".writes" should {
     "write a Hours model to JSON" in {

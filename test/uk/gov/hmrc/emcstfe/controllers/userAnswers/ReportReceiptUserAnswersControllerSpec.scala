@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.services.userAnswers.ReportReceiptUserAnswersService
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class ReportReceiptUserAnswersControllerSpec extends UnitSpec with GuiceOneAppPerSuite {
+class ReportReceiptUserAnswersControllerSpec extends TestBaseSpec with GuiceOneAppPerSuite {
 
   "ReportReceiptUserAnswersController" must {
 

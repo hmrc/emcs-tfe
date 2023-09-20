@@ -19,12 +19,12 @@ package uk.gov.hmrc.emcstfe.models.request
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitChangeDestinationFixtures, TraderModelFixtures}
 import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitChangeDestinationRequestSpec extends UnitSpec with SubmitChangeDestinationFixtures with TraderModelFixtures {
+class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeDestinationFixtures with TraderModelFixtures {
 
   import DeliveryPlaceCustomsOfficeFixtures._
   import DestinationChangedFixtures._

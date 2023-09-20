@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.libs.json.{JsError, JsNumber, JsString, JsSuccess}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class EnumerableSpec extends UnitSpec with Enumerable.Implicits {
+class EnumerableSpec extends TestBaseSpec with Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[Int] = Enumerable.apply(
     "a" -> 1,

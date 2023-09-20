@@ -19,10 +19,10 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.UnsatisfactoryModelFixtures
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
-class UnsatisfactoryModelSpec extends UnitSpec with UnsatisfactoryModelFixtures {
+class UnsatisfactoryModelSpec extends TestBaseSpec with UnsatisfactoryModelFixtures {
 
   "UnsatisfactoryModel" must {
 

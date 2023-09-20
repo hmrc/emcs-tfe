@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
+import com.google.inject.ImplementedBy
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
@@ -33,18 +34,29 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
+@ImplementedBy(classOf[CreateMovementUserAnswersRepositoryImpl])
+trait CreateMovementUserAnswersRepository {
+  def keepAlive(ern: String, lrn: String): Future[Boolean]
+
+  def get(ern: String, lrn: String): Future[Option[CreateMovementUserAnswers]]
+
+  def set(answers: CreateMovementUserAnswers): Future[Boolean]
+
+  def clear(ern: String, lrn: String): Future[Boolean]
+}
+
 @Singleton
-class CreateMovementUserAnswersRepository @Inject()(mongoComponent: MongoComponent,
-                                                    appConfig: AppConfig,
-                                                    time: TimeMachine
-                                                   )(implicit ec: ExecutionContext)
+class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoComponent,
+                                                        appConfig: AppConfig,
+                                                        time: TimeMachine
+                                                       )(implicit ec: ExecutionContext)
   extends PlayMongoRepository[CreateMovementUserAnswers](
     collectionName = "create-movement-user-answers",
     mongoComponent = mongoComponent,
     domainFormat = CreateMovementUserAnswers.format,
     indexes = mongoIndexes(appConfig.createMovementUserAnswersTTL()),
     replaceIndexes = appConfig.createMovementUserAnswersReplaceIndexes()
-  ) {
+  ) with CreateMovementUserAnswersRepository {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 

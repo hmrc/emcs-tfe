@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.models.common
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.{Consignee, Consignor}
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class SubmitterTypeSpec extends UnitSpec with SubmitExplainDelayFixtures {
+class SubmitterTypeSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
 
   "SubmitterType" must {
 

@@ -18,11 +18,11 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.XML
 
-class GetMovementIfChangedResponseSpec extends UnitSpec with GetMovementFixture {
+class GetMovementIfChangedResponseSpec extends TestBaseSpec with GetMovementFixture {
 
   ".xmlReads" should {
 

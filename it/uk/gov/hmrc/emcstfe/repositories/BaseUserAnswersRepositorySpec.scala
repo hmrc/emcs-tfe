@@ -18,7 +18,6 @@ package uk.gov.hmrc.emcstfe.repositories
 
 import org.mongodb.scala.model.Filters
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 
@@ -31,12 +30,11 @@ class BaseUserAnswersRepositorySpec extends RepositoryBaseSpec[UserAnswers] {
   val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   val userAnswers = UserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
   val timeMachine: TimeMachine = () => instantNow
-  val mockAppConfig = mock[AppConfig]
 
-  protected override val repository: BaseUserAnswersRepository = new BaseUserAnswersRepository(
+  protected override val repository: BaseUserAnswersRepositoryImpl = new BaseUserAnswersRepositoryImpl(
     collectionName = "test-user-answers",
-    ttl = Duration("5 seconds"),
-    replaceIndexes = true
+    ttl = Duration(testTtl),
+    replaceIndexes = testReplaceIndexes
   )(
     mongoComponent = mongoComponent,
     time = timeMachine,

@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType._
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class AlertOrRejectionReasonTypeSpec extends UnitSpec with SubmitAlertOrRejectionFixtures {
+class AlertOrRejectionReasonTypeSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
 
   "AlertOrRejectionReasonType" must {
 

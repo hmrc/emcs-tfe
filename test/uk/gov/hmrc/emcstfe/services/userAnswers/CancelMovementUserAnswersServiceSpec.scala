@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.services.userAnswers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.emcstfe.repositories.CancelMovementUserAnswersRepository
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class CancelMovementUserAnswersServiceSpec extends UnitSpec with GuiceOneAppPerSuite {
+class CancelMovementUserAnswersServiceSpec extends TestBaseSpec with GuiceOneAppPerSuite {
 
   "CancelMovementUserAnswersService" must {
 

@@ -24,12 +24,12 @@ import uk.gov.hmrc.emcstfe.models.common.Enumerable.EnumerableXmlParseFailure
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.GetMovementResponse
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.http.HttpResponse
 
 import scala.xml.XML
 
-class ChrisXMLHttpParserSpec extends UnitSpec with MockXmlUtils with GetMovementFixture {
+class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMovementFixture {
 
   object TestParser extends ChrisXMLHttpParser(mockXmlUtils)
 

@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.models.common
 
 import com.lucidchart.open.xtract.{ParseSuccess, XmlReader}
 import uk.gov.hmrc.emcstfe.fixtures.TraderModelFixtures
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class TraderModelSpec extends UnitSpec with TraderModelFixtures {
+class TraderModelSpec extends TestBaseSpec with TraderModelFixtures {
 
   "TraderModel" when {
 

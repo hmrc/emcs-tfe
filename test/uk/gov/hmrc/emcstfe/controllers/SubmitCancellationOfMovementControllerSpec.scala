@@ -25,11 +25,11 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitCancellationOfMovementFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitCancellationOfMovementService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitCancellationOfMovementControllerSpec extends UnitSpec
+class SubmitCancellationOfMovementControllerSpec extends TestBaseSpec
   with MockSubmitCancellationOfMovementService
   with SubmitCancellationOfMovementFixtures
   with FakeAuthAction {

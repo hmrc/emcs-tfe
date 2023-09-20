@@ -28,7 +28,7 @@ class AlertRejectionUserAnswersRepository @Inject()(implicit mongoComponent: Mon
                                                     appConfig: AppConfig,
                                                     time: TimeMachine,
                                                     ec: ExecutionContext)
-  extends BaseUserAnswersRepository(
+  extends BaseUserAnswersRepositoryImpl(
     collectionName = "alert-rejection-user-answers",
     ttl = appConfig.alertRejectionUserAnswersTTL(),
     replaceIndexes = appConfig.alertRejectionUserAnswersReplaceIndexes()

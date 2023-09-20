@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.mocks.config
 
-import org.scalamock.handlers.{CallHandler, CallHandler1}
+import org.scalamock.handlers.{CallHandler, CallHandler0, CallHandler1}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.models.FeatureSwitch
+
+import scala.concurrent.duration.Duration
 
 trait MockAppConfig extends MockFactory {
   lazy val mockAppConfig: AppConfig = mock[AppConfig]
@@ -31,5 +33,9 @@ trait MockAppConfig extends MockFactory {
     def isEnabled(feature: FeatureSwitch): CallHandler1[FeatureSwitch, Boolean] = {
       (mockAppConfig.isEnabled(_: FeatureSwitch)).expects(feature)
     }
+
+
+    def createMovementUserAnswersTTL: CallHandler0[Duration] = (() => mockAppConfig.createMovementUserAnswersTTL()).expects()
+    def createMovementUserAnswersReplaceIndexes: CallHandler0[Boolean] = (() => mockAppConfig.createMovementUserAnswersReplaceIndexes()).expects()
   }
 }

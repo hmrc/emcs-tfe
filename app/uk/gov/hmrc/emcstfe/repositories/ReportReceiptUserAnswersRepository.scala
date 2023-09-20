@@ -28,7 +28,7 @@ class ReportReceiptUserAnswersRepository @Inject()(implicit mongoComponent: Mong
                                                    appConfig: AppConfig,
                                                    time: TimeMachine,
                                                    ec: ExecutionContext)
-  extends BaseUserAnswersRepository(
+  extends BaseUserAnswersRepositoryImpl(
     collectionName = "report-receipt-user-answers",
     ttl = appConfig.reportReceiptUserAnswersTTL(),
     replaceIndexes = appConfig.reportReceiptUserAnswersReplaceIndexes()

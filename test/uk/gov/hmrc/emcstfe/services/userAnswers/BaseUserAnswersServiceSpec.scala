@@ -22,12 +22,12 @@ import uk.gov.hmrc.emcstfe.mocks.repository.MockUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.mongo.UserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 import uk.gov.hmrc.emcstfe.repositories.BaseUserAnswersRepository
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.Instant
 import scala.concurrent.Future
 
-class BaseUserAnswersServiceSpec extends UnitSpec with GetMovementListFixture with MockUserAnswersRepository {
+class BaseUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixture with MockUserAnswersRepository {
 
   val service = new BaseUserAnswersService {
     override val repo: BaseUserAnswersRepository = mockRepo
@@ -39,7 +39,7 @@ class BaseUserAnswersServiceSpec extends UnitSpec with GetMovementListFixture wi
     "return a Right(Some(answers))" when {
       "UserAnswers are successfully returned from Mongo" in {
 
-        MockUserAnswers.get(testErn, testArc).thenReturn(Future.successful(Some(userAnswers)))
+        MockRepository.get(testErn, testArc).returns(Future.successful(Some(userAnswers)))
         await(service.get(testErn, testArc)) shouldBe Right(Some(userAnswers))
       }
     }
@@ -47,14 +47,14 @@ class BaseUserAnswersServiceSpec extends UnitSpec with GetMovementListFixture wi
     "return a Right(None)" when {
       "UserAnswers are not found in Mongo" in {
 
-        MockUserAnswers.get(testErn, testArc).thenReturn(Future.successful(None))
+        MockRepository.get(testErn, testArc).returns(Future.successful(None))
         await(service.get(testErn, testArc)) shouldBe Right(None)
       }
     }
     "return a Left" when {
       "mongo error is returned" in {
 
-        MockUserAnswers.get(testErn, testArc).thenReturn(Future.failed(new Exception("bang")))
+        MockRepository.get(testErn, testArc).returns(Future.failed(new Exception("bang")))
         await(service.get(testErn, testArc)) shouldBe Left(MongoError("bang"))
       }
     }
@@ -64,14 +64,14 @@ class BaseUserAnswersServiceSpec extends UnitSpec with GetMovementListFixture wi
     "return a Right(boolean)" when {
       "UserAnswers are successfully saved/updated in Mongo" in {
 
-        MockUserAnswers.set(userAnswers).thenReturn(Future.successful(true))
+        MockRepository.set(userAnswers).returns(Future.successful(true))
         await(service.set(userAnswers)) shouldBe Right(userAnswers)
       }
     }
     "return a Left" when {
       "mongo error is returned" in {
 
-        MockUserAnswers.set(userAnswers).thenReturn(Future.failed(new Exception("bang")))
+        MockRepository.set(userAnswers).returns(Future.failed(new Exception("bang")))
         await(service.set(userAnswers)) shouldBe Left(MongoError("bang"))
       }
     }
@@ -81,14 +81,14 @@ class BaseUserAnswersServiceSpec extends UnitSpec with GetMovementListFixture wi
     "return a Right(boolean)" when {
       "UserAnswers are successfully saved/updated in Mongo" in {
 
-        MockUserAnswers.clear(testErn, testArc).thenReturn(Future.successful(true))
+        MockRepository.clear(testErn, testArc).returns(Future.successful(true))
         await(service.clear(testErn, testArc)) shouldBe Right(true)
       }
     }
     "return a Left" when {
       "mongo error is returned" in {
 
-        MockUserAnswers.clear(testErn, testArc).thenReturn(Future.failed(new Exception("bang")))
+        MockRepository.clear(testErn, testArc).returns(Future.failed(new Exception("bang")))
         await(service.clear(testErn, testArc)) shouldBe Left(MongoError("bang"))
       }
     }

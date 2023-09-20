@@ -24,7 +24,7 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
-import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
+import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepositoryImpl
 import uk.gov.hmrc.emcstfe.stubs.AuthStub
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
@@ -39,8 +39,10 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
 
   private trait Test {
 
-    lazy val mongoRepo: CreateMovementUserAnswersRepository = app.injector.instanceOf[CreateMovementUserAnswersRepository]
+    lazy val mongoRepo: CreateMovementUserAnswersRepositoryImpl = app.injector.instanceOf[CreateMovementUserAnswersRepositoryImpl]
+
     def setupStubs(): StubMapping
+
     def request(): WSRequest = {
       await(mongoRepo.collection.deleteMany(Document()).toFuture())
       setupStubs()

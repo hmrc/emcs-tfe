@@ -18,13 +18,11 @@ package uk.gov.hmrc.emcstfe.repositories
 
 import org.mongodb.scala.model.Filters
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import scala.concurrent.duration.Duration
 
 class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateMovementUserAnswers] {
 
@@ -33,17 +31,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
   private val userAnswers = CreateMovementUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
-  private val mockAppConfig = mock[AppConfig]
-  (() => mockAppConfig.createMovementUserAnswersTTL(): Duration)
-    .expects()
-    .returns(Duration("1seconds"))
-    .anyNumberOfTimes()
-  (() => mockAppConfig.createMovementUserAnswersReplaceIndexes(): Boolean)
-    .expects()
-    .returns(true)
-    .anyNumberOfTimes()
-
-  protected override val repository = new CreateMovementUserAnswersRepository(
+  protected override val repository = new CreateMovementUserAnswersRepositoryImpl(
     mongoComponent = mongoComponent,
     appConfig = mockAppConfig,
     time = timeMachine

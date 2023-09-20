@@ -25,11 +25,11 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitCreateMovementService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitCreateMovementControllerSpec extends UnitSpec with MockSubmitCreateMovementService with CreateMovementFixtures with FakeAuthAction {
+class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCreateMovementService with CreateMovementFixtures with FakeAuthAction {
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/create-movement").withBody(Json.toJson(CreateMovementFixtures.createMovementModelMax))

@@ -23,11 +23,11 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitExplainShortageExcessServiceSpec extends UnitSpec with SubmitExplainShortageExcessFixtures {
+class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExplainShortageExcessFixtures {
 
   import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 

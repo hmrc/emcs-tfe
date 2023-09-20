@@ -18,11 +18,11 @@ package uk.gov.hmrc.emcstfe.utils
 
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MarkCreationError
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.{Elem, XML}
 
-class HMRCMarkUtilSpec extends UnitSpec with GetMovementFixture {
+class HMRCMarkUtilSpec extends TestBaseSpec with GetMovementFixture {
 
   object TestHmrcMark extends HMRCMarkUtil
 

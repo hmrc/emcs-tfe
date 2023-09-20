@@ -19,11 +19,11 @@ package uk.gov.hmrc.emcstfe.models.response
 import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess}
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.SubmitDraftMovementFixture
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.XML
 
-class SubmitDraftMovementResponseSpec extends UnitSpec with SubmitDraftMovementFixture {
+class SubmitDraftMovementResponseSpec extends TestBaseSpec with SubmitDraftMovementFixture {
 
   "writes" should {
     "write a model to JSON" in {

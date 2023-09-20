@@ -21,11 +21,11 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
-import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.XML
 
-class GetMovementResponseSpec extends UnitSpec with GetMovementFixture {
+class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
 
   "writes" should {
     "write a model to JSON" in {

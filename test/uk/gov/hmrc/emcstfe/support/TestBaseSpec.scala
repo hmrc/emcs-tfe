@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.repositories
+package uk.gov.hmrc.emcstfe.support
 
-import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
+import org.scalamock.scalatest.MockFactory
 
-trait RepositoryBaseSpec[A] extends IntegrationBaseSpec
-  with DefaultPlayMongoRepositorySupport[A] {
-
-  val mockAppConfig: AppConfig = app.injector.instanceOf[AppConfig]
-
-  protected val repository: PlayMongoRepository[A]
-}
+trait TestBaseSpec extends UnitSpec with MockFactory

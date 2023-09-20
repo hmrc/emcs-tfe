@@ -25,7 +25,7 @@ import play.api.test.Injecting
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, GetMovementIfChangedFixture}
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
-import uk.gov.hmrc.emcstfe.repositories.GetMovementRepository
+import uk.gov.hmrc.emcstfe.repositories.GetMovementRepositoryImpl
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
@@ -33,7 +33,7 @@ import scala.xml.XML
 
 class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture with GetMovementIfChangedFixture with Injecting {
 
-  val repository: GetMovementRepository = inject[GetMovementRepository]
+  val repository: GetMovementRepositoryImpl = inject[GetMovementRepositoryImpl]
 
   override def beforeEach(): Unit = {
     await(repository.collection.deleteMany(BsonDocument()).toFuture())
@@ -49,6 +49,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
     def generateHeaders(action: String) = Map(HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action"""")
 
     def getMovementIfChangedHeaders: Map[String, String] = generateHeaders("http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementIfChanged")
+
     def getMovementHeaders: Map[String, String] = generateHeaders("http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement")
 
     def forceFetchNew: Boolean
