@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MetricsService @Inject()(metrics: Metrics) extends Logging {
 
-  def chrisTimer(metricName: String): Timer = metrics.defaultRegistry.timer(s"$metricName.timer")
+  def requestTimer(metricName: String): Timer = metrics.defaultRegistry.timer(s"$metricName.timer")
 
   def rorStatusCounter(status: String) = metrics.defaultRegistry.counter(s"report-receipt.status-count.$status")
 

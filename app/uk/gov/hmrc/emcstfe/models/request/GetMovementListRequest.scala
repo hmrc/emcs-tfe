@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+
 case class GetMovementListRequest(exciseRegistrationNumber: String,
                                   searchOptions: GetMovementListSearchOptions) extends ChrisRequest {
   override def requestBody: String =

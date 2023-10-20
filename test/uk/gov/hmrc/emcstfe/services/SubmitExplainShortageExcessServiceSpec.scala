@@ -34,14 +34,14 @@ class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExp
   trait Test extends MockChrisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
-    val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockConnector)
+    val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockChrisConnector)
   }
 
   "submit" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
+        MockChrisConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
           Future.successful(Right(chrisSuccessResponse))
         )
 
@@ -51,7 +51,7 @@ class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExp
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
+        MockChrisConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
           Future.successful(Left(XmlValidationError))
         )
 

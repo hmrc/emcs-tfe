@@ -20,6 +20,7 @@ import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, TaxWarehouse}
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 
 case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
                                          (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {

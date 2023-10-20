@@ -33,14 +33,14 @@ class SubmitChangeDestinationServiceSpec extends TestBaseSpec with SubmitChangeD
   trait Test extends MockChrisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
-    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockConnector)
+    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockChrisConnector)
   }
 
   "submit" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
+        MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
           Future.successful(Right(chrisSuccessResponse))
         )
 
@@ -50,7 +50,7 @@ class SubmitChangeDestinationServiceSpec extends TestBaseSpec with SubmitChangeD
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
+        MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
           Future.successful(Left(XmlValidationError))
         )
 

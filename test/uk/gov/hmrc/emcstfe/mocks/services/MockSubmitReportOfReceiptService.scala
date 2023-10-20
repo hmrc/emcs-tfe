@@ -21,19 +21,23 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitReportOfReceiptService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockSubmitReportOfReceiptService extends MockFactory  {
+trait MockSubmitReportOfReceiptService extends MockFactory {
 
   lazy val mockService: SubmitReportOfReceiptService = mock[SubmitReportOfReceiptService]
 
   object MockService extends Matchers {
     def submit(submission: SubmitReportOfReceiptModel): CallHandler4[SubmitReportOfReceiptModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
       (mockService.submit(_: SubmitReportOfReceiptModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(submission, *, *, *)
+
+    def submitViaEIS(submission: SubmitReportOfReceiptModel): CallHandler4[SubmitReportOfReceiptModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSuccessResponse]]] =
+      (mockService.submitViaEIS(_: SubmitReportOfReceiptModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
         .expects(submission, *, *, *)
   }
 }

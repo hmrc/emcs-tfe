@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
-import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, ConsigneeTrader, DeliveryPlaceTrader, DestinationType, TraderModel, XmlBaseModel}
+import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import java.time.LocalDate

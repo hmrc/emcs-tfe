@@ -409,8 +409,8 @@ trait CreateMovementFixtures extends BaseFixtures
   }
 
   object CreateMovementFixtures {
-    import CaMAttributesFixtures._
     import BodyEadEsadFixtures._
+    import CaMAttributesFixtures._
     import ComplementConsigneeTraderFixtures._
     import DocumentCertificateFixtures._
     import EadEsadDraftFixtures._

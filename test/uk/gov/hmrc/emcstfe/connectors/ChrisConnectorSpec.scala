@@ -72,7 +72,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is successful" in new Test {
 
 
-        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.requestTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -93,7 +93,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.requestTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -110,7 +110,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.requestTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -132,7 +132,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.requestTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -153,7 +153,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.requestTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -170,7 +170,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(getMovementRequest.metricName)
+        MockMetricsService.requestTimer(getMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -195,7 +195,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(submitCreateMovementRequest.metricName)
+        MockMetricsService.requestTimer(submitCreateMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -219,7 +219,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(submitCreateMovementRequest.metricName)
+        MockMetricsService.requestTimer(submitCreateMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -239,7 +239,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(submitCreateMovementRequest.metricName)
+        MockMetricsService.requestTimer(submitCreateMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -276,7 +276,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(submitReportOfReceiptRequest.metricName)
+        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -300,7 +300,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(submitReportOfReceiptRequest.metricName)
+        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -320,7 +320,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(submitReportOfReceiptRequest.metricName)
+        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -357,7 +357,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(submitExplainDelayRequest.metricName)
+        MockMetricsService.requestTimer(submitExplainDelayRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -381,7 +381,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(submitExplainDelayRequest.metricName)
+        MockMetricsService.requestTimer(submitExplainDelayRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -401,7 +401,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(submitExplainDelayRequest.metricName)
+        MockMetricsService.requestTimer(submitExplainDelayRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -440,7 +440,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(submitChangeDestinationRequest.metricName)
+        MockMetricsService.requestTimer(submitChangeDestinationRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -464,7 +464,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(submitChangeDestinationRequest.metricName)
+        MockMetricsService.requestTimer(submitChangeDestinationRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -484,7 +484,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(submitChangeDestinationRequest.metricName)
+        MockMetricsService.requestTimer(submitChangeDestinationRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -523,7 +523,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(submitExplainShortageExcessRequest.metricName)
+        MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -547,7 +547,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(submitExplainShortageExcessRequest.metricName)
+        MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -567,7 +567,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(submitExplainShortageExcessRequest.metricName)
+        MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -604,7 +604,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(submitAlertOrRejectionRequest.metricName)
+        MockMetricsService.requestTimer(submitAlertOrRejectionRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -628,7 +628,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(submitAlertOrRejectionRequest.metricName)
+        MockMetricsService.requestTimer(submitAlertOrRejectionRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -648,7 +648,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(submitAlertOrRejectionRequest.metricName)
+        MockMetricsService.requestTimer(submitAlertOrRejectionRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -685,7 +685,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     "return a Right" when {
       "downstream call is successful" in new Test {
 
-        MockMetricsService.chrisTimer(submitCancellationOfMovementRequest.metricName)
+        MockMetricsService.requestTimer(submitCancellationOfMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -709,7 +709,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
         val response: Either[ErrorResponse, String] = Left(XmlValidationError)
 
-        MockMetricsService.chrisTimer(submitCancellationOfMovementRequest.metricName)
+        MockMetricsService.requestTimer(submitCancellationOfMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(
@@ -729,7 +729,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
       "downstream call is unsuccessful" in new Test {
         val response: Either[ErrorResponse, String] = Left(UnexpectedDownstreamResponseError)
 
-        MockMetricsService.chrisTimer(submitCancellationOfMovementRequest.metricName)
+        MockMetricsService.requestTimer(submitCancellationOfMovementRequest.metricName)
         MockMetricsService.processWithTimer()
 
         MockHttpClient.postString(

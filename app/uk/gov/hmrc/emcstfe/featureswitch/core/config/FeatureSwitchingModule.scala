@@ -39,3 +39,13 @@ case object UseChrisStub extends FeatureSwitch {
   override val displayName: String = "enables chris stub"
 }
 
+case object UseEisStub extends FeatureSwitch {
+  override val configName: String = "features.eisStub"
+  override val displayName: String = "Enables EIS stub"
+}
+
+case object SendToEIS extends FeatureSwitch {
+  override val configName: String = "features.sendToEIS"
+  override val displayName: String = "Sends message to EIS instead of ChRIS"
+}
+

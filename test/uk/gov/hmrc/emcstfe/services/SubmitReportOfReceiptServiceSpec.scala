@@ -19,95 +19,119 @@ package uk.gov.hmrc.emcstfe.services
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{Refused, Satisfactory, Unsatisfactory}
+import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{PartiallyRefused, Refused, Satisfactory, Unsatisfactory}
 import uk.gov.hmrc.emcstfe.models.request.SubmitReportOfReceiptRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfReceiptFixtures with MockMetricsService {
-  trait Test extends MockChrisConnector with MockAppConfig {
+class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfReceiptFixtures {
+
+  trait Test extends MockChrisConnector with MockEisConnector with MockAppConfig with MockMetricsService {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
-    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockConnector, mockAppConfig, mockMetricsService)
+
+    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockChrisConnector, mockEisConnector, mockAppConfig, mockMetricsService)
   }
 
-  "submit" should {
-    "return a Right" when {
-      "connector call is successful and XML is the correct format" when {
-        "status is partially-refused" in new Test {
+  "submit" when {
 
-          MockConnector
-            .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
-            .returns(Future.successful(Right(chrisSuccessResponse)))
+    "calling EIS" should {
 
-          MockMetricsService.rorStatusCounter("partially-refused")
+      "return a Right" when {
+        "connector call is successful and Json is the correct format" when {
 
-          await(service.submit(maxSubmitReportOfReceiptModel)) shouldBe Right(chrisSuccessResponse)
+          Seq(
+            PartiallyRefused -> "partially-refused",
+            Refused -> "refused",
+            Satisfactory -> "satisfactory",
+            Unsatisfactory -> "unsatisfactory"
+          ).foreach { statusAndMetricName =>
+
+            s"status is ${statusAndMetricName._2}" in new Test {
+
+              val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = statusAndMetricName._1)
+
+              override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
+                SubmitReportOfReceiptRequest(model)
+
+              MockEisConnector
+                .submitReportOfReceiptEISRequest(submitReportOfReceiptRequest)
+                .returns(Future.successful(Right(eisSuccessResponse)))
+
+              MockMetricsService.rorStatusCounter(statusAndMetricName._2)
+
+              await(service.submitViaEIS(model)) shouldBe Right(eisSuccessResponse)
+
+
+            }
+          }
         }
 
-        "status is refused" in new Test {
+        "return a Left" when {
+          "connector call is unsuccessful" in new Test {
 
-          val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = Refused)
+            MockEisConnector
+              .submitReportOfReceiptEISRequest(submitReportOfReceiptRequest)
+              .returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
 
-          override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
-            SubmitReportOfReceiptRequest(model)
+            MockMetricsService.rorStatusCounter("failed-submission")
 
-          MockConnector
-            .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
-            .returns(Future.successful(Right(chrisSuccessResponse)))
-
-          MockMetricsService.rorStatusCounter("refused")
-
-          await(service.submit(model)) shouldBe Right(chrisSuccessResponse)
-        }
-        "status is satisfactory" in new Test {
-
-          val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = Satisfactory)
-
-          override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(model)
-
-          MockConnector
-            .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
-            .returns(Future.successful(Right(chrisSuccessResponse)))
-
-          MockMetricsService.rorStatusCounter("satisfactory")
-
-          await(service.submit(model)) shouldBe Right(chrisSuccessResponse)
-        }
-        "status is unsatisfactory" in new Test {
-
-          val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = Unsatisfactory)
-
-          override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
-            SubmitReportOfReceiptRequest(model)
-
-          MockConnector
-            .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
-            .returns(Future.successful(Right(chrisSuccessResponse)))
-
-          MockMetricsService.rorStatusCounter("unsatisfactory")
-
-          await(service.submit(model)) shouldBe Right(chrisSuccessResponse)
+            await(service.submitViaEIS(maxSubmitReportOfReceiptModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+          }
         }
       }
     }
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
 
+    "calling ChRIS" should {
 
-        MockConnector
-          .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
-          .returns(Future.successful(Left(XmlValidationError)))
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" when {
 
-        MockMetricsService.rorStatusCounter("failed-submission")
+          Seq(
+            PartiallyRefused -> "partially-refused",
+            Refused -> "refused",
+            Satisfactory -> "satisfactory",
+            Unsatisfactory -> "unsatisfactory"
+          ).foreach { statusAndMetricName =>
 
-        await(service.submit(maxSubmitReportOfReceiptModel)) shouldBe Left(XmlValidationError)
+            s"status is ${statusAndMetricName._2}" in new Test {
+
+              val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = statusAndMetricName._1)
+
+              override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
+                SubmitReportOfReceiptRequest(model)
+
+              MockChrisConnector
+                .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
+                .returns(Future.successful(Right(chrisSuccessResponse)))
+
+              MockMetricsService.rorStatusCounter(statusAndMetricName._2)
+
+              await(service.submit(model)) shouldBe Right(chrisSuccessResponse)
+            }
+          }
+        }
+
+        "return a Left" when {
+          "connector call is unsuccessful" in new Test {
+
+            MockChrisConnector
+              .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
+              .returns(Future.successful(Left(XmlValidationError)))
+
+            MockMetricsService.rorStatusCounter("failed-submission")
+
+            await(service.submit(maxSubmitReportOfReceiptModel)) shouldBe Left(XmlValidationError)
+          }
+        }
       }
     }
+
+
   }
 }

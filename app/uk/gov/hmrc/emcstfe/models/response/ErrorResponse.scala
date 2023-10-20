@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.response
 
 import com.lucidchart.open.xtract.ParseError
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, JsonValidationError, OWrites}
 
 sealed trait ErrorResponse {
   val message: String
@@ -62,6 +62,34 @@ object ErrorResponse {
 
   case class MongoError(msg: String) extends ErrorResponse {
     val message = s"Error from Mongo with message: $msg"
+  }
+
+  case class EISJsonParsingError(errors: Seq[JsonValidationError]) extends ErrorResponse {
+    val message = s"Errors parsing JSON, errors: $errors"
+  }
+
+  case class EISJsonSchemaMismatchError(errorResponse: String) extends ErrorResponse {
+    val message = s"Invalid JSON sent to EIS, error response: $errorResponse"
+  }
+
+  case class EISResourceNotFoundError(errorResponse: String) extends ErrorResponse {
+    val message = s"Not found returned from EIS, error response: $errorResponse"
+  }
+
+  case class EISBusinessError(errorResponse: String) extends ErrorResponse {
+    val message = s"Request not processed returned by EIS, error response: $errorResponse"
+  }
+
+  case class EISInternalServerError(errorResponse: String) extends ErrorResponse {
+    val message = s"Request not processed returned by EIS, error response: $errorResponse"
+  }
+
+  case class EISServiceUnavailableError(errorResponse: String) extends ErrorResponse {
+    val message = s"Service unavailable returned by EIS, error response: $errorResponse"
+  }
+
+  case class EISUnknownError(errorResponse: String) extends ErrorResponse {
+    val message = s"An unknown response was returned by EIS, error response: $errorResponse"
   }
 
 }

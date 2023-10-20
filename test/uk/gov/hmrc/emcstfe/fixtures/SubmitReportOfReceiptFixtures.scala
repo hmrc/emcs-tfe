@@ -27,7 +27,8 @@ import java.time.LocalDate
 trait SubmitReportOfReceiptFixtures extends BaseFixtures
   with TraderModelFixtures
   with ReceiptedItemsModelFixtures
-  with ChRISResponsesFixture {
+  with ChRISResponsesFixture
+  with EISResponsesFixture {
 
   val arrivalDate = LocalDate.now()
   val destinationOfficeId = "GB000434"

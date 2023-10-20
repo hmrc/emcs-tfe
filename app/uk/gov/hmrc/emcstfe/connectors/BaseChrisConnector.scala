@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.connectors
 
 import play.api.http.HeaderNames
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.models.request.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
@@ -36,7 +36,7 @@ trait BaseChrisConnector extends Logging {
   )
 
   private def withTimer[T](chrisRequest: ChrisRequest)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
-    val timer = metricsService.chrisTimer(chrisRequest.metricName).time()
+    val timer = metricsService.requestTimer(chrisRequest.metricName).time()
     metricsService.processWithTimer(timer)(f)
   }
 

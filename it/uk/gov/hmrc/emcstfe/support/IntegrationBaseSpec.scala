@@ -41,6 +41,7 @@ trait IntegrationBaseSpec
   def servicesConfig: Map[String, _] = Map(
     "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
     "microservice.services.chris.port" -> WireMockHelper.wireMockPort,
+    "microservice.services.eis.port" -> WireMockHelper.wireMockPort,
     "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort,
     "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
     "createMovementUserAnswers.TTL" -> testTtl,

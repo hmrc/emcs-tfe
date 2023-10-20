@@ -20,6 +20,7 @@ import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{ExemptedOrganisations, Export}
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 
 import scala.xml.Elem
 
