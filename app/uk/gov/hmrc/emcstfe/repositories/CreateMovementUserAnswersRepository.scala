@@ -43,6 +43,8 @@ trait CreateMovementUserAnswersRepository {
   def set(answers: CreateMovementUserAnswers): Future[Boolean]
 
   def clear(ern: String, draftId: String): Future[Boolean]
+
+  def checkForExistingLrn(ern: String, lrn: String): Future[Boolean]
 }
 
 @Singleton
@@ -102,6 +104,18 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
       .deleteOne(by(ern, draftId))
       .toFuture()
       .map(_ => true)
+
+  def checkForExistingLrn(ern: String, lrn: String): Future[Boolean] =
+    collection
+      .find(
+        Filters.and(
+          Filters.equal("ern", ern),
+          Filters.equal("data.info.localReferenceNumber", lrn)
+        )
+      )
+      .headOption()
+      .map(_.isDefined)
+
 }
 
 object CreateMovementUserAnswersRepository {
