@@ -36,13 +36,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[CreateMovementUserAnswersRepositoryImpl])
 trait CreateMovementUserAnswersRepository {
-  def keepAlive(ern: String, lrn: String): Future[Boolean]
+  def keepAlive(ern: String, draftId: String): Future[Boolean]
 
-  def get(ern: String, lrn: String): Future[Option[CreateMovementUserAnswers]]
+  def get(ern: String, draftId: String): Future[Option[CreateMovementUserAnswers]]
 
   def set(answers: CreateMovementUserAnswers): Future[Boolean]
 
-  def clear(ern: String, lrn: String): Future[Boolean]
+  def clear(ern: String, draftId: String): Future[Boolean]
 }
 
 @Singleton
@@ -60,26 +60,26 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  private def by(ern: String, lrn: String): Bson =
+  private def by(ern: String, draftId: String): Bson =
     Filters.and(
       Filters.equal("ern", ern),
-      Filters.equal("lrn", lrn)
+      Filters.equal("draftId", draftId)
     )
 
-  def keepAlive(ern: String, lrn: String): Future[Boolean] =
+  def keepAlive(ern: String, draftId: String): Future[Boolean] =
     collection
       .updateOne(
-        filter = by(ern: String, lrn: String),
+        filter = by(ern: String, draftId: String),
         update = Updates.set("lastUpdated", time.instant()),
       )
       .toFuture()
       .map(_ => true)
 
-  def get(ern: String, lrn: String): Future[Option[CreateMovementUserAnswers]] =
-    keepAlive(ern, lrn).flatMap {
+  def get(ern: String, draftId: String): Future[Option[CreateMovementUserAnswers]] =
+    keepAlive(ern, draftId).flatMap {
       _ =>
         collection
-          .find(by(ern, lrn))
+          .find(by(ern, draftId))
           .headOption()
     }
 
@@ -89,7 +89,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
 
     collection
       .replaceOne(
-        filter = by(updatedAnswers.ern, updatedAnswers.lrn),
+        filter = by(updatedAnswers.ern, updatedAnswers.draftId),
         replacement = updatedAnswers,
         options = ReplaceOptions().upsert(true)
       )
@@ -97,9 +97,9 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
       .map(_ => true)
   }
 
-  def clear(ern: String, lrn: String): Future[Boolean] =
+  def clear(ern: String, draftId: String): Future[Boolean] =
     collection
-      .deleteOne(by(ern, lrn))
+      .deleteOne(by(ern, draftId))
       .toFuture()
       .map(_ => true)
 }
@@ -115,7 +115,7 @@ object CreateMovementUserAnswersRepository {
     IndexModel(
       Indexes.compoundIndex(
         Indexes.ascending("ern"),
-        Indexes.ascending("lrn")
+        Indexes.ascending("draftId")
       ),
       IndexOptions().name("uniqueIdx")
     )

@@ -30,7 +30,7 @@ class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures {
 
   val userAnswersModel: CreateMovementUserAnswers = CreateMovementUserAnswers(
     ern = testErn,
-    lrn = testLrn,
+    draftId = testDraftId,
     data = Json.obj(
       "foo" -> "bar"
     ),
@@ -39,7 +39,7 @@ class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures {
 
   val userAnswersJson: JsObject = Json.obj(
     "ern" -> testErn,
-    "lrn" -> testLrn,
+    "draftId" -> testDraftId,
     "data" -> Json.obj(
       "foo" -> "bar"
     ),

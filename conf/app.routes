@@ -11,7 +11,7 @@ POST        /alert-or-rejection/:ern/:arc             uk.gov.hmrc.emcstfe.contro
 POST        /change-destination/:ern/:arc             uk.gov.hmrc.emcstfe.controllers.SubmitChangeDestinationController.submit(ern, arc)
 POST        /explain-shortage-excess/:ern/:arc        uk.gov.hmrc.emcstfe.controllers.SubmitExplainShortageExcessController.submit(ern, arc)
 POST        /cancel-movement/:ern/:arc                uk.gov.hmrc.emcstfe.controllers.SubmitCancellationOfMovementController.submit(ern, arc)
-POST        /create-movement/:ern/:lrn                uk.gov.hmrc.emcstfe.controllers.SubmitCreateMovementController.submit(ern, lrn)
+POST        /create-movement/:ern/:draftId            uk.gov.hmrc.emcstfe.controllers.SubmitCreateMovementController.submit(ern, draftId)
 
 # User answers
 ->          /user-answers                             userAnswers.Routes

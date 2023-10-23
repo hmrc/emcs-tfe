@@ -311,13 +311,13 @@ This method is idempotent, in the sense that if no data exists it returns NO_CON
 #### Create Movement Frontend
 
 <details>
-<summary>Retrieve Create Movement Frontend UserAnswers for the ERN and LRN supplied
+<summary>Retrieve Create Movement Frontend UserAnswers for the ERN and DRAFT-ID supplied
 
-**`GET`** /user-answers/create-movement/:ern/:lrn</summary>
+**`GET`** /user-answers/create-movement/:ern/:draftId</summary>
 
 #### Success Response(s)
 
-**Status**: 200 (OK) _(when data is found for supplied ern and lrn)_
+**Status**: 200 (OK) _(when data is found for supplied ern and draftId)_
 
 **Body**: [CreateMovementUserAnswers Model](app/uk/gov/hmrc/emcstfe/models/mongo/CreateMovementUserAnswers.scala)
 
@@ -335,9 +335,9 @@ This method is idempotent, in the sense that if no data exists it returns NO_CON
 </details>
 
 <details>
-<summary>Store Create Movement Frontend UserAnswers for the ERN and LRN supplied
+<summary>Store Create Movement Frontend UserAnswers for the ERN and DRAFT-ID supplied
 
-**`PUT`** /user-answers/create-movement/:ern/:lrn</summary>
+**`PUT`** /user-answers/create-movement/:ern/:draftId</summary>
 
 This method is idempotent, in the sense that if no data exists it will be created and if some data already exists it will be updated with the new submitted data.
 
@@ -366,9 +366,9 @@ This method is idempotent, in the sense that if no data exists it will be create
 </details>
 
 <details>
-<summary>Remove Create Movement Frontend UserAnswers for the ERN and LRN supplied
+<summary>Remove Create Movement Frontend UserAnswers for the ERN and DRAFT-ID supplied
 
-**`DELETE`** /user-answers/create-movement/:ern/:lrn</summary>
+**`DELETE`** /user-answers/create-movement/:ern/:draftId</summary>
 
 This method is idempotent, in the sense that if no data exists it returns NO_CONTENT as a successful response. If data exist, it will removed and also return a NO_CONTENT.
 

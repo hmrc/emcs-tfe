@@ -32,17 +32,17 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
                                                     override val auth: AuthAction
                                                    )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
-  def get(ern: String, lrn: String): Action[AnyContent] =
+  def get(ern: String, draftId: String): Action[AnyContent] =
     authorisedUserRequest(ern) {
       _ =>
-        createMovementUserAnswersService.get(ern, lrn) map {
+        createMovementUserAnswersService.get(ern, draftId) map {
           case Right(Some(answers)) => Ok(Json.toJson(answers))
           case Right(None) => NoContent
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
         }
     }
 
-  def set(ern: String, lrn: String): Action[JsValue] =
+  def set(ern: String, draftId: String): Action[JsValue] =
     authorisedUserSubmissionRequest(ern) {
       implicit request =>
         withJsonBody[CreateMovementUserAnswers] {
@@ -54,10 +54,10 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
         }
     }
 
-  def clear(ern: String, lrn: String): Action[AnyContent] =
+  def clear(ern: String, draftId: String): Action[AnyContent] =
     authorisedUserRequest(ern) {
       _ =>
-        createMovementUserAnswersService.clear(ern, lrn) map {
+        createMovementUserAnswersService.clear(ern, draftId) map {
           case Right(_) => NoContent
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
         }
