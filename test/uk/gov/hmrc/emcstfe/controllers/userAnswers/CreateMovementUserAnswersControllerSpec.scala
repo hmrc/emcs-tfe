@@ -79,6 +79,41 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     }
   }
 
+  "GET /user-answers/create-movement/trader/:ern/lrn/:lrn" should {
+    s"return $OK (OK)" when {
+
+      "service returns a Right(true)" in {
+        MockUserAnswers.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Right(true)))
+
+        val result = controller.checkForExistingLrn(testErn, testLrn)(fakeRequest)
+
+        status(result) shouldBe Status.OK
+        contentAsJson(result) shouldBe Json.toJson(true)
+      }
+
+      "service returns a Right(false)" in {
+        MockUserAnswers.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Right(false)))
+
+        val result = controller.checkForExistingLrn(testErn, testLrn)(fakeRequest)
+
+        status(result) shouldBe Status.OK
+        contentAsJson(result) shouldBe Json.toJson(false)
+      }
+    }
+
+    s"return $INTERNAL_SERVER_ERROR (ISE)" when {
+      "service returns a Left" in {
+
+        MockUserAnswers.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Left(MongoError("errMsg"))))
+
+        val result = controller.checkForExistingLrn(testErn, testLrn)(fakeRequest)
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))
+      }
+    }
+  }
+
   "PUT /user-answers/report-receipt/:ern/:lrn" should {
     s"return $OK (OK)" when {
       "service stores the new model returns a Right(answers)" in {
