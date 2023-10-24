@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.connectors
 
 import play.api.libs.json.JsValue
+import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisHeaders, EisRequest}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -30,10 +31,10 @@ trait BaseEisConnector extends Logging {
 
   def metricsService: MetricsService
 
-  private def eisHeaders(correlationId: String): Seq[(String, String)] = Seq(
+  private def eisHeaders(correlationId: String, forwardedHost: String): Seq[(String, String)] = Seq(
     EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
     EisHeaders.correlationId -> correlationId,
-    EisHeaders.forwardedHost -> "MDTP",
+    EisHeaders.forwardedHost -> forwardedHost,
     EisHeaders.source -> "TFE",
     EisHeaders.contentType -> "application/json",
     EisHeaders.accept -> "application/json"
@@ -45,10 +46,11 @@ trait BaseEisConnector extends Logging {
   }
 
   def postJson[A, B](http: HttpClient, uri: String, body: JsValue, request: EisRequest)
-                      (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]]): Future[Either[A, B]] = {
+                      (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request) {
+      val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[postJson] POST to $uri being made with body:\n\n$body")
-      http.POST[JsValue, Either[A, B]](uri, body, eisHeaders(request.correlationUUID.toString))
+      http.POST[JsValue, Either[A, B]](uri, body, eisHeaders(request.correlationUUID.toString, forwardedHost))
     }
   }
 }

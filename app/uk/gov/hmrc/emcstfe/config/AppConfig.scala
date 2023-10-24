@@ -89,4 +89,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def urlCancellationOfMovement(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitCancellationPortal/3"
+
+  def eisForwardedHost() = configuration.get[String]("eis.forwardedHost")
 }

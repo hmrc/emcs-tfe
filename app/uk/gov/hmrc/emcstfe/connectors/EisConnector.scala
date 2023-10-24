@@ -37,7 +37,7 @@ class EisConnector @Inject()(val http: HttpClient,
                                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
     logger.debug(s"[$callingMethod] Sending body: ${request.toJson}")
-    postJson(http, url, request.toJson, request)(ec, headerCarrier, httpParser.modelFromJsonHttpReads)
+    postJson(http, url, request.toJson, request)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
   }
 
   def submitReportOfReceiptEISRequest[A](request: EisRequest)
