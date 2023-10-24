@@ -35,6 +35,9 @@ trait MockCreateMovementUserAnswersRepository extends MockFactory {
 
     def clear(ern: String, lrn: String): CallHandler2[String, String, Future[Boolean]] =
       (mockRepo.clear(_: String, _: String)).expects(ern, lrn)
+
+    def checkForExistingLrn(ern: String, lrn: String): CallHandler2[String, String, Future[Boolean]] =
+      (mockRepo.checkForExistingLrn(_: String, _: String)).expects(ern, lrn)
   }
 }
 

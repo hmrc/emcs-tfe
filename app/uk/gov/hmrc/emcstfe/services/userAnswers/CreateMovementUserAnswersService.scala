@@ -36,4 +36,8 @@ class CreateMovementUserAnswersService @Inject()(repo: CreateMovementUserAnswers
 
   def clear(ern: String, draftId: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
     repo.clear(ern, draftId).map(Right(_)).recover(recovery)
+
+  def checkForExistingLrn(ern: String, lrn: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
+    repo.checkForExistingLrn(ern, lrn).map(answers => Right(answers)).recover(recovery)
+
 }

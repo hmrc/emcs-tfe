@@ -62,4 +62,13 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
         }
     }
+
+  def checkForExistingLrn(ern: String, lrn: String): Action[AnyContent] =
+    authorisedUserRequest(ern) {
+      _ =>
+        createMovementUserAnswersService.checkForExistingLrn(ern, lrn) map {
+          case Right(exists) => Ok(Json.toJson(exists))
+          case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
+        }
+    }
 }

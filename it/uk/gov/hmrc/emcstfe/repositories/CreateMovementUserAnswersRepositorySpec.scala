@@ -130,4 +130,20 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       }
     }
   }
+
+  ".checkForExistingLrn" must {
+
+    "there is a record with this ern and lrn" in {
+      val lrnEntry = userAnswers.copy(data = Json.obj("info" -> Json.obj("localReferenceNumber" -> "LRN1234")))
+      insert(lrnEntry).futureValue
+      repository.checkForExistingLrn(userAnswers.ern, "LRN1234").futureValue shouldBe true
+    }
+
+    "there is no record with this ern and lrn" in {
+      val lrnEntry = userAnswers.copy(data = Json.obj("info" -> Json.obj("localReferenceNumber" -> "LRN1234")))
+      insert(lrnEntry).futureValue
+      repository.checkForExistingLrn(userAnswers.ern, "ABC1234").futureValue shouldBe false
+    }
+
+  }
 }

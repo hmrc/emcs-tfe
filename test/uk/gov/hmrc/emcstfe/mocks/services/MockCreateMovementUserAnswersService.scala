@@ -37,6 +37,9 @@ trait MockCreateMovementUserAnswersService extends MockFactory  {
 
     def clear(ern: String, lrn: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
       (mockService.clear(_: String, _: String)(_: ExecutionContext)).expects(ern, lrn, *)
+
+    def checkForExistingLrn(ern: String, lrn: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
+      (mockService.checkForExistingLrn(_: String, _: String)(_: ExecutionContext)).expects(ern, lrn, *)
   }
 }
 

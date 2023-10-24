@@ -92,4 +92,28 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
       }
     }
   }
+
+  ".checkForExistingLrn" should {
+    "return a Right(true)" when {
+      "there is already a draft with the ERN and LRN" in new Test {
+        MockRepository.checkForExistingLrn(testErn, testLrn).returns(Future.successful(true))
+        await(service.checkForExistingLrn(testErn, testLrn)) shouldBe Right(true)
+      }
+    }
+
+    "return a Right(false)" when {
+      "there isn't a draft with the ERN and LRN" in new Test {
+        MockRepository.checkForExistingLrn(testErn, testLrn).returns(Future.successful(false))
+        await(service.checkForExistingLrn(testErn, testLrn)) shouldBe Right(false)
+      }
+    }
+
+    "return a Left" when {
+      "mongo error is returned" in new Test {
+
+        MockRepository.checkForExistingLrn(testErn, testLrn).returns(Future.failed(new Exception("bang")))
+        await(service.checkForExistingLrn(testErn, testLrn)) shouldBe Left(MongoError("bang"))
+      }
+    }
+  }
 }
