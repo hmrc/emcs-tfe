@@ -23,7 +23,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseEisStub}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDownstreamStub}
 import uk.gov.hmrc.emcstfe.fixtures._
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
@@ -47,7 +47,7 @@ class EisConnectorSpec extends TestBaseSpec with Status with MimeTypes with Head
   with MockMetricsService {
 
   override def afterEach(): Unit = {
-    disable(UseEisStub)
+    disable(UseDownstreamStub)
     super.afterEach()
   }
 

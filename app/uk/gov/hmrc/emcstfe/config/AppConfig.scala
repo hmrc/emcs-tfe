@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.config
 
 import play.api.Configuration
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub, UseEisStub}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDownstreamStub}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
@@ -59,9 +59,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def getFeatureSwitchValue(feature: String): Boolean = configuration.get[Boolean](feature)
 
-  def chrisBaseUrl: String = if(isEnabled(UseChrisStub)) downstreamStubUrl else chrisUrl
+  def chrisBaseUrl: String = if(isEnabled(UseDownstreamStub)) downstreamStubUrl else chrisUrl
 
-  def eisBaseUrl: String = if(isEnabled(UseEisStub)) downstreamStubUrl else eisUrl
+  def eisBaseUrl: String = if(isEnabled(UseDownstreamStub)) downstreamStubUrl else eisUrl
 
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"

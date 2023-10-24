@@ -22,7 +22,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDownstreamStub}
 import uk.gov.hmrc.emcstfe.fixtures._
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
@@ -51,7 +51,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
   with MockMetricsService {
 
   override def afterEach(): Unit = {
-    disable(UseChrisStub)
+    disable(UseDownstreamStub)
     super.afterEach()
   }
 

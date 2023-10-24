@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.config
 
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub, UseEisStub}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDownstreamStub}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.duration.Duration
@@ -33,20 +33,20 @@ class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
     }
 
     ".chris url()" should {
-      "when UseChrisStub is enabled" should  {
+      "when UseDownstreamStub is enabled" should  {
 
         "must return to the legacy URL" in {
-          enable(UseChrisStub)
+          enable(UseDownstreamStub)
           config.urlEMCSApplicationService() shouldBe s"http://localhost:8308/ChRISOSB/EMCS/EMCSApplicationService/2"
           config.urlSubmitCreateMovement() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
           config.urlSubmitReportOfReceipt() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
         }
       }
 
-      "when UseChrisStub is disabled" should {
+      "when UseDownstreamStub is disabled" should {
 
         "must return to the new URL" in {
-          disable(UseChrisStub)
+          disable(UseDownstreamStub)
           config.urlEMCSApplicationService() shouldBe s"http://localhost:8308/ChRISOSB/EMCS/EMCSApplicationService/2"
           config.urlSubmitCreateMovement() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
           config.urlSubmitReportOfReceipt() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
@@ -55,18 +55,18 @@ class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
     }
 
     ".eis url()" should {
-      "when UseEisStub is enabled" should {
+      "when UseDownstreamStub is enabled" should {
 
         "must return to the legacy URL" in {
-          enable(UseEisStub)
+          enable(UseDownstreamStub)
           config.urlSubmitReportOfReceiptEis() shouldBe s"http://localhost:8308/emcs/digital-submit-new-message/v1"
         }
       }
 
-      "when UseEisStub is disabled" should {
+      "when UseDownstreamStub is disabled" should {
 
         "must return to the new URL" in {
-          disable(UseEisStub)
+          disable(UseDownstreamStub)
           config.urlSubmitReportOfReceiptEis() shouldBe s"http://localhost:8308/emcs/digital-submit-new-message/v1"
         }
       }

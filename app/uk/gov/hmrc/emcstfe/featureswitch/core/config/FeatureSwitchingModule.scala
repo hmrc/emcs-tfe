@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-  val switches: Seq[FeatureSwitch] = Seq(UseChrisStub, UseEisStub, SendToEIS)
+  val switches: Seq[FeatureSwitch] = Seq(UseDownstreamStub, SendToEIS)
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
@@ -34,14 +34,9 @@ class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
   }
 }
 
-case object UseChrisStub extends FeatureSwitch {
-  override val configName: String = "features.chrisStub"
-  override val displayName: String = "enables chris stub"
-}
-
-case object UseEisStub extends FeatureSwitch {
-  override val configName: String = "features.eisStub"
-  override val displayName: String = "Enables EIS stub"
+case object UseDownstreamStub extends FeatureSwitch {
+  override val configName: String = "features.downstreamStub"
+  override val displayName: String = "enables downstream stub (for ChRIS / EIS calls)"
 }
 
 case object SendToEIS extends FeatureSwitch {
