@@ -28,12 +28,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class CreateMovementUserAnswersService @Inject()(repo: CreateMovementUserAnswersRepository) extends Logging {
 
-  def get(ern: String, lrn: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[CreateMovementUserAnswers]]] =
-    repo.get(ern, lrn).map(answers => Right(answers)).recover(recovery)
+  def get(ern: String, draftId: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[CreateMovementUserAnswers]]] =
+    repo.get(ern, draftId).map(answers => Right(answers)).recover(recovery)
 
   def set(answers: CreateMovementUserAnswers)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, CreateMovementUserAnswers]] =
     repo.set(answers).map(_ => Right(answers)).recover(recovery)
 
-  def clear(ern: String, arc: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
-    repo.clear(ern, arc).map(Right(_)).recover(recovery)
+  def clear(ern: String, draftId: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
+    repo.clear(ern, draftId).map(Right(_)).recover(recovery)
 }

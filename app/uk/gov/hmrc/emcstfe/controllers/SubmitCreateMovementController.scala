@@ -33,7 +33,7 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
                                                override val auth: AuthAction
                                               )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
 
-  def submit(ern: String, lrn: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
+  def submit(ern: String, draftId: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[CreateMovementModel] {
       service.submit(_).map {
         case Left(value) => InternalServerError(Json.toJson(value))

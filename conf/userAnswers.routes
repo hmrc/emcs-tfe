@@ -4,9 +4,9 @@ GET           /report-receipt/:ern/:arc                    uk.gov.hmrc.emcstfe.c
 PUT           /report-receipt/:ern/:arc                    uk.gov.hmrc.emcstfe.controllers.userAnswers.ReportReceiptUserAnswersController.set(ern, arc)
 DELETE        /report-receipt/:ern/:arc                    uk.gov.hmrc.emcstfe.controllers.userAnswers.ReportReceiptUserAnswersController.clear(ern, arc)
 
-GET           /create-movement/:ern/:lrn                   uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.get(ern, lrn)
-PUT           /create-movement/:ern/:lrn                   uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.set(ern, lrn)
-DELETE        /create-movement/:ern/:lrn                   uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.clear(ern, lrn)
+GET           /create-movement/:ern/:draftId               uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.get(ern, draftId)
+PUT           /create-movement/:ern/:draftId               uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.set(ern, draftId)
+DELETE        /create-movement/:ern/:draftId               uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.clear(ern, draftId)
 
 DELETE        /explain-delay/:ern/:arc                     uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainDelayUserAnswersController.clear(ern, arc)
 GET           /explain-delay/:ern/:arc                     uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainDelayUserAnswersController.get(ern, arc)

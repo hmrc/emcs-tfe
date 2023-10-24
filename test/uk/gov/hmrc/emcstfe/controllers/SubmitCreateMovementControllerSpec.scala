@@ -36,7 +36,7 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
     val controller = new SubmitCreateMovementController(Helpers.stubControllerComponents(), mockService, authAction)
   }
 
-  s"POST ${routes.SubmitCreateMovementController.submit(testErn, testLrn)}" when {
+  s"POST ${routes.SubmitCreateMovementController.submit(testErn, testDraftId)}" when {
 
     "user is authorised" must {
       s"return ${Status.OK} (OK)" when {

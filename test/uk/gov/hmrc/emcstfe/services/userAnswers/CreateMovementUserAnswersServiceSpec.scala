@@ -32,29 +32,29 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
   }
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testLrn, Json.obj(), Instant.now())
+    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now())
 
   ".get" should {
     "return a Right(Some(answers))" when {
       "UserAnswers are successfully returned from Mongo" in new Test {
 
-        MockRepository.get(testErn, testLrn).returns(Future.successful(Some(userAnswers)))
-        await(service.get(testErn, testLrn)) shouldBe Right(Some(userAnswers))
+        MockRepository.get(testErn, testDraftId).returns(Future.successful(Some(userAnswers)))
+        await(service.get(testErn, testDraftId)) shouldBe Right(Some(userAnswers))
       }
     }
 
     "return a Right(None)" when {
       "UserAnswers are not found in Mongo" in new Test {
 
-        MockRepository.get(testErn, testLrn).returns(Future.successful(None))
-        await(service.get(testErn, testLrn)) shouldBe Right(None)
+        MockRepository.get(testErn, testDraftId).returns(Future.successful(None))
+        await(service.get(testErn, testDraftId)) shouldBe Right(None)
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockRepository.get(testErn, testLrn).returns(Future.failed(new Exception("bang")))
-        await(service.get(testErn, testLrn)) shouldBe Left(MongoError("bang"))
+        MockRepository.get(testErn, testDraftId).returns(Future.failed(new Exception("bang")))
+        await(service.get(testErn, testDraftId)) shouldBe Left(MongoError("bang"))
       }
     }
   }
@@ -80,15 +80,15 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Right(boolean)" when {
       "UserAnswers are successfully saved/updated in Mongo" in new Test {
 
-        MockRepository.clear(testErn, testLrn).returns(Future.successful(true))
-        await(service.clear(testErn, testLrn)) shouldBe Right(true)
+        MockRepository.clear(testErn, testDraftId).returns(Future.successful(true))
+        await(service.clear(testErn, testDraftId)) shouldBe Right(true)
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockRepository.clear(testErn, testLrn).returns(Future.failed(new Exception("bang")))
-        await(service.clear(testErn, testLrn)) shouldBe Left(MongoError("bang"))
+        MockRepository.clear(testErn, testDraftId).returns(Future.failed(new Exception("bang")))
+        await(service.clear(testErn, testDraftId)) shouldBe Left(MongoError("bang"))
       }
     }
   }

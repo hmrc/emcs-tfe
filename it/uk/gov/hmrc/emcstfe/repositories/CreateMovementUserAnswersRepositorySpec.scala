@@ -47,7 +47,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       val updatedRecord = find(
         Filters.and(
           Filters.equal("ern", userAnswers.ern),
-          Filters.equal("lrn", userAnswers.lrn)
+          Filters.equal("draftId", userAnswers.draftId)
         )
       ).futureValue.headOption.value
 
@@ -64,7 +64,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         insert(userAnswers).futureValue
 
-        val result = repository.get(userAnswers.ern, userAnswers.lrn).futureValue
+        val result = repository.get(userAnswers.ern, userAnswers.draftId).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
         result.value shouldBe expectedResult
@@ -86,14 +86,14 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
       insert(userAnswers).futureValue
 
-      val result = repository.clear(userAnswers.ern, userAnswers.lrn).futureValue
+      val result = repository.clear(userAnswers.ern, userAnswers.draftId).futureValue
 
       result shouldBe true
-      repository.get(userAnswers.ern, userAnswers.lrn).futureValue shouldBe None
+      repository.get(userAnswers.ern, userAnswers.draftId).futureValue shouldBe None
     }
 
     "return true when there is no record to remove" in {
-      val result = repository.clear(userAnswers.ern, userAnswers.lrn).futureValue
+      val result = repository.clear(userAnswers.ern, userAnswers.draftId).futureValue
 
       result shouldBe true
     }
@@ -107,7 +107,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         insert(userAnswers).futureValue
 
-        val result = repository.keepAlive(userAnswers.ern, userAnswers.lrn).futureValue
+        val result = repository.keepAlive(userAnswers.ern, userAnswers.draftId).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instantNow)
 
@@ -115,7 +115,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
         val updatedAnswers = find(
           Filters.and(
             Filters.equal("ern", userAnswers.ern),
-            Filters.equal("lrn", userAnswers.lrn)
+            Filters.equal("draftId", userAnswers.draftId)
           )
         ).futureValue.headOption.value
         updatedAnswers shouldBe expectedUpdatedAnswers
