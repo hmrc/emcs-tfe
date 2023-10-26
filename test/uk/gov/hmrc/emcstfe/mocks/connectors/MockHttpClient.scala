@@ -20,8 +20,11 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import play.api.libs.json.Writes
+import uk.gov.hmrc.emcstfe.models.request.eis.EisHeaders
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockHttpClient extends MockFactory {
@@ -65,6 +68,21 @@ trait MockHttpClient extends MockFactory {
 //          (XML.loadString(actualBody) \\ "OperationRequest"). shouldBe (XML.loadString(body) \\ "OperationRequest")
         }
         })
+    }
+
+    def postJson[I, T](url: String,
+                      body: I,
+                      headers: Seq[(String, String)] = Seq()): CallHandler[Future[T]] = {
+      (mockHttpClient
+        .POST[I, T](_: String, _: I, _: Seq[(String, String)])(_: Writes[I], _: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
+        .expects(assertArgs { (actualUrl, actualBody, actualHeaders, _, _, _, _) => {
+          actualUrl shouldBe url
+          actualBody shouldBe body
+          actualHeaders.filterNot(_._1 == EisHeaders.dateTime) shouldBe headers.filterNot(_._1 == EisHeaders.dateTime)
+          //Can't compare the original timestamps so truncate to days instead
+          Instant.parse(actualHeaders.find(_._1 == EisHeaders.dateTime).get._2).truncatedTo(ChronoUnit.DAYS) shouldBe Instant.parse(headers.find(_._1 == EisHeaders.dateTime).get._2).truncatedTo(ChronoUnit.DAYS)
+        }
+      })
     }
 
     def put[I, T](url: String,

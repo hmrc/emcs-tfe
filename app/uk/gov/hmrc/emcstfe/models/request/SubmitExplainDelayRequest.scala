@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.models.request
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 
 case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
                                     (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {

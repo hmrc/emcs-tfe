@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.connectors
 import com.lucidchart.open.xtract.XmlReader
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.ChrisXMLHttpParser
-import uk.gov.hmrc.emcstfe.models.request.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.XmlUtils

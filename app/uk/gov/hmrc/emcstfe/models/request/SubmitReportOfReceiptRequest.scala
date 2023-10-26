@@ -16,17 +16,23 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.models.common.TraderModel
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
+
+import java.util.Base64
 
 case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
-                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {
+                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisRequest with EisMessage {
 
   private val arcCountryCode = body.arc.substring(2, 4)
   private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(Constants.GB)
+  private val messageNumber = 818
 
   val messageSender =
     Constants.NDEA ++ (if (body.destinationType == DirectDelivery) {
@@ -48,7 +54,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
   override def requestBody: String =
     withSoapEnvelope(
       body = body,
-      messageNumber = 818,
+      messageNumber = messageNumber,
       messageSender = messageSender,
       messageRecipient = messageRecipient
     ).toString()
@@ -58,4 +64,21 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
   override def shouldExtractFromSoap: Boolean = false
 
   override def metricName: String = "report-receipt"
+
+  override def eisXMLBody(): String = {
+    withEisMessage(
+      body = body,
+      messageNumber = messageNumber,
+      messageSender = messageSender,
+      messageRecipient = messageRecipient
+    ).toString()
+  }
+
+  override def toJson: JsObject = {
+    Json.obj(
+      "user" -> exciseRegistrationNumber,
+      "messageType" -> s"IE$messageNumber",
+      "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
+    )
+  }
 }

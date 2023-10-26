@@ -19,8 +19,8 @@ package uk.gov.hmrc.emcstfe.models.response
 import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess}
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
-import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
+import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.XML

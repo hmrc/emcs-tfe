@@ -18,11 +18,11 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.MovementType
-import uk.gov.hmrc.emcstfe.models.common.DestinationType
-import uk.gov.hmrc.emcstfe.models.common.MovementType._
 import uk.gov.hmrc.emcstfe.models.common.DestinationType._
+import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementType}
+import uk.gov.hmrc.emcstfe.models.common.MovementType._
 import uk.gov.hmrc.emcstfe.models.createMovement.CreateMovementModel
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 
 case class SubmitCreateMovementRequest(body: CreateMovementModel)
                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {

@@ -28,10 +28,15 @@ trait MockAppConfig extends MockFactory {
 
   object MockedAppConfig {
     def chrisUrl: CallHandler[String] = ((() => mockAppConfig.chrisUrl): () => String).expects()
-    def chrisStubUrl: CallHandler[String] = ((() => mockAppConfig.chrisStubUrl): () => String).expects()
+    def downstreamStubUrl: CallHandler[String] = ((() => mockAppConfig.downstreamStubUrl): () => String).expects()
 
     def isEnabled(feature: FeatureSwitch): CallHandler1[FeatureSwitch, Boolean] = {
       (mockAppConfig.isEnabled(_: FeatureSwitch)).expects(feature)
+    }
+
+    def getFeatureSwitchValue(feature: FeatureSwitch): CallHandler1[String, Boolean] = {
+      val featureSwitchName = feature.configName
+      (mockAppConfig.getFeatureSwitchValue(_: String)).expects(featureSwitchName)
     }
 
 

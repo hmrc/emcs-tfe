@@ -28,14 +28,14 @@ import scala.concurrent.Future
 class GetMovementListServiceSpec extends TestBaseSpec with GetMovementListFixture {
   trait Test extends MockChrisConnector with MockAppConfig {
     val getMovementListRequest: GetMovementListRequest = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions())
-    val service: GetMovementListService = new GetMovementListService(mockConnector, mockAppConfig)
+    val service: GetMovementListService = new GetMovementListService(mockChrisConnector, mockAppConfig)
   }
 
   "getMovementList" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector
+        MockChrisConnector
           .postChrisSOAPRequestAndExtractToModel(getMovementListRequest)
           .returns(Future.successful(Right(getMovementListResponse)))
 
@@ -44,14 +44,14 @@ class GetMovementListServiceSpec extends TestBaseSpec with GetMovementListFixtur
     }
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
-        MockConnector
+        MockChrisConnector
           .postChrisSOAPRequestAndExtractToModel(getMovementListRequest)
           .returns(Future.successful(Left(XmlValidationError)))
 
         await(service.getMovementList(getMovementListRequest)) shouldBe Left(XmlValidationError)
       }
       "connector call response cannot be extracted" in new Test {
-        MockConnector
+        MockChrisConnector
           .postChrisSOAPRequestAndExtractToModel(getMovementListRequest)
           .returns(Future.successful(Left(SoapExtractionError)))
 

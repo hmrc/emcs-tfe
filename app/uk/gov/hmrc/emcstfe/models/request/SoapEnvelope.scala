@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 
 import scala.xml.{Elem, XML}
 

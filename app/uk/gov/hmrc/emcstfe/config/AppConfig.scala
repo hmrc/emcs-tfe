@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.config
 
 import play.api.Configuration
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseChrisStub}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDownstreamStub}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
@@ -29,7 +29,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   override lazy val config: AppConfig = this
 
   def chrisUrl: String = servicesConfig.baseUrl("chris")
-  def chrisStubUrl: String = servicesConfig.baseUrl("chris-stub")
+  def downstreamStubUrl: String = servicesConfig.baseUrl("downstream-stub")
+
+  def eisUrl: String = servicesConfig.baseUrl("eis")
 
   def createMovementUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.createMovementUserAnswers.TTL"))
   def createMovementUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.createMovementUserAnswers.replaceIndexes")
@@ -57,7 +59,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def getFeatureSwitchValue(feature: String): Boolean = configuration.get[Boolean](feature)
 
-  def chrisBaseUrl: String = if(isEnabled(UseChrisStub)) chrisStubUrl else chrisUrl
+  def chrisBaseUrl: String = if(isEnabled(UseDownstreamStub)) downstreamStubUrl else chrisUrl
+
+  def eisBaseUrl: String = if(isEnabled(UseDownstreamStub)) downstreamStubUrl else eisUrl
 
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
@@ -67,6 +71,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def urlSubmitReportOfReceipt(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
+
+  def urlSubmitReportOfReceiptEis(): String =
+    eisBaseUrl + "/emcs/digital-submit-new-message/v1"
 
   def urlSubmitExplainDelay(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4"
@@ -82,4 +89,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def urlCancellationOfMovement(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitCancellationPortal/3"
+
+  def eisForwardedHost() = configuration.get[String]("eis.forwardedHost")
 }

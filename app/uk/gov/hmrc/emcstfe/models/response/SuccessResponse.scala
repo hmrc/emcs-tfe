@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request
+package uk.gov.hmrc.emcstfe.models.response
 
-import java.time.{LocalDate, LocalTime, ZoneId}
-import java.util.UUID
+import play.api.libs.json.OWrites
 
-trait ChrisRequest {
-  def requestBody: String
+trait SuccessResponse {
 
-  def exciseRegistrationNumber: String
+  implicit val writes: OWrites[SuccessResponse]
 
-  def action: String
-
-  def uuid: String = java.util.UUID.randomUUID().toString
-
-  def shouldExtractFromSoap: Boolean
-
-  def metricName: String
-
-  val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID: UUID = UUID.randomUUID()
-  val messageUUID: UUID = UUID.randomUUID()
 }

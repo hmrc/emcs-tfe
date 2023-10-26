@@ -20,6 +20,7 @@ import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 
 case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessModel)
                                        (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {

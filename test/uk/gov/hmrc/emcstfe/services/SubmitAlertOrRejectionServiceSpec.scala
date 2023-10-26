@@ -30,14 +30,14 @@ class SubmitAlertOrRejectionServiceSpec extends TestBaseSpec with SubmitAlertOrR
   trait Test extends MockChrisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitAlertOrRejectionRequest: SubmitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
-    val service: SubmitAlertOrRejectionService = new SubmitAlertOrRejectionService(mockConnector)
+    val service: SubmitAlertOrRejectionService = new SubmitAlertOrRejectionService(mockChrisConnector)
   }
 
   "submit" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
+        MockChrisConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
           Future.successful(Right(chrisSuccessResponse))
         )
 
@@ -47,7 +47,7 @@ class SubmitAlertOrRejectionServiceSpec extends TestBaseSpec with SubmitAlertOrR
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
+        MockChrisConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
           Future.successful(Left(XmlValidationError))
         )
 

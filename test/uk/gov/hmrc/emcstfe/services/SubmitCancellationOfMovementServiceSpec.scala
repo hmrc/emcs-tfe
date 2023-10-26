@@ -31,14 +31,14 @@ class SubmitCancellationOfMovementServiceSpec extends TestBaseSpec with SubmitCa
   trait Test extends MockChrisConnector {
     implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitCancellationOfMovementRequest: SubmitCancellationOfMovementRequest = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
-    val service: SubmitCancellationOfMovementService = new SubmitCancellationOfMovementService(mockConnector)
+    val service: SubmitCancellationOfMovementService = new SubmitCancellationOfMovementService(mockChrisConnector)
   }
 
   "submit" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector.submitCancellationOfMovementChrisSOAPRequest(submitCancellationOfMovementRequest).returns(
+        MockChrisConnector.submitCancellationOfMovementChrisSOAPRequest(submitCancellationOfMovementRequest).returns(
           Future.successful(Right(chrisSuccessResponse))
         )
 
@@ -48,7 +48,7 @@ class SubmitCancellationOfMovementServiceSpec extends TestBaseSpec with SubmitCa
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockConnector.submitCancellationOfMovementChrisSOAPRequest(submitCancellationOfMovementRequest).returns(
+        MockChrisConnector.submitCancellationOfMovementChrisSOAPRequest(submitCancellationOfMovementRequest).returns(
           Future.successful(Left(XmlValidationError))
         )
 

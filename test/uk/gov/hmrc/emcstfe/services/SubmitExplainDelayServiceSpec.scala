@@ -30,14 +30,14 @@ class SubmitExplainDelayServiceSpec extends TestBaseSpec with SubmitExplainDelay
   trait Test extends MockChrisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitExplainDelayRequest: SubmitExplainDelayRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
-    val service: SubmitExplainDelayService = new SubmitExplainDelayService(mockConnector)
+    val service: SubmitExplainDelayService = new SubmitExplainDelayService(mockChrisConnector)
   }
 
   "submit" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
+        MockChrisConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
           Future.successful(Right(chrisSuccessResponse))
         )
 
@@ -47,7 +47,7 @@ class SubmitExplainDelayServiceSpec extends TestBaseSpec with SubmitExplainDelay
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
+        MockChrisConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
           Future.successful(Left(XmlValidationError))
         )
 

@@ -23,7 +23,7 @@ import uk.gov.hmrc.emcstfe.services.MetricsService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockMetricsService extends MockFactory  {
+trait MockMetricsService extends MockFactory {
 
   lazy val mockMetricsService: MetricsService = mock[MetricsService]
   lazy val mockTimer: Timer = new Timer()
@@ -38,10 +38,10 @@ trait MockMetricsService extends MockFactory  {
           f()
         }
 
-    def chrisTimer(metricName: String): CallHandler1[String, Timer] =
-      (mockMetricsService.chrisTimer(_: String)).expects(metricName).returns(mockTimer)
+    def requestTimer(metricName: String): CallHandler1[String, Timer] =
+      (mockMetricsService.requestTimer(_: String)).expects(metricName).returns(mockTimer)
 
-    def rorStatusCounter(status: String) =
+    def rorStatusCounter(status: String): CallHandler1[String, Counter] =
       (mockMetricsService.rorStatusCounter(_: String)).expects(status).returns(mockCounter)
   }
 }

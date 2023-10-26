@@ -39,7 +39,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
     lazy val getMovementIfChangedRequest: GetMovementIfChangedRequest = GetMovementIfChangedRequest(exciseRegistrationNumber = testErn, arc = testArc, sequenceNumber = "1", versionTransactionReference = "008")
 
     lazy val service: GetMovementService = new GetMovementService(
-      mockConnector,
+      mockChrisConnector,
       mockRepo,
       mockXmlUtils,
       mockAppConfig
@@ -54,7 +54,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
         "retrieving from mongo returns nothing so a fresh call to GetMovement is made" in new Test {
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
-          MockConnector
+          MockChrisConnector
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
@@ -69,7 +69,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
             .get(testArc)
             .returns(Future.successful(Some(getMovementMongoResponse)))
 
-          MockConnector
+          MockChrisConnector
             .postChrisSOAPRequest(getMovementIfChangedRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementIfChangedNoChangeSoapWrapper))))
 
@@ -78,7 +78,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
         "retrieving from mongo returns a match so a fresh call to GetMovementIfChanged is made and there is a change" in new Test {
           MockGetMovementRepository.get(testArc).returns(Future.successful(Some(getMovementMongoResponse)))
 
-          MockConnector
+          MockChrisConnector
             .postChrisSOAPRequest(getMovementIfChangedRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementIfChangedWithChangeSoapWrapper))))
 
@@ -95,7 +95,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
         "GetMovement call is unsuccessful" in new Test {
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
-          MockConnector
+          MockChrisConnector
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Left(XmlValidationError)))
 
@@ -104,7 +104,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
         "GetMovement call response cannot be extracted" in new Test {
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
-          MockConnector
+          MockChrisConnector
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Left(SoapExtractionError)))
 
@@ -113,7 +113,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
         "repository.set fails with MongoException, still return the movement as doesn't matter if cache doesn't store" in new Test {
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
-          MockConnector
+          MockChrisConnector
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
@@ -126,7 +126,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
         "repository.set returns some other failed future, still return the movement as doesn't matter if cache doesn't store" in new Test {
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
-          MockConnector
+          MockChrisConnector
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
@@ -143,7 +143,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
       "fetch from downstream if Mongo returns no data" in new Test {
         MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
-        MockConnector
+        MockChrisConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
@@ -217,7 +217,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
     "return a Right" when {
       "connector call is successful and repository call is successful" in new Test {
 
-        MockConnector
+        MockChrisConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
@@ -234,7 +234,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
     "return a Right" when {
       "downstream call is successful but response model is empty" in new Test {
 
-        MockConnector
+        MockChrisConnector
           .postChrisSOAPRequest(getMovementIfChangedRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementIfChangedNoChangeSoapWrapper))))
 
@@ -243,7 +243,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
       "downstream call is successful and response model is not empty" in new Test {
 
 
-        MockConnector
+        MockChrisConnector
           .postChrisSOAPRequest(getMovementIfChangedRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementIfChangedWithChangeSoapWrapper))))
 

@@ -30,14 +30,14 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
   trait Test extends MockChrisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax)
-    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockConnector)
+    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector)
   }
 
   "submit" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
 
-        MockConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
+        MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
           Future.successful(Right(chrisSuccessResponse))
         )
 
@@ -47,7 +47,7 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
+        MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
           Future.successful(Left(XmlValidationError))
         )
 

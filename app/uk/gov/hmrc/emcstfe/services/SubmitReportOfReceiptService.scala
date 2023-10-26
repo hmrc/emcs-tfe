@@ -17,12 +17,12 @@
 package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitReportOfReceiptRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -30,22 +30,29 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitReportOfReceiptService @Inject()(connector: ChrisConnector,
+class SubmitReportOfReceiptService @Inject()(chrisConnector: ChrisConnector,
+                                             eisConnector: EisConnector,
                                              val appConfig: AppConfig,
                                              metricsService: MetricsService) extends Logging {
   def submit(submission: SubmitReportOfReceiptModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    connector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](SubmitReportOfReceiptRequest(submission)) map {
-      case r@Right(_) =>
-        submission.acceptMovement match {
-          case AcceptMovement.Satisfactory => metricsService.rorSatisfactoryCount.inc()
-          case AcceptMovement.Unsatisfactory => metricsService.rorUnsatisfactoryCount.inc()
-          case AcceptMovement.Refused => metricsService.rorRefused.inc()
-          case AcceptMovement.PartiallyRefused => metricsService.rorPartiallyRefused.inc()
-        }
-        r
-      case l@Left(_) =>
-        metricsService.rorFailedSubmission.inc()
-        l
-    }
+    chrisConnector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](SubmitReportOfReceiptRequest(submission)).map(handleResponse(_, submission))
+
+  def submitViaEIS(submission: SubmitReportOfReceiptModel)
+            (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSuccessResponse]] =
+    eisConnector.submitReportOfReceiptEISRequest[EISSuccessResponse](SubmitReportOfReceiptRequest(submission)).map(handleResponse(_, submission))
+
+  private def handleResponse[A](response: Either[ErrorResponse, A], submission: SubmitReportOfReceiptModel): Either[ErrorResponse, A] = response match {
+    case r@Right(_) =>
+      submission.acceptMovement match {
+        case AcceptMovement.Satisfactory => metricsService.rorSatisfactoryCount.inc()
+        case AcceptMovement.Unsatisfactory => metricsService.rorUnsatisfactoryCount.inc()
+        case AcceptMovement.Refused => metricsService.rorRefused.inc()
+        case AcceptMovement.PartiallyRefused => metricsService.rorPartiallyRefused.inc()
+      }
+      r
+    case l@Left(_) =>
+      metricsService.rorFailedSubmission.inc()
+      l
+  }
 }
