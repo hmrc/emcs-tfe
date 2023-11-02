@@ -37,5 +37,10 @@ trait MockEisConnector extends MockFactory {
         .expects(eisRequest, *, *, *)
     }
 
+    def submitExplainShortageExcessEISRequest[A](eisRequest: EisRequest): CallHandler4[EisRequest, HeaderCarrier, ExecutionContext, Reads[A], Future[Either[ErrorResponse, A]]] = {
+      (mockEisConnector.submitExplainShortageExcessEISRequest[A](_: EisRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[A]))
+        .expects(eisRequest, *, *, *)
+    }
+
   }
 }

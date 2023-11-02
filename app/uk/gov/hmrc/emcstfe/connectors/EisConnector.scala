@@ -42,5 +42,9 @@ class EisConnector @Inject()(val http: HttpClient,
 
   def submitReportOfReceiptEISRequest[A](request: EisRequest)
                                         (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
-    prepareJsonAndSubmit(appConfig.urlSubmitReportOfReceiptEis(), request, "submitReportOfReceiptEISRequest")
+    prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, "submitReportOfReceiptEISRequest")
+
+  def submitExplainShortageExcessEISRequest[A](request: EisRequest)
+                                              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
+    prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, "submitExplainShortageExcessEISRequest")
 }

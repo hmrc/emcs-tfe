@@ -63,6 +63,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def eisBaseUrl: String = if(isEnabled(UseDownstreamStub)) downstreamStubUrl else eisUrl
 
+  def eisSubmissionsUrl(): String =
+    eisBaseUrl + "/emcs/digital-submit-new-message/v1"
+
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
 
@@ -71,9 +74,6 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   def urlSubmitReportOfReceipt(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
-
-  def urlSubmitReportOfReceiptEis(): String =
-    eisBaseUrl + "/emcs/digital-submit-new-message/v1"
 
   def urlSubmitExplainDelay(): String =
     chrisBaseUrl + "/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4"

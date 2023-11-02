@@ -21,7 +21,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitExplainShortageExcessService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -35,6 +35,11 @@ trait MockSubmitExplainShortageExcessService extends MockFactory  {
     def submit(submission: SubmitExplainShortageExcessModel): CallHandler4[SubmitExplainShortageExcessModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
       (mockService.submit(_: SubmitExplainShortageExcessModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
         .expects(submission, *, *, *)
+
+    def submitViaEIS(submission: SubmitExplainShortageExcessModel): CallHandler4[SubmitExplainShortageExcessModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSuccessResponse]]] =
+      (mockService.submitViaEIS(_: SubmitExplainShortageExcessModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(submission, *, *, *)
+
   }
 }
 

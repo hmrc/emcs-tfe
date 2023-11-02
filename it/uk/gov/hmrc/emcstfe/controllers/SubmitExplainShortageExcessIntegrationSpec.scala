@@ -21,6 +21,8 @@ import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
@@ -30,9 +32,11 @@ import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import scala.xml.XML
 
-class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec with SubmitExplainShortageExcessFixtures {
+class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec with SubmitExplainShortageExcessFixtures with FeatureSwitching {
 
   import SubmitExplainShortageExcessFixtures._
+
+  override val config: AppConfig = app.injector.instanceOf[AppConfig]
 
   private trait Test {
     def setupStubs(): StubMapping
@@ -41,11 +45,19 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
 
     def downstreamUri: String = s"/ChRIS/EMCS/SubmitReasonForShortagePortal/2"
 
+    def downstreamEisUri: String = s"/emcs/digital-submit-new-message/v1"
+
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri, "Content-Type" -> "application/json")
     }
   }
+
+  override def beforeEach(): Unit = {
+    disable(SendToEIS)
+    super.beforeEach()
+  }
+
 
   "Calling the submit explain shortage or excess endpoint" must {
     "return a success" when {
@@ -106,5 +118,54 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
         response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
       }
     }
+    "when calling EIS" must {
+      "return a success" when {
+        "all downstream calls are successful" in new Test {
+          override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson)
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(submitExplainShortageExcessJsonMax(Consignor))))
+          response.status shouldBe Status.OK
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe eisSuccessJson
+        }
+
+      }
+
+      "return an error" when {
+
+        "downstream call returns unexpected JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, imcompleteEisSuccessJson.toString())
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(submitExplainShortageExcessJsonMax(Consignor))))
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Errors parsing JSON, errors: List(JsonValidationError(List(error.path.missing),ArraySeq()))"
+          )
+        }
+
+        "downstream call returns a non-200 HTTP response" in new Test {
+          override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.INTERNAL_SERVER_ERROR, "bad things")
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(submitExplainShortageExcessJsonMax(Consignor))))
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.toJson(EISInternalServerError("bad things"))
+        }
+      }
+    }
+
   }
 }

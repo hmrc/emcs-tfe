@@ -16,15 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
+
+import java.util.Base64
 
 case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessModel)
-                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {
+                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
+  private val messageNumber = 871
 
   val messageRecipient: String = {
     val countryCode: String = body.attributes.submitterType match {
@@ -46,7 +51,7 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
   override def requestBody: String =
     withSoapEnvelope(
       body = body,
-      messageNumber = 871,
+      messageNumber = messageNumber,
       messageSender = messageSender,
       messageRecipient = messageRecipient
     ).toString()
@@ -56,4 +61,21 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
   override def shouldExtractFromSoap: Boolean = false
 
   override def metricName = "explain-shortage-excess"
+
+  override def eisXMLBody(): String = {
+    withEisMessage(
+      body = body,
+      messageNumber = messageNumber,
+      messageSender = messageSender,
+      messageRecipient = messageRecipient
+    ).toString()
+  }
+
+  override def toJson: JsObject = {
+    Json.obj(
+      "user" -> exciseRegistrationNumber,
+      "messageType" -> s"IE$messageNumber",
+      "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
+    )
+  }
 }

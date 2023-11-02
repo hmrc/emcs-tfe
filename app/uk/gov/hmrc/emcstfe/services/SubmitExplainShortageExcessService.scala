@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,9 +28,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitExplainShortageExcessService @Inject()(connector: ChrisConnector) extends Logging {
+class SubmitExplainShortageExcessService @Inject()(connector: ChrisConnector, eisConnector: EisConnector) extends Logging {
   def submit(submission: SubmitExplainShortageExcessModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
     connector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainShortageExcessRequest(submission))
+
+  def submitViaEIS(submission: SubmitExplainShortageExcessModel)
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSuccessResponse]] =
+    eisConnector.submitExplainShortageExcessEISRequest[EISSuccessResponse](SubmitExplainShortageExcessRequest(submission))
+
 
 }
