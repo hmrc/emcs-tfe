@@ -19,10 +19,10 @@ object AppDependencies {
   )
 
   val test: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"           %% s"bootstrap-test$playSuffix"     % boostrapVersion         % "test, it",
-    "org.scalamock"         %%  "scalamock"                     % scalamockVersion        % "test, it",
-    "com.lucidchart"        %%  "xtract-testing"                % xtractVersion           % "test, it",
-    "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-test$playSuffix"    % hmrcMongoVersion        % "it"
+    "uk.gov.hmrc"           %% s"bootstrap-test$playSuffix"     % boostrapVersion         % Test,
+    "org.scalamock"         %%  "scalamock"                     % scalamockVersion        % Test,
+    "com.lucidchart"        %%  "xtract-testing"                % xtractVersion           % Test,
+    "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-test$playSuffix"    % hmrcMongoVersion        % Test
   )
 
   val overrides: Seq[ModuleID] = Seq(

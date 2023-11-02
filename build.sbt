@@ -1,14 +1,15 @@
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
 import scoverage.ScoverageKeys
+import uk.gov.hmrc.DefaultBuildSettings
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 
-lazy val ItTest = config("it") extend Test
+
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.8"
 
 lazy val microservice = Project("emcs-tfe", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    majorVersion        := 0,
-    scalaVersion        := "2.13.8",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     dependencyOverrides ++= AppDependencies.overrides,
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
@@ -16,18 +17,19 @@ lazy val microservice = Project("emcs-tfe", file("."))
     scalacOptions += "-Wconf:src=routes/.*:s",
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions",
     ScoverageKeys.coverageMinimumStmtTotal := 95,
-)
-  .configs(ItTest)
-  .settings(inConfig(ItTest)(Defaults.itSettings ++ headerSettings(ItTest) ++ automateHeaderSettings(ItTest)): _*)
-  .settings(
-    ItTest / fork := true,
-    ItTest / unmanagedSourceDirectories := Seq((ItTest / baseDirectory).value / "it"),
-    ItTest / unmanagedClasspath += baseDirectory.value / "resources",
-    Runtime / unmanagedClasspath += baseDirectory.value / "resources",
-    ItTest / javaOptions += "-Dlogger.resource=logback-test.xml",
-    ItTest / parallelExecution := false,
-    addTestReportOption(ItTest, "int-test-reports")
+    resolvers += Resolver.jcenterRepo,
+    CodeCoverageSettings.settings,
+    PlayKeys.playDefaultPort := 8311
   )
-  .settings(resolvers += Resolver.jcenterRepo)
-  .settings(CodeCoverageSettings.settings: _*)
-  .settings(PlayKeys.playDefaultPort := 8311)
+
+lazy val it = (project in file("it"))
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(
+    DefaultBuildSettings.itSettings,
+    Test / fork := true,
+    addTestReportOption(Test, "int-test-reports"),
+    Test / javaOptions += "-Dlogger.resource=logback-test.xml",
+    Test / parallelExecution := false
+  )
+
