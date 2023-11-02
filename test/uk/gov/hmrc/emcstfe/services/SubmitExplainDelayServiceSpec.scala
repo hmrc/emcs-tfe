@@ -18,41 +18,67 @@ package uk.gov.hmrc.emcstfe.services
 
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainDelayRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
 class SubmitExplainDelayServiceSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
-  trait Test extends MockChrisConnector {
+  trait Test extends MockChrisConnector with MockEisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitExplainDelayRequest: SubmitExplainDelayRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
-    val service: SubmitExplainDelayService = new SubmitExplainDelayService(mockChrisConnector)
+    val service: SubmitExplainDelayService = new SubmitExplainDelayService(mockChrisConnector, mockEisConnector)
   }
 
-  "submit" should {
-    "return a Right" when {
-      "connector call is successful and XML is the correct format" in new Test {
+  "SubmitExplainDelayService" should {
+    "submit" should {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in new Test {
 
-        MockChrisConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
-          Future.successful(Right(chrisSuccessResponse))
-        )
+          MockChrisConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
+            Future.successful(Right(chrisSuccessResponse))
+          )
 
-        await(service.submit(maxSubmitExplainDelayModel)) shouldBe Right(chrisSuccessResponse)
+          await(service.submit(maxSubmitExplainDelayModel)) shouldBe Right(chrisSuccessResponse)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in new Test {
+
+          MockChrisConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
+            Future.successful(Left(XmlValidationError))
+          )
+
+          await(service.submit(maxSubmitExplainDelayModel)) shouldBe Left(XmlValidationError)
+        }
       }
     }
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
 
-        MockChrisConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
-          Future.successful(Left(XmlValidationError))
-        )
+    "submitViaEis" should {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in new Test {
 
-        await(service.submit(maxSubmitExplainDelayModel)) shouldBe Left(XmlValidationError)
+          MockEisConnector.submitExplainDelayEISRequest(submitExplainDelayRequest).returns(
+            Future.successful(Right(eisSuccessResponse))
+          )
+
+          await(service.submitViaEIS(maxSubmitExplainDelayModel)) shouldBe Right(eisSuccessResponse)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in new Test {
+
+          MockEisConnector.submitExplainDelayEISRequest(submitExplainDelayRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
+
+          await(service.submitViaEIS(maxSubmitExplainDelayModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
       }
     }
   }
+
 }

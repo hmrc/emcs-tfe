@@ -41,10 +41,18 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.{ExecutionContext, Future}
 
-class EisConnectorSpec extends TestBaseSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with FeatureSwitching with BeforeAndAfterEach
+class EisConnectorSpec extends TestBaseSpec
+  with Status
+  with MimeTypes
+  with HeaderNames
+  with MockAppConfig
+  with MockHttpClient
+  with FeatureSwitching
+  with BeforeAndAfterEach
   with GetMovementFixture
   with SubmitReportOfReceiptFixtures
   with SubmitExplainShortageExcessFixtures
+  with SubmitExplainDelayFixtures
   with CreateMovementFixtures
   with MockMetricsService {
 
@@ -67,6 +75,7 @@ class EisConnectorSpec extends TestBaseSpec with Status with MimeTypes with Head
   }
 
   "EISConnector" when {
+
     "submitReportOfReceiptEISRequest is called" should {
 
       implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
@@ -453,6 +462,201 @@ class EisConnectorSpec extends TestBaseSpec with Status with MimeTypes with Head
         }
       }
     }
+
+    "submitExplainDelayEISRequest is called" should {
+
+      implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+
+      val submitExplainDelayEISRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
+
+      "return a Right" when {
+        "downstream call is successful" in new Test {
+
+          MockMetricsService.requestTimer(submitExplainDelayEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainDelayEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainDelayEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(Right(eisSuccessResponse)))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe Right(eisSuccessResponse)
+        }
+      }
+
+      "return a Left" when {
+
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(submitExplainDelayEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainDelayEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainDelayEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+          MockMetricsService.requestTimer(submitExplainDelayEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainDelayEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainDelayEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+          MockMetricsService.requestTimer(submitExplainDelayEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainDelayEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainDelayEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+          MockMetricsService.requestTimer(submitExplainDelayEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainDelayEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainDelayEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 500 (ISE) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+          MockMetricsService.requestTimer(submitExplainDelayEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainDelayEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainDelayEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(submitExplainDelayEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainDelayEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainDelayEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(submitExplainDelayEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainDelayEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainDelayEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+        }
+      }
+    }
+
   }
 
 }

@@ -16,17 +16,22 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
+
+import java.util.Base64
 
 case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
-                                    (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {
+                                    (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope  with EisRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
 
   private val arcCountryCode = body.arc.substring(2, 4)
   private val ernCountryCode = exciseRegistrationNumber.substring(0, 2)
+  private val messageNumber = 837
 
   val messageRecipient = Constants.NDEA ++ arcCountryCode
   val messageSender: String = Constants.NDEA ++ ernCountryCode
@@ -34,7 +39,7 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
   override def requestBody: String =
     withSoapEnvelope(
       body = body,
-      messageNumber = 837,
+      messageNumber = messageNumber,
       messageSender = messageSender,
       messageRecipient = messageRecipient
     ).toString()
@@ -44,4 +49,21 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
   override def shouldExtractFromSoap: Boolean = false
 
   override def metricName = "explain-delay"
+
+  override def eisXMLBody(): String = {
+    withEisMessage(
+      body = body,
+      messageNumber = messageNumber,
+      messageSender = messageSender,
+      messageRecipient = messageRecipient
+    ).toString()
+  }
+
+  override def toJson: JsObject = {
+    Json.obj(
+      "user" -> exciseRegistrationNumber,
+      "messageType" -> s"IE$messageNumber",
+      "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
+    )
+  }
 }

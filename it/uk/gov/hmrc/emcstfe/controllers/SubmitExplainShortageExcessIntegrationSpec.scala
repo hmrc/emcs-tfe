@@ -141,7 +141,7 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
           override def setupStubs(): StubMapping = {
             enable(SendToEIS)
             AuthStub.authorised()
-            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, imcompleteEisSuccessJson.toString())
+            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, incompleteEisSuccessJson.toString())
           }
 
           val response: WSResponse = await(request().post(Json.toJson(submitExplainShortageExcessJsonMax(Consignor))))

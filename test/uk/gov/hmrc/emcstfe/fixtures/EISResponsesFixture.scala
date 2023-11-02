@@ -34,7 +34,7 @@ trait EISResponsesFixture {
       | "emcsCorrelationId": "3e8dae97-b586-4cef-8511-68ac12da9028"
       |}""".stripMargin)
 
-  lazy val imcompleteEisSuccessJson: JsValue = Json.parse(
+  lazy val incompleteEisSuccessJson: JsValue = Json.parse(
     """{
       | "status": "OK",
       | "message": "Great success"
