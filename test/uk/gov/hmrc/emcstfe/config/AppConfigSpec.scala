@@ -59,7 +59,7 @@ class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
 
         "must return to the legacy URL" in {
           enable(UseDownstreamStub)
-          config.urlSubmitReportOfReceiptEis() shouldBe s"http://localhost:8308/emcs/digital-submit-new-message/v1"
+          config.eisSubmissionsUrl() shouldBe s"http://localhost:8308/emcs/digital-submit-new-message/v1"
         }
       }
 
@@ -67,7 +67,7 @@ class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
 
         "must return to the new URL" in {
           disable(UseDownstreamStub)
-          config.urlSubmitReportOfReceiptEis() shouldBe s"http://localhost:8308/emcs/digital-submit-new-message/v1"
+          config.eisSubmissionsUrl() shouldBe s"http://localhost:8308/emcs/digital-submit-new-message/v1"
         }
       }
     }

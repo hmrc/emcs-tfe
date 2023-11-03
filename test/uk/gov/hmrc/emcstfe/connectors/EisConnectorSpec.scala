@@ -29,6 +29,7 @@ import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignee
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisHeaders
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
@@ -43,6 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class EisConnectorSpec extends TestBaseSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with FeatureSwitching with BeforeAndAfterEach
   with GetMovementFixture
   with SubmitReportOfReceiptFixtures
+  with SubmitExplainShortageExcessFixtures
   with CreateMovementFixtures
   with MockMetricsService {
 
@@ -64,195 +66,391 @@ class EisConnectorSpec extends TestBaseSpec with Status with MimeTypes with Head
     val baseUrl: String = "http://localhost:8308"
   }
 
-  "submitReportOfReceiptChrisSOAPRequest" should {
+  "EISConnector" when {
+    "submitReportOfReceiptEISRequest is called" should {
 
-    implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
+      implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+      val submitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
-    "return a Right" when {
-      "downstream call is successful" in new Test {
+      "return a Right" when {
+        "downstream call is successful" in new Test {
 
-        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
-        MockMetricsService.processWithTimer()
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
 
-        MockHttpClient.postJson(
-          url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-          body = submitReportOfReceiptRequest.toJson,
-          headers = Seq(
-            EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-            EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
-            EisHeaders.forwardedHost -> "MDTP",
-            EisHeaders.source -> "TFE",
-            EisHeaders.contentType -> "application/json",
-            EisHeaders.accept -> "application/json"
-          )
-        ).returns(Future.successful(Right(eisSuccessResponse)))
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitReportOfReceiptRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(Right(eisSuccessResponse)))
 
-        await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe Right(eisSuccessResponse)
+          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe Right(eisSuccessResponse)
+        }
+      }
+
+      "return a Left" when {
+
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitReportOfReceiptRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitReportOfReceiptRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitReportOfReceiptRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitReportOfReceiptRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 500 (ISE) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitReportOfReceiptRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitReportOfReceiptRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitReportOfReceiptRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+
+          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+        }
       }
     }
 
-    "return a Left" when {
+    "submitExplainShortageExcessEISRequest is called" should {
 
-      "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+      implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
 
-        val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+      val submitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignee))
 
-        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
-        MockMetricsService.processWithTimer()
+      "return a Right" when {
+        "downstream call is successful" in new Test {
 
-        MockHttpClient.postJson(
-          url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-          body = submitReportOfReceiptRequest.toJson,
-          headers = Seq(
-            EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-            EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
-            EisHeaders.forwardedHost -> "MDTP",
-            EisHeaders.source -> "TFE",
-            EisHeaders.contentType -> "application/json",
-            EisHeaders.accept -> "application/json"
-          )
-        ).returns(Future.successful(response))
+          MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainShortageExcessRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainShortageExcessRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(Right(eisSuccessResponse)))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe Right(eisSuccessResponse)
+        }
       }
 
-      "downstream call fails due to a 400 (Bad Request) response" in new Test {
+      "return a Left" when {
 
-        val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
 
-        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
 
-        MockHttpClient.postJson(
-          url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-          body = submitReportOfReceiptRequest.toJson,
-          headers = Seq(
-            EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-            EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
-            EisHeaders.forwardedHost -> "MDTP",
-            EisHeaders.source -> "TFE",
-            EisHeaders.contentType -> "application/json",
-            EisHeaders.accept -> "application/json"
-          )
-        ).returns(Future.successful(response))
+          MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
-      }
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainShortageExcessRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainShortageExcessRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
 
-      "downstream call fails due to a 404 (Not Found) response" in new Test {
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+        }
 
-        val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
 
-        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
 
-        MockHttpClient.postJson(
-          url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-          body = submitReportOfReceiptRequest.toJson,
-          headers = Seq(
-            EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-            EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
-            EisHeaders.forwardedHost -> "MDTP",
-            EisHeaders.source -> "TFE",
-            EisHeaders.contentType -> "application/json",
-            EisHeaders.accept -> "application/json"
-          )
-        ).returns(Future.successful(response))
+          MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
-      }
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainShortageExcessRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainShortageExcessRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
 
-      "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+        }
 
-        val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
 
-        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
 
-        MockHttpClient.postJson(
-          url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-          body = submitReportOfReceiptRequest.toJson,
-          headers = Seq(
-            EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-            EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
-            EisHeaders.forwardedHost -> "MDTP",
-            EisHeaders.source -> "TFE",
-            EisHeaders.contentType -> "application/json",
-            EisHeaders.accept -> "application/json"
-          )
-        ).returns(Future.successful(response))
+          MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
-      }
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainShortageExcessRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainShortageExcessRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
 
-      "downstream call fails due to a 500 (ISE) response" in new Test {
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+        }
 
-        val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
 
-        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
 
-        MockHttpClient.postJson(
-          url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-          body = submitReportOfReceiptRequest.toJson,
-          headers = Seq(
-            EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-            EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
-            EisHeaders.forwardedHost -> "MDTP",
-            EisHeaders.source -> "TFE",
-            EisHeaders.contentType -> "application/json",
-            EisHeaders.accept -> "application/json"
-          )
-        ).returns(Future.successful(response))
+          MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
-      }
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainShortageExcessRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainShortageExcessRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
 
-      "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+        }
 
-        val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+        "downstream call fails due to a 500 (ISE) response" in new Test {
 
-        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
 
-        MockHttpClient.postJson(
-          url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-          body = submitReportOfReceiptRequest.toJson,
-          headers = Seq(
-            EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-            EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
-            EisHeaders.forwardedHost -> "MDTP",
-            EisHeaders.source -> "TFE",
-            EisHeaders.contentType -> "application/json",
-            EisHeaders.accept -> "application/json"
-          )
-        ).returns(Future.successful(response))
+          MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
-      }
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainShortageExcessRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainShortageExcessRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
 
-      "downstream call is unsuccessful" in new Test {
-        val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+        }
 
-        MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
-        MockMetricsService.processWithTimer()
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
 
-        MockHttpClient.postJson(
-          url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-          body = submitReportOfReceiptRequest.toJson,
-          headers = Seq(
-            EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-            EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
-            EisHeaders.forwardedHost -> "MDTP",
-            EisHeaders.source -> "TFE",
-            EisHeaders.contentType -> "application/json",
-            EisHeaders.accept -> "application/json"
-          )
-        ).returns(Future.successful(response))
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainShortageExcessRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainShortageExcessRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(submitExplainShortageExcessRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitExplainShortageExcessRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitExplainShortageExcessRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
 
 
-        await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+        }
       }
     }
   }
