@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.emcstfe.controllers
 
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.mvc.{Action, ControllerComponents, Result}
+import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.SubmitCancellationOfMovementService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -30,17 +33,26 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class SubmitCancellationOfMovementController @Inject()(cc: ControllerComponents,
                                                        service: SubmitCancellationOfMovementService,
-                                                       override val auth: AuthAction
-                                                      )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
+                                                       override val auth: AuthAction,
+                                                       val config: AppConfig
+                                                      )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging with FeatureSwitching {
 
-  def submit(ern: String, arc: String): Action[JsValue] =
-    authorisedUserSubmissionRequest(ern) {
+  def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) {
       implicit request =>
         withJsonBody[SubmitCancellationOfMovementModel] {
-          service.submit(_).map {
-            case Right(success) => Ok(Json.toJson(success))
-            case Left(errorResponse) => InternalServerError(Json.toJson(errorResponse))
-          }
+          submission =>
+            if (isEnabled(SendToEIS)) {
+              service.submitViaEIS(submission).map(handleResponse(_))
+            } else {
+              service.submit(submission).map(handleResponse(_))
+            }
         }
+  }
+
+  def handleResponse[A](response: Either[ErrorResponse, A])(implicit writes: Writes[A]): Result =
+    response match {
+      case Left(value) => InternalServerError(Json.toJson(value))
+      case Right(value) => Ok(Json.toJson(value))
     }
+
 }
