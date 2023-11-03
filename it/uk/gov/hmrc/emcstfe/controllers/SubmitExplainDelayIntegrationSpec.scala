@@ -21,6 +21,8 @@ import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
@@ -29,7 +31,9 @@ import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import scala.xml.XML
 
-class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitExplainDelayFixtures {
+class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitExplainDelayFixtures with FeatureSwitching {
+
+  override val config: AppConfig = app.injector.instanceOf[AppConfig]
 
   private trait Test {
     def setupStubs(): StubMapping
@@ -38,14 +42,22 @@ class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitE
 
     def downstreamUri: String = s"/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4"
 
+    def downstreamEisUri: String = s"/emcs/digital-submit-new-message/v1"
+
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri, "Content-Type" -> "application/json")
     }
   }
 
-  "Calling the submit draft movement endpoint" must {
-    "return a success" when {
+  override def beforeEach(): Unit = {
+    disable(SendToEIS)
+    super.beforeEach()
+  }
+
+
+  "Calling the explain delay endpoint" must {
+    "return a success from Chris" when {
       "all downstream calls are successful" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
@@ -58,11 +70,11 @@ class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitE
         response.json shouldBe chrisSuccessJsonNoLRN
       }
     }
-    "return an error" when {
+    "return an error from Chris" when {
       "downstream call returns unexpected XML" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, <Message>Success!</Message>)
+          DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.OK, <Message>Success!</Message>.toString())
         }
 
         val response: WSResponse = await(request().post(Json.toJson(maxSubmitExplainDelayModel)))
@@ -75,7 +87,7 @@ class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitE
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, responseBody)
+          DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.OK, responseBody.toString())
         }
 
         val response: WSResponse = await(request().post(Json.toJson(maxSubmitExplainDelayModel)))
@@ -94,13 +106,64 @@ class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitE
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
+          DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody.toString())
         }
 
         val response: WSResponse = await(request().post(Json.toJson(maxSubmitExplainDelayModel)))
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
+      }
+    }
+
+    "return a success from EIS" when {
+      "all downstream calls are successful" in new Test {
+        override def setupStubs(): StubMapping = {
+          enable(SendToEIS)
+          AuthStub.authorised()
+          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson)
+        }
+
+        val response: WSResponse = await(request().post(Json.toJson(maxSubmitExplainDelayModel)))
+        response.status shouldBe Status.OK
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe eisSuccessJson
+      }
+    }
+    "return an error from EIS" when {
+      "downstream call returns unexpected JSON" in new Test {
+        override def setupStubs(): StubMapping = {
+          enable(SendToEIS)
+          AuthStub.authorised()
+          DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, incompleteEisSuccessJson.toString())
+        }
+
+        val response: WSResponse = await(request().post(Json.toJson(maxSubmitExplainDelayModel)))
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe Json.obj(
+          "message" -> "Errors parsing JSON, errors: List(JsonValidationError(List(error.path.missing),ArraySeq()))"
+        )
+      }
+      "downstream call returns a non-200 HTTP response" in new Test {
+        val referenceDataResponseBody: JsValue = Json.parse(
+          s"""
+             |{
+             |   "message": "test message"
+             |}
+             |""".stripMargin
+        )
+
+        override def setupStubs(): StubMapping = {
+          enable(SendToEIS)
+          AuthStub.authorised()
+          DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.INTERNAL_SERVER_ERROR, "bad things")
+        }
+
+        val response: WSResponse = await(request().post(Json.toJson(maxSubmitExplainDelayModel)))
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe Json.toJson(EISInternalServerError("bad things"))
       }
     }
   }

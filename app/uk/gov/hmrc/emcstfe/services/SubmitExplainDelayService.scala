@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainDelayRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,9 +28,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitExplainDelayService @Inject()(connector: ChrisConnector) extends Logging {
+class SubmitExplainDelayService @Inject()(connector: ChrisConnector, eisConnector: EisConnector) extends Logging {
   def submit(submission: SubmitExplainDelayModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
     connector.submitExplainDelayChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainDelayRequest(submission))
+
+  def submitViaEIS(submission: SubmitExplainDelayModel)
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSuccessResponse]] =
+    eisConnector.submitExplainDelayEISRequest[EISSuccessResponse](SubmitExplainDelayRequest(submission))
 
 }

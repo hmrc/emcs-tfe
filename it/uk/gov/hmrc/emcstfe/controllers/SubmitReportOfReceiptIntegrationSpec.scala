@@ -147,7 +147,7 @@ class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with Subm
         "downstream call returns unexpected JSON" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
-            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, imcompleteEisSuccessJson.toString())
+            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, incompleteEisSuccessJson.toString())
           }
 
           val response: WSResponse = await(request().post(Json.toJson(maxSubmitReportOfReceiptModel)))

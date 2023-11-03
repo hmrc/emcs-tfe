@@ -51,7 +51,7 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
 
         "an OK response is returned but the body is invalid JSON" in {
 
-          val response = HttpResponse(OK, json = imcompleteEisSuccessJson, headers = Map.empty)
+          val response = HttpResponse(OK, json = incompleteEisSuccessJson, headers = Map.empty)
 
           val validationErrors = Seq(JsonValidationError(Seq("error.path.missing")))
 

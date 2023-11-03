@@ -42,5 +42,10 @@ trait MockEisConnector extends MockFactory {
         .expects(eisRequest, *, *, *)
     }
 
+    def submitExplainDelayEISRequest[A](eisRequest: EisRequest): CallHandler4[EisRequest, HeaderCarrier, ExecutionContext, Reads[A], Future[Either[ErrorResponse, A]]] = {
+      (mockEisConnector.submitExplainDelayEISRequest[A](_: EisRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[A]))
+        .expects(eisRequest, *, *, *)
+    }
+
   }
 }
