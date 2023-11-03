@@ -47,5 +47,10 @@ trait MockEisConnector extends MockFactory {
         .expects(eisRequest, *, *, *)
     }
 
+    def submitCancellationOfMovementEISRequest[A](eisRequest: EisRequest): CallHandler4[EisRequest, HeaderCarrier, ExecutionContext, Reads[A], Future[Either[ErrorResponse, A]]] = {
+      (mockEisConnector.submitCancellationOfMovementEISRequest[A](_: EisRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[A]))
+        .expects(eisRequest, *, *, *)
+    }
+
   }
 }

@@ -26,7 +26,7 @@ import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
 import java.util.Base64
 
 case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
-                                    (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope  with EisRequest with EisMessage {
+                                    (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
 
   private val arcCountryCode = body.arc.substring(2, 4)

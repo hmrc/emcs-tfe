@@ -16,16 +16,19 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{ExemptedOrganisations, Export}
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
 
+import java.util.Base64
 import scala.xml.Elem
 
 case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovementModel)
-                                              (implicit request: UserRequest[_]) extends ChrisRequest {
+                                              (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
 
   private val arcCountryCode: String = body.exciseMovement.arc.substring(2, 4)
@@ -36,50 +39,41 @@ case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovemen
       case ExemptedOrganisations => body.memberStateCode.getOrElse(Constants.GB)
       case _ => body.consigneeTrader.flatMap(_.countryCode).getOrElse(Constants.GB)
     }
+  private val messageNumber = 810
+
 
   val messageRecipient: String = Constants.NDEA ++ messageRecipientSuffix
 
   val messageSender: String = Constants.NDEA ++ arcCountryCode
 
-  val soapRequest: Elem =
-    <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-      <soapenv:Header>
-        <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
-          <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
-          <ns:VendorID>1259</ns:VendorID>
-          <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
-          <ns:ServiceID>1138</ns:ServiceID>
-          <ns:ServiceMessageType>HMRC-EMCS-IE810-DIRECT</ns:ServiceMessageType>
-        </ns:Info>
-        <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-          <CredentialID>{request.credId}</CredentialID>
-          <Identifier>{exciseRegistrationNumber}</Identifier>
-        </MetaData>
-      </soapenv:Header>
-      <soapenv:Body>
-        <urn:IE810 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
-          <urn:Header>
-            <urn1:MessageSender>{messageSender}</urn1:MessageSender>
-            <urn1:MessageRecipient>{messageRecipient}</urn1:MessageRecipient>
-            <urn1:DateOfPreparation>{preparedDate.toString}</urn1:DateOfPreparation>
-            <urn1:TimeOfPreparation>{preparedTime.toString}</urn1:TimeOfPreparation>
-            <urn1:MessageIdentifier>{messageUUID}</urn1:MessageIdentifier>
-            <urn1:CorrelationIdentifier>{correlationUUID}</urn1:CorrelationIdentifier>
-          </urn:Header>
-          <urn:Body>
-            {body.toXml}
-          </urn:Body>
-        </urn:IE810>
-      </soapenv:Body>
-    </soapenv:Envelope>
-
   override def requestBody: String =
-    s"""<?xml version='1.0' encoding='UTF-8'?>
-       |${soapRequest.toString}""".stripMargin
+    withSoapEnvelope(
+      body = body,
+      messageNumber = messageNumber,
+      messageSender = messageSender,
+      messageRecipient = messageRecipient
+    ).toString()
 
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitcancellationportal"
 
   override def shouldExtractFromSoap: Boolean = false
 
   override def metricName: String = "cancellation-of-movement"
+
+  override def eisXMLBody(): String = {
+    withEisMessage(
+      body = body,
+      messageNumber = messageNumber,
+      messageSender = messageSender,
+      messageRecipient = messageRecipient
+    ).toString()
+  }
+
+  override def toJson: JsObject = {
+    Json.obj(
+      "user" -> exciseRegistrationNumber,
+      "messageType" -> s"IE$messageNumber",
+      "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
+    )
+  }
 }

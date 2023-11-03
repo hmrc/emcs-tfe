@@ -24,7 +24,7 @@ import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
 
 import scala.xml.Elem
 
-trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISResponsesFixture with TraderModelFixtures {
+trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISResponsesFixture with TraderModelFixtures with EISResponsesFixture {
 
   val maxSubmitCancellationOfMovementModel: SubmitCancellationOfMovementModel = SubmitCancellationOfMovementModel(
     exciseMovement = ExciseMovementModel(testArc, 1),

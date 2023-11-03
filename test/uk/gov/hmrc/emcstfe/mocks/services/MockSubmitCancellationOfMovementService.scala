@@ -21,7 +21,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitCancellationOfMovementService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,6 +34,10 @@ trait MockSubmitCancellationOfMovementService extends MockFactory  {
   object MockService extends Matchers {
     def submit(submission: SubmitCancellationOfMovementModel): CallHandler4[SubmitCancellationOfMovementModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
       (mockService.submit(_: SubmitCancellationOfMovementModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(submission, *, *, *)
+
+    def submitViaEIS(submission: SubmitCancellationOfMovementModel): CallHandler4[SubmitCancellationOfMovementModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSuccessResponse]]] =
+      (mockService.submitViaEIS(_: SubmitCancellationOfMovementModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
         .expects(submission, *, *, *)
   }
 }

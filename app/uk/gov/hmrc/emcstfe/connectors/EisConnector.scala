@@ -52,4 +52,8 @@ class EisConnector @Inject()(val http: HttpClient,
                                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
     prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, "submitExplainDelayEISRequest")
 
+  def submitCancellationOfMovementEISRequest[A](request: EisRequest)
+                                               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
+    prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, "submitCancellationOfMovementEISRequest")
+
 }

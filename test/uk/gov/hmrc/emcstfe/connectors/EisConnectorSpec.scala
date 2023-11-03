@@ -53,6 +53,7 @@ class EisConnectorSpec extends TestBaseSpec
   with SubmitReportOfReceiptFixtures
   with SubmitExplainShortageExcessFixtures
   with SubmitExplainDelayFixtures
+  with SubmitCancellationOfMovementFixtures
   with CreateMovementFixtures
   with MockMetricsService {
 
@@ -653,6 +654,200 @@ class EisConnectorSpec extends TestBaseSpec
 
 
           await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+        }
+      }
+    }
+
+    "submitCancellationOfMovementEISRequest is called" should {
+
+      implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+
+      val submitCancellationOfMovementEISRequest = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
+
+      "return a Right" when {
+        "downstream call is successful" in new Test {
+
+          MockMetricsService.requestTimer(submitCancellationOfMovementEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitCancellationOfMovementEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitCancellationOfMovementEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(Right(eisSuccessResponse)))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe Right(eisSuccessResponse)
+        }
+      }
+
+      "return a Left" when {
+
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(submitCancellationOfMovementEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitCancellationOfMovementEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitCancellationOfMovementEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+          MockMetricsService.requestTimer(submitCancellationOfMovementEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitCancellationOfMovementEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitCancellationOfMovementEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+          MockMetricsService.requestTimer(submitCancellationOfMovementEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitCancellationOfMovementEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitCancellationOfMovementEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+          MockMetricsService.requestTimer(submitCancellationOfMovementEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitCancellationOfMovementEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitCancellationOfMovementEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 500 (ISE) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+          MockMetricsService.requestTimer(submitCancellationOfMovementEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitCancellationOfMovementEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitCancellationOfMovementEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(submitCancellationOfMovementEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitCancellationOfMovementEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitCancellationOfMovementEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(submitCancellationOfMovementEISRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.postJson(
+            url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+            body = submitCancellationOfMovementEISRequest.toJson,
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> submitCancellationOfMovementEISRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.contentType -> "application/json",
+              EisHeaders.accept -> "application/json"
+            )
+          ).returns(Future.successful(response))
+
+
+          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
         }
       }
     }
