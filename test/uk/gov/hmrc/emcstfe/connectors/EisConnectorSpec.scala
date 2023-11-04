@@ -33,7 +33,7 @@ import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignee
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisHeaders
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
-import uk.gov.hmrc.emcstfe.models.response.{EISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -101,7 +101,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(Right(eisSuccessResponse)))
 
-          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe Right(eisSuccessResponse)
+          await(connector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](submitReportOfReceiptRequest)) shouldBe Right(eisSuccessResponse)
         }
       }
 
@@ -127,7 +127,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          await(connector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
         }
 
         "downstream call fails due to a 400 (Bad Request) response" in new Test {
@@ -150,7 +150,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          await(connector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
         }
 
         "downstream call fails due to a 404 (Not Found) response" in new Test {
@@ -173,7 +173,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          await(connector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
         }
 
         "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
@@ -196,7 +196,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          await(connector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
         }
 
         "downstream call fails due to a 500 (ISE) response" in new Test {
@@ -219,7 +219,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          await(connector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
         }
 
         "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
@@ -242,7 +242,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          await(connector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
         }
 
         "downstream call is unsuccessful" in new Test {
@@ -265,7 +265,7 @@ class EisConnectorSpec extends TestBaseSpec
           ).returns(Future.successful(response))
 
 
-          await(connector.submitReportOfReceiptEISRequest[EISSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
+          await(connector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](submitReportOfReceiptRequest)) shouldBe response
         }
       }
     }
@@ -295,7 +295,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(Right(eisSuccessResponse)))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe Right(eisSuccessResponse)
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainShortageExcessRequest)) shouldBe Right(eisSuccessResponse)
         }
       }
 
@@ -321,7 +321,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
         }
 
         "downstream call fails due to a 400 (Bad Request) response" in new Test {
@@ -344,7 +344,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
         }
 
         "downstream call fails due to a 404 (Not Found) response" in new Test {
@@ -367,7 +367,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
         }
 
         "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
@@ -390,7 +390,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
         }
 
         "downstream call fails due to a 500 (ISE) response" in new Test {
@@ -413,7 +413,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
         }
 
         "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
@@ -436,7 +436,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
         }
 
         "downstream call is unsuccessful" in new Test {
@@ -459,7 +459,7 @@ class EisConnectorSpec extends TestBaseSpec
           ).returns(Future.successful(response))
 
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainShortageExcessRequest)) shouldBe response
         }
       }
     }
@@ -489,7 +489,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(Right(eisSuccessResponse)))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe Right(eisSuccessResponse)
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainDelayEISRequest)) shouldBe Right(eisSuccessResponse)
         }
       }
 
@@ -515,7 +515,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 400 (Bad Request) response" in new Test {
@@ -538,7 +538,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 404 (Not Found) response" in new Test {
@@ -561,7 +561,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
@@ -584,7 +584,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 500 (ISE) response" in new Test {
@@ -607,7 +607,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
@@ -630,7 +630,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
         }
 
         "downstream call is unsuccessful" in new Test {
@@ -653,7 +653,7 @@ class EisConnectorSpec extends TestBaseSpec
           ).returns(Future.successful(response))
 
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitExplainDelayEISRequest)) shouldBe response
         }
       }
     }
@@ -683,7 +683,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(Right(eisSuccessResponse)))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe Right(eisSuccessResponse)
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe Right(eisSuccessResponse)
         }
       }
 
@@ -709,7 +709,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 400 (Bad Request) response" in new Test {
@@ -732,7 +732,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 404 (Not Found) response" in new Test {
@@ -755,7 +755,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
@@ -778,7 +778,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 500 (ISE) response" in new Test {
@@ -801,7 +801,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
         }
 
         "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
@@ -824,7 +824,7 @@ class EisConnectorSpec extends TestBaseSpec
             )
           ).returns(Future.successful(response))
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
         }
 
         "downstream call is unsuccessful" in new Test {
@@ -847,7 +847,7 @@ class EisConnectorSpec extends TestBaseSpec
           ).returns(Future.successful(response))
 
 
-          await(connector.submitExplainShortageExcessEISRequest[EISSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
+          await(connector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](submitCancellationOfMovementEISRequest)) shouldBe response
         }
       }
     }

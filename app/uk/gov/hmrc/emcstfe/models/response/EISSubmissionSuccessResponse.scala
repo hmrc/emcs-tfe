@@ -18,8 +18,8 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import play.api.libs.json.{Json, OFormat}
 
-case class EISSuccessResponse(status: String, message: String, emcsCorrelationId: String)
+case class EISSubmissionSuccessResponse(status: String, message: String, emcsCorrelationId: String)
 
-object EISSuccessResponse {
-  implicit val format: OFormat[EISSuccessResponse] = Json.format[EISSuccessResponse]
+object EISSubmissionSuccessResponse {
+  implicit val format: OFormat[EISSubmissionSuccessResponse] = Json.format[EISSubmissionSuccessResponse]
 }

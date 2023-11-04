@@ -20,7 +20,7 @@ import play.api.http.Status
 import play.api.http.Status.OK
 import play.api.libs.json.JsonValidationError
 import uk.gov.hmrc.emcstfe.fixtures.EISResponsesFixture
-import uk.gov.hmrc.emcstfe.models.response.EISSuccessResponse
+import uk.gov.hmrc.emcstfe.models.response.EISSubmissionSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISInternalServerError, EISJsonParsingError, EISJsonSchemaMismatchError, EISResourceNotFoundError, EISServiceUnavailableError, EISUnknownError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -41,7 +41,7 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
 
           val response = HttpResponse(OK, json = eisSuccessJson, headers = Map.empty)
 
-          val result = TestParser.modelFromJsonHttpReads[EISSuccessResponse].read("POST", "/eis/foo/bar", response)
+          val result = TestParser.modelFromJsonHttpReads[EISSubmissionSuccessResponse].read("POST", "/eis/foo/bar", response)
 
           result shouldBe Right(eisSuccessResponse)
         }
@@ -55,7 +55,7 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
 
           val validationErrors = Seq(JsonValidationError(Seq("error.path.missing")))
 
-          val result = TestParser.modelFromJsonHttpReads[EISSuccessResponse].read("POST", "/eis/foo/bar", response)
+          val result = TestParser.modelFromJsonHttpReads[EISSubmissionSuccessResponse].read("POST", "/eis/foo/bar", response)
 
           result shouldBe Left(EISJsonParsingError(validationErrors))
 
@@ -71,7 +71,7 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
 
             val response = HttpResponse(statusAndErrorModel._1, body = "an error", headers = Map.empty)
 
-            val result = TestParser.modelFromJsonHttpReads[EISSuccessResponse].read("POST", "/eis/foo/bar", response)
+            val result = TestParser.modelFromJsonHttpReads[EISSubmissionSuccessResponse].read("POST", "/eis/foo/bar", response)
 
             result shouldBe Left(statusAndErrorModel._2)
 
@@ -85,7 +85,7 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
           withCaptureOfLoggingFrom(logger) {
             logs =>
 
-              val result = TestParser.modelFromJsonHttpReads[EISSuccessResponse].read("POST", "/eis/foo/bar", response)
+              val result = TestParser.modelFromJsonHttpReads[EISSubmissionSuccessResponse].read("POST", "/eis/foo/bar", response)
 
               result shouldBe Left(EISUnknownError("an error"))
 

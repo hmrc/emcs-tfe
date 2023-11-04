@@ -20,7 +20,7 @@ import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitCancellationOfMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -38,7 +38,7 @@ class SubmitCancellationOfMovementService @Inject()(connector: ChrisConnector, e
   def submitViaEIS(submission: SubmitCancellationOfMovementModel)
                   (implicit hc: HeaderCarrier,
                    ec: ExecutionContext,
-                   request: UserRequest[_]): Future[Either[ErrorResponse, EISSuccessResponse]] =
-    eisConnector.submitCancellationOfMovementEISRequest[EISSuccessResponse](SubmitCancellationOfMovementRequest(submission))
+                   request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
+    eisConnector.submitCancellationOfMovementEISRequest[EISSubmissionSuccessResponse](SubmitCancellationOfMovementRequest(submission))
 
 }

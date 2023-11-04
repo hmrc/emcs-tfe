@@ -25,7 +25,6 @@ import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
 
 import java.util.Base64
-import scala.xml.Elem
 
 case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovementModel)
                                               (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisRequest with EisMessage {
