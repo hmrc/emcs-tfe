@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.GetMessagesFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.GetMessagesRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -31,8 +29,7 @@ class GetMessagesServiceSpec extends TestBaseSpec with GetMessagesFixtures {
   import GetMessagesResponseFixtures.getMessagesResponseModel
 
   trait Test extends MockEisConnector {
-    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val getMessagesRequest: GetMessagesRequest = GetMessagesRequest(testErn, "arc", "A", 0)
+    val getMessagesRequest: GetMessagesRequest = GetMessagesRequest(testErn, "arc", "A", 1)
     val service: GetMessagesService = new GetMessagesService(mockEisConnector)
   }
 

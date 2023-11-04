@@ -26,7 +26,7 @@ class GetMessagesRequestSpec extends TestBaseSpec {
           GetMessagesRequest.validSortOrders.foreach(
             sortOrder =>
               s"page is >= 0, sortField is $sortField and sortOrder is $sortOrder" in {
-                GetMessagesRequest(testErn, sortField, sortOrder, 0) shouldBe GetMessagesRequest(testErn, sortField, sortOrder, 0)
+                GetMessagesRequest(testErn, sortField, sortOrder, 1) shouldBe GetMessagesRequest(testErn, sortField, sortOrder, 1)
               }
           )
       )
@@ -34,19 +34,19 @@ class GetMessagesRequestSpec extends TestBaseSpec {
 
     "fail" when {
       "sortField is invalid" in {
-        val result = intercept[IllegalArgumentException](GetMessagesRequest(testErn, "beans", "A", 0))
+        val result = intercept[IllegalArgumentException](GetMessagesRequest(testErn, "beans", "A", 1))
 
         result.getMessage shouldBe s"requirement failed: sortField of beans is invalid. Valid sort fields: ${GetMessagesRequest.validSortFields}"
       }
       "sortOrder is invalid" in {
-        val result = intercept[IllegalArgumentException](GetMessagesRequest(testErn, "arc", "beans", 0))
+        val result = intercept[IllegalArgumentException](GetMessagesRequest(testErn, "arc", "beans", 1))
 
         result.getMessage shouldBe s"requirement failed: sortOrder of beans is invalid. Valid sort orders: ${GetMessagesRequest.validSortOrders}"
       }
       "page is < 0" in {
-        val result = intercept[IllegalArgumentException](GetMessagesRequest(testErn, "arc", "A", -1))
+        val result = intercept[IllegalArgumentException](GetMessagesRequest(testErn, "arc", "A", 0))
 
-        result.getMessage shouldBe "requirement failed: page cannot be less than 0"
+        result.getMessage shouldBe "requirement failed: page cannot be less than 1"
       }
     }
   }

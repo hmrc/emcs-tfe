@@ -69,7 +69,7 @@ object ErrorResponse {
   }
 
   case class EISJsonSchemaMismatchError(errorResponse: String) extends ErrorResponse {
-    val message = s"Invalid JSON sent to EIS, error response: $errorResponse"
+    val message = s"Invalid JSON sent from EIS, error response: $errorResponse"
   }
 
   case class EISResourceNotFoundError(errorResponse: String) extends ErrorResponse {
@@ -90,6 +90,10 @@ object ErrorResponse {
 
   case class EISUnknownError(errorResponse: String) extends ErrorResponse {
     val message = s"An unknown response was returned by EIS, error response: $errorResponse"
+  }
+
+  case class QueryParameterError(queryParams: Seq[(String, String)]) extends ErrorResponse {
+    val message = s"Invalid query parameters provided. Query parameters: $queryParams"
   }
 
 }

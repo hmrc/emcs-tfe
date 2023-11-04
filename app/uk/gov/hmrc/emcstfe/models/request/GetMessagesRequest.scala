@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.request
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
 case class GetMessagesRequest(exciseRegistrationNumber: String, sortField: String, sortOrder: String, page: Int) extends EisConsumptionRequest {
-  require(page >= 0, "page cannot be less than 0")
+  require(page >= 1, "page cannot be less than 1")
   require(GetMessagesRequest.validSortFields.contains(sortField), s"sortField of $sortField is invalid. Valid sort fields: ${GetMessagesRequest.validSortFields}")
   require(GetMessagesRequest.validSortOrders.contains(sortOrder), s"sortOrder of $sortOrder is invalid. Valid sort orders: ${GetMessagesRequest.validSortOrders}")
 
