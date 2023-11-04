@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.mocks.connectors
 
-import org.scalamock.handlers.CallHandler4
+import org.scalamock.handlers.CallHandler5
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
-import uk.gov.hmrc.emcstfe.models.request.eis.EisRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -32,24 +32,9 @@ trait MockEisConnector extends MockFactory {
 
   object MockEisConnector {
 
-    def submitReportOfReceiptEISRequest[A](eisRequest: EisRequest): CallHandler4[EisRequest, HeaderCarrier, ExecutionContext, Reads[A], Future[Either[ErrorResponse, A]]] = {
-      (mockEisConnector.submitReportOfReceiptEISRequest[A](_: EisRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[A]))
-        .expects(eisRequest, *, *, *)
-    }
-
-    def submitExplainShortageExcessEISRequest[A](eisRequest: EisRequest): CallHandler4[EisRequest, HeaderCarrier, ExecutionContext, Reads[A], Future[Either[ErrorResponse, A]]] = {
-      (mockEisConnector.submitExplainShortageExcessEISRequest[A](_: EisRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[A]))
-        .expects(eisRequest, *, *, *)
-    }
-
-    def submitExplainDelayEISRequest[A](eisRequest: EisRequest): CallHandler4[EisRequest, HeaderCarrier, ExecutionContext, Reads[A], Future[Either[ErrorResponse, A]]] = {
-      (mockEisConnector.submitExplainDelayEISRequest[A](_: EisRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[A]))
-        .expects(eisRequest, *, *, *)
-    }
-
-    def submitCancellationOfMovementEISRequest[A](eisRequest: EisRequest): CallHandler4[EisRequest, HeaderCarrier, ExecutionContext, Reads[A], Future[Either[ErrorResponse, A]]] = {
-      (mockEisConnector.submitCancellationOfMovementEISRequest[A](_: EisRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[A]))
-        .expects(eisRequest, *, *, *)
+    def submit[A](eisRequest: EisSubmissionRequest): CallHandler5[EisSubmissionRequest, String, HeaderCarrier, ExecutionContext, Reads[A], Future[Either[ErrorResponse, A]]] = {
+      (mockEisConnector.submit[A](_: EisSubmissionRequest, _: String)(_: HeaderCarrier, _: ExecutionContext, _: Reads[A]))
+        .expects(eisRequest, *, *, *, *)
     }
 
   }

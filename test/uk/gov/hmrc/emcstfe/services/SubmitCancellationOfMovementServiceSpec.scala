@@ -62,7 +62,7 @@ class SubmitCancellationOfMovementServiceSpec extends TestBaseSpec with SubmitCa
       "return a Right" when {
         "connector call is successful and XML is the correct format" in new Test {
 
-          MockEisConnector.submitCancellationOfMovementEISRequest(submitCancellationOfMovementRequest).returns(
+          MockEisConnector.submit(submitCancellationOfMovementRequest).returns(
             Future.successful(Right(chrisSuccessResponse))
           )
 
@@ -72,7 +72,7 @@ class SubmitCancellationOfMovementServiceSpec extends TestBaseSpec with SubmitCa
       "return a Left" when {
         "connector call is unsuccessful" in new Test {
 
-          MockEisConnector.submitCancellationOfMovementEISRequest(submitCancellationOfMovementRequest).returns(
+          MockEisConnector.submit(submitCancellationOfMovementRequest).returns(
             Future.successful(Left(EISUnknownError("Downstream failed to respond")))
           )
 

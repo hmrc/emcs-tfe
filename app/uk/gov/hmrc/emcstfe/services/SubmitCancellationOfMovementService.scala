@@ -39,6 +39,6 @@ class SubmitCancellationOfMovementService @Inject()(connector: ChrisConnector, e
                   (implicit hc: HeaderCarrier,
                    ec: ExecutionContext,
                    request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submitCancellationOfMovementEISRequest[EISSubmissionSuccessResponse](SubmitCancellationOfMovementRequest(submission))
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitCancellationOfMovementRequest(submission), "submitCancellationOfMovementEISRequest")
 
 }

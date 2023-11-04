@@ -1,11 +1,24 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.emcstfe.models.response.getMessages
 
-import com.lucidchart.open.xtract.ParseSuccess
-import play.api.libs.json.{JsError, JsPath, JsResult, JsSuccess, Json, JsonValidationError}
+import play.api.libs.json.{JsError, JsResult, JsSuccess, Json}
 import uk.gov.hmrc.emcstfe.fixtures.GetMessagesFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
-
-import scala.xml.XML
 
 class GetMessagesResponseSpec extends TestBaseSpec with GetMessagesFixtures {
 
@@ -31,10 +44,15 @@ class GetMessagesResponseSpec extends TestBaseSpec with GetMessagesFixtures {
 
         result.cause shouldBe JsError("Illegal base64 character 3c")
       }
-      "XML cannot be mapped to a valid model" in {
+      "XML cannot be mapped to a valid model - complete nonsense" in {
         val result = intercept[JsResult.Exception](GetMessagesResponse.reads.reads(getMessagesResponseDownstreamJsonBadXml))
 
         result.cause shouldBe JsError("""{"obj":[{"msg":["XML failed to parse, with the following errors:\n - EmptyError(//MessagesDataResponse//TotalNumberOfMessagesAvailable)"],"args":[]}]}""")
+      }
+      "XML cannot be mapped to a valid model - partial failure" in {
+        val result = intercept[JsResult.Exception](GetMessagesResponse.reads.reads(getMessagesResponseDownstreamJsonPartiallyBadXml))
+
+        result.cause shouldBe JsError("""{"obj":[{"msg":["XML failed to parse, with the following errors:\n - EmptyError(//MessagesDataResponse//Message//DateCreatedOnCore)\n - EmptyError(//MessagesDataResponse//Message//MessageType)\n - EmptyError(//MessagesDataResponse//Message//RelatedMessageType)\n - EmptyError(//MessagesDataResponse//Message//ReadIndicator)\n - EmptyError(//MessagesDataResponse//Message//MessageRole)\n - EmptyError(//MessagesDataResponse//Message//SubmittedByRequestingTrader)"],"args":[]}]}""")
       }
     }
   }

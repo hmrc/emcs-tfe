@@ -22,12 +22,12 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
 case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessModel)
-                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisRequest with EisMessage {
+                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
   private val messageNumber = 871
 

@@ -1,7 +1,52 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.getMessages._
+import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-case class GetMessagesRequest(exciseRegistrationNumber: String, sortField: SortField, sortOrder: SortOrder, page: BigInt) {
-  require(page >= 1, "Page cannot be less than 1")
+case class GetMessagesRequest(exciseRegistrationNumber: String, sortField: String, sortOrder: String, page: Int) extends EisConsumptionRequest {
+  require(page >= 0, "page cannot be less than 0")
+  require(GetMessagesRequest.validSortFields.contains(sortField), s"sortField of $sortField is invalid. Valid sort fields: ${GetMessagesRequest.validSortFields}")
+  require(GetMessagesRequest.validSortOrders.contains(sortOrder), s"sortOrder of $sortOrder is invalid. Valid sort orders: ${GetMessagesRequest.validSortOrders}")
+
+  def maxNoToReturn: Int = 10
+
+  // page 1 -> start at 0
+  // page 2 -> start at 10
+  // page 3 -> start at 20
+  // etc
+  def startPosition: BigInt = (page - 1) * maxNoToReturn
+
+  override def metricName: String = "messages"
+
+  override def queryParams: Seq[(String, String)] = Seq(
+    "exciseregistrationnumber" -> exciseRegistrationNumber,
+    "sortfield" -> sortField,
+    "sortorder" -> sortOrder,
+    "startposition" -> startPosition.toString,
+    "maxnotoreturn" -> maxNoToReturn.toString
+  )
+}
+
+object GetMessagesRequest {
+  val validSortFields: Seq[String] = Seq(
+    "messagetype", "datereceived", "arc", "readindicator"
+  )
+  val validSortOrders: Seq[String] = Seq(
+    "A", "D"
+  )
 }

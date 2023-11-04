@@ -22,12 +22,12 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{ExemptedOrganisations, Export}
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
 case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovementModel)
-                                              (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisRequest with EisMessage {
+                                              (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
 
   private val arcCountryCode: String = body.exciseMovement.arc.substring(2, 4)

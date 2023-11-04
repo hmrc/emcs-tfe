@@ -66,6 +66,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def eisSubmissionsUrl(): String =
     eisBaseUrl + "/emcs/digital-submit-new-message/v1"
 
+  def eisGetMessagesUrl(): String =
+    eisBaseUrl + "/emcs/messages/v1/messages"
+
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
 

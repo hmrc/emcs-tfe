@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import scala.xml.{Elem, XML}
 
 trait EisMessage {
-  _: EisRequest =>
+  _: EisSubmissionRequest =>
 
   def withEisMessage[T <: XmlBaseModel](body: T,
                                         messageNumber: Int,

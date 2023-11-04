@@ -35,6 +35,6 @@ class SubmitExplainDelayService @Inject()(connector: ChrisConnector, eisConnecto
 
   def submitViaEIS(submission: SubmitExplainDelayModel)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submitExplainDelayEISRequest[EISSubmissionSuccessResponse](SubmitExplainDelayRequest(submission))
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitExplainDelayRequest(submission), "submitExplainDelayEISRequest")
 
 }

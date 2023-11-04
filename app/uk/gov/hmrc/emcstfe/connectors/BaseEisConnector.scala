@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.connectors
 
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisHeaders, EisRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisHeaders, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
@@ -31,7 +31,7 @@ trait BaseEisConnector extends Logging {
 
   def metricsService: MetricsService
 
-  private def eisHeaders(correlationId: String, forwardedHost: String): Seq[(String, String)] = Seq(
+  private def eisSubmissionHeaders(correlationId: String, forwardedHost: String): Seq[(String, String)] = Seq(
     EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
@@ -40,17 +40,33 @@ trait BaseEisConnector extends Logging {
     EisHeaders.accept -> "application/json"
   )
 
-  private def withTimer[T](eisRequest: EisRequest)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
-    val timer = metricsService.requestTimer(eisRequest.metricName).time()
+  private def eisConsumptionHeaders(correlationId: String, forwardedHost: String): Seq[(String, String)] = Seq(
+    EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+    EisHeaders.correlationId -> correlationId,
+    EisHeaders.forwardedHost -> forwardedHost,
+    EisHeaders.source -> "TFE"
+  )
+
+  private def withTimer[T](metricName: String)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+    val timer = metricsService.requestTimer(metricName).time()
     metricsService.processWithTimer(timer)(f)
   }
 
-  def postJson[A, B](http: HttpClient, uri: String, body: JsValue, request: EisRequest)
-                      (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
-    withTimer(request) {
+  def postJson[A, B](http: HttpClient, uri: String, body: JsValue, request: EisSubmissionRequest)
+                    (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
+    withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[postJson] POST to $uri being made with body:\n\n$body")
-      http.POST[JsValue, Either[A, B]](uri, body, eisHeaders(request.correlationUUID.toString, forwardedHost))
+      http.POST[JsValue, Either[A, B]](uri, body, eisSubmissionHeaders(request.correlationUUID.toString, forwardedHost))
+    }
+  }
+
+  def get[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest)
+               (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
+    withTimer(request.metricName) {
+      val forwardedHost = appConfig.eisForwardedHost()
+      logger.debug(s"[get] GET to $uri being made with query params ${request.queryParams}")
+      http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID.toString, forwardedHost))
     }
   }
 }

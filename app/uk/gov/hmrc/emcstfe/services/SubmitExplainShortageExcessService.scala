@@ -35,7 +35,7 @@ class SubmitExplainShortageExcessService @Inject()(connector: ChrisConnector, ei
 
   def submitViaEIS(submission: SubmitExplainShortageExcessModel)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submitExplainShortageExcessEISRequest[EISSubmissionSuccessResponse](SubmitExplainShortageExcessRequest(submission))
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitExplainShortageExcessRequest(submission), "submitExplainShortageExcessEISRequest")
 
 
 }

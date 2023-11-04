@@ -68,6 +68,10 @@ object ErrorResponse {
     val message = s"Errors parsing JSON, errors: $errors"
   }
 
+  case class QueryParameterParsingError(queryParam: String, errors: Seq[JsonValidationError]) extends ErrorResponse {
+    val message = s"Errors parsing queryParameter $queryParam, errors: $errors"
+  }
+
   case class EISJsonSchemaMismatchError(errorResponse: String) extends ErrorResponse {
     val message = s"Invalid JSON sent to EIS, error response: $errorResponse"
   }

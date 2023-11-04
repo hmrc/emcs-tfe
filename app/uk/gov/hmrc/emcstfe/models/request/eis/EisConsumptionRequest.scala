@@ -16,11 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.request.eis
 
-import play.api.libs.json.JsValue
 import uk.gov.hmrc.emcstfe.models.request.BaseRequest
 
-trait EisRequest extends BaseRequest {
-  def eisXMLBody(): String
+trait EisConsumptionRequest extends BaseRequest {
 
-  def toJson: JsValue
+  def queryParams: Seq[(String, String)]
 }

@@ -61,7 +61,7 @@ class SubmitExplainDelayServiceSpec extends TestBaseSpec with SubmitExplainDelay
       "return a Right" when {
         "connector call is successful and XML is the correct format" in new Test {
 
-          MockEisConnector.submitExplainDelayEISRequest(submitExplainDelayRequest).returns(
+          MockEisConnector.submit(submitExplainDelayRequest).returns(
             Future.successful(Right(eisSuccessResponse))
           )
 
@@ -71,7 +71,7 @@ class SubmitExplainDelayServiceSpec extends TestBaseSpec with SubmitExplainDelay
       "return a Left" when {
         "connector call is unsuccessful" in new Test {
 
-          MockEisConnector.submitExplainDelayEISRequest(submitExplainDelayRequest).returns(
+          MockEisConnector.submit(submitExplainDelayRequest).returns(
             Future.successful(Left(EISUnknownError("Downstream failed to respond")))
           )
 

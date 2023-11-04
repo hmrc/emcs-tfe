@@ -40,7 +40,7 @@ class SubmitReportOfReceiptService @Inject()(chrisConnector: ChrisConnector,
 
   def submitViaEIS(submission: SubmitReportOfReceiptModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submitReportOfReceiptEISRequest[EISSubmissionSuccessResponse](SubmitReportOfReceiptRequest(submission)).map(handleResponse(_, submission))
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitReportOfReceiptRequest(submission), "submitReportOfReceiptEISRequest").map(handleResponse(_, submission))
 
   private def handleResponse[A](response: Either[ErrorResponse, A], submission: SubmitReportOfReceiptModel): Either[ErrorResponse, A] = response match {
     case r@Right(_) =>

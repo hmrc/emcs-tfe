@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsArray, JsValue, Json}
@@ -635,6 +651,7 @@ trait GetMessagesFixtures extends BaseFixtures {
   }
 
   object GetMessagesResponseFixtures {
+
     import MessagesDataFixtures._
 
     val getMessagesResponseDownstreamJson: JsValue = Json.obj(
@@ -653,6 +670,32 @@ trait GetMessagesFixtures extends BaseFixtures {
       "dateTime" -> "now",
       "exciseRegistrationNumber" -> testErn,
       "message" -> trim(XML.loadString(messagesDataXmlBody)).toString()
+    )
+
+    //noinspection LanguageFeature
+    val getMessagesResponseDownstreamJsonPartiallyBadXml: JsValue = Json.obj(
+      "dateTime" -> "now",
+      "exciseRegistrationNumber" -> testErn,
+      "message" -> Base64.getEncoder.encodeToString(trim(
+        <MessagesDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MessagesData/3" xmlns:ns1="http://hmrc/emcs/tfe/data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <Message>
+            <UniqueMessageIdentifier>1000</UniqueMessageIdentifier>
+            <SubmittedByRequestingTrader>true</SubmittedByRequestingTrader>
+            <DateCreatedOnCore>2008-09-17T09:30:47.0Z</DateCreatedOnCore>
+            <Arc>GBTR000000EMCS1000001</Arc>
+            <MessageType>IE801</MessageType>
+            <RelatedMessageType></RelatedMessageType>
+            <SequenceNumber>1</SequenceNumber>
+            <ReadIndicator>false</ReadIndicator>
+            <MessageRole>1</MessageRole>
+            <LRN>LRN4567890123456789012</LRN>
+          </Message>
+          <Message>
+            <UniqueMessageIdentifier>1000</UniqueMessageIdentifier>
+          </Message>
+          <TotalNumberOfMessagesAvailable>35</TotalNumberOfMessagesAvailable>
+        </MessagesDataResponse>
+      ).toString().getBytes(StandardCharsets.UTF_8))
     )
 
     val getMessagesResponseDownstreamJsonBadXml: JsValue = Json.obj(
