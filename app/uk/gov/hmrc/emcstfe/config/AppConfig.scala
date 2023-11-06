@@ -72,6 +72,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def eisMessageUrl(exciseRegistrationNumber: String, messageId: String): String =
     eisBaseUrl + "/emcs/messages/v1/message" + s"?exciseregistrationnumber=$exciseRegistrationNumber&uniquemessageid=$messageId"
 
+  def eisGetMessageStatisticsUrl(): String =
+    eisBaseUrl + "/emcs/messages/v1/message-statistics"
+
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
 
