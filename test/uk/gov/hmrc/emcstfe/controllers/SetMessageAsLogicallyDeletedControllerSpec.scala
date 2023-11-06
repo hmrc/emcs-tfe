@@ -21,40 +21,40 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
-import uk.gov.hmrc.emcstfe.fixtures.MarkMessageAsReadFixtures
-import uk.gov.hmrc.emcstfe.mocks.services.MockMarkMessageAsReadService
-import uk.gov.hmrc.emcstfe.models.request.MarkMessageAsReadRequest
+import uk.gov.hmrc.emcstfe.fixtures.SetMessageAsLogicallyDeletedFixtures
+import uk.gov.hmrc.emcstfe.mocks.services.MockSetMessageAsLogicallyDeletedService
+import uk.gov.hmrc.emcstfe.models.request.SetMessageAsLogicallyDeletedRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class MarkMessageAsReadControllerSpec extends TestBaseSpec with MockMarkMessageAsReadService with MarkMessageAsReadFixtures with FakeAuthAction {
+class SetMessageAsLogicallyDeletedControllerSpec extends TestBaseSpec with MockSetMessageAsLogicallyDeletedService with SetMessageAsLogicallyDeletedFixtures with FakeAuthAction {
 
   private val fakeRequest = FakeRequest("GET", "/movement/:ern/:arc")
-  private val controller = new MarkMessageAsReadController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
+  private val controller = new SetMessageAsLogicallyDeletedController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
-  private val markMessageAsReadRequest = MarkMessageAsReadRequest(testErn, testArc)
+  private val setMessageAsLogicallyDeletedRequest = SetMessageAsLogicallyDeletedRequest(testErn, testArc)
 
 
-  "markMessageAsRead" should {
+  "setMessageAsLogicallyDeleted" should {
     "return 200" when {
       "service returns a Right" in {
 
-        MockService.markMessageAsRead(markMessageAsReadRequest).returns(Future.successful(Right(markMessageAsReadResponseModel)))
+        MockService.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest).returns(Future.successful(Right(setMessageAsLogicallyDeletedResponseModel)))
 
-        val result = controller.markMessageAsRead(testErn, testArc)(fakeRequest)
+        val result = controller.setMessageAsLogicallyDeleted(testErn, testArc)(fakeRequest)
 
         status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe markMessageAsReadJson
+        contentAsJson(result) shouldBe setMessageAsLogicallyDeletedJson
       }
     }
     "return 500" when {
       "service returns a Left" in {
 
-        MockService.markMessageAsRead(markMessageAsReadRequest).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+        MockService.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-        val result = controller.markMessageAsRead(testErn, testArc)(fakeRequest)
+        val result = controller.setMessageAsLogicallyDeleted(testErn, testArc)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)

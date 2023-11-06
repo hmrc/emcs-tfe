@@ -20,9 +20,9 @@ import org.scalamock.handlers.{CallHandler4, CallHandler5}
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
-import uk.gov.hmrc.emcstfe.models.request.{GetMessagesRequest, MarkMessageAsReadRequest}
+import uk.gov.hmrc.emcstfe.models.request.{GetMessagesRequest, MarkMessageAsReadRequest, SetMessageAsLogicallyDeletedRequest}
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, MarkMessageAsReadResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, MarkMessageAsReadResponse, SetMessageAsLogicallyDeletedResponse}
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -46,6 +46,11 @@ trait MockEisConnector extends MockFactory {
 
     def markMessageAsRead(request: MarkMessageAsReadRequest): CallHandler4[MarkMessageAsReadRequest, HeaderCarrier, ExecutionContext, Reads[MarkMessageAsReadResponse], Future[Either[ErrorResponse, MarkMessageAsReadResponse]]] = {
       (mockEisConnector.markMessageAsRead(_: MarkMessageAsReadRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[MarkMessageAsReadResponse]))
+        .expects(request, *, *, *)
+    }
+
+    def setMessageAsLogicallyDeleted(request: SetMessageAsLogicallyDeletedRequest): CallHandler4[SetMessageAsLogicallyDeletedRequest, HeaderCarrier, ExecutionContext, Reads[SetMessageAsLogicallyDeletedResponse], Future[Either[ErrorResponse, SetMessageAsLogicallyDeletedResponse]]] = {
+      (mockEisConnector.setMessageAsLogicallyDeleted(_: SetMessageAsLogicallyDeletedRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[SetMessageAsLogicallyDeletedResponse]))
         .expects(request, *, *, *)
     }
 

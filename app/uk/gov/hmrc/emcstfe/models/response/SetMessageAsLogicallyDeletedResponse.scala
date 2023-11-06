@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.fixtures
+package uk.gov.hmrc.emcstfe.models.response
 
-import java.time.LocalDate
+import play.api.libs.json.{Json, OFormat}
 
-trait BaseFixtures {
+case class SetMessageAsLogicallyDeletedResponse(dateTime: String, exciseRegistrationNumber: String, recordsAffected: Int)
 
-  val testErn = "GBWK000001234"
-  val testArc: String = "23GB00000000000376967"
-  val testLrn: String = "LRN"
-  val testMessageId = "1234"
-  val testDraftId: String = "1234-5678-9012"
-  val testCredId = "cred1234567891"
-  val testInternalId = "int1234567891"
-  val testDestinationOffice = "GB1234"
-
-  val now: String = LocalDate.now().toString
-
+object SetMessageAsLogicallyDeletedResponse {
+  implicit val fmt: OFormat[SetMessageAsLogicallyDeletedResponse] = Json.format
 }

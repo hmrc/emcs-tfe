@@ -17,18 +17,18 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.response.MarkMessageAsReadResponse
+import uk.gov.hmrc.emcstfe.models.response.SetMessageAsLogicallyDeletedResponse
 
-trait MarkMessageAsReadFixtures extends BaseFixtures {
-  val markMessageAsReadDownstreamJson: JsValue = Json.obj(
+trait SetMessageAsLogicallyDeletedFixtures extends BaseFixtures {
+  val setMessageAsLogicallyDeletedDownstreamJson: JsValue = Json.obj(
     "dateTime" -> now,
     "exciseRegistrationNumber" -> testErn,
     "recordsAffected" -> 1
   )
-  val markMessageAsReadResponseModel: MarkMessageAsReadResponse = MarkMessageAsReadResponse(
+  val setMessageAsLogicallyDeletedResponseModel: SetMessageAsLogicallyDeletedResponse = SetMessageAsLogicallyDeletedResponse(
     dateTime = now, exciseRegistrationNumber = testErn, recordsAffected = 1
   )
-  val markMessageAsReadJson: JsValue = Json.obj(
+  val setMessageAsLogicallyDeletedJson: JsValue = Json.obj(
     "dateTime" -> now,
     "exciseRegistrationNumber" -> testErn,
     "recordsAffected" -> 1
