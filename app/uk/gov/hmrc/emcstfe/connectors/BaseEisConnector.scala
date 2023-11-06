@@ -69,4 +69,13 @@ trait BaseEisConnector extends Logging {
       http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID.toString, forwardedHost))
     }
   }
+
+  def putEmpty[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest)
+               (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
+    withTimer(request.metricName) {
+      val forwardedHost = appConfig.eisForwardedHost()
+      logger.debug(s"[putEmpty] PUT to $uri being made with empty body")
+      http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID.toString, forwardedHost))
+    }
+  }
 }

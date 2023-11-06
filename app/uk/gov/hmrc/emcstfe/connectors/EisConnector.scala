@@ -19,10 +19,10 @@ package uk.gov.hmrc.emcstfe.connectors
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
-import uk.gov.hmrc.emcstfe.models.request.GetMessagesRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest}
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.request.{GetMessagesRequest, MarkMessageAsReadRequest}
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, MarkMessageAsReadResponse}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -48,6 +48,12 @@ class EisConnector @Inject()(val http: HttpClient,
     get(http, url, request)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
   }
 
+  private def prepareEmptyPutRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String)
+                                                (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
+    logger.debug(s"[$callingMethod] Sending to URL: $url")
+    putEmpty(http, url, request)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
+  }
+
   def submit[A](request: EisSubmissionRequest, callingMethod: String)
                (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
     prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, callingMethod)
@@ -55,4 +61,10 @@ class EisConnector @Inject()(val http: HttpClient,
   def getMessages(request: GetMessagesRequest)
                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetMessagesResponse]): Future[Either[ErrorResponse, GetMessagesResponse]] =
     prepareGetRequestAndSubmit(appConfig.eisGetMessagesUrl(), request, "getMessages")
+
+  def markMessageAsRead(request: MarkMessageAsReadRequest)
+                       (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[MarkMessageAsReadResponse]): Future[Either[ErrorResponse, MarkMessageAsReadResponse]] = {
+    val url = appConfig.eisMarkMessageAsReadUrl() + s"?exciseregistrationnumber=${request.exciseRegistrationNumber}&uniquemessageid=${request.messageId}"
+    prepareEmptyPutRequestAndSubmit(url, request, "markMessageAsRead")
+  }
 }
