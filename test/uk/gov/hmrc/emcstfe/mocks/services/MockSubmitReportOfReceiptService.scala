@@ -21,7 +21,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitReportOfReceiptService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -36,7 +36,7 @@ trait MockSubmitReportOfReceiptService extends MockFactory {
       (mockService.submit(_: SubmitReportOfReceiptModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
         .expects(submission, *, *, *)
 
-    def submitViaEIS(submission: SubmitReportOfReceiptModel): CallHandler4[SubmitReportOfReceiptModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSuccessResponse]]] =
+    def submitViaEIS(submission: SubmitReportOfReceiptModel): CallHandler4[SubmitReportOfReceiptModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
       (mockService.submitViaEIS(_: SubmitReportOfReceiptModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
         .expects(submission, *, *, *)
   }

@@ -66,7 +66,7 @@ class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExp
       "return a Right" when {
         "connector call to EIS is successful and XML is the correct format" in new Test {
 
-          MockEisConnector.submitExplainShortageExcessEISRequest(submitExplainShortageExcessRequest).returns(
+          MockEisConnector.submit(submitExplainShortageExcessRequest).returns(
             Future.successful(Right(chrisSuccessResponse))
           )
 
@@ -76,7 +76,7 @@ class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExp
       "return a Left" when {
         "connector call to EIS is unsuccessful" in new Test {
 
-          MockEisConnector.submitExplainShortageExcessEISRequest(submitExplainShortageExcessRequest).returns(
+          MockEisConnector.submit(submitExplainShortageExcessRequest).returns(
            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
           )
 

@@ -20,7 +20,7 @@ import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainDelayRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,7 +34,7 @@ class SubmitExplainDelayService @Inject()(connector: ChrisConnector, eisConnecto
     connector.submitExplainDelayChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainDelayRequest(submission))
 
   def submitViaEIS(submission: SubmitExplainDelayModel)
-                  (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSuccessResponse]] =
-    eisConnector.submitExplainDelayEISRequest[EISSuccessResponse](SubmitExplainDelayRequest(submission))
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitExplainDelayRequest(submission), "submitExplainDelayEISRequest")
 
 }

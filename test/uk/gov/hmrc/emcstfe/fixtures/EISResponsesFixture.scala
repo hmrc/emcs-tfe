@@ -17,11 +17,11 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.response.EISSuccessResponse
+import uk.gov.hmrc.emcstfe.models.response.EISSubmissionSuccessResponse
 
 trait EISResponsesFixture {
 
-  lazy val eisSuccessResponse: EISSuccessResponse = EISSuccessResponse(
+  lazy val eisSuccessResponse: EISSubmissionSuccessResponse = EISSubmissionSuccessResponse(
     status = "OK",
     message = "Great success",
     emcsCorrelationId = "3e8dae97-b586-4cef-8511-68ac12da9028"

@@ -60,7 +60,7 @@ class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfR
                 SubmitReportOfReceiptRequest(model)
 
               MockEisConnector
-                .submitReportOfReceiptEISRequest(submitReportOfReceiptRequest)
+                .submit(submitReportOfReceiptRequest)
                 .returns(Future.successful(Right(eisSuccessResponse)))
 
               MockMetricsService.rorStatusCounter(statusAndMetricName._2)
@@ -76,7 +76,7 @@ class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfR
           "connector call is unsuccessful" in new Test {
 
             MockEisConnector
-              .submitReportOfReceiptEISRequest(submitReportOfReceiptRequest)
+              .submit(submitReportOfReceiptRequest)
               .returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
 
             MockMetricsService.rorStatusCounter("failed-submission")

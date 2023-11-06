@@ -146,14 +146,6 @@ class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitE
         )
       }
       "downstream call returns a non-200 HTTP response" in new Test {
-        val referenceDataResponseBody: JsValue = Json.parse(
-          s"""
-             |{
-             |   "message": "test message"
-             |}
-             |""".stripMargin
-        )
-
         override def setupStubs(): StubMapping = {
           enable(SendToEIS)
           AuthStub.authorised()

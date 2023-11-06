@@ -19,8 +19,10 @@ package uk.gov.hmrc.emcstfe.connectors
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
-import uk.gov.hmrc.emcstfe.models.request.eis.EisRequest
+import uk.gov.hmrc.emcstfe.models.request.GetMessagesRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -33,27 +35,24 @@ class EisConnector @Inject()(val http: HttpClient,
                              httpParser: EisJsonHttpParser
                             ) extends BaseEisConnector {
 
-  private def prepareJsonAndSubmit[A](url: String, request: EisRequest, callingMethod: String)
+  private def prepareJsonAndSubmit[A](url: String, request: EisSubmissionRequest, callingMethod: String)
                                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
     logger.debug(s"[$callingMethod] Sending body: ${request.toJson}")
     postJson(http, url, request.toJson, request)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
   }
 
-  def submitReportOfReceiptEISRequest[A](request: EisRequest)
-                                        (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
-    prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, "submitReportOfReceiptEISRequest")
+  private def prepareGetRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String)
+                                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
+    logger.debug(s"[$callingMethod] Sending to URL: $url")
+    get(http, url, request)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
+  }
 
-  def submitExplainShortageExcessEISRequest[A](request: EisRequest)
-                                              (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
-    prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, "submitExplainShortageExcessEISRequest")
+  def submit[A](request: EisSubmissionRequest, callingMethod: String)
+               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
+    prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, callingMethod)
 
-  def submitExplainDelayEISRequest[A](request: EisRequest)
-                                     (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
-    prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, "submitExplainDelayEISRequest")
-
-  def submitCancellationOfMovementEISRequest[A](request: EisRequest)
-                                               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
-    prepareJsonAndSubmit(appConfig.eisSubmissionsUrl(), request, "submitCancellationOfMovementEISRequest")
-
+  def getMessages(request: GetMessagesRequest)
+                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetMessagesResponse]): Future[Either[ErrorResponse, GetMessagesResponse]] =
+    prepareGetRequestAndSubmit(appConfig.eisGetMessagesUrl(), request, "getMessages")
 }

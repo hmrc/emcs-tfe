@@ -34,13 +34,15 @@ trait MockHttpClient extends MockFactory {
   object MockHttpClient extends Matchers {
 
     def get[T](url: String,
-               parameters: Seq[(String, String)] = Seq.empty): CallHandler[Future[T]] = {
+               parameters: Seq[(String, String)] = Seq.empty,
+               headers: Seq[(String, String)] = Seq.empty): CallHandler[Future[T]] = {
       (mockHttpClient
         .GET(_: String, _: Seq[(String, String)], _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs {
-          (actualUrl: String, actualParams: Seq[(String, String)], _, _, _, _) => {
+          (actualUrl: String, actualParams: Seq[(String, String)], actualHeaders, _, _, _) => {
             actualUrl shouldBe url
             actualParams shouldBe parameters
+            actualHeaders.filterNot(_._1 == "datetime") shouldBe headers.filterNot(_._1 == "datetime")
           }
         })
     }
@@ -59,20 +61,19 @@ trait MockHttpClient extends MockFactory {
 
     def postString[T](url: String,
                       body: String,
-                      headers: Seq[(String,String)] = Seq()): CallHandler[Future[T]] = {
+                      headers: Seq[(String, String)] = Seq()): CallHandler[Future[T]] = {
       (mockHttpClient
         .POSTString[T](_: String, _: String, _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs { (actualUrl, actualBody, actualHeaders, _, _, _) => {
           actualUrl shouldBe url
           actualHeaders shouldBe headers
-//          (XML.loadString(actualBody) \\ "OperationRequest"). shouldBe (XML.loadString(body) \\ "OperationRequest")
         }
         })
     }
 
     def postJson[I, T](url: String,
-                      body: I,
-                      headers: Seq[(String, String)] = Seq()): CallHandler[Future[T]] = {
+                       body: I,
+                       headers: Seq[(String, String)] = Seq()): CallHandler[Future[T]] = {
       (mockHttpClient
         .POST[I, T](_: String, _: I, _: Seq[(String, String)])(_: Writes[I], _: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs { (actualUrl, actualBody, actualHeaders, _, _, _, _) => {
@@ -82,7 +83,7 @@ trait MockHttpClient extends MockFactory {
           //Can't compare the original timestamps so truncate to days instead
           Instant.parse(actualHeaders.find(_._1 == EisHeaders.dateTime).get._2).truncatedTo(ChronoUnit.DAYS) shouldBe Instant.parse(headers.find(_._1 == EisHeaders.dateTime).get._2).truncatedTo(ChronoUnit.DAYS)
         }
-      })
+        })
     }
 
     def put[I, T](url: String,

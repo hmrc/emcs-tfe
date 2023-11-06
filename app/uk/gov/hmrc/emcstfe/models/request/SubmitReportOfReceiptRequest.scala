@@ -23,12 +23,12 @@ import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, Regist
 import uk.gov.hmrc.emcstfe.models.common.TraderModel
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
 case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
-                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisRequest with EisMessage {
+                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
 
   private val arcCountryCode = body.arc.substring(2, 4)
   private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(Constants.GB)

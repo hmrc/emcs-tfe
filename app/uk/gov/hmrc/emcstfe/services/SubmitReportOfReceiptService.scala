@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitReportOfReceiptRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -39,8 +39,8 @@ class SubmitReportOfReceiptService @Inject()(chrisConnector: ChrisConnector,
     chrisConnector.submitReportOfReceiptChrisSOAPRequest[ChRISSuccessResponse](SubmitReportOfReceiptRequest(submission)).map(handleResponse(_, submission))
 
   def submitViaEIS(submission: SubmitReportOfReceiptModel)
-            (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSuccessResponse]] =
-    eisConnector.submitReportOfReceiptEISRequest[EISSuccessResponse](SubmitReportOfReceiptRequest(submission)).map(handleResponse(_, submission))
+            (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitReportOfReceiptRequest(submission), "submitReportOfReceiptEISRequest").map(handleResponse(_, submission))
 
   private def handleResponse[A](response: Either[ErrorResponse, A], submission: SubmitReportOfReceiptModel): Either[ErrorResponse, A] = response match {
     case r@Right(_) =>
