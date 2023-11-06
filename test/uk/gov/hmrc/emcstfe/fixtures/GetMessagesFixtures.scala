@@ -706,13 +706,13 @@ trait GetMessagesFixtures extends BaseFixtures {
 
     val getMessagesResponseModel: GetMessagesResponse = GetMessagesResponse(
       dateTime = "now",
-      ern = testErn,
+      exciseRegistrationNumber = testErn,
       messagesData = messagesDataModel
     )
 
     val getMessagesResponseJson: JsValue = Json.obj(
       "dateTime" -> "now",
-      "ern" -> testErn,
+      "exciseRegistrationNumber" -> testErn,
       "messagesData" -> messagesDataJson
     )
 
@@ -724,13 +724,13 @@ trait GetMessagesFixtures extends BaseFixtures {
 
     val getMessagesResponseMinimumModel: GetMessagesResponse = GetMessagesResponse(
       dateTime = "now",
-      ern = testErn,
+      exciseRegistrationNumber = testErn,
       messagesData = messagesDataMinimumModel
     )
 
     val getMessagesResponseMinimumJson: JsValue = Json.obj(
       "dateTime" -> "now",
-      "ern" -> testErn,
+      "exciseRegistrationNumber" -> testErn,
       "messagesData" -> messagesDataMinimumJson
     )
   }

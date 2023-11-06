@@ -27,7 +27,7 @@ import java.util.Base64
 import scala.util.{Failure, Success, Try}
 import scala.xml.XML
 
-case class GetMessagesResponse(dateTime: String, ern: String, messagesData: MessagesData)
+case class GetMessagesResponse(dateTime: String, exciseRegistrationNumber: String, messagesData: MessagesData)
 
 object GetMessagesResponse {
   implicit val writes: OWrites[GetMessagesResponse] = Json.writes
