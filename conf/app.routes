@@ -4,6 +4,7 @@
 GET         /movements/:ern                           uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(ern, search: GetMovementListSearchOptions)
 GET         /movement/:ern/:arc                       uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(ern, arc, forceFetchNew: Boolean)
 GET         /messages/:ern                            uk.gov.hmrc.emcstfe.controllers.GetMessagesController.getMessages(ern, sortField, sortOrder, page: Int)
+PUT         /message/:ern/:messageId                  uk.gov.hmrc.emcstfe.controllers.MarkMessageAsReadController.markMessageAsRead(ern, messageId)
 
 # Submission
 POST        /report-of-receipt/:ern/:arc              uk.gov.hmrc.emcstfe.controllers.SubmitReportOfReceiptController.submit(ern, arc)

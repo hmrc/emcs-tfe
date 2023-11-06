@@ -20,9 +20,9 @@ import org.scalamock.handlers.{CallHandler4, CallHandler5}
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
-import uk.gov.hmrc.emcstfe.models.request.GetMessagesRequest
+import uk.gov.hmrc.emcstfe.models.request.{GetMessagesRequest, MarkMessageAsReadRequest}
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, MarkMessageAsReadResponse}
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -41,6 +41,11 @@ trait MockEisConnector extends MockFactory {
 
     def getMessages(request: GetMessagesRequest): CallHandler4[GetMessagesRequest, HeaderCarrier, ExecutionContext, Reads[GetMessagesResponse], Future[Either[ErrorResponse, GetMessagesResponse]]] = {
       (mockEisConnector.getMessages(_: GetMessagesRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetMessagesResponse]))
+        .expects(request, *, *, *)
+    }
+
+    def markMessageAsRead(request: MarkMessageAsReadRequest): CallHandler4[MarkMessageAsReadRequest, HeaderCarrier, ExecutionContext, Reads[MarkMessageAsReadResponse], Future[Either[ErrorResponse, MarkMessageAsReadResponse]]] = {
+      (mockEisConnector.markMessageAsRead(_: MarkMessageAsReadRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[MarkMessageAsReadResponse]))
         .expects(request, *, *, *)
     }
 

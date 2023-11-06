@@ -33,7 +33,7 @@ case class GetMessagesRequest(exciseRegistrationNumber: String, sortField: Strin
 
   override def metricName: String = "messages"
 
-  override def queryParams: Seq[(String, String)] = Seq(
+  override val queryParams: Seq[(String, String)] = Seq(
     "exciseregistrationnumber" -> exciseRegistrationNumber,
     "sortfield" -> sortField,
     "sortorder" -> sortOrder,

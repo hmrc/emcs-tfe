@@ -69,6 +69,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def eisGetMessagesUrl(): String =
     eisBaseUrl + "/emcs/messages/v1/messages"
 
+  def eisMarkMessageAsReadUrl(): String =
+    eisBaseUrl + "/emcs/messages/v1/message"
+
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
 

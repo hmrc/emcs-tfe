@@ -19,6 +19,5 @@ package uk.gov.hmrc.emcstfe.models.request.eis
 import uk.gov.hmrc.emcstfe.models.request.BaseRequest
 
 trait EisConsumptionRequest extends BaseRequest {
-
-  def queryParams: Seq[(String, String)]
+  val queryParams: Seq[(String, String)]
 }

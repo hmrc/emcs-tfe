@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.fixtures
+package uk.gov.hmrc.emcstfe.models.request
 
-trait BaseFixtures {
+import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-  val testErn = "GBWK000001234"
-  val testArc: String = "23GB00000000000376967"
-  val testLrn: String = "LRN"
-  val testMessageId = "1234"
-  val testDraftId: String = "1234-5678-9012"
-  val testCredId = "cred1234567891"
-  val testInternalId = "int1234567891"
-  val testDestinationOffice = "GB1234"
+case class MarkMessageAsReadRequest(exciseRegistrationNumber: String, messageId: String) extends EisConsumptionRequest {
+  override def metricName: String = "markMessageAsRead"
 
+  override val queryParams: Seq[(String, String)] = Seq()
 }

@@ -92,4 +92,8 @@ trait WireMockMethods {
   case object GET extends HTTPMethod {
     override def wireMockMapping(pattern: UrlPattern): MappingBuilder = get(pattern)
   }
+
+  case object PUT extends HTTPMethod {
+    override def wireMockMapping(pattern: UrlPattern): MappingBuilder = put(pattern)
+  }
 }
