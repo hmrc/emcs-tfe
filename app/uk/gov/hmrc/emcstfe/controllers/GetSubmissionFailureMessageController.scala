@@ -19,21 +19,21 @@ package uk.gov.hmrc.emcstfe.controllers
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.models.request.MarkMessageAsReadRequest
-import uk.gov.hmrc.emcstfe.services.MarkMessageAsReadService
+import uk.gov.hmrc.emcstfe.models.request.GetSubmissionFailureMessageRequest
+import uk.gov.hmrc.emcstfe.services.GetSubmissionFailureMessageService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class MarkMessageAsReadController @Inject()(cc: ControllerComponents,
-                                            service: MarkMessageAsReadService,
-                                            override val auth: AuthAction
-                                     )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
+class GetSubmissionFailureMessageController @Inject()(cc: ControllerComponents,
+                                                      service: GetSubmissionFailureMessageService,
+                                                      override val auth: AuthAction
+                                                     )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
-  def markMessageAsRead(exciseRegistrationNumber: String, messageId: String): Action[AnyContent] = authorisedUserRequest(exciseRegistrationNumber) { implicit request =>
-    service.markMessageAsRead(MarkMessageAsReadRequest(exciseRegistrationNumber = exciseRegistrationNumber, messageId = messageId)).map {
+  def getSubmissionFailureMessage(exciseRegistrationNumber: String, messageId: String): Action[AnyContent] = authorisedUserRequest(exciseRegistrationNumber) { implicit request =>
+    service.getSubmissionFailureMessage(GetSubmissionFailureMessageRequest(exciseRegistrationNumber = exciseRegistrationNumber, messageId = messageId)).map {
       case Left(value) => InternalServerError(Json.toJson(value))
       case Right(value) => Ok(Json.toJson(value))
     }

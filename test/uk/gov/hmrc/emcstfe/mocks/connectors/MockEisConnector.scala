@@ -20,9 +20,10 @@ import org.scalamock.handlers.{CallHandler4, CallHandler5}
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
+import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
-import uk.gov.hmrc.emcstfe.models.request.{GetMessageStatisticsRequest, GetMessagesRequest, MarkMessageAsReadRequest, SetMessageAsLogicallyDeletedRequest}
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
+import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmissionFailureMessageResponse
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMessageStatisticsResponse, MarkMessageAsReadResponse, SetMessageAsLogicallyDeletedResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -46,6 +47,11 @@ trait MockEisConnector extends MockFactory {
 
     def getMessageStatistics(request: GetMessageStatisticsRequest): CallHandler4[GetMessageStatisticsRequest, HeaderCarrier, ExecutionContext, Reads[GetMessageStatisticsResponse], Future[Either[ErrorResponse, GetMessageStatisticsResponse]]] = {
       (mockEisConnector.getMessageStatistics(_: GetMessageStatisticsRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetMessageStatisticsResponse]))
+        .expects(request, *, *, *)
+    }
+
+    def getSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest): CallHandler4[GetSubmissionFailureMessageRequest, HeaderCarrier, ExecutionContext, Reads[GetSubmissionFailureMessageResponse], Future[Either[ErrorResponse, GetSubmissionFailureMessageResponse]]] = {
+      (mockEisConnector.getSubmissionFailureMessage(_: GetSubmissionFailureMessageRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetSubmissionFailureMessageResponse]))
         .expects(request, *, *, *)
     }
 
