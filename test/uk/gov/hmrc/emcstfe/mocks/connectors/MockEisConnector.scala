@@ -20,10 +20,10 @@ import org.scalamock.handlers.{CallHandler4, CallHandler5}
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
-import uk.gov.hmrc.emcstfe.models.request.{GetMessagesRequest, MarkMessageAsReadRequest, SetMessageAsLogicallyDeletedRequest}
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, MarkMessageAsReadResponse, SetMessageAsLogicallyDeletedResponse}
+import uk.gov.hmrc.emcstfe.models.request.{GetMessageStatisticsRequest, GetMessagesRequest, MarkMessageAsReadRequest, SetMessageAsLogicallyDeletedRequest}
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMessageStatisticsResponse, MarkMessageAsReadResponse, SetMessageAsLogicallyDeletedResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,6 +41,11 @@ trait MockEisConnector extends MockFactory {
 
     def getMessages(request: GetMessagesRequest): CallHandler4[GetMessagesRequest, HeaderCarrier, ExecutionContext, Reads[GetMessagesResponse], Future[Either[ErrorResponse, GetMessagesResponse]]] = {
       (mockEisConnector.getMessages(_: GetMessagesRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetMessagesResponse]))
+        .expects(request, *, *, *)
+    }
+
+    def getMessageStatistics(request: GetMessageStatisticsRequest): CallHandler4[GetMessageStatisticsRequest, HeaderCarrier, ExecutionContext, Reads[GetMessageStatisticsResponse], Future[Either[ErrorResponse, GetMessageStatisticsResponse]]] = {
+      (mockEisConnector.getMessageStatistics(_: GetMessageStatisticsRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetMessageStatisticsResponse]))
         .expects(request, *, *, *)
     }
 
