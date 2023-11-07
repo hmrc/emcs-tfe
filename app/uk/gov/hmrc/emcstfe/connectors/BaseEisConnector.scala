@@ -32,7 +32,7 @@ trait BaseEisConnector extends Logging {
   def metricsService: MetricsService
 
   private def eisSubmissionHeaders(correlationId: String, forwardedHost: String): Seq[(String, String)] = Seq(
-    EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+    EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.SECONDS)}",
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
     EisHeaders.source -> "TFE",
@@ -41,7 +41,7 @@ trait BaseEisConnector extends Logging {
   )
 
   private def eisConsumptionHeaders(correlationId: String, forwardedHost: String): Seq[(String, String)] = Seq(
-    EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+    EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.SECONDS)}",
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
     EisHeaders.source -> "TFE"
