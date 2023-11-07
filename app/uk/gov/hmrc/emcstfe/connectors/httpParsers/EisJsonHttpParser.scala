@@ -44,7 +44,9 @@ class EisJsonHttpParser @Inject()() extends Logging {
       }
       case BAD_REQUEST => Left(EISJsonSchemaMismatchError(response.body))
       case NOT_FOUND => Left(EISResourceNotFoundError(response.body))
-      case UNPROCESSABLE_ENTITY => Left(EISBusinessError(response.body))
+      case UNPROCESSABLE_ENTITY =>
+        logger.debug(s"[modelFromJsonHttpReads] Business/RIM validation error (422) from EIS: ${response.body}")
+        Left(EISBusinessError(response.body))
       case INTERNAL_SERVER_ERROR => Left(EISInternalServerError(response.body))
       case SERVICE_UNAVAILABLE => Left(EISServiceUnavailableError(response.body))
       case _ => {
