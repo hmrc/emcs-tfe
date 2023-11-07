@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.fixtures
+package uk.gov.hmrc.emcstfe.models.request
 
-import java.time.LocalDate
+import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-trait BaseFixtures {
+case class SetMessageAsLogicallyDeletedRequest(exciseRegistrationNumber: String, messageId: String) extends EisConsumptionRequest {
+  override def metricName: String = "setMessageAsLogicallyDeleted"
 
-  val testErn = "GBWK000001234"
-  val testArc: String = "23GB00000000000376967"
-  val testLrn: String = "LRN"
-  val testMessageId = "1234"
-  val testDraftId: String = "1234-5678-9012"
-  val testCredId = "cred1234567891"
-  val testInternalId = "int1234567891"
-  val testDestinationOffice = "GB1234"
-
-  val now: String = LocalDate.now().toString
-
+  override val queryParams: Seq[(String, String)] = Seq()
 }

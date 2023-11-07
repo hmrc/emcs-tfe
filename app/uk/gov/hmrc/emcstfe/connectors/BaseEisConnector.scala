@@ -78,4 +78,13 @@ trait BaseEisConnector extends Logging {
       http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID.toString, forwardedHost))
     }
   }
+
+  def delete[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest)
+               (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
+    withTimer(request.metricName) {
+      val forwardedHost = appConfig.eisForwardedHost()
+      logger.debug(s"[delete] DELETE to $uri being made")
+      http.DELETE[Either[A, B]](uri, eisConsumptionHeaders(request.correlationUUID.toString, forwardedHost))
+    }
+  }
 }

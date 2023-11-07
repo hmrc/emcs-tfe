@@ -56,6 +56,7 @@ class EisConnectorSpec extends TestBaseSpec
   with CreateMovementFixtures
   with GetMessagesFixtures
   with MarkMessageAsReadFixtures
+  with SetMessageAsLogicallyDeletedFixtures
   with MockMetricsService {
 
   override def afterEach(): Unit = {
@@ -659,6 +660,173 @@ class EisConnectorSpec extends TestBaseSpec
           ).returns(Future.successful(response))
 
           await(connector.markMessageAsRead(markMessageAsReadRequest)) shouldBe response
+        }
+      }
+    }
+
+    "setMessageAsLogicallyDeleted is called" should {
+
+      val setMessageAsLogicallyDeletedRequest = SetMessageAsLogicallyDeletedRequest(testErn, testMessageId)
+
+      "return a Right" when {
+        "downstream call is successful" in new Test {
+
+          MockMetricsService.requestTimer(setMessageAsLogicallyDeletedRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.delete(
+            url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(Right(setMessageAsLogicallyDeletedResponseModel)))
+
+          await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe Right(setMessageAsLogicallyDeletedResponseModel)
+        }
+      }
+
+      "return a Left" when {
+
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(setMessageAsLogicallyDeletedRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.delete(
+            url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+          MockMetricsService.requestTimer(setMessageAsLogicallyDeletedRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.delete(
+            url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+          MockMetricsService.requestTimer(setMessageAsLogicallyDeletedRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.delete(
+            url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+          MockMetricsService.requestTimer(setMessageAsLogicallyDeletedRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.delete(
+            url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 500 (ISE) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+          MockMetricsService.requestTimer(setMessageAsLogicallyDeletedRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.delete(
+            url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(setMessageAsLogicallyDeletedRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.delete(
+            url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(setMessageAsLogicallyDeletedRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.delete(
+            url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe response
         }
       }
     }
