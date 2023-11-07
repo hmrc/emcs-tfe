@@ -19,6 +19,8 @@ package uk.gov.hmrc.emcstfe.fixtures
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.GetMessageStatisticsResponse
 
+import java.time.LocalDate
+
 trait GetMessageStatisticsFixtures extends BaseFixtures {
   val getMessageStatisticsDownstreamJson: JsValue = Json.obj(
     "dateTime" -> now,
