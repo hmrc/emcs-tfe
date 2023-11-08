@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.response
 
 import com.lucidchart.open.xtract.ParseError
-import play.api.libs.json.{Json, JsonValidationError, OWrites}
+import play.api.libs.json._
 
 sealed trait ErrorResponse {
   val message: String
@@ -94,6 +94,12 @@ object ErrorResponse {
 
   case class QueryParameterError(queryParams: Seq[(String, String)]) extends ErrorResponse {
     val message = s"Invalid query parameters provided. Query parameters: $queryParams"
+  }
+
+  case class UnknownFunctionalErrorCode(errorCode: String) extends ErrorResponse {
+    val message = s"Unknown functional error code in IE704 message: $errorCode"
+
+    def throwError: JsResult.Exception = JsResult.Exception(JsError(message))
   }
 
 }

@@ -55,6 +55,7 @@ class EisConnectorSpec extends TestBaseSpec
   with SubmitCancellationOfMovementFixtures
   with CreateMovementFixtures
   with GetMessagesFixtures
+  with GetSubmissionFailureMessageFixtures
   with MarkMessageAsReadFixtures
   with SetMessageAsLogicallyDeletedFixtures
   with GetMessageStatisticsFixtures
@@ -494,6 +495,207 @@ class EisConnectorSpec extends TestBaseSpec
           ).returns(Future.successful(response))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe response
+        }
+      }
+    }
+
+    "getSubmissionFailureMessage is called" should {
+
+      val getSubmissionFailureMessageRequest = GetSubmissionFailureMessageRequest(testErn, testMessageId)
+
+      import GetSubmissionFailureMessageResponseFixtures._
+
+      "return a Right" when {
+        "downstream call is successful" in new Test {
+
+          MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "uniquemessageid" -> testMessageId
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(Right(getSubmissionFailureMessageResponseModel)))
+
+          await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe Right(getSubmissionFailureMessageResponseModel)
+        }
+      }
+
+      "return a Left" when {
+
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "uniquemessageid" -> testMessageId
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+          MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "uniquemessageid" -> testMessageId
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+          MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "uniquemessageid" -> testMessageId
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+          MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "uniquemessageid" -> testMessageId
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 500 (ISE) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+          MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "uniquemessageid" -> testMessageId
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "uniquemessageid" -> testMessageId
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "uniquemessageid" -> testMessageId
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
         }
       }
     }

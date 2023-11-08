@@ -19,9 +19,10 @@ package uk.gov.hmrc.emcstfe.connectors
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
+import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest}
-import uk.gov.hmrc.emcstfe.models.request.{GetMessageStatisticsRequest, GetMessagesRequest, MarkMessageAsReadRequest, SetMessageAsLogicallyDeletedRequest}
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
+import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmissionFailureMessageResponse
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMessageStatisticsResponse, MarkMessageAsReadResponse, SetMessageAsLogicallyDeletedResponse}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -72,6 +73,10 @@ class EisConnector @Inject()(val http: HttpClient,
                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetMessageStatisticsResponse]): Future[Either[ErrorResponse, GetMessageStatisticsResponse]] = {
     prepareGetRequestAndSubmit(appConfig.eisGetMessageStatisticsUrl(), request, "getMessageStatistics")
   }
+
+  def getSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest)
+                                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetSubmissionFailureMessageResponse]): Future[Either[ErrorResponse, GetSubmissionFailureMessageResponse]] =
+    prepareGetRequestAndSubmit(appConfig.eisGetSubmissionFailureMessageUrl(), request, "getSubmissionFailureMessage")
 
   def markMessageAsRead(request: MarkMessageAsReadRequest)
                        (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[MarkMessageAsReadResponse]): Future[Either[ErrorResponse, MarkMessageAsReadResponse]] = {
