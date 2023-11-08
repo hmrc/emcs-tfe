@@ -18,40 +18,60 @@ package uk.gov.hmrc.emcstfe.services
 
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitAlertOrRejectionRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
 class SubmitAlertOrRejectionServiceSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
-  trait Test extends MockChrisConnector {
+  trait Test extends MockChrisConnector with MockEisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitAlertOrRejectionRequest: SubmitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
-    val service: SubmitAlertOrRejectionService = new SubmitAlertOrRejectionService(mockChrisConnector)
+    val service: SubmitAlertOrRejectionService = new SubmitAlertOrRejectionService(mockChrisConnector, mockEisConnector)
   }
 
-  "submit" should {
-    "return a Right" when {
-      "connector call is successful and XML is the correct format" in new Test {
+  "SubmitAlertOrRejectionService" when {
+    "calling submit" should {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in new Test {
 
-        MockChrisConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
-          Future.successful(Right(chrisSuccessResponse))
-        )
+          MockChrisConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
+            Future.successful(Right(chrisSuccessResponse))
+          )
 
-        await(service.submit(maxSubmitAlertOrRejectionModel)) shouldBe Right(chrisSuccessResponse)
+          await(service.submit(maxSubmitAlertOrRejectionModel)) shouldBe Right(chrisSuccessResponse)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in new Test {
+
+          MockChrisConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
+            Future.successful(Left(XmlValidationError))
+          )
+
+          await(service.submit(maxSubmitAlertOrRejectionModel)) shouldBe Left(XmlValidationError)
+        }
       }
     }
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
+    "calling submitViaEIS" should {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in new Test {
 
-        MockChrisConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
-          Future.successful(Left(XmlValidationError))
-        )
+          MockEisConnector.submit(submitAlertOrRejectionRequest).returns(Future.successful(Right(eisSuccessResponse)))
 
-        await(service.submit(maxSubmitAlertOrRejectionModel)) shouldBe Left(XmlValidationError)
+          await(service.submitViaEIS(maxSubmitAlertOrRejectionModel)) shouldBe Right(eisSuccessResponse)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in new Test {
+
+          MockEisConnector.submit(submitAlertOrRejectionRequest).returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
+
+          await(service.submitViaEIS(maxSubmitAlertOrRejectionModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
       }
     }
   }

@@ -116,7 +116,7 @@ class SubmitCancellationOfMovementControllerIntegrationSpec extends IntegrationB
         }
       }
     }
-    "when calling EIS" must {
+    "calling EIS" must {
       "return a success" when {
         "all downstream calls are successful" in new Test {
           override def setupStubs(): StubMapping = {
