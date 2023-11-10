@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitAlertOrRejectionRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,9 +28,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitAlertOrRejectionService @Inject()(connector: ChrisConnector) extends Logging {
+class SubmitAlertOrRejectionService @Inject()(connector: ChrisConnector, eisConnector: EisConnector) extends Logging {
   def submit(submission: SubmitAlertOrRejectionModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
     connector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](SubmitAlertOrRejectionRequest(submission))
+
+  def submitViaEIS(submission: SubmitAlertOrRejectionModel)
+                  (implicit hc: HeaderCarrier,
+                   ec: ExecutionContext,
+                   request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitAlertOrRejectionRequest(submission), "submitAlertOrRejectionEISRequest")
+
 
 }

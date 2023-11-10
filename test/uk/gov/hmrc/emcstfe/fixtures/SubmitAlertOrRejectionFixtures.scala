@@ -23,7 +23,7 @@ import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
 
 import java.time.LocalDate
 
-trait SubmitAlertOrRejectionFixtures extends BaseFixtures with TraderModelFixtures with ChRISResponsesFixture {
+trait SubmitAlertOrRejectionFixtures extends BaseFixtures with TraderModelFixtures with ChRISResponsesFixture with EISResponsesFixture {
 
   val maxSubmitAlertOrRejectionModel = SubmitAlertOrRejectionModel(
     consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
