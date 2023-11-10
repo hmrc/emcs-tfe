@@ -200,33 +200,57 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
   ".eisXMLBody" should {
     "generate the correct XML body" in {
-      val expectedRequest =
-        <urn:IE818 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
-          <urn:Header>
-            <urn1:MessageSender>
-              {request.messageSender}
-            </urn1:MessageSender>
-            <urn1:MessageRecipient>
-              {request.messageRecipient}
-            </urn1:MessageRecipient>
-            <urn1:DateOfPreparation>
-              {request.preparedDate.toString}
-            </urn1:DateOfPreparation>
-            <urn1:TimeOfPreparation>
-              {request.preparedTime.toString}
-            </urn1:TimeOfPreparation>
-            <urn1:MessageIdentifier>
-              {request.messageUUID}
-            </urn1:MessageIdentifier>
-            <urn1:CorrelationIdentifier>
-              {request.correlationUUID}
-            </urn1:CorrelationIdentifier>
-          </urn:Header>
-          <urn:Body>
-            {maxSubmitReportOfReceiptModelXML}
-          </urn:Body>
-        </urn:IE818>
-      trim(XML.loadString(request.eisXMLBody())).toString shouldBe trim(expectedRequest).toString
+      import org.scalatest.StreamlinedXml._
+
+      val expectedRequest = {
+        <con:Control xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+          <con:MetaData>
+            <con:MessageId>{request.messageUUID}</con:MessageId>
+            <con:Source>TFE</con:Source>
+            <con:CorrelationId>{request.correlationUUID}</con:CorrelationId>
+          </con:MetaData>
+          <con:OperationRequest>
+            <con:Parameters>
+              {XML.loadString(s"""
+                |<con:Parameter Name="message">
+                |<![CDATA[<urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+                |  <urn:Header>
+                |    <urn1:MessageSender>
+                |      ${request.messageSender}
+                |    </urn1:MessageSender>
+                |    <urn1:MessageRecipient>
+                |      ${request.messageRecipient}
+                |    </urn1:MessageRecipient>
+                |    <urn1:DateOfPreparation>
+                |      ${request.preparedDate.toString}
+                |    </urn1:DateOfPreparation>
+                |    <urn1:TimeOfPreparation>
+                |      ${request.preparedTime.toString}
+                |    </urn1:TimeOfPreparation>
+                |    <urn1:MessageIdentifier>
+                |      ${request.messageUUID}
+                |    </urn1:MessageIdentifier>
+                |    <urn1:CorrelationIdentifier>
+                |      ${request.correlationUUID}
+                |    </urn1:CorrelationIdentifier>
+                |  </urn:Header>
+                |  <urn:Body>
+                |    ${maxSubmitReportOfReceiptModelXML}
+                |  </urn:Body>
+                |</urn:IE818>]]>
+                |</con:Parameter>""".stripMargin)}
+            </con:Parameters>
+          </con:OperationRequest>
+        </con:Control>
+      }
+
+      val xml1 = trim(XML.loadString(request.eisXMLBody()))
+      val xml2 = trim(expectedRequest)
+
+      streamlined
+
+      assert(xml1 == xml2)
+//      trim(XML.loadString(request.eisXMLBody())) shouldBe trim(expectedRequest)
     }
   }
 

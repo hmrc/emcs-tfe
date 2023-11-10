@@ -56,36 +56,66 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
         {maxTraderModelXML(ConsigneeTrader)}
       </urn:ConsigneeTrader>
       <urn:ExciseMovement>
-        <urn:AdministrativeReferenceCode>{testArc}</urn:AdministrativeReferenceCode>
-        <urn:SequenceNumber>1</urn:SequenceNumber>
+        <urn:AdministrativeReferenceCode>
+          {testArc}
+        </urn:AdministrativeReferenceCode>
+        <urn:SequenceNumber>
+          1
+        </urn:SequenceNumber>
       </urn:ExciseMovement>
       <urn:DeliveryPlaceTrader language="en">
         {maxTraderModelXML(DeliveryPlaceTrader)}
       </urn:DeliveryPlaceTrader>
       <urn:DestinationOffice>
-        <urn:ReferenceNumber>{destinationOfficeId}</urn:ReferenceNumber>
+        <urn:ReferenceNumber>
+          {destinationOfficeId}
+        </urn:ReferenceNumber>
       </urn:DestinationOffice>
       <urn:ReportOfReceiptExport>
-        <urn:DateOfArrivalOfExciseProducts>{arrivalDate.toString}</urn:DateOfArrivalOfExciseProducts>
-        <urn:GlobalConclusionOfReceipt>{maxSubmitReportOfReceiptModel.globalConclusion}</urn:GlobalConclusionOfReceipt>
+        <urn:DateOfArrivalOfExciseProducts>
+          {arrivalDate.toString}
+        </urn:DateOfArrivalOfExciseProducts>
+        <urn:GlobalConclusionOfReceipt>
+          {maxSubmitReportOfReceiptModel.globalConclusion}
+        </urn:GlobalConclusionOfReceipt>
         <urn:ComplementaryInformation language="en">
           other
         </urn:ComplementaryInformation>
       </urn:ReportOfReceiptExport>
       <urn:BodyReportOfReceiptExport>
-        <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
-        <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
-        <urn:ObservedShortageOrExcess>12.145</urn:ObservedShortageOrExcess>
-        <urn:ExciseProductCode>W300</urn:ExciseProductCode>
-        <urn:RefusedQuantity>10</urn:RefusedQuantity>
+        <urn:BodyRecordUniqueReference>
+          1
+        </urn:BodyRecordUniqueReference>
+        <urn:IndicatorOfShortageOrExcess>
+          E
+        </urn:IndicatorOfShortageOrExcess>
+        <urn:ObservedShortageOrExcess>
+          12.145
+        </urn:ObservedShortageOrExcess>
+        <urn:ExciseProductCode>
+          W300
+        </urn:ExciseProductCode>
+        <urn:RefusedQuantity>
+          10
+        </urn:RefusedQuantity>
         {maxUnsatisfactoryModelXML(Excess)}
       </urn:BodyReportOfReceiptExport>
       <urn:BodyReportOfReceiptExport>
-        <urn:BodyRecordUniqueReference>2</urn:BodyRecordUniqueReference>
-        <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
-        <urn:ObservedShortageOrExcess>12.145</urn:ObservedShortageOrExcess>
-        <urn:ExciseProductCode>W300</urn:ExciseProductCode>
-        <urn:RefusedQuantity>10</urn:RefusedQuantity>
+        <urn:BodyRecordUniqueReference>
+          2
+        </urn:BodyRecordUniqueReference>
+        <urn:IndicatorOfShortageOrExcess>
+          E
+        </urn:IndicatorOfShortageOrExcess>
+        <urn:ObservedShortageOrExcess>
+          12.145
+        </urn:ObservedShortageOrExcess>
+        <urn:ExciseProductCode>
+          W300
+        </urn:ExciseProductCode>
+        <urn:RefusedQuantity>
+          10
+        </urn:RefusedQuantity>
         {maxUnsatisfactoryModelXML(Excess)}
       </urn:BodyReportOfReceiptExport>
     </urn:AcceptedOrRejectedReportOfReceiptExport>
