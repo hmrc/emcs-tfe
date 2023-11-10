@@ -78,26 +78,17 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
         <urn:GlobalConclusionOfReceipt>
           {maxSubmitReportOfReceiptModel.globalConclusion}
         </urn:GlobalConclusionOfReceipt>
-        <urn:ComplementaryInformation language="en">
-          other
-        </urn:ComplementaryInformation>
-      </urn:ReportOfReceiptExport>
-      <urn:BodyReportOfReceiptExport>
+        <urn:ComplementaryInformation language="en">other</urn:ComplementaryInformation>
+      </urn:ReportOfReceiptExport><urn:BodyReportOfReceiptExport>
         <urn:BodyRecordUniqueReference>
           1
         </urn:BodyRecordUniqueReference>
-        <urn:IndicatorOfShortageOrExcess>
-          E
-        </urn:IndicatorOfShortageOrExcess>
-        <urn:ObservedShortageOrExcess>
-          12.145
-        </urn:ObservedShortageOrExcess>
+        <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
+        <urn:ObservedShortageOrExcess>12.145</urn:ObservedShortageOrExcess>
         <urn:ExciseProductCode>
           W300
         </urn:ExciseProductCode>
-        <urn:RefusedQuantity>
-          10
-        </urn:RefusedQuantity>
+        <urn:RefusedQuantity>10</urn:RefusedQuantity>
         {maxUnsatisfactoryModelXML(Excess)}
       </urn:BodyReportOfReceiptExport>
       <urn:BodyReportOfReceiptExport>

@@ -18,4 +18,24 @@ package uk.gov.hmrc.emcstfe.support
 
 import org.scalamock.scalatest.MockFactory
 
-trait TestBaseSpec extends UnitSpec with MockFactory
+import scala.xml.Utility.trim
+import scala.xml.transform.{RewriteRule, RuleTransformer}
+import scala.xml.{Elem, Node, NodeSeq, XML}
+
+trait TestBaseSpec extends UnitSpec with MockFactory {
+  implicit class TestXMLClassOps(n: NodeSeq) {
+    def getMessageBody: NodeSeq = trim(XML.loadString((n \\ "Parameter" filter {
+      _ \ "@Name" exists (_.text == "message")
+    }).text))
+
+    def getControlDocWithoutMessage: NodeSeq = {
+      val removeMessageFromControl: RewriteRule = new RewriteRule {
+        override def transform(n: Node): NodeSeq = n match {
+          case e: Elem if (e \ "@Name").text == "message" & e.label == "Parameter" => NodeSeq.Empty
+          case n => n
+        }
+      }
+      new RuleTransformer(removeMessageFromControl).transform(n)
+    }
+  }
+}

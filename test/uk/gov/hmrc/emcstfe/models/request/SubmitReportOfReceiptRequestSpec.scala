@@ -200,7 +200,6 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
   ".eisXMLBody" should {
     "generate the correct XML body" in {
-      import org.scalatest.StreamlinedXml._
 
       val expectedRequest = {
         <con:Control xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
@@ -244,13 +243,11 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
         </con:Control>
       }
 
-      val xml1 = trim(XML.loadString(request.eisXMLBody()))
-      val xml2 = trim(expectedRequest)
+      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val expectedXml = trim(expectedRequest)
 
-      streamlined
-
-      assert(xml1 == xml2)
-//      trim(XML.loadString(request.eisXMLBody())) shouldBe trim(expectedRequest)
+      requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
+      requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
     }
   }
 
