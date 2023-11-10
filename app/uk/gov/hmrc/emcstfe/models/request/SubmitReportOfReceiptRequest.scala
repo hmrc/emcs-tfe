@@ -34,14 +34,14 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
   private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(Constants.GB)
   private val messageNumber = 818
 
-  val messageSender =
+  val messageRecipient =
     Constants.NDEA ++ (if (body.destinationType == DirectDelivery) {
       traderModelCountryCode(body.consigneeTrader)
     } else {
       arcCountryCode
     })
 
-  val messageRecipient =
+  val messageSender =
     Constants.NDEA ++ (body.destinationType match {
       case TaxWarehouse => traderModelCountryCode(body.deliveryPlaceTrader)
       case TemporaryRegisteredConsignee | RegisteredConsignee => traderModelCountryCode(body.consigneeTrader)
