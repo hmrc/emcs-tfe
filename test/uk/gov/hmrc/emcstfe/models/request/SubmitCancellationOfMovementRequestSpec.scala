@@ -28,7 +28,7 @@ import scala.xml.XML
 
 class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCancellationOfMovementFixtures {
 
-  val request = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
+  implicit val request = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
 
   "requestBody" should {
     "generate the correct request XML" in {
@@ -137,7 +137,7 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
 
   ".eisXMLBody" should {
     "generate the correct XML body" in {
-      val expectedRequest =
+      val expectedRequest = wrapInControlDoc(
         <urn:IE810 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.01">
           <urn:Header>
             <urn1:MessageSender>
@@ -162,8 +162,13 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
           <urn:Body>
             {maxSubmitCancellationOfMovementModelXml}
           </urn:Body>
-        </urn:IE810>
-      trim(XML.loadString(request.eisXMLBody())).toString shouldBe trim(expectedRequest).toString
+        </urn:IE810>)
+
+      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val expectedXml = trim(expectedRequest)
+
+      requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
+      requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
     }
   }
 

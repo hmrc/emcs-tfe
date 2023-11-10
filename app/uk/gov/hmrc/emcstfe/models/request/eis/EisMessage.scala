@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.request.eis
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
-import scala.xml.{Elem, Node, XML}
+import scala.xml.{Elem, Node, PCData, XML}
 
 trait EisMessage {
   _: EisSubmissionRequest =>
@@ -69,7 +69,7 @@ trait EisMessage {
       <con:OperationRequest>
         <con:Parameters>
           <con:Parameter Name="message">
-            {scala.xml.Unparsed("<![CDATA[%s]]>".format(xml))}
+            {PCData(xml.toString())}
           </con:Parameter>
         </con:Parameters>
       </con:OperationRequest>
