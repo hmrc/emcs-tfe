@@ -59,6 +59,7 @@ trait TestBaseSpec extends UnitSpec with MockFactory {
                              |</con:Parameter>
                              """.stripMargin)}
           </con:Parameters>
+          <con:ReturnData/>
         </con:OperationRequest>
       </con:Control>
 }

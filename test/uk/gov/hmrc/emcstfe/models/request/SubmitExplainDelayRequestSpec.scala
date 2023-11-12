@@ -149,7 +149,7 @@ class SubmitExplainDelayRequestSpec extends TestBaseSpec with SubmitExplainDelay
       val expectedResult = Json.obj(
         "user" -> testErn,
         "messageType" -> "IE837",
-        "message" -> Base64.getEncoder.encodeToString(XML.loadString(request.eisXMLBody()).toString().getBytes)
+        "message" -> Base64.getEncoder.encodeToString(XML.loadString(request.eisXMLBody()).toString().trim.getBytes)
       )
       request.toJson shouldBe expectedResult
     }

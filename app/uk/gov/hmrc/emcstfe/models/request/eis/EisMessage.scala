@@ -72,6 +72,7 @@ trait EisMessage {
             {PCData(xml.toString())}
           </con:Parameter>
         </con:Parameters>
+        <con:ReturnData/>
       </con:OperationRequest>
     </con:Control>
   }
