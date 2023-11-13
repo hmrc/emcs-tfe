@@ -17,5 +17,49 @@
 package uk.gov.hmrc.emcstfe.support
 
 import org.scalamock.scalatest.MockFactory
+import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
 
-trait TestBaseSpec extends UnitSpec with MockFactory
+import scala.xml.Utility.trim
+import scala.xml.transform.{RewriteRule, RuleTransformer}
+import scala.xml.{Elem, Node, NodeSeq, XML}
+
+trait TestBaseSpec extends UnitSpec with MockFactory {
+  implicit class TestXMLClassOps(n: NodeSeq) {
+    def getMessageBody: NodeSeq = trim(XML.loadString((n \\ "Parameter" filter {
+      _ \ "@Name" exists (_.text == "message")
+    }).text))
+
+    def getControlDocWithoutMessage: NodeSeq = {
+      val removeMessageFromControl: RewriteRule = new RewriteRule {
+        override def transform(n: Node): NodeSeq = n match {
+          case e: Elem if (e \ "@Name").text == "message" & e.label == "Parameter" => NodeSeq.Empty
+          case n => n
+        }
+      }
+      new RuleTransformer(removeMessageFromControl).transform(n)
+    }
+  }
+
+  def wrapInControlDoc(xml: Node)(implicit request: EisSubmissionRequest): Node =
+    <con:Control xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+      <con:MetaData>
+        <con:MessageId>
+          {request.messageUUID}
+        </con:MessageId>
+        <con:Source>TFE</con:Source>
+        <con:CorrelationId>
+          {request.correlationUUID}
+        </con:CorrelationId>
+      </con:MetaData>
+      <con:OperationRequest>
+        <con:Parameters>
+          {XML.loadString(s"""
+                             |<con:Parameter Name="message">
+                             |<![CDATA[$xml]]>
+                             |</con:Parameter>
+                             """.stripMargin)}
+          </con:Parameters>
+          <con:ReturnData/>
+        </con:OperationRequest>
+      </con:Control>
+}

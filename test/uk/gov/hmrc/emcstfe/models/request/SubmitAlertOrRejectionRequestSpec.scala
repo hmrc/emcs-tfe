@@ -27,7 +27,7 @@ import scala.xml.XML
 
 class SubmitAlertOrRejectionRequestSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
 
-  val request = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
+  implicit val request = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
 
   "requestBody" should {
 
@@ -117,7 +117,7 @@ class SubmitAlertOrRejectionRequestSpec extends TestBaseSpec with SubmitAlertOrR
 
   ".eisXMLBody" should {
     "generate the correct XML body" in {
-      val expectedRequest =
+      val expectedRequest = wrapInControlDoc(
         <urn:IE819 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.01">
           <urn:Header>
             <urn1:MessageSender>
@@ -143,7 +143,13 @@ class SubmitAlertOrRejectionRequestSpec extends TestBaseSpec with SubmitAlertOrR
             {maxSubmitAlertOrRejectionModelXML}
           </urn:Body>
         </urn:IE819>
-      trim(XML.loadString(request.eisXMLBody())).toString shouldBe trim(expectedRequest).toString
+      )
+
+      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val expectedXml = trim(expectedRequest)
+
+      requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
+      requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
     }
   }
 
