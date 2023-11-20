@@ -78,7 +78,7 @@ class SubmitExplainShortageExcessRequestSpec extends TestBaseSpec with SubmitExp
                       {submitterRequest.messageUUID}
                     </urn1:MessageIdentifier>
                     <urn1:CorrelationIdentifier>
-                      {submitterRequest.correlationUUID}
+                      {submitterRequest.legacyCorrelationUUID}
                     </urn1:CorrelationIdentifier>
                   </urn:Header>
                   <urn:Body>
