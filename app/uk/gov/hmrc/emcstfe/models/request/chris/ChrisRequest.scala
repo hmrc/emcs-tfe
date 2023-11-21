@@ -28,4 +28,6 @@ trait ChrisRequest extends BaseRequest {
   def shouldExtractFromSoap: Boolean
 
   def metricName: String
+
+  val legacyCorrelationUUID: String = s"PORTAL${correlationUUID.toString.replace("-","")}"
 }

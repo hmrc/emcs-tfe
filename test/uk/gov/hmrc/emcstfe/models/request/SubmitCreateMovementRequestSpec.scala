@@ -287,7 +287,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
                   {request.messageUUID}
                 </urn1:MessageIdentifier>
                 <urn1:CorrelationIdentifier>
-                  {request.correlationUUID}
+                  {request.legacyCorrelationUUID}
                 </urn1:CorrelationIdentifier>
               </urn:Header>
               <urn:Body>

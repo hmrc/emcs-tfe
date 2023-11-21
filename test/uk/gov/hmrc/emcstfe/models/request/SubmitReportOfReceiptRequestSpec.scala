@@ -64,7 +64,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
                   {request.messageUUID}
                 </urn1:MessageIdentifier>
                 <urn1:CorrelationIdentifier>
-                  {request.correlationUUID}
+                  {request.legacyCorrelationUUID}
                 </urn1:CorrelationIdentifier>
               </urn:Header>
               <urn:Body>

@@ -65,7 +65,7 @@ trait SoapEnvelope { _: ChrisRequest =>
          |          $messageUUID
          |        </urn1:MessageIdentifier>
          |        <urn1:CorrelationIdentifier>
-         |          $correlationUUID
+         |          $legacyCorrelationUUID
          |        </urn1:CorrelationIdentifier>
          |      </urn:Header>
          |      <urn:Body>

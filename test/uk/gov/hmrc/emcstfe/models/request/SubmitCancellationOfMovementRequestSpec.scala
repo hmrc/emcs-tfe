@@ -56,7 +56,7 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
                 <urn1:DateOfPreparation>{request.preparedDate.toString}</urn1:DateOfPreparation>
                 <urn1:TimeOfPreparation>{request.preparedTime.toString}</urn1:TimeOfPreparation>
                 <urn1:MessageIdentifier>{request.messageUUID}</urn1:MessageIdentifier>
-                <urn1:CorrelationIdentifier>{request.correlationUUID}</urn1:CorrelationIdentifier>
+                <urn1:CorrelationIdentifier>{request.legacyCorrelationUUID}</urn1:CorrelationIdentifier>
               </urn:Header>
               <urn:Body>
                 {maxSubmitCancellationOfMovementModelXml}
