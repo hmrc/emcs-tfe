@@ -18,8 +18,6 @@ package uk.gov.hmrc.emcstfe.models.request.chris
 
 import uk.gov.hmrc.emcstfe.models.request.BaseRequest
 
-import java.util.UUID
-
 trait ChrisRequest extends BaseRequest {
   def requestBody: String
 
@@ -31,5 +29,5 @@ trait ChrisRequest extends BaseRequest {
 
   def metricName: String
 
-  val legacyCorrelationUUID: String = s"PORTAL${UUID.randomUUID().toString.replace("-","")}"
+  val legacyCorrelationUUID: String = s"PORTAL${correlationUUID.toString.replace("-","")}"
 }
