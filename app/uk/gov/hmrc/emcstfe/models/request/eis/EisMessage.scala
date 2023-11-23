@@ -68,6 +68,7 @@ trait EisMessage {
       </con:MetaData>
       <con:OperationRequest>
         <con:Parameters>
+          <con:Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</con:Parameter>
           <con:Parameter Name="message">
             {PCData(xml.toString())}
           </con:Parameter>
