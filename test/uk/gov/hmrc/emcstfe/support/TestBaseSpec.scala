@@ -53,6 +53,7 @@ trait TestBaseSpec extends UnitSpec with MockFactory {
       </con:MetaData>
       <con:OperationRequest>
         <con:Parameters>
+          <con:Parameter Name="ExciseRegistrationNumber">{request.exciseRegistrationNumber}</con:Parameter>
           {XML.loadString(s"""
                              |<con:Parameter Name="message">
                              |<![CDATA[$xml]]>
