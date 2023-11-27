@@ -102,4 +102,14 @@ object ErrorResponse {
     def throwError: JsResult.Exception = JsResult.Exception(JsError(message))
   }
 
+  case class InvalidLegacyRequestProvided(message: String) extends ErrorResponse
+
+  case class InvalidLegacyActionProvided(action: String) extends ErrorResponse {
+    val message = s"Unknown action requested for legacy: $action"
+  }
+
+  case object NoLegacyActionProvided extends ErrorResponse {
+    val message = s"no action found in the request"
+  }
+
 }

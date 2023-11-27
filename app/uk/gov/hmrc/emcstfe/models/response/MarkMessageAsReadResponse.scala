@@ -18,7 +18,11 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import play.api.libs.json.{Json, OFormat}
 
-case class MarkMessageAsReadResponse(dateTime: String, exciseRegistrationNumber: String, recordsAffected: Int)
+import scala.xml.NodeSeq
+
+case class MarkMessageAsReadResponse(dateTime: String, exciseRegistrationNumber: String, recordsAffected: Int) extends LegacyMessage {
+  override def xmlBody: NodeSeq = recordsAffectedBody(recordsAffected)
+}
 
 object MarkMessageAsReadResponse {
   implicit val fmt: OFormat[MarkMessageAsReadResponse] = Json.format

@@ -26,6 +26,58 @@ import scala.xml.XML
 
 trait GetSubmissionFailureMessageFixtures extends BaseFixtures {
 
+  object IE704Xml {
+    val fullXML: String =
+      """
+        |<p:SubmissionFailureMessageDataResponse xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3 SubmissionFailureMessageData.xsd " xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tms="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02" xmlns:p2="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/Types/3" xmlns:p1="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/EmcsUkCodes/3" xmlns:p="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3" xmlns:ie="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/ie704uk/3" xmlns:emcs="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:EMCS:V2.02">
+        |      <ie:IE704>
+        |      <ie:Header>
+        |      <tms:MessageSender>NDEA.XI</tms:MessageSender>
+        |      <tms:MessageRecipient>NDEA.XI</tms:MessageRecipient>
+        |      <tms:DateOfPreparation>2001-01-01</tms:DateOfPreparation>
+        |      <tms:TimeOfPreparation>12:00:00</tms:TimeOfPreparation>
+        |      <tms:MessageIdentifier>XI000001</tms:MessageIdentifier>
+        |      <tms:CorrelationIdentifier>corr123</tms:CorrelationIdentifier>
+        |    </ie:Header>
+        |      <ie:Body>
+        |      <ie:GenericRefusalMessage>
+        |        <ie:Attributes>
+        |      <ie:AdministrativeReferenceCode>22XI00000000000366000</ie:AdministrativeReferenceCode>
+        |      <ie:SequenceNumber>1</ie:SequenceNumber>
+        |      <ie:LocalReferenceNumber>lrnie8155639253</ie:LocalReferenceNumber>
+        |    </ie:Attributes>
+        |        <ie:FunctionalError>
+        |      <ie:ErrorType>4402</ie:ErrorType>
+        |      <ie:ErrorReason>Boooo! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules</ie:ErrorReason>
+        |      <ie:ErrorLocation>/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]</ie:ErrorLocation>
+        |      <ie:OriginalAttributeValue>lrnie8155639253</ie:OriginalAttributeValue>
+        |    </ie:FunctionalError><ie:FunctionalError>
+        |      <ie:ErrorType>4403</ie:ErrorType>
+        |      <ie:ErrorReason>Oh no! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules</ie:ErrorReason>
+        |
+        |
+        |    </ie:FunctionalError>
+        |      </ie:GenericRefusalMessage>
+        |    </ie:Body>
+        |    </ie:IE704>
+        |      <ie:RelatedMessageType>IE815</ie:RelatedMessageType>
+        |</p:SubmissionFailureMessageDataResponse>""".stripMargin
+
+    val rawGetSubmissionFailureMessageResponse: RawGetSubmissionFailureMessageResponse = RawGetSubmissionFailureMessageResponse("dateTime", testErn, XML.loadString(fullXML))
+
+    val rawGetSubmissionFailureMessageResponseJson: JsValue = Json.obj(
+      "dateTime" -> "dateTime",
+      "exciseRegistrationNumber" -> testErn,
+      "message" -> Base64.getEncoder.encodeToString(fullXML.getBytes)
+    )
+
+    val rawGetSubmissionFailureMessageResponseInvalidJson: JsValue = Json.obj(
+      "dateTime" -> "dateTime",
+      "exciseRegistrationNumber" -> testErn,
+      "message" -> "AB123456ZZ"
+    )
+  }
+
   object IE704HeaderFixtures {
     val ie704HeaderXmlBody: String =
       """

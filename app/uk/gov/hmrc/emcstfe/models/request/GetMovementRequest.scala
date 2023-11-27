@@ -17,8 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-case class GetMovementRequest(exciseRegistrationNumber: String, arc: String) extends ChrisRequest {
+case class GetMovementRequest(exciseRegistrationNumber: String, arc: String, sequenceNumber: Option[Int] = None) extends ChrisRequest with EisConsumptionRequest {
   override def requestBody: String =
     s"""<?xml version='1.0' encoding='UTF-8'?>
       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -37,6 +38,7 @@ case class GetMovementRequest(exciseRegistrationNumber: String, arc: String) ext
       |        <Parameters>
       |          <Parameter Name="ExciseRegistrationNumber">$exciseRegistrationNumber</Parameter>
       |          <Parameter Name="ARC">$arc</Parameter>
+      |          ${sequenceNumber.map(num => s"""<Parameter Name="SequenceNumber">$num</Parameter>""").getOrElse("")}
       |        </Parameters>
       |        <ReturnData>
       |          <Data Name="schema" />
@@ -51,4 +53,10 @@ case class GetMovementRequest(exciseRegistrationNumber: String, arc: String) ext
   override def shouldExtractFromSoap: Boolean = true
 
   override def metricName = "get-movement"
+
+  override val queryParams: Seq[(String, String)] = Seq(
+    "exciseregistrationnumber" -> exciseRegistrationNumber,
+    "arc" -> arc,
+    "sequencenumber" -> sequenceNumber.getOrElse(1).toString
+  )
 }

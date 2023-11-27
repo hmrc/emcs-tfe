@@ -18,7 +18,18 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import play.api.libs.json.{Json, OFormat}
 
-case class GetMessageStatisticsResponse(dateTime: String, exciseRegistrationNumber: String, countOfAllMessages: Int, countOfNewMessages: Int)
+import scala.xml.NodeSeq
+
+case class GetMessageStatisticsResponse(dateTime: String, exciseRegistrationNumber: String, countOfAllMessages: Int, countOfNewMessages: Int) extends LegacyMessage {
+  override def xmlBody: NodeSeq = {
+    schemaResultBody(
+      <MessageStatisticsDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MessageStatisticsData/3" xmlns:ns1="http://hmrc/emcs/tfe/data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+        <CountOfAllMessages>{countOfAllMessages}</CountOfAllMessages>
+        <CountOfNewMessages>{countOfNewMessages}</CountOfNewMessages>
+      </MessageStatisticsDataResponse>
+    )
+  }
+}
 
 object GetMessageStatisticsResponse {
   implicit val fmt: OFormat[GetMessageStatisticsResponse] = Json.format

@@ -17,8 +17,11 @@
 package uk.gov.hmrc.emcstfe.models.response
 
 import play.api.libs.json.{Json, OFormat}
+import scala.xml.NodeSeq
 
-case class SetMessageAsLogicallyDeletedResponse(dateTime: String, exciseRegistrationNumber: String, recordsAffected: Int)
+case class SetMessageAsLogicallyDeletedResponse(dateTime: String, exciseRegistrationNumber: String, recordsAffected: Int) extends LegacyMessage  {
+  override def xmlBody: NodeSeq = recordsAffectedBody(recordsAffected)
+}
 
 object SetMessageAsLogicallyDeletedResponse {
   implicit val fmt: OFormat[SetMessageAsLogicallyDeletedResponse] = Json.format

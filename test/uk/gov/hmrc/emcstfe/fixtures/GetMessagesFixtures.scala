@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsArray, JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, Message, MessagesData}
+import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, Message, MessagesData, RawGetMessagesResponse}
 
 import java.nio.charset.StandardCharsets
 import java.util.Base64
@@ -708,6 +708,12 @@ trait GetMessagesFixtures extends BaseFixtures {
       dateTime = "now",
       exciseRegistrationNumber = testErn,
       messagesData = messagesDataModel
+    )
+
+    val getRawMessagesResponseModel: RawGetMessagesResponse = RawGetMessagesResponse(
+      dateTime = "now",
+      exciseRegistrationNumber = testErn,
+      messagesData = XML.loadString(messagesDataXmlBody)
     )
 
     val getMessagesResponseJson: JsValue = Json.obj(
