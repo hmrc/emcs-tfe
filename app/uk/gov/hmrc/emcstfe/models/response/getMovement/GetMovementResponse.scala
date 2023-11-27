@@ -20,7 +20,7 @@ import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader}
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.common._
-import uk.gov.hmrc.emcstfe.utils.JsonUtils
+import uk.gov.hmrc.emcstfe.utils.{JsonUtils, XmlReaderUtils}
 
 case class GetMovementResponse(
     arc: String,
@@ -52,7 +52,7 @@ case class GetMovementResponse(
     transportDetails: Seq[TransportDetailsModel]
 )
 
-object GetMovementResponse extends JsonUtils {
+object GetMovementResponse extends JsonUtils with XmlReaderUtils {
 
   lazy val currentMovement: XPath                                 = XPath \\ "currentMovement"
   lazy val eadStatus: XPath                                       = currentMovement \ "status"
@@ -105,10 +105,7 @@ object GetMovementResponse extends JsonUtils {
       dateAndTimeOfValidationOfEadEsad                <- dateAndTimeOfValidationOfEadEsad.read[String]
       dateOfDispatch                                  <- dateOfDispatch.read[String]
       journeyTime                                     <- journeyTime.read[JourneyTime].map(_.toString)
-      documentCertificate                             <- documentCertificate.read[Seq[DocumentCertificateModel]](strictReadSeq(DocumentCertificateModel.xmlReads)).map {
-        case Nil => None
-        case other => Some(other)
-      }
+      documentCertificate                             <- documentCertificate.read[Seq[DocumentCertificateModel]](strictReadSeq(DocumentCertificateModel.xmlReads)).seqToOptionSeq
       eadEsad                                         <- eadEsad.read[EadEsadModel]
       headerEadEsad                                   <- headerEadEsad.read[HeaderEadEsadModel]
       transportMode                                   <- transportMode.read[TransportModeModel]

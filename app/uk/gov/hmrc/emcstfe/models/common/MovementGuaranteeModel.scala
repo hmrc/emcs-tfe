@@ -21,7 +21,7 @@ import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
+import uk.gov.hmrc.emcstfe.utils.{XmlReaderUtils, XmlWriterUtils}
 
 import scala.xml.Elem
 
@@ -40,14 +40,11 @@ case class MovementGuaranteeModel(
 
 }
 
-object MovementGuaranteeModel {
+object MovementGuaranteeModel extends XmlReaderUtils {
 
   implicit val xmlReads: XmlReader[MovementGuaranteeModel] = (
     (__ \\ "GuarantorTypeCode").read[GuarantorType](GuarantorType.xmlReads(GuarantorType.enumerable)),
-    (__ \\ "GuarantorTrader").read[Seq[TraderModel]](strictReadSeq(TraderModel.xmlReads(GuarantorTrader))).map {
-      case Nil => None
-      case other => Some(other)
-    }
+    (__ \\ "GuarantorTrader").read[Seq[TraderModel]](strictReadSeq(TraderModel.xmlReads(GuarantorTrader))).seqToOptionSeq
   ).mapN(MovementGuaranteeModel.apply)
 
   implicit val fmt: OFormat[MovementGuaranteeModel] = Json.format

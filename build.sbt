@@ -1,5 +1,5 @@
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
 import scoverage.ScoverageKeys
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 
 lazy val ItTest = config("it") extend Test
 
@@ -7,8 +7,8 @@ lazy val microservice = Project("emcs-tfe", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    majorVersion        := 0,
-    scalaVersion        := "2.13.8",
+    majorVersion := 0,
+    scalaVersion := "2.13.8",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     dependencyOverrides ++= AppDependencies.overrides,
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
@@ -16,10 +16,6 @@ lazy val microservice = Project("emcs-tfe", file("."))
     scalacOptions += "-Wconf:src=routes/.*:s",
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions",
     ScoverageKeys.coverageMinimumStmtTotal := 95,
-)
-  .settings(
-  Test / parallelExecution := false,
-  Test / fork := false
   )
   .configs(ItTest)
   .settings(inConfig(ItTest)(Defaults.itSettings ++ headerSettings(ItTest) ++ automateHeaderSettings(ItTest)): _*)

@@ -21,6 +21,7 @@ import com.lucidchart.open.xtract.XmlReader.{strictReadSeq, stringReader}
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.common.OriginType
+import uk.gov.hmrc.emcstfe.utils.XmlReaderUtils
 
 case class EadEsadModel(
                          localReferenceNumber: String,
@@ -33,7 +34,7 @@ case class EadEsadModel(
                          importSadNumber: Option[Seq[String]]
                        )
 
-object EadEsadModel {
+object EadEsadModel extends XmlReaderUtils {
   implicit val xmlReads: XmlReader[EadEsadModel] = (
     (__ \\ "LocalReferenceNumber").read[String],
     (__ \\ "InvoiceNumber").read[String],
@@ -42,10 +43,7 @@ object EadEsadModel {
     (__ \\ "DateOfDispatch").read[String],
     (__ \\ "TimeOfDispatch").read[Option[String]],
     (__ \\ "UpstreamArc").read[Option[String]],
-    (__ \\ "ImportSad" \\ "ImportSadNumber").read[Seq[String]](strictReadSeq).map {
-      case Nil => None
-      case other => Some(other)
-    }
+    (__ \\ "ImportSad" \\ "ImportSadNumber").read[Seq[String]](strictReadSeq).seqToOptionSeq
   ).mapN(EadEsadModel.apply)
 
   implicit val fmt: OFormat[EadEsadModel] = Json.format

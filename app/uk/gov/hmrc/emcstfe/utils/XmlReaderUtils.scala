@@ -16,20 +16,13 @@
 
 package uk.gov.hmrc.emcstfe.utils
 
-import scala.xml.NodeSeq
+import com.lucidchart.open.xtract.XmlReader
 
-trait XmlWriterUtils {
-
-  implicit class OptionExtensions[T](x: Option[T]) {
-    def mapNodeSeq(f: T => NodeSeq): NodeSeq = x.map(f).getOrElse(NodeSeq.Empty)
+trait XmlReaderUtils {
+  implicit class SeqExtensions[A](reader: XmlReader[Seq[A]]) {
+    def seqToOptionSeq: XmlReader[Option[Seq[A]]] = reader.map {
+      case Nil => None
+      case other => Some(other)
+    }
   }
-
-  implicit class BooleanExtensions(x: Boolean) {
-    def toFlag: String = if (x) "1" else "0"
-  }
-
-  implicit class StringExtensions(x: String) {
-    def fromFlag: Boolean = x == "1"
-  }
-
 }
