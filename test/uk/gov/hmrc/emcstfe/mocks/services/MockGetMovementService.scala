@@ -19,7 +19,8 @@ package uk.gov.hmrc.emcstfe.mocks.services
 import org.scalamock.handlers.CallHandler4
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.request.GetMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementResponse}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 import uk.gov.hmrc.emcstfe.services.GetMovementService
 import uk.gov.hmrc.http.HeaderCarrier
 

@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.utils
+package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import scala.xml.NodeSeq
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import com.lucidchart.open.xtract.{XmlReader, __}
+import play.api.libs.json.{Json, OFormat}
 
-trait XmlWriterUtils {
+case class TransportModeModel(
+    transportModeCode: String,
+    complementaryInformation: Option[String]
+)
 
-  implicit class OptionExtension[T](x: Option[T]) {
-    def mapNodeSeq(f: T => NodeSeq): NodeSeq = x.map(f).getOrElse(NodeSeq.Empty)
-  }
+object TransportModeModel {
 
-  implicit class BooleanExtensions(x: Boolean) {
-    def toFlag: String = if (x) "1" else "0"
-  }
+  implicit val xmlReads: XmlReader[TransportModeModel] = (
+    (__ \\ "TransportModeCode").read[String],
+    (__ \\ "ComplementaryInformation").read[Option[String]]
+  ).mapN(TransportModeModel.apply)
 
-  implicit class StringExtensions(x: String) {
-    def fromFlag: Boolean = x == "1"
-  }
-
+  implicit val fmt: OFormat[TransportModeModel] = Json.format
 }

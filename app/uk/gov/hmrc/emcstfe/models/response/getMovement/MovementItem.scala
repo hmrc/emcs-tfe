@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.response
+package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple17Semigroupal
+import cats.implicits.catsSyntaxTuple18Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.emcstfe.models.response.{Packaging, WineProduct}
+import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 case class MovementItem(itemUniqueReference: Int,
                         productCode: String,
@@ -30,6 +32,7 @@ case class MovementItem(itemUniqueReference: Int,
                         alcoholicStrength: Option[BigDecimal],
                         degreePlato: Option[BigDecimal],
                         fiscalMark: Option[String],
+                        fiscalMarkUsedFlag: Option[Boolean],
                         designationOfOrigin: Option[String],
                         sizeOfProducer: Option[String],
                         density: Option[BigDecimal],
@@ -37,9 +40,9 @@ case class MovementItem(itemUniqueReference: Int,
                         brandNameOfProduct: Option[String],
                         maturationAge: Option[String],
                         packaging: Seq[Packaging],
-                        wineProduct: Option[WineProduct]
-                       )
-object MovementItem {
+                        wineProduct: Option[WineProduct])
+
+object MovementItem extends XmlWriterUtils {
 
   implicit val xmlReader: XmlReader[MovementItem] = (
     (__ \ "BodyRecordUniqueReference").read[Int],
@@ -51,6 +54,7 @@ object MovementItem {
     (__ \ "AlcoholicStrengthByVolumeInPercentage").read[String].map(BigDecimal(_)).optional,
     (__ \ "DegreePlato").read[String].map(BigDecimal(_)).optional,
     (__ \ "FiscalMark").read[String].optional,
+    (__ \ "FiscalMarkUsedFlag").read[String].map(_.fromFlag).optional,
     (__ \ "DesignationOfOrigin").read[String].optional,
     (__ \ "SizeOfProducer").read[String].optional,
     (__ \ "Density").read[String].map(BigDecimal(_)).optional,

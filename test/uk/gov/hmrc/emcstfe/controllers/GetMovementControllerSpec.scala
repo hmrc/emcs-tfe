@@ -41,7 +41,7 @@ class GetMovementControllerSpec extends TestBaseSpec with MockGetMovementService
     "return 200" when {
       "service returns a Right" in {
 
-        MockService.getMovement(getMovementRequest).returns(Future.successful(Right(getMovementResponse)))
+        MockService.getMovement(getMovementRequest).returns(Future.successful(Right(getMovementResponse())))
 
         val result = controller.getMovement(testErn, testArc)(fakeRequest)
 

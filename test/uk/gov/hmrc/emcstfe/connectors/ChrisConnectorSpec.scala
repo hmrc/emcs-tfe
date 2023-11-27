@@ -32,7 +32,8 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MarkPlacementError, UnexpectedDownstreamResponseError, XmlValidationError}
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse, GetMovementResponse}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -83,9 +84,9 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
             HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}""""
           )
         )
-          .returns(Future.successful(Right(getMovementResponse)))
+          .returns(Future.successful(Right(getMovementResponse())))
 
-        await(connector.postChrisSOAPRequestAndExtractToModel[GetMovementResponse](getMovementRequest)) shouldBe Right(getMovementResponse)
+        await(connector.postChrisSOAPRequestAndExtractToModel[GetMovementResponse](getMovementRequest)) shouldBe Right(getMovementResponse())
       }
     }
     "return a Left" when {

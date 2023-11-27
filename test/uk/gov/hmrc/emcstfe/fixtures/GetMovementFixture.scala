@@ -16,17 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.{JsString, JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
-import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
+import play.api.libs.json._
+import uk.gov.hmrc.emcstfe.models.common.DestinationType._
+import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
-import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, RawGetMovementResponse, WineProduct}
+import uk.gov.hmrc.emcstfe.models.response.getMovement._
+import uk.gov.hmrc.emcstfe.models.response.{Packaging, RawGetMovementResponse, WineProduct}
 
 import java.util.Base64
 import scala.xml.XML
 
 trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
-  lazy val getMovementResponseBody: String = s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
+
+  lazy val getMovementResponseBody: String =
+    s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                                |    <mov:currentMovement>
                                                |      <mov:status>Accepted</mov:status>
                                                |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
@@ -176,7 +179,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |              <body:IdentityOfTransportUnits>Cans</body:IdentityOfTransportUnits>
                                                |              <body:CommercialSealIdentification>SID132987</body:CommercialSealIdentification>
                                                |              <body:ComplementaryInformation language="en">Cans</body:ComplementaryInformation>
-                                               |              <body:SealInformation language="en">Seal info</body:SealInformation>
+                                               |              <body:SealInformation language="en">Seal</body:SealInformation>
                                                |            </body:TransportDetails>
                                                |          </body:EADESADContainer>
                                                |        </body:Body>
@@ -439,18 +442,60 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |	</tns:Body>
                                                |</tns:Envelope>""".stripMargin
 
-  lazy val getMovementResponse: GetMovementResponse = GetMovementResponse(
+  def getMovementResponse(journeyTimeValue: String = "20 days"): GetMovementResponse = GetMovementResponse(
     arc = "13AB7778889991ABCDEF9",
     sequenceNumber = 1,
     destinationType = Export,
-    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     memberStateCode = Some("GB"),
+    serialNumberOfCertificateOfExemption = None,
+    consignorTrader = maxTraderModel(ConsignorTrader),
+    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     deliveryPlaceTrader = None,
+    placeOfDispatchTrader = Some(maxTraderModel(PlaceOfDispatchTrader)),
+    transportArrangerTrader = None,
+    firstTransporterTrader = Some(maxTraderModel(TransportTrader)),
+    dispatchImportOfficeReferenceNumber = None,
+    deliveryPlaceCustomsOfficeReferenceNumber = Some("FR000003"),
+    competentAuthorityDispatchOfficeReferenceNumber = Some("GB000002"),
     localReferenceNumber = "EN",
     eadStatus = "Accepted",
-    consignorTrader = maxTraderModel(ConsignorTrader),
+    dateAndTimeOfValidationOfEadEsad = "2008-09-04T10:22:50",
     dateOfDispatch = "2008-11-20",
-    journeyTime = "20 days",
+    journeyTime = journeyTimeValue,
+    documentCertificate = Some(
+      Seq(
+        DocumentCertificateModel(
+          documentType = None,
+          documentReference = None,
+          documentDescription = Some("Test"),
+          referenceOfDocument = Some("AB123")
+        )
+      )),
+    eadEsad = EadEsadModel(
+      localReferenceNumber = "EN",
+      invoiceNumber = "IN777888999",
+      invoiceDate = Some("2008-09-04"),
+      originTypeCode = OriginType.TaxWarehouse,
+      dateOfDispatch = "2008-11-20",
+      timeOfDispatch = Some("10:00:00"),
+      upstreamArc = None,
+      importSadNumber = None
+    ),
+    headerEadEsad = HeaderEadEsadModel(
+      sequenceNumber = 1,
+      dateAndTimeOfUpdateValidation = "2008-09-04T10:22:50",
+      destinationType = DestinationType.Export,
+      journeyTime = journeyTimeValue,
+      transportArrangement = TransportArrangement.Consignor
+    ),
+    transportMode = TransportModeModel(
+      transportModeCode = "1",
+      complementaryInformation = None
+    ),
+    movementGuarantee = MovementGuaranteeModel(
+      guarantorTypeCode = GuarantorType.Transporter,
+      guarantorTrader = None
+    ),
     items = Seq(
       MovementItem(
         itemUniqueReference = 1,
@@ -462,6 +507,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         alcoholicStrength = None,
         degreePlato = Some(1.2),
         fiscalMark = Some("FM564789 Fiscal Mark"),
+        fiscalMarkUsedFlag = Some(true),
         designationOfOrigin = Some("Designation of Origin"),
         sizeOfProducer = Some("20000"),
         density = Some(880),
@@ -497,6 +543,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         alcoholicStrength = Some(BigDecimal(12.7)),
         degreePlato = None,
         fiscalMark = Some("FM564790 Fiscal Mark"),
+        fiscalMarkUsedFlag = Some(true),
         designationOfOrigin = Some("Designation of Origin"),
         sizeOfProducer = Some("20000"),
         density = None,
@@ -530,96 +577,902 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         )
       )
     ),
-    numberOfItems = 2
+    numberOfItems = 2,
+    transportDetails = Seq(
+      TransportDetailsModel(
+        transportUnitCode = "1",
+        identityOfTransportUnits = Some("Bottles"),
+        commercialSealIdentification = Some("SID13245678"),
+        complementaryInformation = Some("Bottles of Restina"),
+        sealInformation = Some("Sealed with red strip")
+      ),
+      TransportDetailsModel(
+        transportUnitCode = "2",
+        identityOfTransportUnits = Some("Cans"),
+        commercialSealIdentification = Some("SID132987"),
+        complementaryInformation = Some("Cans"),
+        sealInformation = Some("Seal")
+      )
+    )
   )
 
   lazy val getRawMovementResponse: RawGetMovementResponse = RawGetMovementResponse("dateTime", testErn, XML.loadString(getMovementResponseBody))
 
-  lazy val getRawMovementJson: JsValue = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> Base64.getEncoder.encodeToString(getMovementResponseBody.getBytes))
+  lazy val getRawMovementJson: JsValue        = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> Base64.getEncoder.encodeToString(getMovementResponseBody.getBytes))
   lazy val getRawMovementInvalidJson: JsValue = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> getMovementResponseBody)
 
-  lazy val getMovementJson: JsValue = Json.obj(fields =
-    "arc" -> "13AB7778889991ABCDEF9",
-    "sequenceNumber" -> 1,
-    "destinationType" -> "6",
-    "consigneeTrader" -> maxTraderModelJson(ConsigneeTrader),
-    "memberStateCode" -> "GB",
-    "localReferenceNumber" -> "EN",
-    "eadStatus" -> "Accepted",
-    "consignorTrader" -> maxTraderModelJson(ConsignorTrader),
-    "dateOfDispatch" -> "2008-11-20",
-    "journeyTime" -> "20 days",
+  lazy val getMovementJson: JsValue = Json.obj(
+    fields = "arc" -> "13AB7778889991ABCDEF9",
+    "sequenceNumber"                                  -> 1,
+    "destinationType"                                 -> "6",
+    "memberStateCode"                                 -> "GB",
+    "consignorTrader"                                 -> maxTraderModelJson(ConsignorTrader),
+    "consigneeTrader"                                 -> maxTraderModelJson(ConsigneeTrader),
+    "placeOfDispatchTrader"                           -> maxTraderModelJson(PlaceOfDispatchTrader),
+    "firstTransporterTrader"                          -> maxTraderModelJson(TransportTrader),
+    "deliveryPlaceCustomsOfficeReferenceNumber"       -> "FR000003",
+    "competentAuthorityDispatchOfficeReferenceNumber" -> "GB000002",
+    "localReferenceNumber"                            -> "EN",
+    "eadStatus"                                       -> "Accepted",
+    "dateAndTimeOfValidationOfEadEsad"                -> "2008-09-04T10:22:50",
+    "dateOfDispatch"                                  -> "2008-11-20",
+    "journeyTime"                                     -> "20 days",
+    "documentCertificate" -> Json.arr(
+      Json.obj(
+        "documentDescription" -> "Test",
+        "referenceOfDocument" -> "AB123"
+      )
+    ),
+    "eadEsad" -> Json.obj(
+      "localReferenceNumber" -> "EN",
+      "invoiceNumber"        -> "IN777888999",
+      "invoiceDate"          -> "2008-09-04",
+      "originTypeCode"       -> "1",
+      "dateOfDispatch"       -> "2008-11-20",
+      "timeOfDispatch"       -> "10:00:00"
+    ),
+    "headerEadEsad" -> Json.obj(
+      "sequenceNumber"                -> 1,
+      "dateAndTimeOfUpdateValidation" -> "2008-09-04T10:22:50",
+      "destinationType"               -> "6",
+      "journeyTime"                   -> "20 days",
+      "transportArrangement"          -> "1"
+    ),
+    "transportMode" -> Json.obj(
+      "transportModeCode" -> "1"
+    ),
+    "movementGuarantee" -> Json.obj(
+      "guarantorTypeCode" -> "2"
+    ),
     "items" -> Json.arr(
-      Json.obj(fields =
-        "itemUniqueReference" -> 1,
-        "productCode" -> "W200",
-        "cnCode" -> "22041011",
-        "quantity" -> 500,
-        "grossMass" -> 900,
-        "netMass" -> 375,
-        "degreePlato" -> 1.2,
-        "fiscalMark" -> "FM564789 Fiscal Mark",
-        "designationOfOrigin" -> "Designation of Origin",
-        "sizeOfProducer" -> "20000",
-        "density" -> 880,
+      Json.obj(
+        fields = "itemUniqueReference" -> 1,
+        "productCode"           -> "W200",
+        "cnCode"                -> "22041011",
+        "quantity"              -> 500,
+        "grossMass"             -> 900,
+        "netMass"               -> 375,
+        "degreePlato"           -> 1.2,
+        "fiscalMark"            -> "FM564789 Fiscal Mark",
+        "fiscalMarkUsedFlag"    -> true,
+        "designationOfOrigin"   -> "Designation of Origin",
+        "sizeOfProducer"        -> "20000",
+        "density"               -> 880,
         "commercialDescription" -> "Retsina",
-        "brandNameOfProduct" -> "MALAMATINA",
-        "maturationAge" -> "Maturation Period",
+        "brandNameOfProduct"    -> "MALAMATINA",
+        "maturationAge"         -> "Maturation Period",
         "packaging" -> Json.arr(
-          Json.obj(fields =
-            "typeOfPackage" -> "BO",
-            "quantity" -> 125,
-            "shippingMarks" -> "MARKS",
-            "identityOfCommercialSeal" -> "SEAL456789321",
-            "sealInformation" -> "Red Strip"
-          )
+          Json.obj(fields = "typeOfPackage" -> "BO", "quantity" -> 125, "shippingMarks" -> "MARKS", "identityOfCommercialSeal" -> "SEAL456789321", "sealInformation" -> "Red Strip")
         ),
         "wineProduct" -> Json.obj(
-          "wineProductCategory" -> "4",
-          "wineGrowingZoneCode" -> "2",
+          "wineProductCategory"  -> "4",
+          "wineGrowingZoneCode"  -> "2",
           "thirdCountryOfOrigin" -> "FJ",
-          "otherInformation" -> "Not available",
-          "wineOperations" -> Json.arr("4", "5")
+          "otherInformation"     -> "Not available",
+          "wineOperations"       -> Json.arr("4", "5")
         )
       ),
-      Json.obj(fields =
-        "itemUniqueReference" -> 2,
-        "productCode" -> "W300",
-        "cnCode" -> "27111901",
-        "quantity" -> 501,
-        "grossMass" -> 901,
-        "netMass" -> 475,
-        "alcoholicStrength" -> 12.7,
-        "fiscalMark" -> "FM564790 Fiscal Mark",
-        "designationOfOrigin" -> "Designation of Origin",
-        "sizeOfProducer" -> "20000",
+      Json.obj(
+        fields = "itemUniqueReference" -> 2,
+        "productCode"           -> "W300",
+        "cnCode"                -> "27111901",
+        "quantity"              -> 501,
+        "grossMass"             -> 901,
+        "netMass"               -> 475,
+        "alcoholicStrength"     -> 12.7,
+        "fiscalMark"            -> "FM564790 Fiscal Mark",
+        "fiscalMarkUsedFlag"    -> true,
+        "designationOfOrigin"   -> "Designation of Origin",
+        "sizeOfProducer"        -> "20000",
         "commercialDescription" -> "Retsina",
-        "brandNameOfProduct" -> "BrandName",
+        "brandNameOfProduct"    -> "BrandName",
         "packaging" -> Json.arr(
-          Json.obj(fields =
-            "typeOfPackage" -> "BO",
-            "quantity" -> 125,
-            "identityOfCommercialSeal" -> "SEAL456789321",
-            "sealInformation" -> "Red Strip"
-          ),
-          Json.obj(fields =
-            "typeOfPackage" -> "HG",
-            "quantity" -> 7,
-            "identityOfCommercialSeal" -> "SEAL77",
-            "sealInformation" -> "Cork"
-          )
+          Json.obj(fields = "typeOfPackage" -> "BO", "quantity" -> 125, "identityOfCommercialSeal" -> "SEAL456789321", "sealInformation" -> "Red Strip"),
+          Json.obj(fields = "typeOfPackage" -> "HG", "quantity" -> 7, "identityOfCommercialSeal"   -> "SEAL77", "sealInformation"        -> "Cork")
         ),
         "wineProduct" -> Json.obj(
-          "wineProductCategory" -> "3",
+          "wineProductCategory"  -> "3",
           "thirdCountryOfOrigin" -> "FJ",
-          "otherInformation" -> "Not available",
-          "wineOperations" -> Json.arr("0", "1")
+          "otherInformation"     -> "Not available",
+          "wineOperations"       -> Json.arr("0", "1")
         )
       )
     ),
-    "numberOfItems" -> 2
+    "numberOfItems" -> 2,
+    "transportDetails" -> Json.arr(
+      Json.obj(
+        "transportUnitCode"            -> "1",
+        "identityOfTransportUnits"     -> "Bottles",
+        "commercialSealIdentification" -> "SID13245678",
+        "complementaryInformation"     -> "Bottles of Restina",
+        "sealInformation"              -> "Sealed with red strip"
+      ),
+      Json.obj(
+        "transportUnitCode"            -> "2",
+        "identityOfTransportUnits"     -> "Cans",
+        "commercialSealIdentification" -> "SID132987",
+        "complementaryInformation"     -> "Cans",
+        "sealInformation"              -> "Seal"
+      )
+    )
   )
 
-  val getMovementMongoResponse = GetMovementMongoResponse(testArc, JsString(getMovementResponseBody))
+  lazy val maxGetMovementResponseBody: String =
+    s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
+                                         |    <mov:currentMovement>
+                                         |      <mov:status>Beans</mov:status>
+                                         |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
+                                         |      <body:IE801 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE801:V3.01">
+                                         |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+                                         |          <head:MessageSender>NDEA.FR</head:MessageSender>
+                                         |          <head:MessageRecipient>NDEA.GB</head:MessageRecipient>
+                                         |          <head:DateOfPreparation>2008-09-04</head:DateOfPreparation>
+                                         |          <head:TimeOfPreparation>10:22:50</head:TimeOfPreparation>
+                                         |          <head:MessageIdentifier>Message identifier</head:MessageIdentifier>
+                                         |        </body:Header>
+                                         |        <body:Body>
+                                         |          <body:EADESADContainer>
+                                         |            <body:ConsigneeTrader language="en">
+                                         |              <body:Traderid>ConsigneeTraderId</body:Traderid>
+                                         |              <body:TraderName>ConsigneeTraderName</body:TraderName>
+                                         |              <body:StreetName>ConsigneeTraderStreetName</body:StreetName>
+                                         |              <body:StreetNumber>ConsigneeTraderStreetNumber</body:StreetNumber>
+                                         |              <body:Postcode>ConsigneeTraderPostcode</body:Postcode>
+                                         |              <body:City>ConsigneeTraderCity</body:City>
+                                         |              <body:EoriNumber>ConsigneeTraderEori</body:EoriNumber>
+                                         |            </body:ConsigneeTrader>
+                                         |            <body:ExciseMovement>
+                                         |               <body:AdministrativeReferenceCode>ExciseMovementArc</body:AdministrativeReferenceCode>
+                                         |               <body:DateAndTimeOfValidationOfEadEsad>ExciseMovementDateTime</body:DateAndTimeOfValidationOfEadEsad>
+                                         |            </body:ExciseMovement>
+                                         |            <body:ConsignorTrader language="en">
+                                         |              <body:TraderExciseNumber>ConsignorTraderExciseNumber</body:TraderExciseNumber>
+                                         |              <body:TraderName>ConsignorTraderName</body:TraderName>
+                                         |              <body:StreetName>ConsignorTraderStreetName</body:StreetName>
+                                         |              <body:StreetNumber>ConsignorTraderStreetNumber</body:StreetNumber>
+                                         |              <body:Postcode>ConsignorTraderPostcode</body:Postcode>
+                                         |              <body:City>ConsignorTraderCity</body:City>
+                                         |            </body:ConsignorTrader>
+                                         |            <body:PlaceOfDispatchTrader language="en">
+                                         |              <body:ReferenceOfTaxWarehouse>PlaceOfDispatchTraderReferenceOfTaxWarehouse</body:ReferenceOfTaxWarehouse>
+                                         |              <body:TraderName>PlaceOfDispatchTraderName</body:TraderName>
+                                         |              <body:StreetName>PlaceOfDispatchTraderStreetName</body:StreetName>
+                                         |              <body:StreetNumber>PlaceOfDispatchTraderStreetNumber</body:StreetNumber>
+                                         |              <body:Postcode>PlaceOfDispatchTraderPostcode</body:Postcode>
+                                         |              <body:City>PlaceOfDispatchTraderCity</body:City>
+                                         |            </body:PlaceOfDispatchTrader>
+                                         |            <body:DispatchImportOffice>
+                                         |              <body:ReferenceNumber>DispatchImportOfficeErn</body:ReferenceNumber>
+                                         |            </body:DispatchImportOffice>
+                                         |            <body:ComplementConsigneeTrader>
+                                         |              <body:MemberStateCode>CCTMemberStateCode</body:MemberStateCode>
+                                         |              <body:SerialNumberOfCertificateOfExemption>CCTSerialNumber</body:SerialNumberOfCertificateOfExemption>
+                                         |            </body:ComplementConsigneeTrader>
+                                         |            <body:DeliveryPlaceTrader language="en">
+                                         |              <body:Traderid>DeliveryPlaceTraderId</body:Traderid>
+                                         |              <body:TraderName>DeliveryPlaceTraderName</body:TraderName>
+                                         |              <body:StreetName>DeliveryPlaceTraderStreetName</body:StreetName>
+                                         |              <body:StreetNumber>DeliveryPlaceTraderStreetNumber</body:StreetNumber>
+                                         |              <body:Postcode>DeliveryPlaceTraderPostcode</body:Postcode>
+                                         |              <body:City>DeliveryPlaceTraderCity</body:City>
+                                         |            </body:DeliveryPlaceTrader>
+                                         |            <body:DeliveryPlaceCustomsOffice>
+                                         |              <body:ReferenceNumber>DeliveryPlaceCustomsOfficeErn</body:ReferenceNumber>
+                                         |            </body:DeliveryPlaceCustomsOffice>
+                                         |            <body:CompetentAuthorityDispatchOffice>
+                                         |              <body:ReferenceNumber>CompetentAuthorityDispatchOfficeErn</body:ReferenceNumber>
+                                         |            </body:CompetentAuthorityDispatchOffice>
+                                         |            <body:TransportArrangerTrader language="en">
+                                         |              <body:VatNumber>TransportArrangerTraderVatNumber</body:VatNumber>
+                                         |              <body:TraderName>TransportArrangerTraderName</body:TraderName>
+                                         |              <body:StreetName>TransportArrangerTraderStreetName</body:StreetName>
+                                         |              <body:StreetNumber>TransportArrangerTraderStreetNumber</body:StreetNumber>
+                                         |              <body:Postcode>TransportArrangerTraderPostcode</body:Postcode>
+                                         |              <body:City>TransportArrangerTraderCity</body:City>
+                                         |            </body:TransportArrangerTrader>
+                                         |            <body:FirstTransporterTrader language="en">
+                                         |              <body:VatNumber>FirstTransporterTraderVatNumber</body:VatNumber>
+                                         |              <body:TraderName>FirstTransporterTraderName</body:TraderName>
+                                         |              <body:StreetName>FirstTransporterTraderStreetName</body:StreetName>
+                                         |              <body:StreetNumber>FirstTransporterTraderStreetNumber</body:StreetNumber>
+                                         |              <body:Postcode>FirstTransporterTraderPostcode</body:Postcode>
+                                         |              <body:City>FirstTransporterTraderCity</body:City>
+                                         |            </body:FirstTransporterTrader>
+                                         |            <body:DocumentCertificate>
+                                         |              <body:DocumentType>DocumentCertificateDocumentType1</body:DocumentType>
+                                         |              <body:DocumentReference>DocumentCertificateDocumentReference1</body:DocumentReference>
+                                         |              <body:DocumentDescription>DocumentCertificateDocumentDescription1</body:DocumentDescription>
+                                         |              <body:ReferenceOfDocument>DocumentCertificateReferenceOfDocument1</body:ReferenceOfDocument>
+                                         |            </body:DocumentCertificate>
+                                         |            <body:DocumentCertificate>
+                                         |              <body:DocumentType>DocumentCertificateDocumentType2</body:DocumentType>
+                                         |              <body:DocumentReference>DocumentCertificateDocumentReference2</body:DocumentReference>
+                                         |              <body:DocumentDescription>DocumentCertificateDocumentDescription2</body:DocumentDescription>
+                                         |              <body:ReferenceOfDocument>DocumentCertificateReferenceOfDocument2</body:ReferenceOfDocument>
+                                         |            </body:DocumentCertificate>
+                                         |            <body:EadEsad>
+                                         |              <body:LocalReferenceNumber>EadEsadLocalReferenceNumber</body:LocalReferenceNumber>
+                                         |              <body:InvoiceNumber>EadEsadInvoiceNumber</body:InvoiceNumber>
+                                         |              <body:InvoiceDate>EadEsadInvoiceDate</body:InvoiceDate>
+                                         |              <body:OriginTypeCode>3</body:OriginTypeCode>
+                                         |              <body:DateOfDispatch>EadEsadDateOfDispatch</body:DateOfDispatch>
+                                         |              <body:TimeOfDispatch>EadEsadTimeOfDispatch</body:TimeOfDispatch>
+                                         |              <body:UpstreamArc>EadEsadUpstreamArc</body:UpstreamArc>
+                                         |              <body:ImportSad>
+                                         |                <body:ImportSadNumber>ImportSadNumber1</body:ImportSadNumber>
+                                         |              </body:ImportSad>
+                                         |              <body:ImportSad>
+                                         |                <body:ImportSadNumber>ImportSadNumber2</body:ImportSadNumber>
+                                         |              </body:ImportSad>
+                                         |            </body:EadEsad>
+                                         |            <body:HeaderEadEsad>
+                                         |              <body:SequenceNumber>1</body:SequenceNumber>
+                                         |              <body:DateAndTimeOfUpdateValidation>HeaderEadEsadDateTime</body:DateAndTimeOfUpdateValidation>
+                                         |              <body:DestinationTypeCode>10</body:DestinationTypeCode>
+                                         |              <body:JourneyTime>H10</body:JourneyTime>
+                                         |              <body:TransportArrangement>2</body:TransportArrangement>
+                                         |            </body:HeaderEadEsad>
+                                         |            <body:TransportMode>
+                                         |              <body:TransportModeCode>TransportModeTransportModeCode</body:TransportModeCode>
+                                         |              <body:ComplementaryInformation>TransportModeComplementaryInformation</body:ComplementaryInformation>
+                                         |            </body:TransportMode>
+                                         |            <body:MovementGuarantee>
+                                         |              <body:GuarantorTypeCode>123</body:GuarantorTypeCode>
+                                         |              <body:GuarantorTrader>
+                                         |                <body:TraderExciseNumber>GuarantorTraderErn1</body:TraderExciseNumber>
+                                         |                <body:TraderName>GuarantorTraderName1</body:TraderName>
+                                         |                <body:StreetName>GuarantorTraderStreetName1</body:StreetName>
+                                         |                <body:StreetNumber>GuarantorTraderStreetNumber1</body:StreetNumber>
+                                         |                <body:Postcode>GuarantorTraderPostcode1</body:Postcode>
+                                         |                <body:City>GuarantorTraderCity1</body:City>
+                                         |                <body:VatNumber>GuarantorTraderVatNumber1</body:VatNumber>
+                                         |              </body:GuarantorTrader>
+                                         |              <body:GuarantorTrader>
+                                         |                <body:TraderExciseNumber>GuarantorTraderErn2</body:TraderExciseNumber>
+                                         |                <body:TraderName>GuarantorTraderName2</body:TraderName>
+                                         |                <body:StreetName>GuarantorTraderStreetName2</body:StreetName>
+                                         |                <body:StreetNumber>GuarantorTraderStreetNumber2</body:StreetNumber>
+                                         |                <body:Postcode>GuarantorTraderPostcode2</body:Postcode>
+                                         |                <body:City>GuarantorTraderCity2</body:City>
+                                         |                <body:VatNumber>GuarantorTraderVatNumber2</body:VatNumber>
+                                         |              </body:GuarantorTrader>
+                                         |            </body:MovementGuarantee>
+                                         |            <body:BodyEadEsad>
+                                         |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
+                                         |              <body:ExciseProductCode>BodyEadEsadExciseProductCode1</body:ExciseProductCode>
+                                         |              <body:CnCode>BodyEadEsadCnCode1</body:CnCode>
+                                         |              <body:Quantity>2</body:Quantity>
+                                         |              <body:GrossMass>3</body:GrossMass>
+                                         |              <body:NetMass>4</body:NetMass>
+                                         |              <body:AlcoholicStrengthByVolumeInPercentage>5</body:AlcoholicStrengthByVolumeInPercentage>
+                                         |              <body:DegreePlato>6</body:DegreePlato>
+                                         |              <body:FiscalMark>BodyEadEsadFiscalMark1</body:FiscalMark>
+                                         |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+                                         |              <body:DesignationOfOrigin>BodyEadEsadDesignationOfOrigin1</body:DesignationOfOrigin>
+                                         |              <body:SizeOfProducer>BodyEadEsadSizeOfProducer1</body:SizeOfProducer>
+                                         |              <body:Density>7</body:Density>
+                                         |              <body:CommercialDescription>BodyEadEsadCommercialDescription1</body:CommercialDescription>
+                                         |              <body:BrandNameOfProducts>BodyEadEsadBrandNameOfProducts1</body:BrandNameOfProducts>
+                                         |              <body:MaturationPeriodOrAgeOfProducts>BodyEadEsadMaturationPeriodOrAgeOfProducts1</body:MaturationPeriodOrAgeOfProducts>
+                                         |              <body:Package>
+                                         |                <body:KindOfPackages>PackageKindOfPackages11</body:KindOfPackages>
+                                         |                <body:NumberOfPackages>1</body:NumberOfPackages>
+                                         |                <body:ShippingMarks>PackageShippingMarks11</body:ShippingMarks>
+                                         |                <body:CommercialSealIdentification>PackageCommercialSealIdentification11</body:CommercialSealIdentification>
+                                         |                <body:SealInformation>PackageSealInformation11</body:SealInformation>
+                                         |              </body:Package>
+                                         |              <body:Package>
+                                         |                <body:KindOfPackages>PackageKindOfPackages12</body:KindOfPackages>
+                                         |                <body:NumberOfPackages>2</body:NumberOfPackages>
+                                         |                <body:ShippingMarks>PackageShippingMarks12</body:ShippingMarks>
+                                         |                <body:CommercialSealIdentification>PackageCommercialSealIdentification12</body:CommercialSealIdentification>
+                                         |                <body:SealInformation>PackageSealInformation12</body:SealInformation>
+                                         |              </body:Package>
+                                         |              <body:WineProduct>
+                                         |                <body:WineProductCategory>1</body:WineProductCategory>
+                                         |                <body:WineGrowingZoneCode>WineProductWineGrowingZoneCode1</body:WineGrowingZoneCode>
+                                         |                <body:ThirdCountryOfOrigin>WineProductThirdCountryOfOrigin1</body:ThirdCountryOfOrigin>
+                                         |                <body:OtherInformation>WineProductOtherInformation1</body:OtherInformation>
+                                         |                <body:WineOperation>
+                                         |                  <body:WineOperationCode>WineOperationCode11</body:WineOperationCode>
+                                         |                </body:WineOperation>
+                                         |                <body:WineOperation>
+                                         |                  <body:WineOperationCode>WineOperationCode12</body:WineOperationCode>
+                                         |                </body:WineOperation>
+                                         |              </body:WineProduct>
+                                         |            </body:BodyEadEsad>
+                                         |            <body:BodyEadEsad>
+                                         |              <body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
+                                         |              <body:ExciseProductCode>BodyEadEsadExciseProductCode2</body:ExciseProductCode>
+                                         |              <body:CnCode>BodyEadEsadCnCode2</body:CnCode>
+                                         |              <body:Quantity>3</body:Quantity>
+                                         |              <body:GrossMass>4</body:GrossMass>
+                                         |              <body:NetMass>5</body:NetMass>
+                                         |              <body:AlcoholicStrengthByVolumeInPercentage>6</body:AlcoholicStrengthByVolumeInPercentage>
+                                         |              <body:DegreePlato>7</body:DegreePlato>
+                                         |              <body:FiscalMark>BodyEadEsadFiscalMark2</body:FiscalMark>
+                                         |              <body:FiscalMarkUsedFlag>0</body:FiscalMarkUsedFlag>
+                                         |              <body:DesignationOfOrigin>BodyEadEsadDesignationOfOrigin2</body:DesignationOfOrigin>
+                                         |              <body:SizeOfProducer>BodyEadEsadSizeOfProducer2</body:SizeOfProducer>
+                                         |              <body:Density>8</body:Density>
+                                         |              <body:CommercialDescription>BodyEadEsadCommercialDescription2</body:CommercialDescription>
+                                         |              <body:BrandNameOfProducts>BodyEadEsadBrandNameOfProducts2</body:BrandNameOfProducts>
+                                         |              <body:MaturationPeriodOrAgeOfProducts>BodyEadEsadMaturationPeriodOrAgeOfProducts2</body:MaturationPeriodOrAgeOfProducts>
+                                         |              <body:Package>
+                                         |                <body:KindOfPackages>PackageKindOfPackages21</body:KindOfPackages>
+                                         |                <body:NumberOfPackages>3</body:NumberOfPackages>
+                                         |                <body:ShippingMarks>PackageShippingMarks21</body:ShippingMarks>
+                                         |                <body:CommercialSealIdentification>PackageCommercialSealIdentification21</body:CommercialSealIdentification>
+                                         |                <body:SealInformation>PackageSealInformation21</body:SealInformation>
+                                         |              </body:Package>
+                                         |              <body:Package>
+                                         |                <body:KindOfPackages>PackageKindOfPackages22</body:KindOfPackages>
+                                         |                <body:NumberOfPackages>4</body:NumberOfPackages>
+                                         |                <body:ShippingMarks>PackageShippingMarks22</body:ShippingMarks>
+                                         |                <body:CommercialSealIdentification>PackageCommercialSealIdentification22</body:CommercialSealIdentification>
+                                         |                <body:SealInformation>PackageSealInformation22</body:SealInformation>
+                                         |              </body:Package>
+                                         |              <body:WineProduct>
+                                         |                <body:WineProductCategory>2</body:WineProductCategory>
+                                         |                <body:WineGrowingZoneCode>WineProductWineGrowingZoneCode2</body:WineGrowingZoneCode>
+                                         |                <body:ThirdCountryOfOrigin>WineProductThirdCountryOfOrigin2</body:ThirdCountryOfOrigin>
+                                         |                <body:OtherInformation>WineProductOtherInformation2</body:OtherInformation>
+                                         |                <body:WineOperation>
+                                         |                  <body:WineOperationCode>WineOperationCode21</body:WineOperationCode>
+                                         |                </body:WineOperation>
+                                         |                <body:WineOperation>
+                                         |                  <body:WineOperationCode>WineOperationCode22</body:WineOperationCode>
+                                         |                </body:WineOperation>
+                                         |              </body:WineProduct>
+                                         |            </body:BodyEadEsad>
+                                         |            <body:TransportDetails>
+                                         |              <body:TransportUnitCode>TransportDetailsTransportUnitCode1</body:TransportUnitCode>
+                                         |              <body:IdentityOfTransportUnits>TransportDetailsIdentityOfTransportUnits1</body:IdentityOfTransportUnits>
+                                         |              <body:CommercialSealIdentification>TransportDetailsCommercialSealIdentification1</body:CommercialSealIdentification>
+                                         |              <body:ComplementaryInformation>TransportDetailsComplementaryInformation1</body:ComplementaryInformation>
+                                         |              <body:SealInformation>TransportDetailsSealInformation1</body:SealInformation>
+                                         |            </body:TransportDetails>
+                                         |            <body:TransportDetails>
+                                         |              <body:TransportUnitCode>TransportDetailsTransportUnitCode2</body:TransportUnitCode>
+                                         |              <body:IdentityOfTransportUnits>TransportDetailsIdentityOfTransportUnits2</body:IdentityOfTransportUnits>
+                                         |              <body:CommercialSealIdentification>TransportDetailsCommercialSealIdentification2</body:CommercialSealIdentification>
+                                         |              <body:ComplementaryInformation>TransportDetailsComplementaryInformation2</body:ComplementaryInformation>
+                                         |              <body:SealInformation>TransportDetailsSealInformation2</body:SealInformation>
+                                         |            </body:TransportDetails>
+                                         |          </body:EADESADContainer>
+                                         |        </body:Body>
+                                         |      </body:IE801>
+                                         |    </mov:currentMovement>
+                                         |    <mov:eventHistory></mov:eventHistory>
+                                         |  </mov:movementView>""".stripMargin
+
+  lazy val maxGetMovementResponse: GetMovementResponse = GetMovementResponse(
+    arc = "ExciseMovementArc",
+    sequenceNumber = 1,
+    destinationType = DestinationType.TemporaryCertifiedConsignee,
+    memberStateCode = Some("CCTMemberStateCode"),
+    serialNumberOfCertificateOfExemption = Some("CCTSerialNumber"),
+    consignorTrader = TraderModel(
+      traderExciseNumber = Some("ConsignorTraderExciseNumber"),
+      traderName = Some("ConsignorTraderName"),
+      address = Some(
+        AddressModel(
+          streetNumber = Some("ConsignorTraderStreetNumber"),
+          street = Some("ConsignorTraderStreetName"),
+          postcode = Some("ConsignorTraderPostcode"),
+          city = Some("ConsignorTraderCity")
+        )),
+      vatNumber = None,
+      eoriNumber = None
+    ),
+    consigneeTrader = Some(
+      TraderModel(
+        traderExciseNumber = Some("ConsigneeTraderId"),
+        traderName = Some("ConsigneeTraderName"),
+        address = Some(AddressModel(
+          streetNumber = Some("ConsigneeTraderStreetNumber"),
+          street = Some("ConsigneeTraderStreetName"),
+          postcode = Some("ConsigneeTraderPostcode"),
+          city = Some("ConsigneeTraderCity")
+        )),
+        vatNumber = None,
+        eoriNumber = Some("ConsigneeTraderEori")
+      )),
+    deliveryPlaceTrader = Some(
+      TraderModel(
+        traderExciseNumber = Some("DeliveryPlaceTraderId"),
+        traderName = Some("DeliveryPlaceTraderName"),
+        address = Some(AddressModel(
+          streetNumber = Some("DeliveryPlaceTraderStreetNumber"),
+          street = Some("DeliveryPlaceTraderStreetName"),
+          postcode = Some("DeliveryPlaceTraderPostcode"),
+          city = Some("DeliveryPlaceTraderCity")
+        )),
+        vatNumber = None,
+        eoriNumber = None
+      )),
+    placeOfDispatchTrader = Some(
+      TraderModel(
+        traderExciseNumber = Some("PlaceOfDispatchTraderReferenceOfTaxWarehouse"),
+        traderName = Some("PlaceOfDispatchTraderName"),
+        address = Some(AddressModel(
+          streetNumber = Some("PlaceOfDispatchTraderStreetNumber"),
+          street = Some("PlaceOfDispatchTraderStreetName"),
+          postcode = Some("PlaceOfDispatchTraderPostcode"),
+          city = Some("PlaceOfDispatchTraderCity")
+        )),
+        vatNumber = None,
+        eoriNumber = None
+      )),
+    transportArrangerTrader = Some(
+      TraderModel(
+        traderExciseNumber = None,
+        traderName = Some("TransportArrangerTraderName"),
+        address = Some(AddressModel(
+          streetNumber = Some("TransportArrangerTraderStreetNumber"),
+          street = Some("TransportArrangerTraderStreetName"),
+          postcode = Some("TransportArrangerTraderPostcode"),
+          city = Some("TransportArrangerTraderCity")
+        )),
+        vatNumber = Some("TransportArrangerTraderVatNumber"),
+        eoriNumber = None
+      )),
+    firstTransporterTrader = Some(
+      TraderModel(
+        traderExciseNumber = None,
+        traderName = Some("FirstTransporterTraderName"),
+        address = Some(AddressModel(
+          streetNumber = Some("FirstTransporterTraderStreetNumber"),
+          street = Some("FirstTransporterTraderStreetName"),
+          postcode = Some("FirstTransporterTraderPostcode"),
+          city = Some("FirstTransporterTraderCity")
+        )),
+        vatNumber = Some("FirstTransporterTraderVatNumber"),
+        eoriNumber = None
+      )),
+    dispatchImportOfficeReferenceNumber = Some("DispatchImportOfficeErn"),
+    deliveryPlaceCustomsOfficeReferenceNumber = Some("DeliveryPlaceCustomsOfficeErn"),
+    competentAuthorityDispatchOfficeReferenceNumber = Some("CompetentAuthorityDispatchOfficeErn"),
+    localReferenceNumber = "EadEsadLocalReferenceNumber",
+    eadStatus = "Beans",
+    dateAndTimeOfValidationOfEadEsad = "ExciseMovementDateTime",
+    dateOfDispatch = "EadEsadDateOfDispatch",
+    journeyTime = "10 hours",
+    documentCertificate = Some(
+      Seq(
+        DocumentCertificateModel(
+          documentType = Some("DocumentCertificateDocumentType1"),
+          documentReference = Some("DocumentCertificateDocumentReference1"),
+          documentDescription = Some("DocumentCertificateDocumentDescription1"),
+          referenceOfDocument = Some("DocumentCertificateReferenceOfDocument1")
+        ),
+        DocumentCertificateModel(
+          documentType = Some("DocumentCertificateDocumentType2"),
+          documentReference = Some("DocumentCertificateDocumentReference2"),
+          documentDescription = Some("DocumentCertificateDocumentDescription2"),
+          referenceOfDocument = Some("DocumentCertificateReferenceOfDocument2")
+        )
+      )
+    ),
+    eadEsad = EadEsadModel(
+      localReferenceNumber = "EadEsadLocalReferenceNumber",
+      invoiceNumber = "EadEsadInvoiceNumber",
+      invoiceDate = Some("EadEsadInvoiceDate"),
+      originTypeCode = OriginType.DutyPaid,
+      dateOfDispatch = "EadEsadDateOfDispatch",
+      timeOfDispatch = Some("EadEsadTimeOfDispatch"),
+      upstreamArc = Some("EadEsadUpstreamArc"),
+      importSadNumber = Some(Seq("ImportSadNumber1", "ImportSadNumber2"))
+    ),
+    headerEadEsad = HeaderEadEsadModel(
+      sequenceNumber = 1,
+      dateAndTimeOfUpdateValidation = "HeaderEadEsadDateTime",
+      destinationType = DestinationType.TemporaryCertifiedConsignee,
+      journeyTime = "10 hours",
+      transportArrangement = TransportArrangement.Consignee
+    ),
+    transportMode = TransportModeModel(
+      transportModeCode = "TransportModeTransportModeCode",
+      complementaryInformation = Some("TransportModeComplementaryInformation")
+    ),
+    movementGuarantee = MovementGuaranteeModel(
+      guarantorTypeCode = GuarantorType.ConsignorTransporterOwner,
+      guarantorTrader = Some(
+        Seq(
+          TraderModel(
+            traderExciseNumber = Some("GuarantorTraderErn1"),
+            traderName = Some("GuarantorTraderName1"),
+            address = Some(
+              AddressModel(
+                streetNumber = Some("GuarantorTraderStreetNumber1"),
+                street = Some("GuarantorTraderStreetName1"),
+                postcode = Some("GuarantorTraderPostcode1"),
+                city = Some("GuarantorTraderCity1")
+              )),
+            vatNumber = Some("GuarantorTraderVatNumber1"),
+            eoriNumber = None
+          ),
+          TraderModel(
+            traderExciseNumber = Some("GuarantorTraderErn2"),
+            traderName = Some("GuarantorTraderName2"),
+            address = Some(
+              AddressModel(
+                streetNumber = Some("GuarantorTraderStreetNumber2"),
+                street = Some("GuarantorTraderStreetName2"),
+                postcode = Some("GuarantorTraderPostcode2"),
+                city = Some("GuarantorTraderCity2")
+              )),
+            vatNumber = Some("GuarantorTraderVatNumber2"),
+            eoriNumber = None
+          )
+        )
+      )
+    ),
+    items = Seq(
+      MovementItem(
+        itemUniqueReference = 1,
+        productCode = "BodyEadEsadExciseProductCode1",
+        cnCode = "BodyEadEsadCnCode1",
+        quantity = 2,
+        grossMass = 3,
+        netMass = 4,
+        alcoholicStrength = Some(5),
+        degreePlato = Some(6),
+        fiscalMark = Some("BodyEadEsadFiscalMark1"),
+        fiscalMarkUsedFlag = Some(true),
+        designationOfOrigin = Some("BodyEadEsadDesignationOfOrigin1"),
+        sizeOfProducer = Some("BodyEadEsadSizeOfProducer1"),
+        density = Some(7),
+        commercialDescription = Some("BodyEadEsadCommercialDescription1"),
+        brandNameOfProduct = Some("BodyEadEsadBrandNameOfProducts1"),
+        maturationAge = Some("BodyEadEsadMaturationPeriodOrAgeOfProducts1"),
+        packaging = Seq(
+          Packaging(
+            typeOfPackage = "PackageKindOfPackages11",
+            quantity = Some(1),
+            shippingMarks = Some("PackageShippingMarks11"),
+            identityOfCommercialSeal = Some("PackageCommercialSealIdentification11"),
+            sealInformation = Some("PackageSealInformation11")
+          ),
+          Packaging(
+            typeOfPackage = "PackageKindOfPackages12",
+            quantity = Some(2),
+            shippingMarks = Some("PackageShippingMarks12"),
+            identityOfCommercialSeal = Some("PackageCommercialSealIdentification12"),
+            sealInformation = Some("PackageSealInformation12")
+          )
+        ),
+        wineProduct = Some(
+          WineProduct(
+            wineProductCategory = "1",
+            wineGrowingZoneCode = Some("WineProductWineGrowingZoneCode1"),
+            thirdCountryOfOrigin = Some("WineProductThirdCountryOfOrigin1"),
+            otherInformation = Some("WineProductOtherInformation1"),
+            wineOperations = Some(Seq("WineOperationCode11", "WineOperationCode12"))
+          ))
+      ),
+      MovementItem(
+        itemUniqueReference = 2,
+        productCode = "BodyEadEsadExciseProductCode2",
+        cnCode = "BodyEadEsadCnCode2",
+        quantity = 3,
+        grossMass = 4,
+        netMass = 5,
+        alcoholicStrength = Some(6),
+        degreePlato = Some(7),
+        fiscalMark = Some("BodyEadEsadFiscalMark2"),
+        fiscalMarkUsedFlag = Some(false),
+        designationOfOrigin = Some("BodyEadEsadDesignationOfOrigin2"),
+        sizeOfProducer = Some("BodyEadEsadSizeOfProducer2"),
+        density = Some(8),
+        commercialDescription = Some("BodyEadEsadCommercialDescription2"),
+        brandNameOfProduct = Some("BodyEadEsadBrandNameOfProducts2"),
+        maturationAge = Some("BodyEadEsadMaturationPeriodOrAgeOfProducts2"),
+        packaging = Seq(
+          Packaging(
+            typeOfPackage = "PackageKindOfPackages21",
+            quantity = Some(3),
+            shippingMarks = Some("PackageShippingMarks21"),
+            identityOfCommercialSeal = Some("PackageCommercialSealIdentification21"),
+            sealInformation = Some("PackageSealInformation21")
+          ),
+          Packaging(
+            typeOfPackage = "PackageKindOfPackages22",
+            quantity = Some(4),
+            shippingMarks = Some("PackageShippingMarks22"),
+            identityOfCommercialSeal = Some("PackageCommercialSealIdentification22"),
+            sealInformation = Some("PackageSealInformation22")
+          )
+        ),
+        wineProduct = Some(
+          WineProduct(
+            wineProductCategory = "2",
+            wineGrowingZoneCode = Some("WineProductWineGrowingZoneCode2"),
+            thirdCountryOfOrigin = Some("WineProductThirdCountryOfOrigin2"),
+            otherInformation = Some("WineProductOtherInformation2"),
+            wineOperations = Some(Seq("WineOperationCode21", "WineOperationCode22"))
+          ))
+      )
+    ),
+    numberOfItems = 2,
+    transportDetails = Seq(
+      TransportDetailsModel(
+        transportUnitCode = "TransportDetailsTransportUnitCode1",
+        identityOfTransportUnits = Some("TransportDetailsIdentityOfTransportUnits1"),
+        commercialSealIdentification = Some("TransportDetailsCommercialSealIdentification1"),
+        complementaryInformation = Some("TransportDetailsComplementaryInformation1"),
+        sealInformation = Some("TransportDetailsSealInformation1")
+      ),
+      TransportDetailsModel(
+        transportUnitCode = "TransportDetailsTransportUnitCode2",
+        identityOfTransportUnits = Some("TransportDetailsIdentityOfTransportUnits2"),
+        commercialSealIdentification = Some("TransportDetailsCommercialSealIdentification2"),
+        complementaryInformation = Some("TransportDetailsComplementaryInformation2"),
+        sealInformation = Some("TransportDetailsSealInformation2")
+      )
+    )
+  )
+
+  lazy val maxGetMovementJson: JsObject = Json.obj(
+    "arc"                                  -> "ExciseMovementArc",
+    "sequenceNumber"                       -> 1,
+    "destinationType"                      -> "10",
+    "memberStateCode"                      -> "CCTMemberStateCode",
+    "serialNumberOfCertificateOfExemption" -> "CCTSerialNumber",
+    "consignorTrader" -> Json.obj(
+      "traderExciseNumber" -> "ConsignorTraderExciseNumber",
+      "traderName"         -> "ConsignorTraderName",
+      "address" -> Json.obj(
+        "streetNumber" -> "ConsignorTraderStreetNumber",
+        "street"       -> "ConsignorTraderStreetName",
+        "postcode"     -> "ConsignorTraderPostcode",
+        "city"         -> "ConsignorTraderCity"
+      )
+    ),
+    "consigneeTrader" -> Json.obj(
+      "traderExciseNumber" -> "ConsigneeTraderId",
+      "traderName"         -> "ConsigneeTraderName",
+      "address" -> Json.obj(
+        "streetNumber" -> "ConsigneeTraderStreetNumber",
+        "street"       -> "ConsigneeTraderStreetName",
+        "postcode"     -> "ConsigneeTraderPostcode",
+        "city"         -> "ConsigneeTraderCity"
+      ),
+      "eoriNumber" -> "ConsigneeTraderEori"
+    ),
+    "deliveryPlaceTrader" -> Json.obj(
+      "traderExciseNumber" -> "DeliveryPlaceTraderId",
+      "traderName"         -> "DeliveryPlaceTraderName",
+      "address" -> Json.obj(
+        "streetNumber" -> "DeliveryPlaceTraderStreetNumber",
+        "street"       -> "DeliveryPlaceTraderStreetName",
+        "postcode"     -> "DeliveryPlaceTraderPostcode",
+        "city"         -> "DeliveryPlaceTraderCity"
+      )
+    ),
+    "placeOfDispatchTrader" -> Json.obj(
+      "traderExciseNumber" -> "PlaceOfDispatchTraderReferenceOfTaxWarehouse",
+      "traderName"         -> "PlaceOfDispatchTraderName",
+      "address" -> Json.obj(
+        "streetNumber" -> "PlaceOfDispatchTraderStreetNumber",
+        "street"       -> "PlaceOfDispatchTraderStreetName",
+        "postcode"     -> "PlaceOfDispatchTraderPostcode",
+        "city"         -> "PlaceOfDispatchTraderCity"
+      )
+    ),
+    "transportArrangerTrader" -> Json.obj(
+      "traderName" -> "TransportArrangerTraderName",
+      "address" -> Json.obj(
+        "streetNumber" -> "TransportArrangerTraderStreetNumber",
+        "street"       -> "TransportArrangerTraderStreetName",
+        "postcode"     -> "TransportArrangerTraderPostcode",
+        "city"         -> "TransportArrangerTraderCity"
+      ),
+      "vatNumber" -> "TransportArrangerTraderVatNumber"
+    ),
+    "firstTransporterTrader" -> Json.obj(
+      "traderName" -> "FirstTransporterTraderName",
+      "address" -> Json.obj(
+        "streetNumber" -> "FirstTransporterTraderStreetNumber",
+        "street"       -> "FirstTransporterTraderStreetName",
+        "postcode"     -> "FirstTransporterTraderPostcode",
+        "city"         -> "FirstTransporterTraderCity"
+      ),
+      "vatNumber" -> "FirstTransporterTraderVatNumber"
+    ),
+    "dispatchImportOfficeReferenceNumber"             -> "DispatchImportOfficeErn",
+    "deliveryPlaceCustomsOfficeReferenceNumber"       -> "DeliveryPlaceCustomsOfficeErn",
+    "competentAuthorityDispatchOfficeReferenceNumber" -> "CompetentAuthorityDispatchOfficeErn",
+    "localReferenceNumber"                            -> "EadEsadLocalReferenceNumber",
+    "eadStatus"                                       -> "Beans",
+    "dateAndTimeOfValidationOfEadEsad"                -> "ExciseMovementDateTime",
+    "dateOfDispatch"                                  -> "EadEsadDateOfDispatch",
+    "journeyTime"                                     -> "10 hours",
+    "documentCertificate" -> Json.arr(
+      Json.obj(
+        "documentType"        -> "DocumentCertificateDocumentType1",
+        "documentReference"   -> "DocumentCertificateDocumentReference1",
+        "documentDescription" -> "DocumentCertificateDocumentDescription1",
+        "referenceOfDocument" -> "DocumentCertificateReferenceOfDocument1"
+      ),
+      Json.obj(
+        "documentType"        -> "DocumentCertificateDocumentType2",
+        "documentReference"   -> "DocumentCertificateDocumentReference2",
+        "documentDescription" -> "DocumentCertificateDocumentDescription2",
+        "referenceOfDocument" -> "DocumentCertificateReferenceOfDocument2"
+      )
+    ),
+    "eadEsad" -> Json.obj(
+      "localReferenceNumber" -> "EadEsadLocalReferenceNumber",
+      "invoiceNumber"        -> "EadEsadInvoiceNumber",
+      "invoiceDate"          -> "EadEsadInvoiceDate",
+      "originTypeCode"       -> "3",
+      "dateOfDispatch"       -> "EadEsadDateOfDispatch",
+      "timeOfDispatch"       -> "EadEsadTimeOfDispatch",
+      "upstreamArc"          -> "EadEsadUpstreamArc",
+      "importSadNumber"      -> Json.arr("ImportSadNumber1", "ImportSadNumber2")
+    ),
+    "headerEadEsad" -> Json.obj(
+      "sequenceNumber"                -> 1,
+      "dateAndTimeOfUpdateValidation" -> "HeaderEadEsadDateTime",
+      "destinationType"               -> "10",
+      "journeyTime"                   -> "10 hours",
+      "transportArrangement"          -> "2"
+    ),
+    "transportMode" -> Json.obj(
+      "transportModeCode"        -> "TransportModeTransportModeCode",
+      "complementaryInformation" -> "TransportModeComplementaryInformation"
+    ),
+    "movementGuarantee" -> Json.obj(
+      "guarantorTypeCode" -> "123",
+      "guarantorTrader" -> Json.arr(
+        Json.obj(
+          "traderExciseNumber" -> "GuarantorTraderErn1",
+          "traderName"         -> "GuarantorTraderName1",
+          "address" -> Json.obj(
+            "streetNumber" -> "GuarantorTraderStreetNumber1",
+            "street"       -> "GuarantorTraderStreetName1",
+            "postcode"     -> "GuarantorTraderPostcode1",
+            "city"         -> "GuarantorTraderCity1"
+          ),
+          "vatNumber" -> "GuarantorTraderVatNumber1"
+        ),
+        Json.obj(
+          "traderExciseNumber" -> "GuarantorTraderErn2",
+          "traderName"         -> "GuarantorTraderName2",
+          "address" -> Json.obj(
+            "streetNumber" -> "GuarantorTraderStreetNumber2",
+            "street"       -> "GuarantorTraderStreetName2",
+            "postcode"     -> "GuarantorTraderPostcode2",
+            "city"         -> "GuarantorTraderCity2"
+          ),
+          "vatNumber" -> "GuarantorTraderVatNumber2"
+        )
+      )
+    ),
+    "items" -> Json.arr(
+      Json.obj(
+        "itemUniqueReference"   -> 1,
+        "productCode"           -> "BodyEadEsadExciseProductCode1",
+        "cnCode"                -> "BodyEadEsadCnCode1",
+        "quantity"              -> 2,
+        "grossMass"             -> 3,
+        "netMass"               -> 4,
+        "alcoholicStrength"     -> 5,
+        "degreePlato"           -> 6,
+        "fiscalMark"            -> "BodyEadEsadFiscalMark1",
+        "fiscalMarkUsedFlag"    -> true,
+        "designationOfOrigin"   -> "BodyEadEsadDesignationOfOrigin1",
+        "sizeOfProducer"        -> "BodyEadEsadSizeOfProducer1",
+        "density"               -> 7,
+        "commercialDescription" -> "BodyEadEsadCommercialDescription1",
+        "brandNameOfProduct"    -> "BodyEadEsadBrandNameOfProducts1",
+        "maturationAge"         -> "BodyEadEsadMaturationPeriodOrAgeOfProducts1",
+        "packaging" -> Json.arr(
+          Json.obj(
+            "typeOfPackage"            -> "PackageKindOfPackages11",
+            "quantity"                 -> 1,
+            "shippingMarks"            -> "PackageShippingMarks11",
+            "identityOfCommercialSeal" -> "PackageCommercialSealIdentification11",
+            "sealInformation"          -> "PackageSealInformation11"
+          ),
+          Json.obj(
+            "typeOfPackage"            -> "PackageKindOfPackages12",
+            "quantity"                 -> 2,
+            "shippingMarks"            -> "PackageShippingMarks12",
+            "identityOfCommercialSeal" -> "PackageCommercialSealIdentification12",
+            "sealInformation"          -> "PackageSealInformation12"
+          )
+        ),
+        "wineProduct" -> Json.obj(
+          "wineProductCategory"  -> "1",
+          "wineGrowingZoneCode"  -> "WineProductWineGrowingZoneCode1",
+          "thirdCountryOfOrigin" -> "WineProductThirdCountryOfOrigin1",
+          "otherInformation"     -> "WineProductOtherInformation1",
+          "wineOperations"       -> Json.arr("WineOperationCode11", "WineOperationCode12")
+        )
+      ),
+      Json.obj(
+        "itemUniqueReference"   -> 2,
+        "productCode"           -> "BodyEadEsadExciseProductCode2",
+        "cnCode"                -> "BodyEadEsadCnCode2",
+        "quantity"              -> 3,
+        "grossMass"             -> 4,
+        "netMass"               -> 5,
+        "alcoholicStrength"     -> 6,
+        "degreePlato"           -> 7,
+        "fiscalMark"            -> "BodyEadEsadFiscalMark2",
+        "fiscalMarkUsedFlag"    -> false,
+        "designationOfOrigin"   -> "BodyEadEsadDesignationOfOrigin2",
+        "sizeOfProducer"        -> "BodyEadEsadSizeOfProducer2",
+        "density"               -> 8,
+        "commercialDescription" -> "BodyEadEsadCommercialDescription2",
+        "brandNameOfProduct"    -> "BodyEadEsadBrandNameOfProducts2",
+        "maturationAge"         -> "BodyEadEsadMaturationPeriodOrAgeOfProducts2",
+        "packaging" -> Json.arr(
+          Json.obj(
+            "typeOfPackage"            -> "PackageKindOfPackages21",
+            "quantity"                 -> 3,
+            "shippingMarks"            -> "PackageShippingMarks21",
+            "identityOfCommercialSeal" -> "PackageCommercialSealIdentification21",
+            "sealInformation"          -> "PackageSealInformation21"
+          ),
+          Json.obj(
+            "typeOfPackage"            -> "PackageKindOfPackages22",
+            "quantity"                 -> 4,
+            "shippingMarks"            -> "PackageShippingMarks22",
+            "identityOfCommercialSeal" -> "PackageCommercialSealIdentification22",
+            "sealInformation"          -> "PackageSealInformation22"
+          )
+        ),
+        "wineProduct" -> Json.obj(
+          "wineProductCategory"  -> "2",
+          "wineGrowingZoneCode"  -> "WineProductWineGrowingZoneCode2",
+          "thirdCountryOfOrigin" -> "WineProductThirdCountryOfOrigin2",
+          "otherInformation"     -> "WineProductOtherInformation2",
+          "wineOperations"       -> Json.arr("WineOperationCode21", "WineOperationCode22")
+        )
+      )
+    ),
+    "numberOfItems" -> 2,
+    "transportDetails" -> Json.arr(
+      Json.obj(
+        "transportUnitCode"            -> "TransportDetailsTransportUnitCode1",
+        "identityOfTransportUnits"     -> "TransportDetailsIdentityOfTransportUnits1",
+        "commercialSealIdentification" -> "TransportDetailsCommercialSealIdentification1",
+        "complementaryInformation"     -> "TransportDetailsComplementaryInformation1",
+        "sealInformation"              -> "TransportDetailsSealInformation1"
+      ),
+      Json.obj(
+        "transportUnitCode"            -> "TransportDetailsTransportUnitCode2",
+        "identityOfTransportUnits"     -> "TransportDetailsIdentityOfTransportUnits2",
+        "commercialSealIdentification" -> "TransportDetailsCommercialSealIdentification2",
+        "complementaryInformation"     -> "TransportDetailsComplementaryInformation2",
+        "sealInformation"              -> "TransportDetailsSealInformation2"
+      )
+    )
+  )
+
+  lazy val getMovementMongoResponse: GetMovementMongoResponse = GetMovementMongoResponse(testArc, JsString(getMovementResponseBody))
 
 }
