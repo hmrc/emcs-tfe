@@ -54,7 +54,8 @@ case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel)
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient
+      messageRecipient = messageRecipient,
+      messageIdentifier = messageUUID.toString
     ).toString()
   }
 

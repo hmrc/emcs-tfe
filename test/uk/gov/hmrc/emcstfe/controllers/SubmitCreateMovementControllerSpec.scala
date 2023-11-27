@@ -50,9 +50,9 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
             MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-            MockService.submit(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Right(chrisSuccessResponse)))
+            MockService.submit(CreateMovementFixtures.createMovementModelMax, testDraftId).returns(Future.successful(Right(chrisSuccessResponse)))
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
             status(result) shouldBe Status.OK
             contentAsJson(result) shouldBe chrisSuccessJson
@@ -63,9 +63,9 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
             MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-            MockService.submit(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+            MockService.submit(CreateMovementFixtures.createMovementModelMax, testDraftId).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
             status(result) shouldBe Status.INTERNAL_SERVER_ERROR
             contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
@@ -79,9 +79,9 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
             MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-            MockService.submitViaEIS(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Right(eisSuccessResponse)))
+            MockService.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId).returns(Future.successful(Right(eisSuccessResponse)))
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
             status(result) shouldBe Status.OK
             contentAsJson(result) shouldBe eisSuccessJson
@@ -93,9 +93,9 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
             MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-            MockService.submitViaEIS(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
+            MockService.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
             status(result) shouldBe Status.INTERNAL_SERVER_ERROR
             contentAsJson(result) shouldBe Json.obj("message" -> EISServiceUnavailableError("SERVICE_UNAVAILABLE").message)
@@ -107,7 +107,7 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
     "user is NOT authorised" must {
       s"return ${Status.FORBIDDEN} (FORBIDDEN)" in new Fixture(FakeFailedAuthAction) {
 
-        val result = controller.submit(testErn, testArc)(fakeRequest)
+        val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
         status(result) shouldBe Status.FORBIDDEN
       }

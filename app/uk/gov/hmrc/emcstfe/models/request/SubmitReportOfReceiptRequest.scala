@@ -70,7 +70,8 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient
+      messageRecipient = messageRecipient,
+      messageIdentifier = messageUUID.toString
     ).toString()
   }
 

@@ -42,7 +42,7 @@ case class SubmitCreateMovementModel(
                                 movementGuarantee: MovementGuaranteeModel,
                                 bodyEadEsad: Seq[BodyEadEsadModel],
                                 eadEsadDraft: EadEsadDraftModel,
-                                transportDetails: Seq[TransportDetailsModel],
+                                transportDetails: Seq[TransportDetailsModel]
                               ) extends XmlBaseModel with XmlWriterUtils {
   def toXml(implicit request: UserRequest[_]): Elem = <urn:SubmittedDraftOfEADESAD>
     {attributes.toXml}

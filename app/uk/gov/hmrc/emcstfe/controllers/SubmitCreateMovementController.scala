@@ -40,9 +40,9 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
   def submit(ern: String, draftId: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitCreateMovementModel] { submission =>
       if (isEnabled(SendToEIS)) {
-        service.submitViaEIS(submission).map(handleResponse(_))
+        service.submitViaEIS(submission, draftId).map(handleResponse(_))
       } else {
-        service.submit(submission).map(handleResponse(_))
+        service.submit(submission, draftId).map(handleResponse(_))
       }
     }
   }

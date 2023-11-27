@@ -30,12 +30,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
                                             eisConnector: EisConnector) extends Logging {
-  def submit(submission: SubmitCreateMovementModel)
+  def submit(submission: SubmitCreateMovementModel, draftId: String)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    chrisConnector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](SubmitCreateMovementRequest(submission))
+    chrisConnector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](SubmitCreateMovementRequest(submission, draftId))
 
-  def submitViaEIS(submission: SubmitCreateMovementModel)
+  def submitViaEIS(submission: SubmitCreateMovementModel, draftId: String)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submit[EISSubmissionSuccessResponse](SubmitCreateMovementRequest(submission), "submitCreateMovementEISRequest")
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitCreateMovementRequest(submission, draftId), "submitCreateMovementEISRequest")
 
 }

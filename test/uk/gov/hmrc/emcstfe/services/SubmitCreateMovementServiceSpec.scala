@@ -29,7 +29,7 @@ import scala.concurrent.Future
 class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures {
   trait Test extends MockChrisConnector with MockEisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax)
+    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
     val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector)
   }
 
@@ -42,7 +42,7 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
             Future.successful(Right(chrisSuccessResponse))
           )
 
-          await(service.submit(CreateMovementFixtures.createMovementModelMax)) shouldBe Right(chrisSuccessResponse)
+          await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(chrisSuccessResponse)
         }
       }
       "return a Left" when {
@@ -52,7 +52,7 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
             Future.successful(Left(XmlValidationError))
           )
 
-          await(service.submit(CreateMovementFixtures.createMovementModelMax)) shouldBe Left(XmlValidationError)
+          await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(XmlValidationError)
         }
       }
     }
@@ -65,7 +65,7 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
           Future.successful(Right(eisSuccessResponse))
         )
 
-        await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax)) shouldBe Right(eisSuccessResponse)
+        await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(eisSuccessResponse)
       }
     }
 
@@ -76,7 +76,7 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
           Future.successful(Left(EISUnknownError("Downstream failed to respond")))
         )
 
-        await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
       }
     }
   }

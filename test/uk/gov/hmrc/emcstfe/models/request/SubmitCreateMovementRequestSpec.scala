@@ -51,7 +51,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
   val deliveryPlaceCustomsOfficeCountryCode = "EE"
   val consignorTraderCountryCode = "FF"
 
-  implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax)
+  implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
 
   s".messageRecipientCountryCode()" when {
 
@@ -348,7 +348,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
                 {request.preparedTime.toString}
               </urn1:TimeOfPreparation>
               <urn1:MessageIdentifier>
-                {request.messageUUID}
+                {testDraftId}
               </urn1:MessageIdentifier>
               <urn1:CorrelationIdentifier>
                 {request.correlationUUID}
@@ -413,7 +413,8 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
         ))
       } else {
         request.copy(placeOfDispatchTrader = None)
-      }
+      },
+      draftId = testDraftId
     )
   }
 }

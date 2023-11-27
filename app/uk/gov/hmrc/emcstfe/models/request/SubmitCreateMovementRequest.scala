@@ -28,7 +28,7 @@ import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
-case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel)
+case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId: String)
                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
   private val messageNumber = 815
@@ -85,7 +85,8 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel)
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient
+      messageRecipient = messageRecipient,
+      messageIdentifier = draftId
     ).toString()
   }
 
