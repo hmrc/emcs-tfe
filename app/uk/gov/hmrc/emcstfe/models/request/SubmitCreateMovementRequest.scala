@@ -45,7 +45,8 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
       body = body,
       messageNumber = 815,
       messageSender = messageSender,
-      messageRecipient = messageRecipient
+      messageRecipient = messageRecipient,
+      messageIdentifier = draftId
     ).toString()
 
   override def metricName = "create-movement"

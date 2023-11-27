@@ -53,7 +53,8 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient
+      messageRecipient = messageRecipient,
+      messageIdentifier = messageUUID.toString
     ).toString()
 
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitreasonforshortageportal"
