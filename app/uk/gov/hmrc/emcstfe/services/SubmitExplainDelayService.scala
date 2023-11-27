@@ -28,10 +28,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitExplainDelayService @Inject()(connector: ChrisConnector, eisConnector: EisConnector) extends Logging {
+class SubmitExplainDelayService @Inject()(chrisConnector: ChrisConnector, eisConnector: EisConnector) extends Logging {
   def submit(submission: SubmitExplainDelayModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    connector.submitExplainDelayChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainDelayRequest(submission))
+    chrisConnector.submitExplainDelayChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainDelayRequest(submission))
 
   def submitViaEIS(submission: SubmitExplainDelayModel)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =

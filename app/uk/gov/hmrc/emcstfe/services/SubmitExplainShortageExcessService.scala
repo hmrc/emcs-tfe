@@ -28,10 +28,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitExplainShortageExcessService @Inject()(connector: ChrisConnector, eisConnector: EisConnector) extends Logging {
+class SubmitExplainShortageExcessService @Inject()(chrisConnector: ChrisConnector, eisConnector: EisConnector) extends Logging {
   def submit(submission: SubmitExplainShortageExcessModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    connector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainShortageExcessRequest(submission))
+    chrisConnector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainShortageExcessRequest(submission))
 
   def submitViaEIS(submission: SubmitExplainShortageExcessModel)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =

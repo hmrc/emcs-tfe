@@ -35,7 +35,7 @@ class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with Subm
 
   override val config: AppConfig = app.injector.instanceOf[AppConfig]
 
-  abstract class Test(enableSendToEIS: Boolean = false) {
+  private trait Test {
     def setupStubs(): StubMapping
 
     def uri: String = s"/report-of-receipt/$testErn/$testArc"
@@ -49,8 +49,11 @@ class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with Subm
       buildRequest(uri, "Content-Type" -> "application/json")
     }
 
-    if(enableSendToEIS) enable(SendToEIS)
+  }
 
+  override def beforeEach(): Unit = {
+    disable(SendToEIS)
+    super.beforeEach()
   }
 
   override protected def afterAll(): Unit = {
@@ -127,9 +130,8 @@ class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with Subm
 
         "all downstream calls are successful" in new Test {
 
-          enable(SendToEIS)
-
           override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
             AuthStub.authorised()
             DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson)
           }
@@ -146,6 +148,7 @@ class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with Subm
 
         "downstream call returns unexpected JSON" in new Test {
           override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
             AuthStub.authorised()
             DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, incompleteEisSuccessJson.toString())
           }
@@ -161,6 +164,7 @@ class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with Subm
         "downstream call returns a non-200 HTTP response" in new Test {
 
           override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
             AuthStub.authorised()
             DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.INTERNAL_SERVER_ERROR, "bad things")
           }

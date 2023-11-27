@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.createMovement.CreateMovementModel
+import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,9 +28,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitCreateMovementService @Inject()(connector: ChrisConnector) extends Logging {
-  def submit(submission: CreateMovementModel)
+class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
+                                            eisConnector: EisConnector) extends Logging {
+  def submit(submission: SubmitCreateMovementModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    connector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](SubmitCreateMovementRequest(submission))
+    chrisConnector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](SubmitCreateMovementRequest(submission))
+
+  def submitViaEIS(submission: SubmitCreateMovementModel)
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitCreateMovementRequest(submission), "submitCreateMovementEISRequest")
 
 }

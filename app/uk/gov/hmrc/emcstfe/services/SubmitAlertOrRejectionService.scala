@@ -28,10 +28,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitAlertOrRejectionService @Inject()(connector: ChrisConnector, eisConnector: EisConnector) extends Logging {
+class SubmitAlertOrRejectionService @Inject()(chrisConnector: ChrisConnector, eisConnector: EisConnector) extends Logging {
   def submit(submission: SubmitAlertOrRejectionModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    connector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](SubmitAlertOrRejectionRequest(submission))
+    chrisConnector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](SubmitAlertOrRejectionRequest(submission))
 
   def submitViaEIS(submission: SubmitAlertOrRejectionModel)
                   (implicit hc: HeaderCarrier,

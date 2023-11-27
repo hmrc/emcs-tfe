@@ -22,43 +22,84 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitCreateMovementService
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISServiceUnavailableError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCreateMovementService with CreateMovementFixtures with FakeAuthAction {
+class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCreateMovementService with CreateMovementFixtures with
+  MockAppConfig with FakeAuthAction {
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/create-movement").withBody(Json.toJson(CreateMovementFixtures.createMovementModelMax))
-    val controller = new SubmitCreateMovementController(Helpers.stubControllerComponents(), mockService, authAction)
+    val controller = new SubmitCreateMovementController(Helpers.stubControllerComponents(), mockService, mockAppConfig, authAction)
   }
 
   s"POST ${routes.SubmitCreateMovementController.submit(testErn, testDraftId)}" when {
 
     "user is authorised" must {
-      s"return ${Status.OK} (OK)" when {
-        "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-          MockService.submit(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Right(chrisSuccessResponse)))
+      "when calling ChRIS" should {
 
-          val result = controller.submit(testErn, testArc)(fakeRequest)
+        s"return ${Status.OK} (OK)" when {
+          "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-          status(result) shouldBe Status.OK
-          contentAsJson(result) shouldBe chrisSuccessJson
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+            MockService.submit(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Right(chrisSuccessResponse)))
+
+            val result = controller.submit(testErn, testArc)(fakeRequest)
+
+            status(result) shouldBe Status.OK
+            contentAsJson(result) shouldBe chrisSuccessJson
+          }
+        }
+        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+          "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+            MockService.submit(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+
+            val result = controller.submit(testErn, testArc)(fakeRequest)
+
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
+          }
         }
       }
-      s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-        "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
 
-          MockService.submit(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+      "when calling EIS" should {
+        s"return ${Status.OK} (OK)" when {
+          "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-          val result = controller.submit(testErn, testArc)(fakeRequest)
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-          contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
+            MockService.submitViaEIS(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Right(eisSuccessResponse)))
+
+            val result = controller.submit(testErn, testArc)(fakeRequest)
+
+            status(result) shouldBe Status.OK
+            contentAsJson(result) shouldBe eisSuccessJson
+          }
+        }
+
+        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+          "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+            MockService.submitViaEIS(CreateMovementFixtures.createMovementModelMax).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
+
+            val result = controller.submit(testErn, testArc)(fakeRequest)
+
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            contentAsJson(result) shouldBe Json.obj("message" -> EISServiceUnavailableError("SERVICE_UNAVAILABLE").message)
+          }
         }
       }
     }

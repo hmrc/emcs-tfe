@@ -28,9 +28,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitChangeDestinationService @Inject()(connector: ChrisConnector) extends Logging {
+class SubmitChangeDestinationService @Inject()(chrisConnector: ChrisConnector) extends Logging {
   def submit(submission: SubmitChangeDestinationModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    connector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](SubmitChangeDestinationRequest(submission))
+    chrisConnector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](SubmitChangeDestinationRequest(submission))
 
 }
