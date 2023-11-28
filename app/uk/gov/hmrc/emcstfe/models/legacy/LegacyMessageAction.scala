@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.legacy
 
+import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal, catsSyntaxTuple5Semigroupal}
 import com.lucidchart.open.xtract._
+import play.api.http.HeaderNames
 import play.api.mvc.Request
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
@@ -44,13 +46,15 @@ trait LegacyMessageAction {
 
 object GetMessages extends LegacyMessageAction {
   def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, GetMessagesRequest] = {
-    readXml((for {
-      ern <- ernXmlPath.read[String]
-      sortField <- sortFieldPath.read[String].map(_.toLowerCase)
-      sortOrder <- sortOrderPath.read[String].map(_.toUpperCase)
-      startPosition <- startPositionPath.read[Int]
-      maxNoToReturn <- maxNoToReturnPath.read[Int]
-    } yield GetMessagesRequest(ern, sortField, sortOrder, 1, maxNoToReturn, Some(startPosition))))
+    readXml((
+      ernXmlPath.read[String],
+      sortFieldPath.read[String].map(_.toLowerCase),
+      sortOrderPath.read[String].map(_.toUpperCase),
+      startPositionPath.read[Int],
+      maxNoToReturnPath.read[Int]
+    ).mapN((ern, sortField, sortOrder, startPosition, maxNoToReturn) =>
+      GetMessagesRequest(ern, sortField, sortOrder, 1, maxNoToReturn, Some(startPosition))
+    ))
   }
 }
 
@@ -61,39 +65,39 @@ object GetMessageStatistics extends LegacyMessageAction {
 
 object MarkMessagesAsRead extends LegacyMessageAction {
   def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, MarkMessageAsReadRequest] = {
-    readXml(for {
-      ern <- ernXmlPath.read[String]
-      messageId <- uniqueMessageIdPath.read[String]
-    } yield MarkMessageAsReadRequest(ern, messageId))
+    readXml((
+      ernXmlPath.read[String],
+      uniqueMessageIdPath.read[String]
+    ).mapN(MarkMessageAsReadRequest))
   }
 }
 
 object SetMessageAsLogicallyDeleted extends LegacyMessageAction {
-  def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, SetMessageAsLogicallyDeletedRequest] = readXml(for {
-    ern <- ernXmlPath.read[String]
-    messageId <- uniqueMessageIdPath.read[String]
-  } yield SetMessageAsLogicallyDeletedRequest(ern, messageId))
+  def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, SetMessageAsLogicallyDeletedRequest] = readXml((
+    ernXmlPath.read[String],
+    uniqueMessageIdPath.read[String],
+  ).mapN(SetMessageAsLogicallyDeletedRequest))
 }
 object GetSubmissionFailureMessage extends LegacyMessageAction {
-  def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, GetSubmissionFailureMessageRequest] = readXml(for {
-    ern <- ernXmlPath.read[String]
-    messageId <- uniqueMessageIdPath.read[String]
-  } yield GetSubmissionFailureMessageRequest(ern, messageId))
+  def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, GetSubmissionFailureMessageRequest] = readXml((
+    ernXmlPath.read[String],
+    uniqueMessageIdPath.read[String],
+  ).mapN(GetSubmissionFailureMessageRequest))
 }
 
 object GetMovement extends LegacyMessageAction {
-  def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, GetMovementRequest] = readXml(for {
-    ern <- ernXmlPath.read[String]
-    arc <- arcPath.read[String]
-    seqNumber <- sequenceNumberPath.read[Option[Int]]
-  } yield GetMovementRequest(ern, arc, seqNumber))
+  def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, GetMovementRequest] = readXml((
+    ernXmlPath.read[String],
+    arcPath.read[String],
+    sequenceNumberPath.read[Option[Int]],
+  ).mapN(GetMovementRequest))
 }
 
 object LegacyMessageAction {
   val regex: Regex = ".*action=\".*EMCSApplicationService/2.0/(.*)\".*".r
 
   def apply(request: Request[_]): Either[ErrorResponse, LegacyMessageAction] =
-    request.headers.get("Content-Type") match {
+    request.headers.get(HeaderNames.CONTENT_TYPE) match {
       case Some(regex("GetMessages")) => Right(GetMessages)
       case Some(regex("GetMessageStatistics")) => Right(GetMessageStatistics)
       case Some(regex("MarkMessagesAsRead")) => Right(MarkMessagesAsRead)

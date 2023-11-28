@@ -8,6 +8,7 @@ GET           /create-movement/:ern/:draftId               uk.gov.hmrc.emcstfe.c
 PUT           /create-movement/:ern/:draftId               uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.set(ern, draftId)
 DELETE        /create-movement/:ern/:draftId               uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.clear(ern, draftId)
 GET           /create-movement/trader/:ern/lrn/:lrn        uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.checkForExistingLrn(ern, lrn)
+GET           /create-movement/draft/:ern/:messageId       uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.checkForExistingDraft(ern, messageId)
 
 DELETE        /explain-delay/:ern/:arc                     uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainDelayUserAnswersController.clear(ern, arc)
 GET           /explain-delay/:ern/:arc                     uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainDelayUserAnswersController.get(ern, arc)
