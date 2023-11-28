@@ -81,13 +81,6 @@ object GetMovementResponse extends JsonUtils with XmlReaderUtils {
   lazy val transportDetails: XPath                                = EADESADContainer \ "TransportDetails"
 
   implicit lazy val xmlReader: XmlReader[GetMovementResponse] = {
-    /*
-     * This function uses the following Cats-inspired functions:
-     * - map27:         In Scala 2 (which this is currently being written in), Tuples can only be 22 elements long, however GetMovementResponse has more than 22 fields.
-     *                  This means that Cats's `.mapN` functions won't work, so a custom `map27` function was made, which takes a Tuple22 and a Tuple5 and squashes them together.
-     *                  Therefore, we can take advantage of lucidchart returning all parsing errors rather than just the first one, which would've been the alternative option (using for-comprehensions which fail fast).
-     *
-     * */
     (
       arc.read[String],
       memberStateCode.read[Option[String]],
