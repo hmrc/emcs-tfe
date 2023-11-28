@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
+import cats.implicits.catsSyntaxTuple22Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader}
 import play.api.libs.json._
@@ -58,13 +59,9 @@ object GetMovementResponse extends JsonUtils with XmlReaderUtils {
   lazy val eadStatus: XPath                                       = currentMovement \ "status"
   lazy val EADESADContainer: XPath                                = currentMovement \ "IE801" \ "Body" \ "EADESADContainer"
   lazy val arc: XPath                                             = EADESADContainer \ "ExciseMovement" \ "AdministrativeReferenceCode"
-  lazy val sequenceNumber: XPath                                  = EADESADContainer \ "HeaderEadEsad" \ "SequenceNumber"
-  lazy val destinationTypeCode: XPath                             = EADESADContainer \ "HeaderEadEsad" \ "DestinationTypeCode"
-  lazy val memberStateCode: XPath                                 = EADESADContainer \ "ComplementConsigneeTrader" \ "MemberStateCode"
-  lazy val localReferenceNumber: XPath                            = EADESADContainer \ "EadEsad" \ "LocalReferenceNumber"
-  lazy val dateOfDispatch: XPath                                  = EADESADContainer \ "EadEsad" \ "DateOfDispatch"
   lazy val dateAndTimeOfValidationOfEadEsad: XPath                = EADESADContainer \ "ExciseMovement" \ "DateAndTimeOfValidationOfEadEsad"
-  lazy val journeyTime: XPath                                     = EADESADContainer \ "HeaderEadEsad" \ "JourneyTime"
+  lazy val memberStateCode: XPath                                 = EADESADContainer \ "ComplementConsigneeTrader" \ "MemberStateCode"
+  lazy val serialNumberOfCertificateOfExemption: XPath            = EADESADContainer \ "ComplementConsigneeTrader" \ "SerialNumberOfCertificateOfExemption"
   lazy val consignorTrader: XPath                                 = EADESADContainer \\ "ConsignorTrader"
   lazy val consigneeTrader: XPath                                 = EADESADContainer \\ "ConsigneeTrader"
   lazy val deliveryPlaceTrader: XPath                             = EADESADContainer \\ "DeliveryPlaceTrader"
@@ -80,70 +77,95 @@ object GetMovementResponse extends JsonUtils with XmlReaderUtils {
   lazy val transportMode: XPath                                   = EADESADContainer \ "TransportMode"
   lazy val movementGuarantee: XPath                               = EADESADContainer \ "MovementGuarantee"
   lazy val items: XPath                                           = EADESADContainer \ "BodyEadEsad"
-  lazy val numberOfItems: XPath                                   = EADESADContainer \\ "BodyEadEsad" \\ "CnCode"
-  lazy val serialNumberOfCertificateOfExemption: XPath            = EADESADContainer \ "ComplementConsigneeTrader" \ "SerialNumberOfCertificateOfExemption"
+  lazy val numberOfItems: XPath                                   = items \\ "CnCode"
   lazy val transportDetails: XPath                                = EADESADContainer \ "TransportDetails"
 
-  implicit lazy val xmlReader: XmlReader[GetMovementResponse] =
-    for {
-      arc                                             <- arc.read[String]
-      sequenceNumber                                  <- sequenceNumber.read[Int]
-      destinationTypeCode                             <- destinationTypeCode.read[DestinationType](DestinationType.xmlReads(DestinationType.enumerable))
-      memberStateCode                                 <- memberStateCode.read[Option[String]]
-      serialNumberOfCertificateOfExemption            <- serialNumberOfCertificateOfExemption.read[Option[String]]
-      consignorTrader                                 <- consignorTrader.read[TraderModel](TraderModel.xmlReads(ConsignorTrader))
-      consigneeTrader                                 <- consigneeTrader.read[Option[TraderModel]](TraderModel.xmlReads(ConsigneeTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model)
-      deliveryPlaceTrader                             <- deliveryPlaceTrader.read[Option[TraderModel]](TraderModel.xmlReads(DeliveryPlaceTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model)
-      placeOfDispatchTrader                           <- placeOfDispatchTrader.read[Option[TraderModel]](TraderModel.xmlReads(PlaceOfDispatchTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model)
-      transportArrangerTrader                         <- transportArrangerTrader.read[Option[TraderModel]](TraderModel.xmlReads(TransportTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model)
-      firstTransporterTrader                          <- firstTransporterTrader.read[Option[TraderModel]](TraderModel.xmlReads(TransportTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model)
-      dispatchImportOfficeReferenceNumber             <- dispatchImportOfficeReferenceNumber.read[Option[String]]
-      deliveryPlaceCustomsOfficeReferenceNumber       <- deliveryPlaceCustomsOfficeReferenceNumber.read[Option[String]]
-      competentAuthorityDispatchOfficeReferenceNumber <- competentAuthorityDispatchOfficeReferenceNumber.read[Option[String]]
-      localReferenceNumber                            <- localReferenceNumber.read[String]
-      eadStatus                                       <- eadStatus.read[String]
-      dateAndTimeOfValidationOfEadEsad                <- dateAndTimeOfValidationOfEadEsad.read[String]
-      dateOfDispatch                                  <- dateOfDispatch.read[String]
-      journeyTime                                     <- journeyTime.read[JourneyTime].map(_.toString)
-      documentCertificate                             <- documentCertificate.read[Seq[DocumentCertificateModel]](strictReadSeq(DocumentCertificateModel.xmlReads)).seqToOptionSeq
-      eadEsad                                         <- eadEsad.read[EadEsadModel]
-      headerEadEsad                                   <- headerEadEsad.read[HeaderEadEsadModel]
-      transportMode                                   <- transportMode.read[TransportModeModel]
-      movementGuarantee                               <- movementGuarantee.read[MovementGuaranteeModel]
-      items                                           <- items.read[Seq[MovementItem]](strictReadSeq)
-      numberOfItems                                   <- numberOfItems.read[Seq[String]](strictReadSeq).map(_.length)
-      transportDetails                                <- transportDetails.read[Seq[TransportDetailsModel]](strictReadSeq)
-    } yield {
-      GetMovementResponse(
-        arc = arc,
-        sequenceNumber = sequenceNumber,
-        destinationType = destinationTypeCode,
-        memberStateCode = memberStateCode,
-        serialNumberOfCertificateOfExemption = serialNumberOfCertificateOfExemption,
-        consignorTrader = consignorTrader,
-        consigneeTrader = consigneeTrader,
-        deliveryPlaceTrader = deliveryPlaceTrader,
-        placeOfDispatchTrader = placeOfDispatchTrader,
-        transportArrangerTrader = transportArrangerTrader,
-        firstTransporterTrader = firstTransporterTrader,
-        dispatchImportOfficeReferenceNumber = dispatchImportOfficeReferenceNumber,
-        deliveryPlaceCustomsOfficeReferenceNumber = deliveryPlaceCustomsOfficeReferenceNumber,
-        competentAuthorityDispatchOfficeReferenceNumber = competentAuthorityDispatchOfficeReferenceNumber,
-        localReferenceNumber = localReferenceNumber,
-        eadStatus = eadStatus,
-        dateAndTimeOfValidationOfEadEsad = dateAndTimeOfValidationOfEadEsad,
-        dateOfDispatch = dateOfDispatch,
-        journeyTime = journeyTime,
-        documentCertificate = documentCertificate,
-        eadEsad = eadEsad,
-        headerEadEsad = headerEadEsad,
-        transportMode = transportMode,
-        movementGuarantee = movementGuarantee,
-        items = items,
-        numberOfItems = numberOfItems,
-        transportDetails = transportDetails
-      )
+  implicit lazy val xmlReader: XmlReader[GetMovementResponse] = {
+    /*
+     * This function uses the following Cats-inspired functions:
+     * - map27:         In Scala 2 (which this is currently being written in), Tuples can only be 22 elements long, however GetMovementResponse has more than 22 fields.
+     *                  This means that Cats's `.mapN` functions won't work, so a custom `map27` function was made, which takes a Tuple22 and a Tuple5 and squashes them together.
+     *                  Therefore, we can take advantage of lucidchart returning all parsing errors rather than just the first one, which would've been the alternative option (using for-comprehensions which fail fast).
+     *
+     * */
+    (
+      arc.read[String],
+      memberStateCode.read[Option[String]],
+      serialNumberOfCertificateOfExemption.read[Option[String]],
+      consignorTrader.read[TraderModel](TraderModel.xmlReads(ConsignorTrader)),
+      consigneeTrader.read[Option[TraderModel]](TraderModel.xmlReads(ConsigneeTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
+      deliveryPlaceTrader.read[Option[TraderModel]](TraderModel.xmlReads(DeliveryPlaceTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
+      placeOfDispatchTrader.read[Option[TraderModel]](TraderModel.xmlReads(PlaceOfDispatchTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
+      transportArrangerTrader.read[Option[TraderModel]](TraderModel.xmlReads(TransportTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
+      firstTransporterTrader.read[Option[TraderModel]](TraderModel.xmlReads(TransportTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
+      dispatchImportOfficeReferenceNumber.read[Option[String]],
+      deliveryPlaceCustomsOfficeReferenceNumber.read[Option[String]],
+      competentAuthorityDispatchOfficeReferenceNumber.read[Option[String]],
+      eadStatus.read[String],
+      dateAndTimeOfValidationOfEadEsad.read[String],
+      documentCertificate.read[Seq[DocumentCertificateModel]](strictReadSeq(DocumentCertificateModel.xmlReads)).seqToOptionSeq,
+      eadEsad.read[EadEsadModel],
+      headerEadEsad.read[HeaderEadEsadModel],
+      transportMode.read[TransportModeModel],
+      movementGuarantee.read[MovementGuaranteeModel],
+      items.read[Seq[MovementItem]](strictReadSeq),
+      numberOfItems.read[Seq[String]](strictReadSeq).map(_.length),
+      transportDetails.read[Seq[TransportDetailsModel]](strictReadSeq)
+    ).mapN {
+      case (
+            arc,
+            memberStateCode,
+            serialNumberOfCertificateOfExemption,
+            consignorTrader,
+            consigneeTrader,
+            deliveryPlaceTrader,
+            placeOfDispatchTrader,
+            transportArrangerTrader,
+            firstTransporterTrader,
+            dispatchImportOfficeReferenceNumber,
+            deliveryPlaceCustomsOfficeReferenceNumber,
+            competentAuthorityDispatchOfficeReferenceNumber,
+            eadStatus,
+            dateAndTimeOfValidationOfEadEsad,
+            documentCertificate,
+            eadEsad,
+            headerEadEsad,
+            transportMode,
+            movementGuarantee,
+            items,
+            numberOfItems,
+            transportDetails) =>
+        GetMovementResponse(
+          arc = arc,
+          sequenceNumber = headerEadEsad.sequenceNumber,
+          destinationType = headerEadEsad.destinationType,
+          memberStateCode = memberStateCode,
+          serialNumberOfCertificateOfExemption = serialNumberOfCertificateOfExemption,
+          consignorTrader = consignorTrader,
+          consigneeTrader = consigneeTrader,
+          deliveryPlaceTrader = deliveryPlaceTrader,
+          placeOfDispatchTrader = placeOfDispatchTrader,
+          transportArrangerTrader = transportArrangerTrader,
+          firstTransporterTrader = firstTransporterTrader,
+          dispatchImportOfficeReferenceNumber = dispatchImportOfficeReferenceNumber,
+          deliveryPlaceCustomsOfficeReferenceNumber = deliveryPlaceCustomsOfficeReferenceNumber,
+          competentAuthorityDispatchOfficeReferenceNumber = competentAuthorityDispatchOfficeReferenceNumber,
+          localReferenceNumber = eadEsad.localReferenceNumber,
+          eadStatus = eadStatus,
+          dateAndTimeOfValidationOfEadEsad = dateAndTimeOfValidationOfEadEsad,
+          dateOfDispatch = eadEsad.dateOfDispatch,
+          journeyTime = headerEadEsad.journeyTime,
+          documentCertificate = documentCertificate,
+          eadEsad = eadEsad,
+          headerEadEsad = headerEadEsad,
+          transportMode = transportMode,
+          movementGuarantee = movementGuarantee,
+          items = items,
+          numberOfItems = numberOfItems,
+          transportDetails = transportDetails
+        )
     }
+  }
 
   implicit lazy val reads: Reads[GetMovementResponse] = for {
     arc                                             <- (__ \ "arc").read[String]

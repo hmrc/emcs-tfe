@@ -22,6 +22,7 @@ import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
 import uk.gov.hmrc.emcstfe.models.response.Packaging
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse.EADESADContainer
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.XML
@@ -647,7 +648,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |           </body:ComplementConsigneeTrader>
             |						<urn:ExciseMovement>
             |							<urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
-            |							<urn:DateAndTimeOfValidationOfEad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEad>
+            |							<urn:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEadEsad>
             |						</urn:ExciseMovement>
             |						<urn:ConsignorTrader language="en">
             |							${maxTraderModelXML(ConsignorTrader)}
@@ -774,7 +775,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |           </body:ComplementConsigneeTrader>
             |						<urn:ExciseMovement>
             |							<urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
-            |							<urn:DateAndTimeOfValidationOfEad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEad>
+            |							<urn:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</urn:DateAndTimeOfValidationOfEadEsad>
             |						</urn:ExciseMovement>
             |						<urn:ConsignorTrader language="en">
             |							${maxTraderModelXML(ConsignorTrader)}
@@ -868,7 +869,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |		</mov:currentMovement>
             |	</mov:movementView>""".stripMargin)
 
-        GetMovementResponse.xmlReader.read(noLrnXML) shouldBe ParseFailure(EmptyError(GetMovementResponse.localReferenceNumber))
+        GetMovementResponse.xmlReader.read(noLrnXML) shouldBe ParseFailure(EmptyError(EADESADContainer \ "EadEsad" \\ "LocalReferenceNumber"))
       }
 
       "missing dateOfDispatch" in {
@@ -994,7 +995,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |		</mov:currentMovement>
             |	</mov:movementView>""".stripMargin)
 
-        GetMovementResponse.xmlReader.read(noDateOfDispatchXML) shouldBe ParseFailure(EmptyError(GetMovementResponse.dateOfDispatch))
+        GetMovementResponse.xmlReader.read(noDateOfDispatchXML) shouldBe ParseFailure(EmptyError(EADESADContainer \ "EadEsad" \\ "DateOfDispatch"))
       }
 
       "missing journeyTime" in {

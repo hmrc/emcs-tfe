@@ -20,10 +20,13 @@ import com.lucidchart.open.xtract._
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
+import uk.gov.hmrc.emcstfe.models.common.Enumerable.EnumerableXmlParseFailure
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse.EADESADContainer
 
 import scala.xml.XML
 
@@ -86,13 +89,19 @@ class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMove
 
           result shouldBe Left(XmlParseError(Seq(
             EmptyError(GetMovementResponse.arc),
-            // TODO: figure out how to get all errors rather than just the first
-//            EmptyError(GetMovementResponse.sequenceNumber),
-//            EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
-//            EmptyError(GetMovementResponse.localReferenceNumber),
-//            EmptyError(GetMovementResponse.eadStatus),
-//            EmptyError(GetMovementResponse.dateOfDispatch),
-//            JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''")
+            EmptyError(GetMovementResponse.eadStatus),
+            EmptyError(EADESADContainer \ "ExciseMovement" \ "DateAndTimeOfValidationOfEadEsad"),
+            EmptyError(EADESADContainer \ "EadEsad" \\ "LocalReferenceNumber"),
+            EmptyError(EADESADContainer \ "EadEsad" \\ "InvoiceNumber"),
+            EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
+            EmptyError(EADESADContainer \ "EadEsad" \\ "DateOfDispatch"),
+            EmptyError(EADESADContainer \ "HeaderEadEsad" \\ "SequenceNumber"),
+            EmptyError(EADESADContainer \ "HeaderEadEsad" \\ "DateAndTimeOfUpdateValidation"),
+            EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
+            JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''"),
+            EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
+            EmptyError(EADESADContainer \ "TransportMode" \\ "TransportModeCode"),
+            EnumerableXmlParseFailure(s"Invalid enumerable value of ''")
           )))
         }
       }
