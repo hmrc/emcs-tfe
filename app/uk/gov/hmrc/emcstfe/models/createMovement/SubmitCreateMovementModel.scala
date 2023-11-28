@@ -23,7 +23,7 @@ import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import scala.xml.Elem
 
-case class CreateMovementModel(
+case class SubmitCreateMovementModel(
                                 movementType: MovementType,
                                 attributes: AttributesModel,
                                 consigneeTrader: Option[TraderModel],
@@ -42,7 +42,7 @@ case class CreateMovementModel(
                                 movementGuarantee: MovementGuaranteeModel,
                                 bodyEadEsad: Seq[BodyEadEsadModel],
                                 eadEsadDraft: EadEsadDraftModel,
-                                transportDetails: Seq[TransportDetailsModel],
+                                transportDetails: Seq[TransportDetailsModel]
                               ) extends XmlBaseModel with XmlWriterUtils {
   def toXml(implicit request: UserRequest[_]): Elem = <urn:SubmittedDraftOfEADESAD>
     {attributes.toXml}
@@ -66,6 +66,6 @@ case class CreateMovementModel(
   </urn:SubmittedDraftOfEADESAD>
 }
 
-object CreateMovementModel {
-  implicit val fmt: OFormat[CreateMovementModel] = Json.format
+object SubmitCreateMovementModel {
+  implicit val fmt: OFormat[SubmitCreateMovementModel] = Json.format
 }

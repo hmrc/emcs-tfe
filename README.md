@@ -206,7 +206,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **`POST`** /create-movement/:ern/:arc</summary>
 
-**Request Body**: [CreateMovement Model](app/uk/gov/hmrc/emcstfe/models/createMovement/CreateMovementModel.scala)
+**Request Body**: [CreateMovement Model](app/uk/gov/hmrc/emcstfe/models/createMovement/SubmitCreateMovementModel.scala)
 
 ### Responses
 

@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import org.scalamock.handlers.CallHandler4
+import org.scalamock.handlers.CallHandler5
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.createMovement.CreateMovementModel
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitCreateMovementService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -32,9 +32,13 @@ trait MockSubmitCreateMovementService extends MockFactory  {
   lazy val mockService: SubmitCreateMovementService = mock[SubmitCreateMovementService]
 
   object MockService extends Matchers {
-    def submit(submission: CreateMovementModel): CallHandler4[CreateMovementModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
-      (mockService.submit(_: CreateMovementModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(submission, *, *, *)
+    def submit(submission: SubmitCreateMovementModel, draftId: String): CallHandler5[SubmitCreateMovementModel, String, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
+      (mockService.submit(_: SubmitCreateMovementModel, _: String)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(submission, draftId, *, *, *)
+
+    def submitViaEIS(submission: SubmitCreateMovementModel, draftId: String): CallHandler5[SubmitCreateMovementModel, String, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
+      (mockService.submitViaEIS(_: SubmitCreateMovementModel, _: String)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
+        .expects(submission, draftId, *, *, *)
   }
 }
 

@@ -41,7 +41,8 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient
+      messageRecipient = messageRecipient,
+      messageIdentifier = messageUUID.toString
     ).toString()
 
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitexplaindelaytodeliveryportal"
@@ -55,7 +56,8 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient
+      messageRecipient = messageRecipient,
+      messageIdentifier = messageUUID.toString
     ).toString()
   }
 

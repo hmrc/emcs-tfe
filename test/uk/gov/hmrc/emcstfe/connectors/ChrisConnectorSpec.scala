@@ -190,7 +190,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
   "submitCreateMovementChrisSOAPRequest" should {
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax)
+    val submitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
 
     "return a Right" when {
       "downstream call is successful" in new Test {

@@ -16,17 +16,22 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType._
-import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementType}
 import uk.gov.hmrc.emcstfe.models.common.MovementType._
-import uk.gov.hmrc.emcstfe.models.createMovement.CreateMovementModel
+import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementType}
+import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
-case class SubmitCreateMovementRequest(body: CreateMovementModel)
-                                      (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope {
+import java.util.Base64
+
+case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId: String)
+                                      (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
+  private val messageNumber = 815
 
   val messageRecipient = Constants.NDEA ++ messageRecipientCountryCode()
   val messageSender: String = Constants.NDEA ++ messageSenderCountryCode().getOrElse(Constants.GB)
@@ -40,7 +45,8 @@ case class SubmitCreateMovementRequest(body: CreateMovementModel)
       body = body,
       messageNumber = 815,
       messageSender = messageSender,
-      messageRecipient = messageRecipient
+      messageRecipient = messageRecipient,
+      messageIdentifier = draftId
     ).toString()
 
   override def metricName = "create-movement"
@@ -74,4 +80,22 @@ case class SubmitCreateMovementRequest(body: CreateMovementModel)
       case _ =>
         body.consignorTrader.countryCode
     }
+
+  override def eisXMLBody(): String = {
+    withEisMessage(
+      body = body,
+      messageNumber = messageNumber,
+      messageSender = messageSender,
+      messageRecipient = messageRecipient,
+      messageIdentifier = draftId
+    ).toString()
+  }
+
+  override def toJson: JsValue = {
+    Json.obj(
+      "user" -> exciseRegistrationNumber,
+      "messageType" -> s"IE$messageNumber",
+      "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
+    )
+  }
 }

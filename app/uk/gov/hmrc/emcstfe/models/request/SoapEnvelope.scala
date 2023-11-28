@@ -26,7 +26,8 @@ trait SoapEnvelope { _: ChrisRequest =>
   def withSoapEnvelope[T <: XmlBaseModel](body: T,
                                           messageNumber: Int,
                                           messageSender: String,
-                                          messageRecipient: String)(implicit request: UserRequest[_]): Elem =
+                                          messageRecipient: String,
+                                          messageIdentifier: String)(implicit request: UserRequest[_]): Elem =
     XML.loadString(
       s"""<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
          |  <soapenv:Header>
@@ -62,7 +63,7 @@ trait SoapEnvelope { _: ChrisRequest =>
          |          ${preparedTime.toString}
          |        </urn1:TimeOfPreparation>
          |        <urn1:MessageIdentifier>
-         |          $messageUUID
+         |          $messageIdentifier
          |        </urn1:MessageIdentifier>
          |        <urn1:CorrelationIdentifier>
          |          $legacyCorrelationUUID

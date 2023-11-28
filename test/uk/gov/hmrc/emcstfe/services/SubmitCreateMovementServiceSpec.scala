@@ -18,40 +18,65 @@ package uk.gov.hmrc.emcstfe.services
 
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlValidationError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
 class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures {
-  trait Test extends MockChrisConnector {
+  trait Test extends MockChrisConnector with MockEisConnector {
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax)
-    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector)
+    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
+    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector)
   }
 
   "submit" should {
-    "return a Right" when {
-      "connector call is successful and XML is the correct format" in new Test {
 
-        MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-          Future.successful(Right(chrisSuccessResponse))
-        )
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in new Test {
 
-        await(service.submit(CreateMovementFixtures.createMovementModelMax)) shouldBe Right(chrisSuccessResponse)
+          MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
+            Future.successful(Right(chrisSuccessResponse))
+          )
+
+          await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(chrisSuccessResponse)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in new Test {
+
+          MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
+            Future.successful(Left(XmlValidationError))
+          )
+
+          await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(XmlValidationError)
+        }
       }
     }
+
+  "submitViaEIS" should {
+    "return a Right" when {
+      "connector call is successful and Json is the correct format" in new Test {
+
+        MockEisConnector.submit(submitCreateMovementRequest).returns(
+          Future.successful(Right(eisSuccessResponse))
+        )
+
+        await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(eisSuccessResponse)
+      }
+    }
+
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
 
-        MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-          Future.successful(Left(XmlValidationError))
+        MockEisConnector.submit(submitCreateMovementRequest).returns(
+          Future.successful(Left(EISUnknownError("Downstream failed to respond")))
         )
 
-        await(service.submit(CreateMovementFixtures.createMovementModelMax)) shouldBe Left(XmlValidationError)
+        await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
       }
     }
   }

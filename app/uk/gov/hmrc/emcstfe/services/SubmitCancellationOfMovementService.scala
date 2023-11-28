@@ -28,12 +28,12 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitCancellationOfMovementService @Inject()(connector: ChrisConnector, eisConnector: EisConnector) extends Logging {
+class SubmitCancellationOfMovementService @Inject()(chrisConnector: ChrisConnector, eisConnector: EisConnector) extends Logging {
   def submit(submission: SubmitCancellationOfMovementModel)
             (implicit hc: HeaderCarrier,
              ec: ExecutionContext,
              request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    connector.submitCancellationOfMovementChrisSOAPRequest[ChRISSuccessResponse](SubmitCancellationOfMovementRequest(submission))
+    chrisConnector.submitCancellationOfMovementChrisSOAPRequest[ChRISSuccessResponse](SubmitCancellationOfMovementRequest(submission))
 
   def submitViaEIS(submission: SubmitCancellationOfMovementModel)
                   (implicit hc: HeaderCarrier,

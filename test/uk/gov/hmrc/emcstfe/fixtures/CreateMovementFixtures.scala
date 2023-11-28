@@ -28,7 +28,8 @@ trait CreateMovementFixtures extends BaseFixtures
   with TraderModelFixtures
   with MovementGuaranteeFixtures
   with TransportDetailsFixtures
-  with ChRISResponsesFixture {
+  with ChRISResponsesFixture
+  with EISResponsesFixture {
 
   object CaMAttributesFixtures {
     lazy val attributesModelMax: AttributesModel = AttributesModel(
@@ -417,7 +418,7 @@ trait CreateMovementFixtures extends BaseFixtures
     import HeaderEadEsadFixtures._
     import OfficeFixtures._
     import TransportModeFixtures._
-    lazy val createMovementModelMax: CreateMovementModel = CreateMovementModel(
+    lazy val createMovementModelMax: SubmitCreateMovementModel = SubmitCreateMovementModel(
       movementType = UKtoUK,
       attributes = attributesModelMax,
       consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
@@ -438,7 +439,7 @@ trait CreateMovementFixtures extends BaseFixtures
       eadEsadDraft = eadEsadDraftModelMax,
       transportDetails = Seq(maxTransportDetailsModel)
     )
-    lazy val createMovementModelMin: CreateMovementModel = CreateMovementModel(
+    lazy val createMovementModelMin: SubmitCreateMovementModel = SubmitCreateMovementModel(
       movementType = UKtoUK,
       attributes = attributesModelMin,
       consigneeTrader = None,
@@ -460,7 +461,7 @@ trait CreateMovementFixtures extends BaseFixtures
       transportDetails = Seq(maxTransportDetailsModel)
     )
 
-    lazy val createMovementModelMultipleCountryCodes: CreateMovementModel = CreateMovementModel(
+    lazy val createMovementModelMultipleCountryCodes: SubmitCreateMovementModel = SubmitCreateMovementModel(
       movementType = UKtoUK,
       attributes = attributesModelMax,
       consigneeTrader = Some(maxTraderModel(ConsignorTrader).copy(traderExciseNumber = Some("CT000001"))),
