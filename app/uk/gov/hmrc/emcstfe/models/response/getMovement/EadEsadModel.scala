@@ -39,7 +39,7 @@ object EadEsadModel extends XmlReaderUtils {
     (__ \\ "LocalReferenceNumber").read[String],
     (__ \\ "InvoiceNumber").read[String],
     (__ \\ "InvoiceDate").read[Option[String]],
-    (__ \\ "OriginTypeCode").read[OriginType](OriginType.xmlReads(OriginType.enumerable)),
+    (__ \\ "OriginTypeCode").read[OriginType](OriginType.xmlReads("EadEsad/OriginTypeCode")(OriginType.enumerable)),
     (__ \\ "DateOfDispatch").read[String],
     (__ \\ "TimeOfDispatch").read[Option[String]],
     (__ \\ "UpstreamArc").read[Option[String]],

@@ -43,7 +43,7 @@ case class MovementGuaranteeModel(
 object MovementGuaranteeModel extends XmlReaderUtils {
 
   implicit val xmlReads: XmlReader[MovementGuaranteeModel] = (
-    (__ \\ "GuarantorTypeCode").read[GuarantorType](GuarantorType.xmlReads(GuarantorType.enumerable)),
+    (__ \\ "GuarantorTypeCode").read[GuarantorType](GuarantorType.xmlReads("MovementGuarantee/GuarantorTypeCode")(GuarantorType.enumerable)),
     (__ \\ "GuarantorTrader").read[Seq[TraderModel]](strictReadSeq(TraderModel.xmlReads(GuarantorTrader))).seqToOptionSeq
   ).mapN(MovementGuaranteeModel.apply)
 

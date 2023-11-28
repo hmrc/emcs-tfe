@@ -93,15 +93,15 @@ class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMove
             EmptyError(EADESADContainer \ "ExciseMovement" \ "DateAndTimeOfValidationOfEadEsad"),
             EmptyError(EADESADContainer \ "EadEsad" \\ "LocalReferenceNumber"),
             EmptyError(EADESADContainer \ "EadEsad" \\ "InvoiceNumber"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
+            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'EadEsad/OriginTypeCode'"),
             EmptyError(EADESADContainer \ "EadEsad" \\ "DateOfDispatch"),
             EmptyError(EADESADContainer \ "HeaderEadEsad" \\ "SequenceNumber"),
             EmptyError(EADESADContainer \ "HeaderEadEsad" \\ "DateAndTimeOfUpdateValidation"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
+            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'HeaderEadEsad/DestinationTypeCode'"),
             JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of ''"),
+            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'HeaderEadEsad/TransportArrangement'"),
             EmptyError(EADESADContainer \ "TransportMode" \\ "TransportModeCode"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of ''")
+            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'MovementGuarantee/GuarantorTypeCode'")
           )))
         }
       }

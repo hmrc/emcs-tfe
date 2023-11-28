@@ -46,7 +46,7 @@ class EnumerableSpec extends TestBaseSpec with Enumerable.Implicits {
     case class TestClass(beans: Int)
 
     implicit val xmlReader: XmlReader[TestClass] =
-      (XPath \\ "Beans").read[Int](xmlReads(enumerable)).map(TestClass)
+      (XPath \\ "Beans").read[Int](xmlReads("Beans")(enumerable)).map(TestClass)
 
     "input is valid" should {
       "return the result" in {
@@ -59,7 +59,7 @@ class EnumerableSpec extends TestBaseSpec with Enumerable.Implicits {
       "return an error" in {
         val xml = <Beans>c</Beans>
 
-        xmlReader.read(xml) shouldBe ParseFailure(Seq(EnumerableXmlParseFailure("Invalid enumerable value of 'c'")))
+        xmlReader.read(xml) shouldBe ParseFailure(Seq(EnumerableXmlParseFailure("Invalid enumerable value of 'c' for field 'Beans'")))
       }
     }
   }

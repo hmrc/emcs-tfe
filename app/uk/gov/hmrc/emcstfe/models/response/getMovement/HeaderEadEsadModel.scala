@@ -34,9 +34,9 @@ object HeaderEadEsadModel {
   implicit val xmlReads: XmlReader[HeaderEadEsadModel] = (
     (__ \\ "SequenceNumber").read[Int],
     (__ \\ "DateAndTimeOfUpdateValidation").read[String],
-    (__ \\ "DestinationTypeCode").read[DestinationType](DestinationType.xmlReads(DestinationType.enumerable)),
+    (__ \\ "DestinationTypeCode").read[DestinationType](DestinationType.xmlReads("HeaderEadEsad/DestinationTypeCode")(DestinationType.enumerable)),
     (__ \\ "JourneyTime").read[JourneyTime](JourneyTime.xmlReads).map(_.toString),
-    (__ \\ "TransportArrangement").read[TransportArrangement](TransportArrangement.xmlReads(TransportArrangement.enumerable))
+    (__ \\ "TransportArrangement").read[TransportArrangement](TransportArrangement.xmlReads("HeaderEadEsad/TransportArrangement")(TransportArrangement.enumerable))
   ).mapN(HeaderEadEsadModel.apply)
 
   implicit val fmt: OFormat[HeaderEadEsadModel] = Json.format

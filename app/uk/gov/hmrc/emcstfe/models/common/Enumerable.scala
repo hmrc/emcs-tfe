@@ -35,10 +35,10 @@ object Enumerable {
 
   trait Implicits {
 
-    implicit def xmlReads[A](implicit ev: Enumerable[A]): XmlReader[A] = (xml: NodeSeq) => {
+    implicit def xmlReads[A](field: String)(implicit ev: Enumerable[A]): XmlReader[A] = (xml: NodeSeq) => {
       ev.withName(xml.text) match {
         case Some(value) => ParseSuccess(value)
-        case None => ParseFailure(EnumerableXmlParseFailure(s"Invalid enumerable value of '${xml.text}'"))
+        case None => ParseFailure(EnumerableXmlParseFailure(s"Invalid enumerable value of '${xml.text}' for field '$field'"))
       }
     }
 
