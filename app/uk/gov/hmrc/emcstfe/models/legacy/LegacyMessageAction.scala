@@ -103,7 +103,7 @@ object LegacyMessageAction {
       case Some(regex("MarkMessagesAsRead")) => Right(MarkMessagesAsRead)
       case Some(regex("SetMessageAsLogicallyDeleted")) => Right(SetMessageAsLogicallyDeleted)
       case Some(regex("GetSubmissionFailureMessage")) => Right(GetSubmissionFailureMessage)
-      case Some(regex("GetMovement")) => Right(GetMovement)
+      case Some(regex("GetMovement" | "GetMovementIfChanged")) => Right(GetMovement)
       case Some(regex(a)) => Left(ErrorResponse.InvalidLegacyActionProvided(a))
       case _ => Left(ErrorResponse.NoLegacyActionProvided)
     }

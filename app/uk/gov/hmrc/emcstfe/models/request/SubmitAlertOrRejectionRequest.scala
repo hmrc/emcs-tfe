@@ -40,8 +40,7 @@ case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel)
     body = body,
     messageNumber = messageNumber,
     messageSender = messageSender,
-    messageRecipient = messageRecipient,
-    messageIdentifier = messageUUID.toString
+    messageRecipient = messageRecipient
   ).toString()
 
   override def action: String = "http://www.hmrc.gov.uk/emcs/SubmitAlertOrRejectionMovementPortal"
@@ -55,8 +54,7 @@ case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel)
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      messageIdentifier = messageUUID.toString
+      messageRecipient = messageRecipient
     ).toString()
   }
 

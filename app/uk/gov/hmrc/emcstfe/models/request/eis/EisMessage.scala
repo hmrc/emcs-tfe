@@ -27,8 +27,7 @@ trait EisMessage {
   def withEisMessage[T <: XmlBaseModel](body: T,
                                         messageNumber: Int,
                                         messageSender: String,
-                                        messageRecipient: String,
-                                        messageIdentifier: String)(implicit request: UserRequest[_]): Elem = {
+                                        messageRecipient: String)(implicit request: UserRequest[_]): Elem = {
     controlDocument(
       XML.loadString(
         s"""<urn:IE$messageNumber xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE$messageNumber:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
@@ -46,7 +45,7 @@ trait EisMessage {
            |      ${preparedTime.toString}
            |    </urn1:TimeOfPreparation>
            |    <urn1:MessageIdentifier>
-           |      $messageIdentifier
+           |      $messageUUID
            |    </urn1:MessageIdentifier>
            |    <urn1:CorrelationIdentifier>
            |      $correlationUUID

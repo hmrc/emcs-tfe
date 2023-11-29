@@ -56,8 +56,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      messageIdentifier = messageUUID.toString
+      messageRecipient = messageRecipient
     ).toString()
 
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitreportofreceiptportal"
@@ -71,8 +70,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      messageIdentifier = messageUUID.toString
+      messageRecipient = messageRecipient
     ).toString()
   }
 
