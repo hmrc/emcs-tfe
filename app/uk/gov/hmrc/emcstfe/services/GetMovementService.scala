@@ -46,10 +46,12 @@ class GetMovementService @Inject()(
   def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(getMovementRequest.arc).flatMap {
       case Some(value) =>
-        logger.info("[getMovement] Matching movement found, calling GetMovementIfChanged")
+        logger.info("[getMovement] Matching movement found")
         if (forceFetchNew) {
+          logger.info("[getMovement] GetMovementIfChanged")
           getMovementIfChanged(getMovementRequest, value)
         } else {
+          logger.info("[getMovement] generateGetMovementResponse from cached movement")
           Future.successful(generateGetMovementResponse(value.data))
         }
       case None =>

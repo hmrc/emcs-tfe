@@ -31,3 +31,7 @@ lazy val microservice = Project("emcs-tfe", file("."))
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
   .settings(PlayKeys.playDefaultPort := 8311)
+
+  // https://github.com/hmrc/bootstrap-play#mdc-logging
+  //.enablePlugins(PlayNettyServer)
+  //.settings(PlayKeys.devSettings += "play.server.provider" -> "play.core.server.NettyServerProvider")

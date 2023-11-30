@@ -25,6 +25,7 @@ import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.play.http.logging.Mdc
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -88,24 +89,28 @@ class BaseUserAnswersRepositoryImpl(collectionName: String,
       .map(_ => true)
 
   def get(ern: String, arc: String): Future[Option[UserAnswers]] =
-    collection.findOneAndUpdate(
-      filter = by(ern, arc),
-      update = Updates.set("lastUpdated", time.instant()),
-      options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
-    ).headOption()
+    Mdc.preservingMdc(
+      collection.findOneAndUpdate(
+        filter = by(ern, arc),
+        update = Updates.set("lastUpdated", time.instant()),
+        options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
+      ).headOption()
+    )
 
   def set(answers: UserAnswers): Future[Boolean] = {
 
     val updatedAnswers = answers copy (lastUpdated = time.instant())
 
-    collection
-      .replaceOne(
-        filter = by(updatedAnswers.ern, updatedAnswers.arc),
-        replacement = updatedAnswers,
-        options = ReplaceOptions().upsert(true)
-      )
-      .toFuture()
-      .map(_ => true)
+    Mdc.preservingMdc(
+      collection
+        .replaceOne(
+          filter = by(updatedAnswers.ern, updatedAnswers.arc),
+          replacement = updatedAnswers,
+          options = ReplaceOptions().upsert(true)
+        )
+        .toFuture()
+        .map(_ => true)
+    )
   }
 
   def clear(ern: String, arc: String): Future[Boolean] =
