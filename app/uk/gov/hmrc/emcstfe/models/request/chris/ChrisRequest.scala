@@ -29,5 +29,5 @@ trait ChrisRequest extends BaseRequest {
 
   def metricName: String
 
-  val legacyCorrelationUUID: String = s"PORTAL${correlationUUID.toString.replace("-","")}"
+  lazy val legacyCorrelationUUID: String = s"PORTAL${correlationUUID.replace("-","")}"
 }

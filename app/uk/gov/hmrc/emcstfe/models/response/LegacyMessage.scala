@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.fixtures
+package uk.gov.hmrc.emcstfe.models.response
 
-import java.time.LocalDate
-import scala.xml.{Node, NodeSeq, PCData}
+import scala.xml.{NodeSeq, PCData}
 
-trait BaseFixtures {
+trait LegacyMessage {
 
-  val testErn = "GBWK000001234"
-  val testArc: String = "23GB00000000000376967"
-  val testLrn: String = "LRN"
-  val testMessageId = "1234"
-  val testDraftId: String = "1234-5678-9012"
-  val testCredId = "cred1234567891"
-  val testInternalId = "int1234567891"
-  val testDestinationOffice = "GB1234"
-
-  val now: String = LocalDate.now().toString
-
-  def soapEnvelope(node: NodeSeq): Node = <env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  private def soapEnvelope(node: NodeSeq): NodeSeq = <env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <env:Body>
       <con:Control xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
         <con:MetaData>
@@ -42,19 +30,23 @@ trait BaseFixtures {
         </con:MetaData>
         <con:OperationResponse>
           <con:Results>
-            {node}
+            { node }
           </con:Results>
         </con:OperationResponse>
       </con:Control>
     </env:Body>
   </env:Envelope>
 
-  def schemaResultBody(nodeSeq: NodeSeq): NodeSeq = <con:Result Name="schema">
+  protected def schemaResultBody(nodeSeq: NodeSeq): NodeSeq = <con:Result Name="schema">
     {PCData(nodeSeq.toString())}
   </con:Result>
 
-  def recordsAffectedBody(records: Int): NodeSeq = <con:Result Name="recordsAffected">
+  protected def recordsAffectedBody(records: Int): NodeSeq = <con:Result Name="recordsAffected">
     {records}
   </con:Result>
+
+  protected def xmlBody: NodeSeq
+
+  def toXml: NodeSeq = soapEnvelope(xmlBody)
 
 }

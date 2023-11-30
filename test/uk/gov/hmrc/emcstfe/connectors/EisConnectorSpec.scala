@@ -1225,6 +1225,59 @@ class EisConnectorSpec extends TestBaseSpec
       }
     }
 
+    "getRawMovement is called" should {
+      val getMovementRequest = GetMovementRequest(testErn, testArc, Some(1))
+      val  url = "/emcs/movements/v1/movement"
+      "return a right" when {
+        "when downstream call is successful" in new Test {
+          MockMetricsService.requestTimer(getMovementRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl$url",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc,
+              "sequencenumber" -> "1"
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(Right(getRawMovementResponse)))
+
+          await(connector.getRawMovement(getMovementRequest)) shouldBe Right(getRawMovementResponse)
+        }
+      }
+      "return a left" when {
+        "downstream call returns a left" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(getMovementRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl$url",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc,
+              "sequencenumber" -> "1"
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementRequest.correlationUUID.toString,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE"
+            )
+          ).returns(Future.successful(response))
+
+          await(connector.getRawMovement(getMovementRequest)) shouldBe response
+        }
+      }
+    }
   }
 
 }

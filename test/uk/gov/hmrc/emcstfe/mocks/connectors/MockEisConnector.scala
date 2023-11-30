@@ -22,9 +22,9 @@ import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
-import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
-import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmissionFailureMessageResponse
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMessageStatisticsResponse, MarkMessageAsReadResponse, SetMessageAsLogicallyDeletedResponse}
+import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, RawGetMessagesResponse}
+import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.{GetSubmissionFailureMessageResponse, RawGetSubmissionFailureMessageResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMessageStatisticsResponse, MarkMessageAsReadResponse, RawGetMovementResponse, SetMessageAsLogicallyDeletedResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,6 +45,11 @@ trait MockEisConnector extends MockFactory {
         .expects(request, *, *, *)
     }
 
+    def getRawMessages(request: GetMessagesRequest): CallHandler4[GetMessagesRequest, HeaderCarrier, ExecutionContext, Reads[RawGetMessagesResponse], Future[Either[ErrorResponse, RawGetMessagesResponse]]] = {
+      (mockEisConnector.getRawMessages(_: GetMessagesRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[RawGetMessagesResponse]))
+        .expects(request, *, *, *)
+    }
+
     def getMessageStatistics(request: GetMessageStatisticsRequest): CallHandler4[GetMessageStatisticsRequest, HeaderCarrier, ExecutionContext, Reads[GetMessageStatisticsResponse], Future[Either[ErrorResponse, GetMessageStatisticsResponse]]] = {
       (mockEisConnector.getMessageStatistics(_: GetMessageStatisticsRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetMessageStatisticsResponse]))
         .expects(request, *, *, *)
@@ -55,6 +60,11 @@ trait MockEisConnector extends MockFactory {
         .expects(request, *, *, *)
     }
 
+    def getRawSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest): CallHandler4[GetSubmissionFailureMessageRequest, HeaderCarrier, ExecutionContext, Reads[RawGetSubmissionFailureMessageResponse], Future[Either[ErrorResponse, RawGetSubmissionFailureMessageResponse]]] = {
+      (mockEisConnector.getRawSubmissionFailureMessage(_: GetSubmissionFailureMessageRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[RawGetSubmissionFailureMessageResponse]))
+        .expects(request, *, *, *)
+    }
+
     def markMessageAsRead(request: MarkMessageAsReadRequest): CallHandler4[MarkMessageAsReadRequest, HeaderCarrier, ExecutionContext, Reads[MarkMessageAsReadResponse], Future[Either[ErrorResponse, MarkMessageAsReadResponse]]] = {
       (mockEisConnector.markMessageAsRead(_: MarkMessageAsReadRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[MarkMessageAsReadResponse]))
         .expects(request, *, *, *)
@@ -62,6 +72,11 @@ trait MockEisConnector extends MockFactory {
 
     def setMessageAsLogicallyDeleted(request: SetMessageAsLogicallyDeletedRequest): CallHandler4[SetMessageAsLogicallyDeletedRequest, HeaderCarrier, ExecutionContext, Reads[SetMessageAsLogicallyDeletedResponse], Future[Either[ErrorResponse, SetMessageAsLogicallyDeletedResponse]]] = {
       (mockEisConnector.setMessageAsLogicallyDeleted(_: SetMessageAsLogicallyDeletedRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[SetMessageAsLogicallyDeletedResponse]))
+        .expects(request, *, *, *)
+    }
+
+    def getRawMovement(request: GetMovementRequest): CallHandler4[GetMovementRequest, HeaderCarrier, ExecutionContext, Reads[RawGetMovementResponse], Future[Either[ErrorResponse, RawGetMovementResponse]]] = {
+      (mockEisConnector.getRawMovement(_: GetMovementRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[RawGetMovementResponse]))
         .expects(request, *, *, *)
     }
 

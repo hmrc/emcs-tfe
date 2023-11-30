@@ -71,4 +71,13 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
         }
     }
+
+  def checkForExistingDraft(ern: String, messageId: String): Action[AnyContent] =
+    authorisedUserRequest(ern) {
+      _ =>
+        createMovementUserAnswersService.get(ern, messageId) map {
+          case Right(draft) => Ok(Json.obj("draftExists" -> draft.isDefined))
+          case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
+        }
+    }
 }

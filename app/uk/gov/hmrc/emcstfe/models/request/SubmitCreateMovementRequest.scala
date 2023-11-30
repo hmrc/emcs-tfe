@@ -40,13 +40,14 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
 
   override def shouldExtractFromSoap: Boolean = false
 
+  override val correlationUUID: String = draftId
+
   override def requestBody: String =
     withSoapEnvelope(
       body = body,
       messageNumber = 815,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      messageIdentifier = draftId
+      messageRecipient = messageRecipient
     ).toString()
 
   override def metricName = "create-movement"
@@ -86,8 +87,7 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      messageIdentifier = draftId
+      messageRecipient = messageRecipient
     ).toString()
   }
 

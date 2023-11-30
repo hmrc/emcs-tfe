@@ -44,8 +44,7 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel)
       body = body,
       messageNumber = 813,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      messageIdentifier = messageUUID.toString
+      messageRecipient = messageRecipient
     ).toString()
 
   override def action: String = "http://www.hmrc.gov.uk/emcs/submitchangeofdestinationportal"

@@ -43,10 +43,10 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
 
     def setupStubs(): StubMapping
 
-    def request(): WSRequest = {
+    def request(url: String = uri): WSRequest = {
       await(mongoRepo.collection.deleteMany(Document()).toFuture())
       setupStubs()
-      buildRequest(uri)
+      buildRequest(url)
     }
   }
 
@@ -227,6 +227,65 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
           response.status shouldBe NO_CONTENT
 
           await(mongoRepo.get(testErn, testDraftId)) shouldBe None
+        }
+      }
+    }
+  }
+
+  s"GET /user-answers/create-movement/draft/$testErn/$testDraftId" when {
+    val draftUri: String = s"/user-answers/create-movement/draft/$testErn/$testDraftId"
+
+    "user is unauthenticated" must {
+      "return Forbidden" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.unauthorised()
+        }
+
+        val response: WSResponse = await(request(draftUri).get())
+
+        response.status shouldBe Status.FORBIDDEN
+      }
+    }
+
+    "user is authenticated but the ERN requested does not match the ERN of the credential" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised("WrongERN")
+      }
+
+      val response: WSResponse = await(request(draftUri).get())
+
+      response.status shouldBe Status.FORBIDDEN
+    }
+
+    "user is authorised" must {
+
+      s"return $OK (OK) and exists to false" when {
+        "no data exists in mongo" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
+
+          val response: WSResponse = await(request(draftUri).get())
+
+          response.status shouldBe OK
+          response.json shouldBe Json.obj("draftExists" -> false)
+        }
+      }
+
+      s"return $OK (OK) and exists to true" when {
+        "data exists in mongo" in new Test {
+          override def setupStubs(): StubMapping = {
+            await(mongoRepo.set(userAnswers)) shouldBe true
+            await(mongoRepo.get(testErn, testDraftId)).map(_.data) shouldBe Some(userAnswers.data)
+            AuthStub.authorised()
+          }
+
+          val response: WSResponse = await(request(draftUri).get())
+
+          response.status shouldBe OK
+          response.json shouldBe Json.obj("draftExists" -> true)
+
         }
       }
     }

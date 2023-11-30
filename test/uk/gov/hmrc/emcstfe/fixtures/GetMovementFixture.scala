@@ -20,7 +20,10 @@ import play.api.libs.json.{JsString, JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
-import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
+import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, RawGetMovementResponse, WineProduct}
+
+import java.util.Base64
+import scala.xml.XML
 
 trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
   lazy val getMovementResponseBody: String = s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
@@ -529,6 +532,11 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     ),
     numberOfItems = 2
   )
+
+  lazy val getRawMovementResponse: RawGetMovementResponse = RawGetMovementResponse("dateTime", testErn, XML.loadString(getMovementResponseBody))
+
+  lazy val getRawMovementJson: JsValue = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> Base64.getEncoder.encodeToString(getMovementResponseBody.getBytes))
+  lazy val getRawMovementInvalidJson: JsValue = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> getMovementResponseBody)
 
   lazy val getMovementJson: JsValue = Json.obj(fields =
     "arc" -> "13AB7778889991ABCDEF9",

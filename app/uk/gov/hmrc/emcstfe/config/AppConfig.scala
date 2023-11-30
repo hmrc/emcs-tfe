@@ -78,6 +78,9 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def eisGetSubmissionFailureMessageUrl(): String =
     eisBaseUrl + "/emcs/messages/v1/submission-failure-message"
 
+  def eisGetMovementUrl(): String =
+    eisBaseUrl + "/emcs/movements/v1/movement"
+
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
 

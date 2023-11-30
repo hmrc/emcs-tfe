@@ -286,7 +286,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
                   {request.preparedTime.toString}
                 </urn1:TimeOfPreparation>
                 <urn1:MessageIdentifier>
-                  {testDraftId}
+                  {request.messageUUID}
                 </urn1:MessageIdentifier>
                 <urn1:CorrelationIdentifier>
                   {request.legacyCorrelationUUID}
@@ -348,10 +348,10 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
                 {request.preparedTime.toString}
               </urn1:TimeOfPreparation>
               <urn1:MessageIdentifier>
-                {testDraftId}
+                {request.messageUUID}
               </urn1:MessageIdentifier>
               <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
+                {testDraftId}
               </urn1:CorrelationIdentifier>
             </urn:Header>
             <urn:Body>

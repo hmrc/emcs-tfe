@@ -27,8 +27,8 @@ trait BaseRequest {
 
   val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
   val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID: UUID = UUID.randomUUID()
-  val messageUUID: UUID = UUID.randomUUID()
+  val correlationUUID: String = UUID.randomUUID().toString
+  val messageUUID: String = UUID.randomUUID().toString
 
   def metricName: String
 
