@@ -27,6 +27,7 @@ import uk.gov.hmrc.emcstfe.utils.{Logging, TimeMachine}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.play.http.logging.Mdc
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -60,22 +61,27 @@ class GetMovementRepositoryImpl @Inject()(mongoComponent: MongoComponent,
     Filters.equal("arc", arc)
 
   def get(arc: String): Future[Option[GetMovementMongoResponse]] =
-    collection
-      .findOneAndUpdate(
-        filter = by(arc),
-        update = Updates.set("lastUpdated", time.instant()),
-        options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
-      )
-      .headOption()
+    Mdc.preservingMdc(
+      collection
+        .findOneAndUpdate(
+          filter = by(arc),
+          update = Updates.set("lastUpdated", time.instant()),
+          options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
+        )
+        .headOption()
+    )
 
   def set(answers: GetMovementMongoResponse): Future[GetMovementMongoResponse] =
-    collection
-      .findOneAndReplace(
-        filter = by(answers.arc),
-        replacement = answers copy (lastUpdated = time.instant()),
-        options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-      )
-      .toFuture()
+    Mdc.preservingMdc(
+      collection
+        .findOneAndReplace(
+          filter = by(answers.arc),
+          replacement = answers copy (lastUpdated = time.instant()),
+          options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        )
+        .toFuture()
+    )
+
 }
 
 object GetMovementRepository {
