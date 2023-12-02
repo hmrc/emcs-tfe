@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,9 +28,15 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitChangeDestinationService @Inject()(chrisConnector: ChrisConnector) extends Logging {
+class SubmitChangeDestinationService @Inject()(chrisConnector: ChrisConnector,
+                                               eisConnector: EisConnector) extends Logging {
   def submit(submission: SubmitChangeDestinationModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
     chrisConnector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](SubmitChangeDestinationRequest(submission))
 
+  def submitViaEIS(submission: SubmitChangeDestinationModel)
+                  (implicit hc: HeaderCarrier,
+                   ec: ExecutionContext,
+                   request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitChangeDestinationRequest(submission), "submitChangeOfDestinationEISRequest")
 }
