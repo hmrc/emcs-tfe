@@ -21,48 +21,47 @@ import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDowns
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
-import scala.annotation.unused
 import scala.concurrent.duration.Duration
 
 @Singleton
-class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configuration) extends FeatureSwitching {
+class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Configuration) extends FeatureSwitching {
 
   override lazy val config: AppConfig = this
 
-  def chrisUrl: String = servicesConfig.baseUrl("chris")
+  def chrisUrl: String          = servicesConfig.baseUrl("chris")
   def downstreamStubUrl: String = servicesConfig.baseUrl("downstream-stub")
 
   def eisUrl: String = servicesConfig.baseUrl("eis")
 
-  def createMovementUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.createMovementUserAnswers.TTL"))
+  def createMovementUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.createMovementUserAnswers.TTL"))
   def createMovementUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.createMovementUserAnswers.replaceIndexes")
 
-  def reportReceiptUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.reportReceiptUserAnswers.TTL"))
+  def reportReceiptUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.reportReceiptUserAnswers.TTL"))
   def reportReceiptUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.reportReceiptUserAnswers.replaceIndexes")
 
-  def explainDelayUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.explainDelayUserAnswers.TTL"))
+  def explainDelayUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.explainDelayUserAnswers.TTL"))
   def explainDelayUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.explainDelayUserAnswers.replaceIndexes")
 
-  def explainShortageOrExcessUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.explainShortageOrExcessUserAnswers.TTL"))
+  def explainShortageOrExcessUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.explainShortageOrExcessUserAnswers.TTL"))
   def explainShortageOrExcessUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.explainShortageOrExcessUserAnswers.replaceIndexes")
 
-  def cancelAMovementUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.cancelAMovementUserAnswers.TTL"))
+  def cancelAMovementUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.cancelAMovementUserAnswers.TTL"))
   def cancelAMovementUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.cancelAMovementUserAnswers.replaceIndexes")
 
-  def changeDestinationUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.changeDestinationUserAnswers.TTL"))
+  def changeDestinationUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.changeDestinationUserAnswers.TTL"))
   def changeDestinationUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.changeDestinationUserAnswers.replaceIndexes")
 
-  def alertRejectionUserAnswersTTL(): Duration = Duration(configuration.get[String]("mongodb.alertRejectionUserAnswers.TTL"))
+  def alertRejectionUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.alertRejectionUserAnswers.TTL"))
   def alertRejectionUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.alertRejectionUserAnswers.replaceIndexes")
 
-  def getMovementTTL(): Duration = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
+  def getMovementTTL(): Duration           = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
   def getMovementReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.getMovement.replaceIndexes")
 
   def getFeatureSwitchValue(feature: String): Boolean = configuration.get[Boolean](feature)
 
-  def chrisBaseUrl: String = if(isEnabled(UseDownstreamStub)) downstreamStubUrl else chrisUrl
+  def chrisBaseUrl: String = if (isEnabled(UseDownstreamStub)) downstreamStubUrl else chrisUrl
 
-  def eisBaseUrl: String = if(isEnabled(UseDownstreamStub)) downstreamStubUrl else eisUrl
+  def eisBaseUrl: String = if (isEnabled(UseDownstreamStub)) downstreamStubUrl else eisUrl
 
   def eisSubmissionsUrl(): String =
     eisBaseUrl + "/emcs/digital-submit-new-message/v1"
@@ -88,15 +87,13 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
   def eisGetMovementBearerToken: String =
     configuration.get[String]("eis.emcmov.movement.token")
 
-  // TODO: remove annotation when we integrate with EIS
-  @unused
-  def eisGetMovementsBearerToken: String =
-    configuration.get[String]("eis.emcmov.movements.token")
+  // TODO: uncomment when we integrate with EIS
+//  def eisGetMovementsBearerToken: String =
+//    configuration.get[String]("eis.emcmov.movements.token")
 
-  // TODO: remove annotation when we integrate with EIS
-  @unused
-  def eisGetMovementHistoryBearerToken: String =
-    configuration.get[String]("eis.emcmov.movement-history.token")
+  // TODO: uncomment when we integrate with EIS
+//  def eisGetMovementHistoryBearerToken: String =
+//    configuration.get[String]("eis.emcmov.movement-history.token")
 
   def eisGetMessagesUrl(): String =
     eisBaseUrl + "/emcs/messages/v1/messages"
