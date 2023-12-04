@@ -16,12 +16,15 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.JsString
+import play.api.libs.json.{JsString, JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
-import uk.gov.hmrc.emcstfe.models.response.getMovement.{EadEsadModel, GetMovementResponse, HeaderEadEsadModel, MovementItem, TransportModeModel}
-import uk.gov.hmrc.emcstfe.models.response.{Packaging, WineProduct}
+import uk.gov.hmrc.emcstfe.models.response.getMovement._
+import uk.gov.hmrc.emcstfe.models.response.{Packaging, RawGetMovementResponse, WineProduct}
+
+import java.util.Base64
+import scala.xml.XML
 
 trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures {
 
@@ -611,6 +614,15 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
     )
   )
 
-  val getMovementIfChangedMongoResponse = GetMovementMongoResponse(testArc, JsString(getMovementIfChangedResponseBody))
+  val getMovementIfChangedMongoResponse: GetMovementMongoResponse = GetMovementMongoResponse(testArc, JsString(getMovementIfChangedResponseBody))
+
+  lazy val getRawMovementIfChangedJson: JsValue = Json.obj(
+    "dateTime" -> "dateTime",
+    "exciseRegistrationNumber" -> testErn,
+    "message" -> Base64.getEncoder.encodeToString(getMovementIfChangedResponseBody.getBytes)
+  )
+
+  val getRawMovementIfChangedMongoResponse: RawGetMovementResponse = RawGetMovementResponse("2023-12-01", testArc, XML.loadString(getMovementIfChangedResponseBody))
+
 
 }

@@ -21,12 +21,13 @@ import cats.implicits._
 import com.lucidchart.open.xtract.XmlReader
 import play.api.libs.json.{JsString, JsValue}
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, XmlParseError}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementIfChangedResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementIfChangedResponse, RawGetMovementResponse}
 import uk.gov.hmrc.emcstfe.repositories.GetMovementRepository
 import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
 import uk.gov.hmrc.emcstfe.utils.{Logging, XmlUtils}
@@ -39,18 +40,23 @@ import scala.xml.{NodeSeq, XML}
 
 @Singleton
 class GetMovementService @Inject()(
-                                    connector: ChrisConnector,
+                                    chrisConnector: ChrisConnector,
+                                    eisConnector: EisConnector,
                                     repository: GetMovementRepository,
                                     xmlUtils: XmlUtils,
                                     val config: AppConfig,
-                                  ) extends Logging {
+                                  ) extends Logging with FeatureSwitching {
   def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(getMovementRequest.arc).flatMap {
       case Some(value) =>
         logger.info("[getMovement] Matching movement found")
         if (forceFetchNew) {
           logger.info("[getMovement] GetMovementIfChanged")
-          getMovementIfChanged(getMovementRequest, value)
+          if(isEnabled(SendToEIS)) {
+            getNewMovement(getMovementRequest)
+          } else {
+            getMovementIfChanged(getMovementRequest, value)
+          }
         } else {
           logger.info("[getMovement] generateGetMovementResponse from cached movement")
           Future.successful(generateGetMovementResponse(value.data))
@@ -75,7 +81,7 @@ class GetMovementService @Inject()(
             sequenceNumber = extractSequenceNumberFromXml(value),
             versionTransactionReference = extractVersionTransactionReferenceFromXml(value)
           )
-          connector.postChrisSOAPRequest(getMovementIfChangedRequest)
+          chrisConnector.postChrisSOAPRequest(getMovementIfChangedRequest)
       }
     }
 
@@ -124,23 +130,32 @@ class GetMovementService @Inject()(
   }
 
   private[services] def getNewMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
-    val chrisResponseF: Future[Either[ErrorResponse, NodeSeq]] = connector.postChrisSOAPRequest(getMovementRequest)
+    if(isEnabled(SendToEIS)) {
+      val eisResponseF: Future[Either[ErrorResponse, RawGetMovementResponse]] = eisConnector.getRawMovement(getMovementRequest)
 
-    chrisResponseF.flatMap {
-      chrisResponse =>
-        storeAndReturn(chrisResponse)(getMovementRequest)
+      eisResponseF.flatMap {
+        eisResponse =>
+          storeAndReturn(eisResponse.map(_.movementView))(getMovementRequest)
+      }
+    } else {
+      val chrisResponseF: Future[Either[ErrorResponse, NodeSeq]] = chrisConnector.postChrisSOAPRequest(getMovementRequest)
+
+      chrisResponseF.flatMap {
+        chrisResponse =>
+          storeAndReturn(chrisResponse)(getMovementRequest)
+      }
     }
   }
 
-  private[services] def storeAndReturn(chrisResponse: Either[ErrorResponse, NodeSeq])(getMovementRequest: GetMovementRequest)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  private[services] def storeAndReturn(response: Either[ErrorResponse, NodeSeq])(getMovementRequest: GetMovementRequest)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
 
     val responseAfterStoringInMongo: EitherT[Future, ErrorResponse, GetMovementResponse] = {
       for {
-        res <- EitherT.fromEither[Future](chrisResponse)
+        res <- EitherT.fromEither[Future](response)
 
         resString <- EitherT.fromEither[Future](xmlUtils.trimWhitespaceFromXml(res))
 
-        getMovementMongoResponse = chrisResponse.map(_ => GetMovementMongoResponse(getMovementRequest.arc, JsString(resString.toString())))
+        getMovementMongoResponse = response.map(_ => GetMovementMongoResponse(getMovementRequest.arc, JsString(resString.toString())))
 
         getMovementMongoResponseRight <- EitherT.fromEither[Future](getMovementMongoResponse)
 

@@ -19,9 +19,10 @@ package uk.gov.hmrc.emcstfe.services
 import com.mongodb.MongoException
 import play.api.libs.json.{JsNull, JsString}
 import play.api.test.FakeRequest
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, GetMovementIfChangedFixture}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.mocks.repository.MockGetMovementRepository
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
@@ -34,12 +35,13 @@ import scala.concurrent.Future
 import scala.xml.XML
 
 class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with GetMovementIfChangedFixture {
-  trait Test extends MockChrisConnector with MockGetMovementRepository with MockXmlUtils with MockAppConfig {
+  trait Test extends MockChrisConnector with MockEisConnector with MockGetMovementRepository with MockXmlUtils with MockAppConfig {
     lazy val getMovementRequest: GetMovementRequest = GetMovementRequest(exciseRegistrationNumber = testErn, arc = testArc)
     lazy val getMovementIfChangedRequest: GetMovementIfChangedRequest = GetMovementIfChangedRequest(exciseRegistrationNumber = testErn, arc = testArc, sequenceNumber = "1", versionTransactionReference = "008")
 
     lazy val service: GetMovementService = new GetMovementService(
       mockChrisConnector,
+      mockEisConnector,
       mockRepo,
       mockXmlUtils,
       mockAppConfig
@@ -52,6 +54,9 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
     "forceFetchNew = true" should {
       "return a Right" when {
         "retrieving from mongo returns nothing so a fresh call to GetMovement is made" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockChrisConnector
@@ -65,6 +70,9 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse())
         }
         "retrieving from mongo returns a match so a fresh call to GetMovementIfChanged is made but there is no change" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
           MockGetMovementRepository
             .get(testArc)
             .returns(Future.successful(Some(getMovementMongoResponse)))
@@ -76,6 +84,9 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse())
         }
         "retrieving from mongo returns a match so a fresh call to GetMovementIfChanged is made and there is a change" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
           MockGetMovementRepository.get(testArc).returns(Future.successful(Some(getMovementMongoResponse)))
 
           MockChrisConnector
@@ -90,9 +101,30 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementIfChangedResponse)
         }
+
+        "retrieving from mongo returns a match so a fresh call is made to EIS" +
+          " (calling EIS enabled)" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true).twice()
+
+          MockGetMovementRepository.get(testArc).returns(Future.successful(Some(getMovementMongoResponse)))
+
+          MockEisConnector
+            .getRawMovement(getMovementRequest)
+            .returns(Future.successful(Right(getRawMovementIfChangedMongoResponse)))
+
+          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementIfChangedResponseBody))))
+
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
+
+          await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementIfChangedResponse)
+        }
       }
       "return a Left" when {
         "GetMovement call is unsuccessful" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockChrisConnector
@@ -102,6 +134,9 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Left(XmlValidationError)
         }
         "GetMovement call response cannot be extracted" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockChrisConnector
@@ -111,6 +146,9 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Left(SoapExtractionError)
         }
         "repository.set fails with MongoException, still return the movement as doesn't matter if cache doesn't store" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockChrisConnector
@@ -124,6 +162,9 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse())
         }
         "repository.set returns some other failed future, still return the movement as doesn't matter if cache doesn't store" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
           MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
           MockChrisConnector
@@ -141,11 +182,31 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
     "forceFetchNew = false" should {
       "fetch from downstream if Mongo returns no data" in new Test {
+
+        MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
         MockGetMovementRepository.get(testArc).returns(Future.successful(None))
 
         MockChrisConnector
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
+
+        MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+
+        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
+
+        await(service.getMovement(getMovementRequest, forceFetchNew = false)) shouldBe Right(getMovementResponse())
+      }
+
+      "fetch from downstream if Mongo returns no data (calling EIS)" in new Test {
+
+        MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+        MockGetMovementRepository.get(testArc).returns(Future.successful(None))
+
+        MockEisConnector
+          .getRawMovement(getMovementRequest)
+          .returns(Future.successful(Right(getRawMovementResponse)))
 
         MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
 
@@ -215,17 +276,42 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
   "getNewMovement" should {
     "return a Right" when {
-      "connector call is successful and repository call is successful" in new Test {
 
-        MockChrisConnector
-          .postChrisSOAPRequest(getMovementRequest)
-          .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
+      "when calling EIS" must {
 
-        MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+        "connector call is successful and repository call is successful" in new Test {
 
-        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-        await(service.getNewMovement(getMovementRequest)) shouldBe Right(getMovementResponse())
+          MockEisConnector
+            .getRawMovement(getMovementRequest)
+            .returns(Future.successful(Right(getRawMovementResponse)))
+
+          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
+
+          await(service.getNewMovement(getMovementRequest)) shouldBe Right(getMovementResponse())
+        }
+      }
+
+      "when calling ChRIS" must {
+
+        "connector call is successful and repository call is successful" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+
+          MockChrisConnector
+            .postChrisSOAPRequest(getMovementRequest)
+            .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
+
+          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
+
+          await(service.getNewMovement(getMovementRequest)) shouldBe Right(getMovementResponse())
+        }
       }
     }
   }
