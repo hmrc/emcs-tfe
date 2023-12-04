@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
+import cats.implicits.catsSyntaxTuple5Semigroupal
+import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
@@ -23,12 +25,13 @@ import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 import scala.xml.Elem
 
 case class TransportDetailsModel(
-                                  transportUnitCode: String,
-                                  identityOfTransportUnits: Option[String],
-                                  commercialSealIdentification: Option[String],
-                                  complementaryInformation: Option[String],
-                                  sealInformation: Option[String],
-                                ) extends XmlBaseModel with XmlWriterUtils {
+    transportUnitCode: String,
+    identityOfTransportUnits: Option[String],
+    commercialSealIdentification: Option[String],
+    complementaryInformation: Option[String],
+    sealInformation: Option[String]
+) extends XmlBaseModel with XmlWriterUtils {
+
   def toXml(implicit request: UserRequest[_]): Elem = <urn:TransportDetails>
     <urn:TransportUnitCode>{transportUnitCode}</urn:TransportUnitCode>
     {identityOfTransportUnits.mapNodeSeq(value => <urn:IdentityOfTransportUnits>{value}</urn:IdentityOfTransportUnits>)}
@@ -36,8 +39,18 @@ case class TransportDetailsModel(
     {complementaryInformation.mapNodeSeq(value => <urn:ComplementaryInformation language="en">{value}</urn:ComplementaryInformation>)}
     {sealInformation.mapNodeSeq(value => <urn:SealInformation language="en">{value}</urn:SealInformation>)}
   </urn:TransportDetails>
+
 }
 
 object TransportDetailsModel {
+
+  implicit val xmlReads: XmlReader[TransportDetailsModel] = (
+    (__ \\ "TransportUnitCode").read[String],
+    (__ \\ "IdentityOfTransportUnits").read[Option[String]],
+    (__ \\ "CommercialSealIdentification").read[Option[String]],
+    (__ \\ "ComplementaryInformation").read[Option[String]],
+    (__ \\ "SealInformation").read[Option[String]]
+  ).mapN(TransportDetailsModel.apply)
+
   implicit val fmt: OFormat[TransportDetailsModel] = Json.format
 }

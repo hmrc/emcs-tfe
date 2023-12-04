@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
+import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XPath, XmlReader}
 import play.api.libs.json.{JsError, JsNumber, JsString, JsSuccess}
+import uk.gov.hmrc.emcstfe.models.common.Enumerable.EnumerableXmlParseFailure
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class EnumerableSpec extends TestBaseSpec with Enumerable.Implicits {
@@ -37,6 +39,28 @@ class EnumerableSpec extends TestBaseSpec with Enumerable.Implicits {
 
     "fail when JSON key is not of type JsString" in {
       reads[Int].reads(JsNumber(1)) shouldBe JsError("Enumerable value was not of type JsString")
+    }
+  }
+
+  "xmlReads" when {
+    case class TestClass(beans: Int)
+
+    implicit val xmlReader: XmlReader[TestClass] =
+      (XPath \\ "Beans").read[Int](xmlReads("Beans")(enumerable)).map(TestClass)
+
+    "input is valid" should {
+      "return the result" in {
+        val xml = <Beans>a</Beans>
+
+        xmlReader.read(xml) shouldBe ParseSuccess(TestClass(1))
+      }
+    }
+    "input is invalid" should {
+      "return an error" in {
+        val xml = <Beans>c</Beans>
+
+        xmlReader.read(xml) shouldBe ParseFailure(Seq(EnumerableXmlParseFailure("Invalid enumerable value of 'c' for field 'Beans'")))
+      }
     }
   }
 }

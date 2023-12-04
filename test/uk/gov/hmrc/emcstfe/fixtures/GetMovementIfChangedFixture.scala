@@ -20,9 +20,11 @@ import play.api.libs.json.JsString
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
-import uk.gov.hmrc.emcstfe.models.response.{GetMovementResponse, MovementItem, Packaging, WineProduct}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.{EadEsadModel, GetMovementResponse, HeaderEadEsadModel, MovementItem, TransportModeModel}
+import uk.gov.hmrc.emcstfe.models.response.{Packaging, WineProduct}
 
 trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures {
+
   lazy val getMovementIfChangedNoChangeSoapWrapper: String = """<tns:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
                                                                |  <tns:Body>
                                                                |    <con:Control xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
@@ -45,7 +47,8 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                                |  </tns:Body>
                                                                |</tns:Envelope>""".stripMargin
 
-  lazy val getMovementIfChangedResponseBody: String = s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
+  lazy val getMovementIfChangedResponseBody: String =
+    s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                                |    <mov:currentMovement>
                                                |      <mov:status>Beans</mov:status>
                                                |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
@@ -457,14 +460,57 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
     arc = "13AB7778889991ABCDEF9",
     sequenceNumber = 1,
     destinationType = Export,
-    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     memberStateCode = None,
+    serialNumberOfCertificateOfExemption = None,
+    consignorTrader = maxTraderModel(ConsignorTrader),
+    consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     deliveryPlaceTrader = Some(maxTraderModel(DeliveryPlaceTrader)),
+    placeOfDispatchTrader = Some(maxTraderModel(PlaceOfDispatchTrader)),
+    transportArrangerTrader = None,
+    firstTransporterTrader = Some(maxTraderModel(TransportTrader)),
+    dispatchImportOfficeReferenceNumber = None,
+    deliveryPlaceCustomsOfficeReferenceNumber = Some("FR000003"),
+    competentAuthorityDispatchOfficeReferenceNumber = Some("GB000002"),
     localReferenceNumber = "EN",
     eadStatus = "Beans",
-    consignorTrader = maxTraderModel(ConsignorTrader),
+    dateAndTimeOfValidationOfEadEsad = "2008-09-04T10:22:50",
     dateOfDispatch = "2008-11-20",
     journeyTime = "20 days",
+    documentCertificate = Some(
+      Seq(
+        DocumentCertificateModel(
+          documentType = None,
+          documentReference = None,
+          documentDescription = Some("Test"),
+          referenceOfDocument = Some("AB123")
+        )
+      )
+    ),
+    eadEsad = EadEsadModel(
+      localReferenceNumber = "EN",
+      invoiceNumber = "IN777888999",
+      invoiceDate = Some("2008-09-04"),
+      originTypeCode = OriginType.TaxWarehouse,
+      dateOfDispatch = "2008-11-20",
+      timeOfDispatch = Some("10:00:00"),
+      upstreamArc = None,
+      importSadNumber = None
+    ),
+    headerEadEsad = HeaderEadEsadModel(
+      sequenceNumber = 1,
+      dateAndTimeOfUpdateValidation = "2008-09-04T10:22:50",
+      destinationType = DestinationType.Export,
+      journeyTime = "20 days",
+      transportArrangement = TransportArrangement.Consignor
+    ),
+    transportMode = TransportModeModel(
+      transportModeCode = "1",
+      complementaryInformation = None
+    ),
+    movementGuarantee = MovementGuaranteeModel(
+      guarantorTypeCode = GuarantorType.Transporter,
+      guarantorTrader = None
+    ),
     items = Seq(
       MovementItem(
         itemUniqueReference = 1,
@@ -476,6 +522,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
         alcoholicStrength = None,
         degreePlato = None,
         fiscalMark = Some("FM564789 Fiscal Mark"),
+        fiscalMarkUsedFlag = Some(true),
         designationOfOrigin = Some("Designation of Origin"),
         sizeOfProducer = Some("20000"),
         density = None,
@@ -511,6 +558,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
         alcoholicStrength = Some(BigDecimal(12.7)),
         degreePlato = None,
         fiscalMark = Some("FM564790 Fiscal Mark"),
+        fiscalMarkUsedFlag = Some(true),
         designationOfOrigin = Some("Designation of Origin"),
         sizeOfProducer = Some("20000"),
         density = None,
@@ -544,7 +592,23 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
         )
       )
     ),
-    numberOfItems = 2
+    numberOfItems = 2,
+    transportDetails = Seq(
+      TransportDetailsModel(
+        transportUnitCode = "1",
+        identityOfTransportUnits = Some("Bottles"),
+        commercialSealIdentification = Some("SID13245678"),
+        complementaryInformation = Some("Bottles of Restina"),
+        sealInformation = Some("Sealed with red strip")
+      ),
+      TransportDetailsModel(
+        transportUnitCode = "2",
+        identityOfTransportUnits = Some("Cans"),
+        commercialSealIdentification = Some("SID132987"),
+        complementaryInformation = Some("Cans"),
+        sealInformation = Some("Seal info")
+      )
+    )
   )
 
   val getMovementIfChangedMongoResponse = GetMovementMongoResponse(testArc, JsString(getMovementIfChangedResponseBody))

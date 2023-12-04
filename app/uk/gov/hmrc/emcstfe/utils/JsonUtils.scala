@@ -16,20 +16,18 @@
 
 package uk.gov.hmrc.emcstfe.utils
 
-import scala.xml.NodeSeq
+import play.api.libs.json.{JsNull, JsObject}
 
-trait XmlWriterUtils {
+trait JsonUtils {
 
-  implicit class OptionExtensions[T](x: Option[T]) {
-    def mapNodeSeq(f: T => NodeSeq): NodeSeq = x.map(f).getOrElse(NodeSeq.Empty)
-  }
+  implicit class JsObjectUtils(json: JsObject) {
 
-  implicit class BooleanExtensions(x: Boolean) {
-    def toFlag: String = if (x) "1" else "0"
-  }
+    def removeNullValues(): JsObject =
+      JsObject(json.fields.flatMap {
+        case (_, JsNull) => None
+        case other       => Some(other)
+      })
 
-  implicit class StringExtensions(x: String) {
-    def fromFlag: Boolean = x == "1"
   }
 
 }

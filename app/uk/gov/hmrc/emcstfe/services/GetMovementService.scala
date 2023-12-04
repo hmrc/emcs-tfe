@@ -25,7 +25,8 @@ import uk.gov.hmrc.emcstfe.connectors.ChrisConnector
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, XmlParseError}
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementIfChangedResponse, GetMovementResponse}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementIfChangedResponse}
 import uk.gov.hmrc.emcstfe.repositories.GetMovementRepository
 import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
 import uk.gov.hmrc.emcstfe.utils.{Logging, XmlUtils}
