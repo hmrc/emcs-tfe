@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisHeaders, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpReads}
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -31,22 +31,27 @@ trait BaseEisConnector extends Logging {
 
   def metricsService: MetricsService
 
-  private def eisSubmissionHeaders(correlationId: String, forwardedHost: String, bearerToken: String): Seq[(String, String)] = Seq(
+  private class BearerToken(val value: String)
+  private object BearerToken {
+    def apply(value: String): BearerToken = new BearerToken(s"Bearer $value")
+  }
+
+  private def eisSubmissionHeaders(correlationId: String, forwardedHost: String, bearerToken: BearerToken): Seq[(String, String)] = Seq(
     EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
     EisHeaders.source -> "TFE",
     EisHeaders.contentType -> "application/json",
     EisHeaders.accept -> "application/json",
-    EisHeaders.authorization -> s"Bearer $bearerToken"
+    EisHeaders.authorization -> bearerToken.value
   )
 
-  private def eisConsumptionHeaders(correlationId: String, forwardedHost: String, bearerToken: String): Seq[(String, String)] = Seq(
+  private def eisConsumptionHeaders(correlationId: String, forwardedHost: String, bearerToken: BearerToken): Seq[(String, String)] = Seq(
     EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
     EisHeaders.source -> "TFE",
-    EisHeaders.authorization -> s"Bearer $bearerToken"
+    EisHeaders.authorization -> bearerToken.value
   )
 
   private def withTimer[T](metricName: String)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
@@ -54,12 +59,17 @@ trait BaseEisConnector extends Logging {
     metricsService.processWithTimer(timer)(f)
   }
 
+  private def headerCarrierWithBearerTokenOverride(hc: HeaderCarrier, bearerToken: BearerToken): HeaderCarrier = {
+    hc.copy(authorization = Some(Authorization(bearerToken.value)))
+  }
+
   def postJson[A, B](http: HttpClient, uri: String, body: JsValue, request: EisSubmissionRequest, bearerToken: String)
                     (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[postJson] POST to $uri being made with body:\n\n$body")
-      http.POST[JsValue, Either[A, B]](uri, body, eisSubmissionHeaders(request.correlationUUID, forwardedHost, bearerToken))
+      val newHC = headerCarrierWithBearerTokenOverride(hc, BearerToken(bearerToken))
+      http.POST[JsValue, Either[A, B]](uri, body, eisSubmissionHeaders(request.correlationUUID, forwardedHost, BearerToken(bearerToken)))(implicitly, rds, newHC, ec)
     }
   }
 
@@ -68,7 +78,8 @@ trait BaseEisConnector extends Logging {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[get] GET to $uri being made with query params ${request.queryParams}")
-      http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken))
+      val newHC = headerCarrierWithBearerTokenOverride(hc, BearerToken(bearerToken))
+      http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID, forwardedHost, BearerToken(bearerToken)))(rds, newHC, ec)
     }
   }
 
@@ -77,7 +88,8 @@ trait BaseEisConnector extends Logging {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[putEmpty] PUT to $uri being made with empty body")
-      http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken))
+      val newHC = headerCarrierWithBearerTokenOverride(hc, BearerToken(bearerToken))
+      http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID, forwardedHost, BearerToken(bearerToken)))(rds, newHC, ec)
     }
   }
 
@@ -86,7 +98,8 @@ trait BaseEisConnector extends Logging {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[delete] DELETE to $uri being made")
-      http.DELETE[Either[A, B]](uri, eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken))
+      val newHC = headerCarrierWithBearerTokenOverride(hc, BearerToken(bearerToken))
+      http.DELETE[Either[A, B]](uri, eisConsumptionHeaders(request.correlationUUID, forwardedHost, BearerToken(bearerToken)))(rds, newHC, ec)
     }
   }
 }
