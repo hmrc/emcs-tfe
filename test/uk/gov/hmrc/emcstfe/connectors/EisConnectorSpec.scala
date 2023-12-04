@@ -97,11 +97,12 @@ class EisConnectorSpec extends TestBaseSpec
             body = submitReportOfReceiptRequest.toJson,
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source -> "TFE",
               EisHeaders.contentType -> "application/json",
-              EisHeaders.accept -> "application/json"
+              EisHeaders.accept -> "application/json",
+              EisHeaders.authorization -> "Bearer value-emcs08"
             )
           ).returns(Future.successful(Right(eisSuccessResponse)))
 
@@ -123,11 +124,12 @@ class EisConnectorSpec extends TestBaseSpec
             body = submitReportOfReceiptRequest.toJson,
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source -> "TFE",
               EisHeaders.contentType -> "application/json",
-              EisHeaders.accept -> "application/json"
+              EisHeaders.accept -> "application/json",
+              EisHeaders.authorization -> "Bearer value-emcs08"
             )
           ).returns(Future.successful(response))
 
@@ -146,11 +148,12 @@ class EisConnectorSpec extends TestBaseSpec
             body = submitReportOfReceiptRequest.toJson,
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source -> "TFE",
               EisHeaders.contentType -> "application/json",
-              EisHeaders.accept -> "application/json"
+              EisHeaders.accept -> "application/json",
+              EisHeaders.authorization -> "Bearer value-emcs08"
             )
           ).returns(Future.successful(response))
 
@@ -169,11 +172,12 @@ class EisConnectorSpec extends TestBaseSpec
             body = submitReportOfReceiptRequest.toJson,
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source -> "TFE",
               EisHeaders.contentType -> "application/json",
-              EisHeaders.accept -> "application/json"
+              EisHeaders.accept -> "application/json",
+              EisHeaders.authorization -> "Bearer value-emcs08"
             )
           ).returns(Future.successful(response))
 
@@ -192,11 +196,12 @@ class EisConnectorSpec extends TestBaseSpec
             body = submitReportOfReceiptRequest.toJson,
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source -> "TFE",
               EisHeaders.contentType -> "application/json",
-              EisHeaders.accept -> "application/json"
+              EisHeaders.accept -> "application/json",
+              EisHeaders.authorization -> "Bearer value-emcs08"
             )
           ).returns(Future.successful(response))
 
@@ -215,11 +220,12 @@ class EisConnectorSpec extends TestBaseSpec
             body = submitReportOfReceiptRequest.toJson,
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source -> "TFE",
               EisHeaders.contentType -> "application/json",
-              EisHeaders.accept -> "application/json"
+              EisHeaders.accept -> "application/json",
+              EisHeaders.authorization -> "Bearer value-emcs08"
             )
           ).returns(Future.successful(response))
 
@@ -238,11 +244,12 @@ class EisConnectorSpec extends TestBaseSpec
             body = submitReportOfReceiptRequest.toJson,
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source -> "TFE",
               EisHeaders.contentType -> "application/json",
-              EisHeaders.accept -> "application/json"
+              EisHeaders.accept -> "application/json",
+              EisHeaders.authorization -> "Bearer value-emcs08"
             )
           ).returns(Future.successful(response))
 
@@ -260,11 +267,12 @@ class EisConnectorSpec extends TestBaseSpec
             body = submitReportOfReceiptRequest.toJson,
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source -> "TFE",
               EisHeaders.contentType -> "application/json",
-              EisHeaders.accept -> "application/json"
+              EisHeaders.accept -> "application/json",
+              EisHeaders.authorization -> "Bearer value-emcs08"
             )
           ).returns(Future.successful(response))
 
@@ -297,9 +305,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessagesRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-messages"
             )
           ).returns(Future.successful(Right(getMessagesResponseModel)))
 
@@ -327,9 +336,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessagesRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-messages"
             )
           ).returns(Future.successful(response))
 
@@ -354,9 +364,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessagesRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-messages"
             )
           ).returns(Future.successful(response))
 
@@ -381,9 +392,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessagesRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-messages"
             )
           ).returns(Future.successful(response))
 
@@ -408,9 +420,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessagesRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-messages"
             )
           ).returns(Future.successful(response))
 
@@ -435,9 +448,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessagesRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-messages"
             )
           ).returns(Future.successful(response))
 
@@ -462,9 +476,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessagesRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-messages"
             )
           ).returns(Future.successful(response))
 
@@ -488,9 +503,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessagesRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-messages"
             )
           ).returns(Future.successful(response))
 
@@ -519,9 +535,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-submission-failure-message"
             )
           ).returns(Future.successful(Right(getSubmissionFailureMessageResponseModel)))
 
@@ -546,9 +563,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-submission-failure-message"
             )
           ).returns(Future.successful(response))
 
@@ -570,9 +588,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-submission-failure-message"
             )
           ).returns(Future.successful(response))
 
@@ -594,9 +613,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-submission-failure-message"
             )
           ).returns(Future.successful(response))
 
@@ -618,9 +638,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-submission-failure-message"
             )
           ).returns(Future.successful(response))
 
@@ -642,9 +663,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-submission-failure-message"
             )
           ).returns(Future.successful(response))
 
@@ -666,9 +688,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-submission-failure-message"
             )
           ).returns(Future.successful(response))
 
@@ -689,9 +712,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-submission-failure-message"
             )
           ).returns(Future.successful(response))
 
@@ -714,9 +738,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-put"
             )
           ).returns(Future.successful(Right(markMessageAsReadResponseModel)))
 
@@ -737,9 +762,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-put"
             )
           ).returns(Future.successful(response))
 
@@ -757,9 +783,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-put"
             )
           ).returns(Future.successful(response))
 
@@ -777,9 +804,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-put"
             )
           ).returns(Future.successful(response))
 
@@ -797,9 +825,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-put"
             )
           ).returns(Future.successful(response))
 
@@ -817,9 +846,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-put"
             )
           ).returns(Future.successful(response))
 
@@ -837,9 +867,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-put"
             )
           ).returns(Future.successful(response))
 
@@ -856,9 +887,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-put"
             )
           ).returns(Future.successful(response))
 
@@ -881,9 +913,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-delete"
             )
           ).returns(Future.successful(Right(setMessageAsLogicallyDeletedResponseModel)))
 
@@ -904,9 +937,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-delete"
             )
           ).returns(Future.successful(response))
 
@@ -924,9 +958,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-delete"
             )
           ).returns(Future.successful(response))
 
@@ -944,9 +979,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-delete"
             )
           ).returns(Future.successful(response))
 
@@ -964,9 +1000,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-delete"
             )
           ).returns(Future.successful(response))
 
@@ -984,9 +1021,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-delete"
             )
           ).returns(Future.successful(response))
 
@@ -1004,9 +1042,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-delete"
             )
           ).returns(Future.successful(response))
 
@@ -1023,9 +1062,10 @@ class EisConnectorSpec extends TestBaseSpec
             url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-delete"
             )
           ).returns(Future.successful(response))
 
@@ -1051,9 +1091,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-statistics"
             )
           ).returns(Future.successful(Right(getMessageStatisticsResponseModel)))
 
@@ -1077,9 +1118,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-statistics"
             )
           ).returns(Future.successful(response))
 
@@ -1100,9 +1142,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-statistics"
             )
           ).returns(Future.successful(response))
 
@@ -1123,9 +1166,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-statistics"
             )
           ).returns(Future.successful(response))
 
@@ -1146,9 +1190,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-statistics"
             )
           ).returns(Future.successful(response))
 
@@ -1169,9 +1214,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-statistics"
             )
           ).returns(Future.successful(response))
 
@@ -1192,9 +1238,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-statistics"
             )
           ).returns(Future.successful(response))
 
@@ -1214,9 +1261,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-message-statistics"
             )
           ).returns(Future.successful(response))
 
@@ -1242,9 +1290,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMovementRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movement"
             )
           ).returns(Future.successful(Right(getRawMovementResponse)))
 
@@ -1268,9 +1317,10 @@ class EisConnectorSpec extends TestBaseSpec
             ),
             headers = Seq(
               EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementRequest.correlationUUID.toString,
+              EisHeaders.correlationId -> getMovementRequest.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE"
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movement"
             )
           ).returns(Future.successful(response))
 
