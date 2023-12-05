@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisHeaders, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpReads}
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -52,39 +52,47 @@ trait BaseEisConnector extends Logging {
     metricsService.processWithTimer(timer)(f)
   }
 
-  def postJson[A, B](http: HttpClient, uri: String, body: JsValue, request: EisSubmissionRequest)
+  private def headerCarrierWithBearerTokenOverride(hc: HeaderCarrier, bearerToken: String): HeaderCarrier = {
+    hc.copy(authorization = Some(Authorization(s"Bearer $bearerToken")))
+  }
+
+  def postJson[A, B](http: HttpClient, uri: String, body: JsValue, request: EisSubmissionRequest, bearerToken: String)
                     (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[postJson] POST to $uri being made with body:\n\n$body")
-      http.POST[JsValue, Either[A, B]](uri, body, eisSubmissionHeaders(request.correlationUUID.toString, forwardedHost))
+      val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
+      http.POST[JsValue, Either[A, B]](uri, body, eisSubmissionHeaders(request.correlationUUID, forwardedHost))(implicitly, rds, newHC, ec)
     }
   }
 
-  def get[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest)
+  def get[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest, bearerToken: String)
                (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[get] GET to $uri being made with query params ${request.queryParams}")
-      http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID.toString, forwardedHost))
+      val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
+      http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID, forwardedHost))(rds, newHC, ec)
     }
   }
 
-  def putEmpty[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest)
+  def putEmpty[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest, bearerToken: String)
                (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[putEmpty] PUT to $uri being made with empty body")
-      http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID.toString, forwardedHost))
+      val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
+      http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID, forwardedHost))(rds, newHC, ec)
     }
   }
 
-  def delete[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest)
+  def delete[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest, bearerToken: String)
                (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[delete] DELETE to $uri being made")
-      http.DELETE[Either[A, B]](uri, eisConsumptionHeaders(request.correlationUUID.toString, forwardedHost))
+      val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
+      http.DELETE[Either[A, B]](uri, eisConsumptionHeaders(request.correlationUUID, forwardedHost))(rds, newHC, ec)
     }
   }
 }

@@ -34,27 +34,18 @@ trait MockHttpClient extends MockFactory {
   object MockHttpClient extends Matchers {
 
     def get[T](url: String,
+               bearerToken: String,
                parameters: Seq[(String, String)] = Seq.empty,
                headers: Seq[(String, String)] = Seq.empty): CallHandler[Future[T]] = {
       (mockHttpClient
         .GET(_: String, _: Seq[(String, String)], _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs {
-          (actualUrl: String, actualParams: Seq[(String, String)], actualHeaders, _, _, _) => {
+          (actualUrl: String, actualParams: Seq[(String, String)], actualHeaders, _, hc, _) => {
             actualUrl shouldBe url
             actualParams shouldBe parameters
             actualHeaders.filterNot(_._1 == "datetime") shouldBe headers.filterNot(_._1 == "datetime")
+            bearerToken shouldBe hc.authorization.get.value
           }
-        })
-    }
-
-    def post[I, T](url: String,
-                   body: I): CallHandler[Future[T]] = {
-      (mockHttpClient
-        .POST[I, T](_: String, _: I, _: Seq[(String, String)])(_: Writes[I], _: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
-        .expects(assertArgs { (actualUrl, actualBody: I, _, _, _, _, _) => {
-          actualUrl shouldBe url
-          actualBody shouldBe body
-        }
         })
     }
 
@@ -72,47 +63,44 @@ trait MockHttpClient extends MockFactory {
     }
 
     def postJson[I, T](url: String,
+                       bearerToken: String,
                        body: I,
                        headers: Seq[(String, String)] = Seq()): CallHandler[Future[T]] = {
       (mockHttpClient
         .POST[I, T](_: String, _: I, _: Seq[(String, String)])(_: Writes[I], _: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
-        .expects(assertArgs { (actualUrl, actualBody, actualHeaders, _, _, _, _) => {
+        .expects(assertArgs { (actualUrl, actualBody, actualHeaders, _, _, hc, _) => {
           actualUrl shouldBe url
           actualBody shouldBe body
           actualHeaders.filterNot(_._1 == EisHeaders.dateTime) shouldBe headers.filterNot(_._1 == EisHeaders.dateTime)
           //Can't compare the original timestamps so truncate to days instead
           Instant.parse(actualHeaders.find(_._1 == EisHeaders.dateTime).get._2).truncatedTo(ChronoUnit.DAYS) shouldBe Instant.parse(headers.find(_._1 == EisHeaders.dateTime).get._2).truncatedTo(ChronoUnit.DAYS)
+          bearerToken shouldBe hc.authorization.get.value
         }
         })
     }
 
-    def put[I, T](url: String,
-                  body: I): CallHandler[Future[T]] = {
-      (mockHttpClient
-        .PUT[I, T](_: String, _: I, _: Seq[(String, String)])(_: Writes[I], _: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
-        .expects(assertArgs { (actualUrl, actualBody: I, _, _, _, _, _) => {
-          actualUrl shouldBe url
-          actualBody shouldBe body
-        }
-        })
-    }
-
-    def putEmpty[T](url: String, headers: Seq[(String, String)]): CallHandler[Future[T]] = {
+    def putEmpty[T](url: String,
+                    bearerToken: String,
+                    headers: Seq[(String, String)]): CallHandler[Future[T]] = {
       (mockHttpClient
         .PUTString[T](_: String, _: String, _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
-        .expects(assertArgs { (actualUrl, _, actualHeaders, _, _, _) => {
+        .expects(assertArgs { (actualUrl, _, actualHeaders, _, hc, _) => {
           actualUrl shouldBe url
           actualHeaders.filterNot(_._1 == "datetime") shouldBe headers.filterNot(_._1 == "datetime")
+          bearerToken shouldBe hc.authorization.get.value
         }
         })
     }
 
-    def delete[T](url: String, headers: Seq[(String, String)]): CallHandler[Future[T]] = {
+    def delete[T](url: String,
+                  bearerToken: String,
+                  headers: Seq[(String, String)]): CallHandler[Future[T]] = {
       (mockHttpClient
         .DELETE(_: String, _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
-        .expects(assertArgs { (actualUrl, actualHeaders, _, _, _) => {
+        .expects(assertArgs { (actualUrl, actualHeaders, _, hc, _) => {
           actualUrl shouldBe url
           actualHeaders.filterNot(_._1 == "datetime") shouldBe headers.filterNot(_._1 == "datetime")
+          bearerToken shouldBe hc.authorization.get.value
         }
         })
     }

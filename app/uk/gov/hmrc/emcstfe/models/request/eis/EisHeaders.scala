@@ -23,4 +23,5 @@ object EisHeaders {
   val source = "source"
   val contentType = "content-type"
   val accept = "accept"
+  val authorization = "Authorization"
 }
