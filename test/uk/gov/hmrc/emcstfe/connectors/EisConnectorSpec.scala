@@ -103,8 +103,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE",
                 EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-emcs08"
             )
@@ -133,8 +132,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE",
                 EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-emcs08"
             )
@@ -160,8 +158,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE",
                 EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-emcs08"
             )
@@ -187,8 +184,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE",
                 EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-emcs08"
             )
@@ -214,8 +210,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE",
                 EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-emcs08"
             )
@@ -241,8 +236,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE",
                 EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-emcs08"
             )
@@ -268,8 +262,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE",
                 EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-emcs08"
             )
@@ -294,8 +287,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE",
                 EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-emcs08"
             )
@@ -332,8 +324,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-messages"
             )
@@ -366,8 +357,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-messages"
             )
@@ -397,8 +387,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-messages"
             )
@@ -428,8 +417,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-messages"
             )
@@ -459,8 +447,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-messages"
             )
@@ -490,8 +477,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-messages"
             )
@@ -521,8 +507,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-messages"
             )
@@ -551,8 +536,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-messages"
             )
@@ -586,8 +570,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-submission-failure-message"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-submission-failure-message"
             )
@@ -617,8 +600,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-submission-failure-message"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-submission-failure-message"
             )
@@ -645,8 +627,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-submission-failure-message"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-submission-failure-message"
             )
@@ -673,8 +654,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-submission-failure-message"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-submission-failure-message"
             )
@@ -701,8 +681,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-submission-failure-message"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-submission-failure-message"
             )
@@ -729,8 +708,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-submission-failure-message"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-submission-failure-message"
             )
@@ -757,8 +735,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-submission-failure-message"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-submission-failure-message"
             )
@@ -784,8 +761,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-submission-failure-message"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-submission-failure-message"
             )
@@ -813,8 +789,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-put"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-put"
             )
@@ -840,8 +815,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-put"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-put"
             )
@@ -864,8 +838,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-put"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-put"
             )
@@ -888,8 +861,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-put"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-put"
             )
@@ -912,8 +884,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-put"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-put"
             )
@@ -936,8 +907,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-put"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-put"
             )
@@ -960,8 +930,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-put"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-put"
             )
@@ -983,8 +952,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> markMessageAsReadRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-put"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-put"
             )
@@ -1012,8 +980,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-delete"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-delete"
             )
@@ -1039,8 +1006,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-delete"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-delete"
             )
@@ -1063,8 +1029,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-delete"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-delete"
             )
@@ -1087,8 +1052,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-delete"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-delete"
             )
@@ -1111,8 +1075,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-delete"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-delete"
             )
@@ -1135,8 +1098,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-delete"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-delete"
             )
@@ -1159,8 +1121,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-delete"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-delete"
             )
@@ -1182,8 +1143,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-delete"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-delete"
             )
@@ -1214,8 +1174,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-statistics"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-statistics"
             )
@@ -1244,8 +1203,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-statistics"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-statistics"
             )
@@ -1271,8 +1229,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-statistics"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-statistics"
             )
@@ -1298,8 +1255,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-statistics"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-statistics"
             )
@@ -1325,8 +1281,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-statistics"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-statistics"
             )
@@ -1352,8 +1307,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-statistics"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-statistics"
             )
@@ -1379,8 +1333,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-statistics"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-statistics"
             )
@@ -1405,8 +1358,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-message-statistics"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-message-statistics"
             )
@@ -1437,8 +1389,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMovementRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movement"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-movement"
             )
@@ -1467,8 +1418,7 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.correlationId -> getMovementRequest.correlationUUID,
                 EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movement"
+                EisHeaders.source        -> "TFE"
               ),
               bearerToken = "Bearer value-movement"
             )
