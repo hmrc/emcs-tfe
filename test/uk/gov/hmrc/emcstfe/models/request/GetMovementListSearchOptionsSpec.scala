@@ -20,18 +20,30 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class GetMovementListSearchOptionsSpec extends TestBaseSpec {
 
-  val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions())
+  val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions(), isEISFeatureEnabled = false)
 
   "GetMovementListSearchOptions" must {
 
     "construct with default options" in {
 
       GetMovementListSearchOptions() shouldBe GetMovementListSearchOptions(
-        traderRole = "Consignor and/or Consignee",
-        sortField = "DateReceived",
+        traderRole = None,
+        sortField = None,
         sortOrder = "D",
-        startPosition = 1,
-        maxRows = 30
+        startPosition = None,
+        maxRows = 30,
+        arc = None,
+        otherTraderId = None,
+        lrn = None,
+        dateOfDispatchFrom = None,
+        dateOfDispatchTo = None,
+        dateOfReceiptFrom = None,
+        dateOfReceiptTo = None,
+        countryOfOrigin = None,
+        movementStatus = None,
+        transporterTraderName = None,
+        undischargedMovements = None,
+        exciseProductCode = None
       )
     }
 
@@ -48,14 +60,38 @@ class GetMovementListSearchOptionsSpec extends TestBaseSpec {
           "search.sortField" -> Seq("bar"),
           "search.sortOrder" -> Seq("wizz"),
           "search.startPosition" -> Seq("10"),
-          "search.maxRows" -> Seq("99")
+          "search.maxRows" -> Seq("99"),
+          "search.arc" -> Seq("1234"),
+          "search.otherTraderId" -> Seq("GB123456789"),
+          "search.lrn" -> Seq("LRN1234"),
+          "search.dateOfDispatchFrom" -> Seq("06/07/2020"),
+          "search.dateOfDispatchTo" -> Seq("07/07/2020"),
+          "search.dateOfReceiptFrom" -> Seq("08/07/2020"),
+          "search.dateOfReceiptTo" -> Seq("09/07/2020"),
+          "search.countryOfOrigin" -> Seq("GB"),
+          "search.movementStatus" -> Seq("e-AD Manually Closed"),
+          "search.transporterTraderName" -> Seq("Trader 1"),
+          "search.undischargedMovements" -> Seq("Accepted"),
+          "search.exciseProductCode" -> Seq("6000")
         )) shouldBe
           Some(Right(GetMovementListSearchOptions(
-            traderRole = "foo",
-            sortField = "bar",
+            traderRole = Some("foo"),
+            sortField = Some("bar"),
             sortOrder = "wizz",
-            startPosition = 10,
-            maxRows = 99
+            startPosition = Some(10),
+            maxRows = 99,
+            arc = Some("1234"),
+            otherTraderId = Some("GB123456789"),
+            lrn = Some("LRN1234"),
+            dateOfDispatchFrom = Some("06/07/2020"),
+            dateOfDispatchTo = Some("07/07/2020"),
+            dateOfReceiptFrom = Some("08/07/2020"),
+            dateOfReceiptTo = Some("09/07/2020"),
+            countryOfOrigin = Some("GB"),
+            movementStatus = Some("e-AD Manually Closed"),
+            transporterTraderName = Some("Trader 1"),
+            undischargedMovements = Some("Accepted"),
+            exciseProductCode = Some("6000")
           )))
       }
 
@@ -65,22 +101,19 @@ class GetMovementListSearchOptionsSpec extends TestBaseSpec {
           "search.startPosition" -> Seq("10"),
         )) shouldBe
           Some(Right(GetMovementListSearchOptions(
-            traderRole = "foo",
-            sortField = GetMovementListSearchOptions.DEFAULT_SORT_FIELD,
-            sortOrder = GetMovementListSearchOptions.DEFAULT_SORT_ORDER,
-            startPosition = 10,
-            maxRows = GetMovementListSearchOptions.DEFAULT_MAX_ROWS
+            traderRole = Some("foo"),
+            startPosition = Some(10)
           )))
       }
     }
 
     "unbind QueryString to URL format" in {
-      GetMovementListSearchOptions.queryStringBinder.unbind("search", GetMovementListSearchOptions()) shouldBe
-        "search.traderRole=Consignor+and%2For+Consignee" +
-          "&search.sortField=DateReceived" +
-          "&search.sortOrder=D" +
-          "&search.startPosition=1" +
-          "&search.maxRows=30"
+      GetMovementListSearchOptions.queryStringBinder.unbind("search", GetMovementListSearchOptions(
+        countryOfOrigin = Some("FR")
+      )) shouldBe
+          "search.sortOrder=D" +
+          "&search.maxRows=30" +
+          "&search.countryOfOrigin=FR"
     }
   }
 }

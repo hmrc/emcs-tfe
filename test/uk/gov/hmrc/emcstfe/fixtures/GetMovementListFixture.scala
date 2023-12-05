@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.RawGetMovementListResponse
 import uk.gov.hmrc.emcstfe.models.response.{GetMovementListItem, GetMovementListResponse}
 
 import java.time.LocalDateTime
@@ -118,6 +119,18 @@ trait GetMovementListFixture extends BaseFixtures {
       movement2Json
     ),
     "count" -> 2
+  )
+
+  lazy val getRawMovementListResponse: RawGetMovementListResponse = RawGetMovementListResponse(
+    exciseRegistrationNumber = testErn,
+    dateTime = "2023-09-07T12:39:20.354Z",
+    movementList = getMovementListResponse
+  )
+
+  lazy val getRawMovementListJsonResponse: JsObject = Json.obj(
+"exciseRegistrationNumber" -> testErn,
+    "dateTime" -> "2023-09-07T12:39:20.354Z",
+    "message" -> "PE1vdmVtZW50TGlzdERhdGFSZXNwb25zZSB4bWxucz0iaHR0cDovL3d3dy5nb3Z0YWxrLmdvdi51ay90YXhhdGlvbi9JbnRlcm5hdGlvbmFsVHJhZGUvRXhjaXNlL01vdmVtZW50TGlzdERhdGEvMyIgeG1sbnM6bnMxPSJodHRwOi8vaG1yYy9lbWNzL3RmZS9kYXRhIiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIj4KCTxNb3ZlbWVudD4KCQk8QXJjPjE4R0IwMDAwMDAwMDAwMDIzMjM2MTwvQXJjPgoJCTxEYXRlT2ZEaXNwYXRjaD4yMDA5LTAxLTI2VDE0OjExOjAwPC9EYXRlT2ZEaXNwYXRjaD4KCQk8TW92ZW1lbnRTdGF0dXM+QWNjZXB0ZWQ8L01vdmVtZW50U3RhdHVzPgoJCTxPdGhlclRyYWRlcklEPkFCQ0QxMjM0PC9PdGhlclRyYWRlcklEPgoJPC9Nb3ZlbWVudD4KCTxNb3ZlbWVudD4KCQk8QXJjPkdCVFIwMDAwMDBFTUNTMTAwMDA0MDwvQXJjPgoJCTxEYXRlT2ZEaXNwYXRjaD4yMDA5LTAxLTI2VDE0OjEyOjAwPC9EYXRlT2ZEaXNwYXRjaD4KCQk8TW92ZW1lbnRTdGF0dXM+QWNjZXB0ZWQ8L01vdmVtZW50U3RhdHVzPgoJCTxPdGhlclRyYWRlcklEPkFCQ0QxMjM0PC9PdGhlclRyYWRlcklEPgoJPC9Nb3ZlbWVudD4KCTxDb3VudE9mTW92ZW1lbnRzQXZhaWxhYmxlPjI8L0NvdW50T2ZNb3ZlbWVudHNBdmFpbGFibGU+CjwvTW92ZW1lbnRMaXN0RGF0YVJlc3BvbnNlPg=="
   )
 
 }

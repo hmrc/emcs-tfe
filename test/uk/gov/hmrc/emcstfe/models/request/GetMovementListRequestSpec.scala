@@ -22,7 +22,7 @@ import scala.xml.XML
 
 class GetMovementListRequestSpec extends TestBaseSpec {
 
-  val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions())
+  val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions(), isEISFeatureEnabled = false)
 
   "requestBody" should {
     "generate the correct request XML" in {
@@ -51,6 +51,88 @@ class GetMovementListRequestSpec extends TestBaseSpec {
   "shouldExtractFromSoap" should {
     "be correct" in {
       request.shouldExtractFromSoap shouldBe true
+    }
+  }
+
+  "queryParams" should {
+    "return only the defined query params" in {
+      val requestWithSomeDefinedQueryParams = request.copy(searchOptions = GetMovementListSearchOptions(
+        dateOfDispatchFrom = Some("01/01/2023"),
+        dateOfDispatchTo = Some("02/01/2023"),
+        transporterTraderName = Some("Trader 1")
+      ), isEISFeatureEnabled = false)
+      requestWithSomeDefinedQueryParams.queryParams shouldBe Seq(
+        "exciseregistrationnumber" -> requestWithSomeDefinedQueryParams.exciseRegistrationNumber,
+        "traderrole" -> "Consignor and/or Consignee",
+        "sortfield" -> "DateReceived",
+        "sortorder" -> "D",
+        "startposition" -> "1",
+        "maxnotoreturn" -> "30",
+        "dateofdispatchfrom" -> "01/01/2023",
+        "dateofdispatchto" -> "02/01/2023",
+        "transportertradername" -> "Trader 1"
+      )
+    }
+
+    "return only the defined query params (when EIS feature switch is enabled)" in {
+      val requestWithSomeDefinedQueryParams = request.copy(searchOptions = GetMovementListSearchOptions(
+        dateOfDispatchFrom = Some("01/01/2023"),
+        dateOfDispatchTo = Some("02/01/2023"),
+        transporterTraderName = Some("Trader 1")
+      ), isEISFeatureEnabled = true)
+      requestWithSomeDefinedQueryParams.queryParams shouldBe Seq(
+        "exciseregistrationnumber" -> requestWithSomeDefinedQueryParams.exciseRegistrationNumber,
+        "traderrole" -> "both",
+        "sortfield" -> "dateofdispatch",
+        "sortorder" -> "D",
+        "startposition" -> "0",
+        "maxnotoreturn" -> "30",
+        "dateofdispatchfrom" -> "01/01/2023",
+        "dateofdispatchto" -> "02/01/2023",
+        "transportertradername" -> "Trader 1"
+      )
+    }
+
+    "return all query params if they are all defined" in {
+      val requestWithSomeDefinedQueryParams = request.copy(searchOptions = GetMovementListSearchOptions(
+        traderRole = Some("foo"),
+        sortField = Some("bar"),
+        sortOrder = "wizz",
+        startPosition = Some(10),
+        maxRows = 99,
+        arc = Some("1234"),
+        otherTraderId = Some("GB123456789"),
+        lrn = Some("LRN1234"),
+        dateOfDispatchFrom = Some("06/07/2020"),
+        dateOfDispatchTo = Some("07/07/2020"),
+        dateOfReceiptFrom = Some("08/07/2020"),
+        dateOfReceiptTo = Some("09/07/2020"),
+        countryOfOrigin = Some("GB"),
+        movementStatus = Some("e-AD Manually Closed"),
+        transporterTraderName = Some("Trader 1"),
+        undischargedMovements = Some("Accepted"),
+        exciseProductCode = Some("6000")
+      ))
+      requestWithSomeDefinedQueryParams.queryParams shouldBe Seq(
+        "exciseregistrationnumber" -> requestWithSomeDefinedQueryParams.exciseRegistrationNumber,
+        "traderrole" -> "foo",
+        "sortfield" -> "bar",
+        "sortorder" -> "wizz",
+        "startposition" -> "10",
+        "maxnotoreturn" -> "99",
+        "arc" -> "1234",
+        "othertraderid" -> "GB123456789",
+        "localreferencenumber" -> "LRN1234",
+        "dateofdispatchfrom" -> "06/07/2020",
+        "dateofdispatchto" -> "07/07/2020",
+        "dateofreceiptfrom" -> "08/07/2020",
+        "dateofreceiptto" -> "09/07/2020",
+        "countryoforigin" -> "GB",
+        "movementstatus" -> "e-AD Manually Closed",
+        "transportertradername" -> "Trader 1",
+        "undischargedmovements" -> "Accepted",
+        "exciseproductcode" -> "6000"
+      )
     }
   }
 }

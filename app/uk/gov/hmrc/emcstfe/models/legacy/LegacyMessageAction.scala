@@ -78,6 +78,7 @@ object SetMessageAsLogicallyDeleted extends LegacyMessageAction {
     uniqueMessageIdPath.read[String],
   ).mapN(SetMessageAsLogicallyDeletedRequest))
 }
+
 object GetSubmissionFailureMessage extends LegacyMessageAction {
   def eisRequest(implicit request: Request[NodeSeq]): Either[ErrorResponse, GetSubmissionFailureMessageRequest] = readXml((
     ernXmlPath.read[String],

@@ -24,6 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfe.stubs.DownstreamStub
 
@@ -60,11 +61,13 @@ trait IntegrationBaseSpec
     startWireMock()
     DownstreamStub.onSuccess(DownstreamStub.POST, "/write/audit", OK, Json.obj())
     DownstreamStub.onSuccess(DownstreamStub.POST, "/write/audit/merged", OK, Json.obj())
+    sys.props -= SendToEIS.configName
   }
 
   override protected def afterAll(): Unit = {
-    stopWireMock()
     super.afterAll()
+    sys.props -= SendToEIS.configName
+    stopWireMock()
   }
 
   def buildRequest(path: String, extraHeaders: (String, String)*): WSRequest = client

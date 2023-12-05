@@ -93,6 +93,9 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def eisGetMovementUrl(): String =
     eisBaseUrl + "/emcs/movements/v1/movement"
 
+  def eisGetMovementsUrl(): String =
+    eisBaseUrl + "/emcs/movements/v1/movements"
+
   def eisGetMovementHistoryEventsUrl(): String =
     eisBaseUrl + "/emcs/movements/v1/movement-history"
 

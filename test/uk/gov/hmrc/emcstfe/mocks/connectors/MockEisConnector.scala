@@ -25,6 +25,7 @@ import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
 import uk.gov.hmrc.emcstfe.models.response._
 import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, RawGetMessagesResponse}
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
+import uk.gov.hmrc.emcstfe.models.response.getMovement.RawGetMovementListResponse
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.{GetSubmissionFailureMessageResponse, RawGetSubmissionFailureMessageResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -78,6 +79,11 @@ trait MockEisConnector extends MockFactory {
 
     def getRawMovement(request: GetMovementRequest): CallHandler4[GetMovementRequest, HeaderCarrier, ExecutionContext, Reads[RawGetMovementResponse], Future[Either[ErrorResponse, RawGetMovementResponse]]] = {
       (mockEisConnector.getRawMovement(_: GetMovementRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[RawGetMovementResponse]))
+        .expects(request, *, *, *)
+    }
+
+    def getMovementList(request: GetMovementListRequest): CallHandler4[GetMovementListRequest, HeaderCarrier, ExecutionContext, Reads[RawGetMovementListResponse], Future[Either[ErrorResponse, RawGetMovementListResponse]]] = {
+      (mockEisConnector.getMovementList(_: GetMovementListRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[RawGetMovementListResponse]))
         .expects(request, *, *, *)
     }
 

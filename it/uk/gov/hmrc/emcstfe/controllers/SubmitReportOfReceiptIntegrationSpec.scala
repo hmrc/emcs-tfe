@@ -52,13 +52,8 @@ class SubmitReportOfReceiptIntegrationSpec extends IntegrationBaseSpec with Subm
   }
 
   override def beforeEach(): Unit = {
-    disable(SendToEIS)
     super.beforeEach()
-  }
-
-  override protected def afterAll(): Unit = {
-    sys.props -= SendToEIS.configName
-    super.afterAll()
+    disable(SendToEIS)
   }
 
   "Calling the submit draft movement endpoint" must {

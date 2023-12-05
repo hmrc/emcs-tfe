@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, RawGetMessagesResponse}
-import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
+import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.{GetMovementHistoryEventsResponse, RawGetMovementListResponse}
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.{GetSubmissionFailureMessageResponse, RawGetSubmissionFailureMessageResponse}
 import uk.gov.hmrc.emcstfe.models.response._
 import uk.gov.hmrc.emcstfe.services.MetricsService
@@ -82,6 +82,11 @@ class EisConnector @Inject()(val http: HttpClient,
   def getRawMovement(request: GetMovementRequest)
                     (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[RawGetMovementResponse]): Future[Either[ErrorResponse, RawGetMovementResponse]] = {
     prepareGetRequestAndSubmit(appConfig.eisGetMovementUrl(), request, "getMovement", appConfig.eisMovementsBearerToken)
+  }
+
+  def getMovementList(request: GetMovementListRequest)
+                    (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[RawGetMovementListResponse]): Future[Either[ErrorResponse, RawGetMovementListResponse]] = {
+    prepareGetRequestAndSubmit(appConfig.eisGetMovementsUrl(), request, "getMovementList", appConfig.eisGetMovementsBearerToken)
   }
 
   def getMovementHistoryEvents(request: GetMovementHistoryEventsRequest)

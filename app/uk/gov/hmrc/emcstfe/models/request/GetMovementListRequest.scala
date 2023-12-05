@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions.{DEFAULT_SORT_FIELD, DEFAULT_START_POSITION, DEFAULT_TRADER_ROLE, EIS_DEFAULT_SORT_FIELD, EIS_DEFAULT_START_POSITION, EIS_DEFAULT_TRADER_ROLE}
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
 case class GetMovementListRequest(exciseRegistrationNumber: String,
-                                  searchOptions: GetMovementListSearchOptions) extends ChrisRequest {
+                                  searchOptions: GetMovementListSearchOptions,
+                                  isEISFeatureEnabled: Boolean) extends ChrisRequest with EisConsumptionRequest {
   override def requestBody: String =
     s"""<?xml version='1.0' encoding='UTF-8'?>
       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -37,10 +40,10 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
       |      <OperationRequest>
       |        <Parameters>
       |          <Parameter Name="ExciseRegistrationNumber">$exciseRegistrationNumber</Parameter>
-      |          <Parameter Name="TraderRole">${searchOptions.traderRole}</Parameter>
-      |          <Parameter Name="SortField">${searchOptions.sortField}</Parameter>
+      |          <Parameter Name="TraderRole">${searchOptions.traderRole.getOrElse(DEFAULT_TRADER_ROLE)}</Parameter>
+      |          <Parameter Name="SortField">${searchOptions.sortField.getOrElse(DEFAULT_SORT_FIELD)}</Parameter>
       |          <Parameter Name="SortOrder">${searchOptions.sortOrder}</Parameter>
-      |          <Parameter Name="StartPosition">${searchOptions.startPosition}</Parameter>
+      |          <Parameter Name="StartPosition">${searchOptions.startPosition.getOrElse(DEFAULT_START_POSITION)}</Parameter>
       |          <Parameter Name="MaxNoToReturn">${searchOptions.maxRows}</Parameter>
       |        </Parameters>
       |        <ReturnData>
@@ -56,4 +59,25 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
   override def shouldExtractFromSoap: Boolean = true
 
   override def metricName = "get-movement-list"
+
+  override val queryParams: Seq[(String, String)] = Seq(
+    "exciseregistrationnumber" -> Some(exciseRegistrationNumber),
+    "traderrole" -> Some(if(isEISFeatureEnabled) searchOptions.traderRole.getOrElse(EIS_DEFAULT_TRADER_ROLE) else searchOptions.traderRole.getOrElse(DEFAULT_TRADER_ROLE)),
+    "sortfield" -> Some(if(isEISFeatureEnabled) searchOptions.sortField.getOrElse(EIS_DEFAULT_SORT_FIELD) else searchOptions.sortField.getOrElse(DEFAULT_SORT_FIELD)),
+    "sortorder" -> Some(searchOptions.sortOrder),
+    "startposition" -> Some(if(isEISFeatureEnabled) searchOptions.startPosition.getOrElse(EIS_DEFAULT_START_POSITION).toString else searchOptions.startPosition.getOrElse(DEFAULT_START_POSITION).toString),
+    "maxnotoreturn" -> Some(searchOptions.maxRows.toString),
+    "arc" -> searchOptions.arc,
+    "othertraderid" -> searchOptions.otherTraderId,
+    "localreferencenumber" -> searchOptions.lrn,
+    "dateofdispatchfrom" -> searchOptions.dateOfDispatchFrom,
+    "dateofdispatchto" -> searchOptions.dateOfDispatchTo,
+    "dateofreceiptfrom" -> searchOptions.dateOfReceiptFrom,
+    "dateofreceiptto" -> searchOptions.dateOfReceiptTo,
+    "countryoforigin" -> searchOptions.countryOfOrigin,
+    "movementstatus" -> searchOptions.movementStatus,
+    "transportertradername" -> searchOptions.transporterTraderName,
+    "undischargedmovements" -> searchOptions.undischargedMovements,
+    "exciseproductcode" -> searchOptions.exciseProductCode
+  ).collect { case (key, Some(value)) => key -> value }
 }

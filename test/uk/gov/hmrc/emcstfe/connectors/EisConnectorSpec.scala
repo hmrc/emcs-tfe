@@ -50,6 +50,7 @@ class EisConnectorSpec
     with FeatureSwitching
     with BeforeAndAfterEach
     with GetMovementFixture
+    with GetMovementListFixture
     with SubmitReportOfReceiptFixtures
     with SubmitExplainShortageExcessFixtures
     with SubmitExplainDelayFixtures
@@ -1476,6 +1477,94 @@ class EisConnectorSpec
             .returns(Future.successful(response))
 
           await(connector.getRawMovement(getMovementRequest)) shouldBe response
+        }
+      }
+    }
+
+    "getMovementList is called" should {
+      val searchOptions = GetMovementListSearchOptions(
+        traderRole = Some("foo"),
+        sortField = Some("bar"),
+        sortOrder = "wizz",
+        startPosition = Some(10),
+        maxRows = 99,
+        arc = Some(testArc),
+        otherTraderId = Some("GB123456789"),
+        lrn = Some(testLrn),
+        dateOfDispatchFrom = Some("06/07/2020"),
+        dateOfDispatchTo = Some("07/07/2020"),
+        dateOfReceiptFrom = Some("08/07/2020"),
+        dateOfReceiptTo = Some("09/07/2020"),
+        countryOfOrigin = Some("GB"),
+        movementStatus = Some("e-AD Manually Closed"),
+        transporterTraderName = Some("Trader 1"),
+        undischargedMovements = Some("Accepted"),
+        exciseProductCode = Some("6000")
+      )
+      val getMovementListRequest = GetMovementListRequest(testErn, searchOptions, isEISFeatureEnabled = true)
+      val url = "/emcs/movements/v1/movements"
+      val queryParameters = Seq(
+        "exciseregistrationnumber" -> testErn,
+        "traderrole"               -> "foo",
+        "sortfield"                 -> "bar",
+        "sortorder"                -> "wizz",
+        "startposition"            -> "10",
+        "maxnotoreturn"            -> "99",
+        "arc"                      -> testArc,
+        "othertraderid"            -> "GB123456789",
+        "localreferencenumber"     -> testLrn,
+        "dateofdispatchfrom"       -> "06/07/2020",
+        "dateofdispatchto"         -> "07/07/2020",
+        "dateofreceiptfrom"        -> "08/07/2020",
+        "dateofreceiptto"          -> "09/07/2020",
+        "countryoforigin"          -> "GB",
+        "movementstatus"           -> "e-AD Manually Closed",
+        "transportertradername"    -> "Trader 1",
+        "undischargedmovements"    -> "Accepted",
+        "exciseproductcode"        -> "6000"
+      )
+
+      "return a Right" when {
+        "downstream call is successful" in new Test {
+          MockMetricsService.requestTimer(getMovementListRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl$url",
+            parameters = queryParameters,
+            headers = Seq(
+              EisHeaders.dateTime        -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId   -> getMovementListRequest.correlationUUID,
+              EisHeaders.forwardedHost   -> "MDTP",
+              EisHeaders.source          -> "TFE"
+            ),
+            bearerToken = "Bearer value-movements"
+          ).returns(Future.successful(Right(getRawMovementListResponse)))
+
+          await(connector.getMovementList(getMovementListRequest)) shouldBe Right(getRawMovementListResponse)
+        }
+      }
+      "return a Left" when {
+        "downstream call returns a Left" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(getMovementListRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient.get(
+            url = s"$baseUrl$url",
+            parameters = queryParameters,
+            headers = Seq(
+              EisHeaders.dateTime        -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId   -> getMovementListRequest.correlationUUID,
+              EisHeaders.forwardedHost   -> "MDTP",
+              EisHeaders.source          -> "TFE"
+            ),
+            bearerToken = "Bearer value-movements"
+          ).returns(Future.successful(response))
+
+          await(connector.getMovementList(getMovementListRequest)) shouldBe response
         }
       }
     }
