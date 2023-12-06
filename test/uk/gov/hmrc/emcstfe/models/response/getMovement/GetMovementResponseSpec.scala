@@ -129,7 +129,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |						<urn:TransportModeCode>1</urn:TransportModeCode>
             |					</urn:TransportMode>
             |					<urn:MovementGuarantee>
-            |						<urn:GuarantorTypeCode>2</urn:GuarantorTypeCode>
+            |						<urn:GuarantorTypeCode>0</urn:GuarantorTypeCode>
             |					</urn:MovementGuarantee>
             |					<urn:BodyEadEsad>
             |           <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
@@ -356,7 +356,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |              <urn:TransportModeCode>1</urn:TransportModeCode>
             |            </urn:TransportMode>
             |            <urn:MovementGuarantee>
-            |              <urn:GuarantorTypeCode>2</urn:GuarantorTypeCode>
+            |              <urn:GuarantorTypeCode>0</urn:GuarantorTypeCode>
             |            </urn:MovementGuarantee>
             |            <urn:BodyEadEsad>
             |              <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
@@ -518,7 +518,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |              <urn:TransportModeCode>1</urn:TransportModeCode>
             |            </urn:TransportMode>
             |            <urn:MovementGuarantee>
-            |              <urn:GuarantorTypeCode>2</urn:GuarantorTypeCode>
+            |              <urn:GuarantorTypeCode>0</urn:GuarantorTypeCode>
             |            </urn:MovementGuarantee>
             |            <urn:BodyEadEsad>
             |              <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>

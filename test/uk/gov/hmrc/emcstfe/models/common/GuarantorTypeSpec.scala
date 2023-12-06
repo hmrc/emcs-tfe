@@ -24,6 +24,7 @@ class GuarantorTypeSpec extends TestBaseSpec {
   "GuarantorType" should {
 
     "have the correct codes" in {
+      GuarantorNotRequired.toString shouldBe "0"
       Consignor.toString shouldBe "1"
       ConsignorTransporter.toString shouldBe "12"
       ConsignorTransporterOwner.toString shouldBe "123"

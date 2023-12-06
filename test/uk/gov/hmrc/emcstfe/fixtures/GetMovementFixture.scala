@@ -91,7 +91,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |              <body:TransportModeCode>1</body:TransportModeCode>
                                                |            </body:TransportMode>
                                                |            <body:MovementGuarantee>
-                                               |              <body:GuarantorTypeCode>2</body:GuarantorTypeCode>
+                                               |              <body:GuarantorTypeCode>0</body:GuarantorTypeCode>
                                                |            </body:MovementGuarantee>
                                                |            <body:BodyEadEsad>
                                                |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
@@ -241,7 +241,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |              <body:TransportModeCode>1</body:TransportModeCode>
                                                |            </body:TransportMode>
                                                |            <body:MovementGuarantee>
-                                               |              <body:GuarantorTypeCode>2</body:GuarantorTypeCode>
+                                               |              <body:GuarantorTypeCode>0</body:GuarantorTypeCode>
                                                |            </body:MovementGuarantee>
                                                |            <body:BodyEadEsad>
                                                |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
@@ -493,7 +493,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       complementaryInformation = None
     ),
     movementGuarantee = MovementGuaranteeModel(
-      guarantorTypeCode = GuarantorType.Transporter,
+      guarantorTypeCode = GuarantorType.GuarantorNotRequired,
       guarantorTrader = None
     ),
     items = Seq(
@@ -642,7 +642,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       "transportModeCode" -> "1"
     ),
     "movementGuarantee" -> Json.obj(
-      "guarantorTypeCode" -> "2"
+      "guarantorTypeCode" -> "0"
     ),
     "items" -> Json.arr(
       Json.obj(

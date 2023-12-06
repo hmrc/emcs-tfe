@@ -20,6 +20,7 @@ sealed trait GuarantorType
 
 object GuarantorType extends Enumerable.Implicits {
 
+  case object GuarantorNotRequired extends WithName("0") with GuarantorType
   case object Consignor extends WithName("1") with GuarantorType
   case object ConsignorTransporter extends WithName("12") with GuarantorType
   case object ConsignorTransporterOwner extends WithName("123") with GuarantorType
@@ -38,6 +39,7 @@ object GuarantorType extends Enumerable.Implicits {
   case object NoGuarantor extends WithName("5") with GuarantorType
 
   val values: Seq[GuarantorType] = Seq(
+    GuarantorNotRequired,
     Consignor,
     ConsignorTransporter,
     ConsignorTransporterOwner,
