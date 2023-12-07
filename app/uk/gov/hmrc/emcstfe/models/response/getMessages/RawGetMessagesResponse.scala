@@ -17,13 +17,10 @@
 package uk.gov.hmrc.emcstfe.models.response.getMessages
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsError, JsResult, Reads, __}
-import uk.gov.hmrc.emcstfe.models.response.LegacyMessage
+import play.api.libs.json.{Reads, __}
+import uk.gov.hmrc.emcstfe.models.response.{Base64Xml, LegacyMessage}
 
-import java.nio.charset.StandardCharsets
-import java.util.Base64
-import scala.util.{Failure, Success, Try}
-import scala.xml.{NodeSeq, XML}
+import scala.xml.NodeSeq
 
 case class RawGetMessagesResponse(dateTime: String, exciseRegistrationNumber: String, messagesData: NodeSeq) extends LegacyMessage {
   override def xmlBody: NodeSeq = schemaResultBody(messagesData)
@@ -33,15 +30,6 @@ object RawGetMessagesResponse {
   implicit val reads: Reads[RawGetMessagesResponse] = (
     (__ \ "dateTime").read[String] and
       (__ \ "exciseRegistrationNumber").read[String] and
-      (__ \ "message").read[String].map {
-        message =>
-          Try {
-            val decodedMessage: String = new String(Base64.getDecoder.decode(message), StandardCharsets.UTF_8)
-            XML.loadString(decodedMessage)
-          } match {
-            case Failure(exception) => throw JsResult.Exception(JsError(exception.getMessage))
-            case Success(value) => value
-          }
-      }
+      (__ \ "message").read[Base64Xml].map(_.value)
     )(RawGetMessagesResponse.apply _)
 }

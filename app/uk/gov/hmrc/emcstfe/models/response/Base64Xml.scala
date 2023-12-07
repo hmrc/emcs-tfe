@@ -16,30 +16,23 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import com.lucidchart.open.xtract.XmlReader
 import play.api.libs.json.{JsError, JsResult, Reads, __}
-import uk.gov.hmrc.emcstfe.utils.XmlResultParser
 
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 import scala.util.{Failure, Success, Try}
-import scala.xml.XML
+import scala.xml.{NodeSeq, XML}
 
-case class Base64Model[T](value: T)
+case class Base64Xml(value: NodeSeq)
 
-object Base64Model {
-  implicit def modelReads[T](implicit xmlReader: XmlReader[T]): Reads[Base64Model[T]] = (__.read[String].map{
+object Base64Xml {
+  implicit val modelReads: Reads[Base64Xml] = (__.read[String].map{
     message => Try {
       val decodedMessage: String = new String(Base64.getDecoder.decode(message), StandardCharsets.UTF_8)
-      XmlResultParser.handleParseResult(xmlReader.read(XML.loadString(decodedMessage))) match {
-        case Left(value) => throw JsResult.Exception(JsError(value.message))
-        case Right(value) => Base64Model(value)
-      }
+      XML.loadString(decodedMessage)
     } match {
       case Failure(exception) => throw JsResult.Exception(JsError(exception.getMessage))
-      case Success(value) => value
+      case Success(value) => Base64Xml(value)
     }
   })
 }
-
-

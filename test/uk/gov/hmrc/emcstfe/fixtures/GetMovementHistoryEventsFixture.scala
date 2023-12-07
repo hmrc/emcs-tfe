@@ -17,7 +17,6 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.models.response.Base64Model
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.{GetMovementHistoryEventsResponse, MovementHistoryEvent}
 
 import java.util.Base64
@@ -85,13 +84,13 @@ trait GetMovementHistoryEventsFixture extends BaseFixtures {
   val emptyGetMovementHistoryEventsResponseModel: GetMovementHistoryEventsResponse = GetMovementHistoryEventsResponse(
     "now",
     testErn,
-    Base64Model(Nil)
+    Nil
   )
 
   val getMovementHistoryEventsResponseModel: GetMovementHistoryEventsResponse = GetMovementHistoryEventsResponse(
     "now",
     testErn,
-    Base64Model(Seq(MovementHistoryEvent("IE801", "2010-06-02T10:22:53", 2, 1, None), MovementHistoryEvent("IE818", "2010-06-02T10:22:53", 2, 1, None)))
+    Seq(MovementHistoryEvent("IE801", "2010-06-02T10:22:53", 2, 1, None), MovementHistoryEvent("IE818", "2010-06-02T10:22:53", 2, 1, None))
   )
 
   val getMovementHistoryEventsControllerResponseJson: JsObject = Json.obj(

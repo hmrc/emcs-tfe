@@ -20,13 +20,13 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Json, Reads, Writes, __}
 import uk.gov.hmrc.emcstfe.models.response.Base64Model
 
-case class GetMovementHistoryEventsResponse(dateTime: String, exciseRegistrationNumber: String, movementHistory: Base64Model[Seq[MovementHistoryEvent]])
+case class GetMovementHistoryEventsResponse(dateTime: String, exciseRegistrationNumber: String, movementHistory: Seq[MovementHistoryEvent])
 
 object GetMovementHistoryEventsResponse {
   implicit val writes: Writes[GetMovementHistoryEventsResponse] = Json.writes
   implicit val reads: Reads[GetMovementHistoryEventsResponse] = (
     (__ \ "dateTime").read[String] and
       (__ \ "exciseRegistrationNumber").read[String] and
-      (__ \ "message").read[Base64Model[Seq[MovementHistoryEvent]]]
+      (__ \ "message").read[Base64Model[Seq[MovementHistoryEvent]]].map(_.value)
     )(GetMovementHistoryEventsResponse.apply _)
 }
