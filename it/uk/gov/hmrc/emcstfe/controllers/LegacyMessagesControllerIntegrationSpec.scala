@@ -45,7 +45,7 @@ class LegacyMessagesControllerIntegrationSpec extends IntegrationBaseSpec with L
 
     lazy val downstreamMovementUri: String = "/emcs/movements/v1/movement"
 
-    lazy val  downstreamGetMovementQueryParam: Map[String, String] = Map(
+    lazy val downstreamGetMovementQueryParam: Map[String, String] = Map(
       "exciseregistrationnumber" -> testErn,
       "arc" -> testArc,
       "sequencenumber" -> "2"

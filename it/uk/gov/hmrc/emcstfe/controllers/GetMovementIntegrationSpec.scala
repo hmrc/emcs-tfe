@@ -22,6 +22,8 @@ import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Injecting
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, GetMovementIfChangedFixture}
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
@@ -31,12 +33,21 @@ import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import scala.xml.XML
 
-class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture with GetMovementIfChangedFixture with Injecting {
+class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture with GetMovementIfChangedFixture with Injecting with FeatureSwitching {
+
+  override val config: AppConfig = app.injector.instanceOf[AppConfig]
 
   val repository: GetMovementRepositoryImpl = inject[GetMovementRepositoryImpl]
 
   override def beforeEach(): Unit = {
+    disable(SendToEIS)
     await(repository.collection.deleteMany(BsonDocument()).toFuture())
+    super.beforeEach()
+  }
+
+  override def afterAll(): Unit = {
+    sys.props -= SendToEIS.configName
+    super.afterAll()
   }
 
   private trait Test {
@@ -44,7 +55,15 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
 
     def uri: String = s"/movement/$testErn/$testArc"
 
-    def downstreamUri: String = s"/ChRISOSB/EMCS/EMCSApplicationService/2"
+    def downstreamUri: String = "/ChRISOSB/EMCS/EMCSApplicationService/2"
+
+    def downstreamEisUri: String = "/emcs/movements/v1/movement"
+
+    def downstreamEisGetMovementQueryParam: Map[String, String] = Map(
+      "exciseregistrationnumber" -> testErn,
+      "arc" -> testArc,
+      "sequencenumber" -> "1"
+    )
 
     def generateHeaders(action: String) = Map(HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action"""")
 
@@ -92,7 +111,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
       }
     }
 
-    "user is authorized" when {
+    "user is authorised" when {
 
       "forceFetchNew = true" must {
         "return a success" when {
@@ -102,6 +121,20 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
               DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, XML.loadString(getMovementSoapWrapper))
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getMovementJson
+          }
+          "no movement exists in mongo so GetMovement is called (calling EIS)" in new Test {
+            override def forceFetchNew: Boolean = true
+
+            override def setupStubs(): StubMapping = {
+              enable(SendToEIS)
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, downstreamEisGetMovementQueryParam, Status.OK, getRawMovementJson)
             }
 
             val response: WSResponse = await(request().get())
@@ -155,6 +188,23 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
               AuthStub.authorised()
 
               DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementIfChangedHeaders, Status.OK, XML.loadString(getMovementIfChangedWithChangeSoapWrapper))
+            }
+
+            await(repository.set(GetMovementMongoResponse(testArc, JsString(getMovementIfChangedResponseBody))))
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(getMovementIfChangedResponse)
+          }
+
+          "a movement exists in mongo (calling EIS)" in new Test {
+            override def forceFetchNew: Boolean = true
+
+            override def setupStubs(): StubMapping = {
+              enable(SendToEIS)
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, downstreamEisGetMovementQueryParam, Status.OK, getRawMovementIfChangedJson)
             }
 
             await(repository.set(GetMovementMongoResponse(testArc, JsString(getMovementIfChangedResponseBody))))
@@ -226,6 +276,20 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
               DownstreamStub.onSuccessWithHeaders(DownstreamStub.POST, downstreamUri, getMovementHeaders, Status.OK, XML.loadString(getMovementSoapWrapper))
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getMovementJson
+          }
+          "no movement exists in mongo so GetMovement is called (calling EIS)" in new Test {
+            override def forceFetchNew: Boolean = false
+
+            override def setupStubs(): StubMapping = {
+              enable(SendToEIS)
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, downstreamEisGetMovementQueryParam, Status.OK, getRawMovementJson)
             }
 
             val response: WSResponse = await(request().get())
