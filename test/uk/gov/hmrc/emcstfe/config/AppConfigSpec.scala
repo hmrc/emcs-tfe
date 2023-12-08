@@ -71,6 +71,21 @@ class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
         }
       }
     }
+
+    "tokens" should {
+      "return the correct value for eis.emcs08.token" in {
+        config.eisSubmitBearerToken shouldBe "value-emcs08"
+      }
+      "return the correct value for eis.emcmes.token" in {
+        config.eisMessagesBearerToken shouldBe "value-messages"
+      }
+      "return the correct value for eis.emcmov.token" in {
+        config.eisMovementsBearerToken shouldBe "value-movements"
+      }
+      "return the correct value for eis.emc15b.token" in {
+        config.eisPrevalidateBearerToken shouldBe "value-prevalidate"
+      }
+    }
   }
 
 }

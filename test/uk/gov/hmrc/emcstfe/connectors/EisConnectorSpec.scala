@@ -572,7 +572,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-submission-failure-message"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(Right(getSubmissionFailureMessageResponseModel)))
 
@@ -602,7 +602,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-submission-failure-message"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -629,7 +629,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-submission-failure-message"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -656,7 +656,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-submission-failure-message"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -683,7 +683,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-submission-failure-message"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -710,7 +710,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-submission-failure-message"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -737,7 +737,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-submission-failure-message"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -763,7 +763,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-submission-failure-message"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -791,7 +791,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-put"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(Right(markMessageAsReadResponseModel)))
 
@@ -817,7 +817,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-put"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -840,7 +840,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-put"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -863,7 +863,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-put"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -886,7 +886,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-put"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -909,7 +909,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-put"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -932,7 +932,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-put"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -954,7 +954,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-put"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -982,7 +982,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-delete"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(Right(setMessageAsLogicallyDeletedResponseModel)))
 
@@ -1008,7 +1008,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-delete"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1031,7 +1031,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-delete"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1054,7 +1054,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-delete"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1077,7 +1077,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-delete"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1100,7 +1100,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-delete"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1123,7 +1123,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-delete"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1145,7 +1145,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-delete"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1176,7 +1176,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-statistics"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(Right(getMessageStatisticsResponseModel)))
 
@@ -1205,7 +1205,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-statistics"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1231,7 +1231,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-statistics"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1257,7 +1257,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-statistics"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1283,7 +1283,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-statistics"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1309,7 +1309,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-statistics"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1335,7 +1335,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-statistics"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1360,7 +1360,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-message-statistics"
+              bearerToken = "Bearer value-messages"
             )
             .returns(Future.successful(response))
 
@@ -1391,7 +1391,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-movement"
+              bearerToken = "Bearer value-movements"
             )
             .returns(Future.successful(Right(getRawMovementResponse)))
 
@@ -1420,7 +1420,7 @@ class EisConnectorSpec
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "TFE"
               ),
-              bearerToken = "Bearer value-movement"
+              bearerToken = "Bearer value-movements"
             )
             .returns(Future.successful(response))
 
