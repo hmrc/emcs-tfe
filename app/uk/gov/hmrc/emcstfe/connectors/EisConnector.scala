@@ -67,39 +67,39 @@ class EisConnector @Inject()(val http: HttpClient,
 
   def getMessages(request: GetMessagesRequest)
                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetMessagesResponse]): Future[Either[ErrorResponse, GetMessagesResponse]] =
-    prepareGetRequestAndSubmit(appConfig.eisGetMessagesUrl(), request, "getMessages", appConfig.eisGetMessagesBearerToken)
+    prepareGetRequestAndSubmit(appConfig.eisGetMessagesUrl(), request, "getMessages", appConfig.eisMessagesBearerToken)
 
   def getRawMessages(request: GetMessagesRequest)
                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[RawGetMessagesResponse]): Future[Either[ErrorResponse, RawGetMessagesResponse]] =
-    prepareGetRequestAndSubmit(appConfig.eisGetMessagesUrl(), request, "getMessages", appConfig.eisGetMessagesBearerToken)
+    prepareGetRequestAndSubmit(appConfig.eisGetMessagesUrl(), request, "getMessages", appConfig.eisMessagesBearerToken)
 
   def getMessageStatistics(request: GetMessageStatisticsRequest)
                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetMessageStatisticsResponse]): Future[Either[ErrorResponse, GetMessageStatisticsResponse]] = {
-    prepareGetRequestAndSubmit(appConfig.eisGetMessageStatisticsUrl(), request, "getMessageStatistics", appConfig.eisGetMessageStatisticsBearerToken)
+    prepareGetRequestAndSubmit(appConfig.eisGetMessageStatisticsUrl(), request, "getMessageStatistics", appConfig.eisMessagesBearerToken)
   }
 
   def getRawMovement(request: GetMovementRequest)
                     (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[RawGetMovementResponse]): Future[Either[ErrorResponse, RawGetMovementResponse]] = {
-    prepareGetRequestAndSubmit(appConfig.eisGetMovementUrl(), request, "getMovement", appConfig.eisGetMovementBearerToken)
+    prepareGetRequestAndSubmit(appConfig.eisGetMovementUrl(), request, "getMovement", appConfig.eisMovementsBearerToken)
   }
 
   def getSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest)
                                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetSubmissionFailureMessageResponse]): Future[Either[ErrorResponse, GetSubmissionFailureMessageResponse]] =
-    prepareGetRequestAndSubmit(appConfig.eisGetSubmissionFailureMessageUrl(), request, "getSubmissionFailureMessage", appConfig.eisGetSubmissionFailureMessageBearerToken)
+    prepareGetRequestAndSubmit(appConfig.eisGetSubmissionFailureMessageUrl(), request, "getSubmissionFailureMessage", appConfig.eisMessagesBearerToken)
 
   def getRawSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest)
                                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[RawGetSubmissionFailureMessageResponse]): Future[Either[ErrorResponse, RawGetSubmissionFailureMessageResponse]] =
-    prepareGetRequestAndSubmit(appConfig.eisGetSubmissionFailureMessageUrl(), request, "getSubmissionFailureMessage", appConfig.eisGetSubmissionFailureMessageBearerToken)
+    prepareGetRequestAndSubmit(appConfig.eisGetSubmissionFailureMessageUrl(), request, "getSubmissionFailureMessage", appConfig.eisMessagesBearerToken)
 
   def markMessageAsRead(request: MarkMessageAsReadRequest)
                        (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[MarkMessageAsReadResponse]): Future[Either[ErrorResponse, MarkMessageAsReadResponse]] = {
     val url = appConfig.eisMessageUrl(request.exciseRegistrationNumber, request.messageId)
-    prepareEmptyPutRequestAndSubmit(url, request, "markMessageAsRead", appConfig.eisMarkMessageAsReadBearerToken)
+    prepareEmptyPutRequestAndSubmit(url, request, "markMessageAsRead", appConfig.eisMessagesBearerToken)
   }
 
   def setMessageAsLogicallyDeleted(request: SetMessageAsLogicallyDeletedRequest)
                                   (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[SetMessageAsLogicallyDeletedResponse]): Future[Either[ErrorResponse, SetMessageAsLogicallyDeletedResponse]] = {
     val url = appConfig.eisMessageUrl(request.exciseRegistrationNumber, request.messageId)
-    prepareDeleteRequestAndSubmit(url, request, "setMessageAsLogicallyDeleted", appConfig.eisSetMessageAsLogicallyDeletedBearerToken)
+    prepareDeleteRequestAndSubmit(url, request, "setMessageAsLogicallyDeleted", appConfig.eisMessagesBearerToken)
   }
 }

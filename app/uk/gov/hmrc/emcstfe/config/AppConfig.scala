@@ -69,31 +69,14 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def eisSubmitBearerToken: String =
     configuration.get[String]("eis.emcs08.token")
 
-  def eisGetMessageStatisticsBearerToken: String =
-    configuration.get[String]("eis.emcmes.message-statistics.token")
+  def eisMessagesBearerToken: String =
+    configuration.get[String]("eis.emcmes.token")
 
-  def eisGetMessagesBearerToken: String =
-    configuration.get[String]("eis.emcmes.messages.token")
+  def eisMovementsBearerToken: String =
+    configuration.get[String]("eis.emcmov.token")
 
-  def eisGetSubmissionFailureMessageBearerToken: String =
-    configuration.get[String]("eis.emcmes.submission-failure-message.token")
-
-  def eisMarkMessageAsReadBearerToken: String =
-    configuration.get[String]("eis.emcmes.message-put.token")
-
-  def eisSetMessageAsLogicallyDeletedBearerToken: String =
-    configuration.get[String]("eis.emcmes.message-delete.token")
-
-  def eisGetMovementBearerToken: String =
-    configuration.get[String]("eis.emcmov.movement.token")
-
-  // TODO: uncomment when we integrate with EIS
-//  def eisGetMovementsBearerToken: String =
-//    configuration.get[String]("eis.emcmov.movements.token")
-
-  // TODO: uncomment when we integrate with EIS
-//  def eisGetMovementHistoryBearerToken: String =
-//    configuration.get[String]("eis.emcmov.movement-history.token")
+  def eisPrevalidateBearerToken: String =
+    configuration.get[String]("eis.emc15b.token")
 
   def eisGetMessagesUrl(): String =
     eisBaseUrl + "/emcs/messages/v1/messages"
