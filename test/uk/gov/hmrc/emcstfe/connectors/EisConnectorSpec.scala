@@ -1536,7 +1536,8 @@ class EisConnectorSpec
               EisHeaders.dateTime        -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
               EisHeaders.correlationId   -> getMovementListRequest.correlationUUID,
               EisHeaders.forwardedHost   -> "MDTP",
-              EisHeaders.source          -> "TFE"
+              EisHeaders.source          -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
             ),
             bearerToken = "Bearer value-movements"
           ).returns(Future.successful(Right(getRawMovementListResponse)))
@@ -1559,7 +1560,8 @@ class EisConnectorSpec
               EisHeaders.dateTime        -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
               EisHeaders.correlationId   -> getMovementListRequest.correlationUUID,
               EisHeaders.forwardedHost   -> "MDTP",
-              EisHeaders.source          -> "TFE"
+              EisHeaders.source          -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
             ),
             bearerToken = "Bearer value-movements"
           ).returns(Future.successful(response))

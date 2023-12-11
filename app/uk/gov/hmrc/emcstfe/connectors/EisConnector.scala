@@ -86,7 +86,7 @@ class EisConnector @Inject()(val http: HttpClient,
 
   def getMovementList(request: GetMovementListRequest)
                     (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[RawGetMovementListResponse]): Future[Either[ErrorResponse, RawGetMovementListResponse]] = {
-    prepareGetRequestAndSubmit(appConfig.eisGetMovementsUrl(), request, "getMovementList", appConfig.eisGetMovementsBearerToken)
+    prepareGetRequestAndSubmit(appConfig.eisGetMovementsUrl(), request, "getMovementList", appConfig.eisMovementsBearerToken)
   }
 
   def getMovementHistoryEvents(request: GetMovementHistoryEventsRequest)
