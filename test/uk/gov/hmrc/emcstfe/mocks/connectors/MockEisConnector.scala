@@ -22,9 +22,10 @@ import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
+import uk.gov.hmrc.emcstfe.models.response._
 import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, RawGetMessagesResponse}
+import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.{GetSubmissionFailureMessageResponse, RawGetSubmissionFailureMessageResponse}
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMessageStatisticsResponse, MarkMessageAsReadResponse, RawGetMovementResponse, SetMessageAsLogicallyDeletedResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -77,6 +78,11 @@ trait MockEisConnector extends MockFactory {
 
     def getRawMovement(request: GetMovementRequest): CallHandler4[GetMovementRequest, HeaderCarrier, ExecutionContext, Reads[RawGetMovementResponse], Future[Either[ErrorResponse, RawGetMovementResponse]]] = {
       (mockEisConnector.getRawMovement(_: GetMovementRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[RawGetMovementResponse]))
+        .expects(request, *, *, *)
+    }
+
+    def getMovementHistoryEvents(request: GetMovementHistoryEventsRequest): CallHandler4[GetMovementHistoryEventsRequest, HeaderCarrier, ExecutionContext, Reads[GetMovementHistoryEventsResponse], Future[Either[ErrorResponse, GetMovementHistoryEventsResponse]]] = {
+      (mockEisConnector.getMovementHistoryEvents(_: GetMovementHistoryEventsRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetMovementHistoryEventsResponse]))
         .expects(request, *, *, *)
     }
 

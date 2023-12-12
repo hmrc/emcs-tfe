@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage
+package uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{Reads, __}
-import uk.gov.hmrc.emcstfe.models.response.{Base64Xml, LegacyMessage}
+import play.api.libs.json.{Json, Reads, Writes, __}
+import uk.gov.hmrc.emcstfe.models.response.Base64Model
 
-import scala.xml.NodeSeq
+case class GetMovementHistoryEventsResponse(dateTime: String, exciseRegistrationNumber: String, movementHistory: Seq[MovementHistoryEvent])
 
-case class RawGetSubmissionFailureMessageResponse(dateTime: String, exciseRegistrationNumber: String, submissionFailureMessageData: NodeSeq) extends LegacyMessage {
-  override def xmlBody: NodeSeq = schemaResultBody(submissionFailureMessageData)
-}
-
-object RawGetSubmissionFailureMessageResponse {
-  implicit val reads: Reads[RawGetSubmissionFailureMessageResponse] = (
+object GetMovementHistoryEventsResponse {
+  implicit val writes: Writes[GetMovementHistoryEventsResponse] = Json.writes
+  implicit val reads: Reads[GetMovementHistoryEventsResponse] = (
     (__ \ "dateTime").read[String] and
       (__ \ "exciseRegistrationNumber").read[String] and
-      (__ \ "message").read[Base64Xml].map(_.value)
-    )(RawGetSubmissionFailureMessageResponse.apply _)
+      (__ \ "message").read[Base64Model[Seq[MovementHistoryEvent]]].map(_.value)
+    )(GetMovementHistoryEventsResponse.apply _)
 }

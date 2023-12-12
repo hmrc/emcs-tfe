@@ -16,18 +16,23 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json._
+import play.api.libs.json.{JsError, JsResult, Reads, __}
 
-import scala.xml.NodeSeq
+import java.nio.charset.StandardCharsets
+import java.util.Base64
+import scala.util.{Failure, Success, Try}
+import scala.xml.{NodeSeq, XML}
 
-case class RawGetMovementResponse(dateTime: String, exciseRegistrationNumber: String, movementView: NodeSeq) extends LegacyMessage {
-  override protected def xmlBody: NodeSeq = schemaResultBody(movementView)
-}
+case class Base64Xml(value: NodeSeq)
 
-object RawGetMovementResponse {
-  implicit val reads: Reads[RawGetMovementResponse] = ((__ \ "dateTime").read[String] and
-    (__ \ "exciseRegistrationNumber").read[String] and
-    (__ \ "message").read[Base64Xml].map(_.value)
-  )(RawGetMovementResponse.apply _)
+object Base64Xml {
+  implicit val modelReads: Reads[Base64Xml] = (__.read[String].map{
+    message => Try {
+      val decodedMessage: String = new String(Base64.getDecoder.decode(message), StandardCharsets.UTF_8)
+      XML.loadString(decodedMessage)
+    } match {
+      case Failure(exception) => throw JsResult.Exception(JsError(exception.getMessage))
+      case Success(value) => Base64Xml(value)
+    }
+  })
 }

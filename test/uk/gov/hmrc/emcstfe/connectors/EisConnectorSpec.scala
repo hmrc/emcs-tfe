@@ -60,6 +60,7 @@ class EisConnectorSpec
     with MarkMessageAsReadFixtures
     with SetMessageAsLogicallyDeletedFixtures
     with GetMessageStatisticsFixtures
+    with GetMovementHistoryEventsFixture
     with MockMetricsService {
 
   override def afterEach(): Unit = {
@@ -1480,4 +1481,233 @@ class EisConnectorSpec
     }
   }
 
+  "getMovementHistoryEvent is called" should {
+
+    val getMovementHistoryEventsRequest = GetMovementHistoryEventsRequest(testErn, testArc)
+
+    "return a Right" when {
+      "downstream call is successful" in new Test {
+
+        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient
+          .get(
+            url = s"$baseUrl/emcs/movements/v1/movement-history",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
+            ),
+            bearerToken = "Bearer value-movements"
+          )
+          .returns(Future.successful(Right(getMovementHistoryEventsResponseModel)))
+
+        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe Right(getMovementHistoryEventsResponseModel)
+      }
+    }
+
+    "return a Left" when {
+
+      "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient
+          .get(
+            url = s"$baseUrl/emcs/movements/v1/movement-history",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"),
+            bearerToken = "Bearer value-movements"
+          )
+          .returns(Future.successful(response))
+
+        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+      }
+
+      "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient
+          .get(
+            url = s"$baseUrl/emcs/movements/v1/movement-history",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
+            ),
+            bearerToken = "Bearer value-movements"
+          )
+          .returns(Future.successful(response))
+
+        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+      }
+
+      "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient
+          .get(
+            url = s"$baseUrl/emcs/movements/v1/movement-history",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
+            ),
+            bearerToken = "Bearer value-movements"
+          )
+          .returns(Future.successful(response))
+
+        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+      }
+
+      "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient
+          .get(
+            url = s"$baseUrl/emcs/movements/v1/movement-history",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
+            ),
+            bearerToken = "Bearer value-movements"
+          )
+          .returns(Future.successful(response))
+
+        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+      }
+
+      "downstream call fails due to a 500 (ISE) response" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient
+          .get(
+            url = s"$baseUrl/emcs/movements/v1/movement-history",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
+            ),
+            bearerToken = "Bearer value-movements"
+          )
+          .returns(Future.successful(response))
+
+        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+      }
+
+      "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+        val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient
+          .get(
+            url = s"$baseUrl/emcs/movements/v1/movement-history",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
+            ),
+            bearerToken = "Bearer value-movements"
+          )
+          .returns(Future.successful(response))
+
+        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+      }
+
+      "downstream call is unsuccessful" in new Test {
+        val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+        MockMetricsService.processWithTimer()
+
+        MockHttpClient
+          .get(
+            url = s"$baseUrl/emcs/movements/v1/movement-history",
+            parameters = Seq(
+              "exciseregistrationnumber" -> testErn,
+              "arc" -> testArc
+            ),
+            headers = Seq(
+              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+              EisHeaders.forwardedHost -> "MDTP",
+              EisHeaders.source -> "TFE",
+              EisHeaders.authorization -> "Bearer value-movements"
+            ),
+            bearerToken = "Bearer value-movements"
+          )
+          .returns(Future.successful(response))
+
+        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+      }
+    }
+  }
 }
