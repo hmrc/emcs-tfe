@@ -611,6 +611,17 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
         complementaryInformation = Some("Cans"),
         sealInformation = Some("Seal info")
       )
+    ),
+    movementViewHistoryAndExtraData = MovementViewHistoryAndExtraDataModel(
+      arc = "13AB7778889991ABCDEF9",
+      serialNumberOfCertificateOfExemption = None,
+      dispatchImportOfficeReferenceNumber = None,
+      deliveryPlaceCustomsOfficeReferenceNumber = Some("FR000003"),
+      competentAuthorityDispatchOfficeReferenceNumber = Some("GB000002"),
+      eadStatus = "Beans",
+      dateAndTimeOfValidationOfEadEsad = "2008-09-04T10:22:50",
+      numberOfItems = 2,
+      reportOfReceipt = None
     )
   )
 

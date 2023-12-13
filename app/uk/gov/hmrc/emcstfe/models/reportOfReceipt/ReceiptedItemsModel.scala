@@ -16,8 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
+import cats.implicits.catsSyntaxTuple6Semigroupal
+import com.lucidchart.open.xtract.XmlReader.strictReadSeq
+import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
+import uk.gov.hmrc.emcstfe.utils.{XmlReaderUtils, XmlWriterUtils}
 
 case class ReceiptedItemsModel(eadBodyUniqueReference: Int,
                                productCode: String,
@@ -53,6 +56,26 @@ case class ReceiptedItemsModel(eadBodyUniqueReference: Int,
     </urn:BodyReportOfReceiptExport>
 }
 
-object ReceiptedItemsModel {
+object ReceiptedItemsModel extends XmlReaderUtils {
+
+  val xmlReads: XmlReader[ReceiptedItemsModel] = (
+    (__ \ "BodyRecordUniqueReference").read[Int],
+    (__ \ "ExciseProductCode").read[String],
+    (__ \ "IndicatorOfShortageOrExcess").read[Option[String]],
+    (__ \ "ObservedShortageOrExcess").read[Option[BigDecimal]],
+    (__ \ "RefusedQuantity").read[Option[BigDecimal]],
+    (__ \ "UnsatisfactoryReason").read[Seq[UnsatisfactoryModel]](strictReadSeq(UnsatisfactoryModel.xmlReads))
+  ).mapN {
+    case (uniqueReference, epc, shortageOrExcessIndicator, shortageOrExcessValue, refusedAmount, unsatisfactoryReasons) => {
+      ReceiptedItemsModel(
+        eadBodyUniqueReference = uniqueReference,
+        productCode = epc,
+        excessAmount = if (shortageOrExcessIndicator.contains("E")) shortageOrExcessValue else None,
+        shortageAmount = if (shortageOrExcessIndicator.contains("S")) shortageOrExcessValue else None,
+        refusedAmount = refusedAmount,
+        unsatisfactoryReasons = unsatisfactoryReasons
+      )
+    }
+  }
   implicit val fmt: Format[ReceiptedItemsModel] = Json.format
 }

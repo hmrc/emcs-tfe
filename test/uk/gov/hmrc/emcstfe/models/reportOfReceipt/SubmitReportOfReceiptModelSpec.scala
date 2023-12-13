@@ -45,5 +45,17 @@ class SubmitReportOfReceiptModelSpec extends XmlModelBaseSpec with SubmitReportO
       minSubmitReportOfReceiptModel,
       minSubmitReportOfReceiptModelXML
     )
+
+    testXmlToModel(
+      "min fields",
+      minSubmitReportOfReceiptModel.copy(destinationType = None),
+      minSubmitReportOfReceiptModelXML
+    )(SubmitReportOfReceiptModel.xmlReads)
+
+    testXmlToModel(
+      "max fields",
+      maxSubmitReportOfReceiptModel.copy(destinationType = None),
+      maxSubmitReportOfReceiptModelXML
+    )(SubmitReportOfReceiptModel.xmlReads)
   }
 }

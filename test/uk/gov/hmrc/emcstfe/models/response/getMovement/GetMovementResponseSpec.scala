@@ -19,12 +19,15 @@ package uk.gov.hmrc.emcstfe.models.response.getMovement
 import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess}
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
+import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
-import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, PlaceOfDispatchTrader, TransportTrader}
+import uk.gov.hmrc.emcstfe.models.common._
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.response.Packaging
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse.EADESADContainer
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
+import java.time.LocalDate
 import scala.xml.XML
 
 class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
@@ -35,15 +38,6 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
     }
     "write a max model to JSON" in {
       Json.toJson(maxGetMovementResponse) shouldBe maxGetMovementJson
-    }
-  }
-
-  "reads" should {
-    "read JSON to a model" in {
-      getMovementJson.as[GetMovementResponse] shouldBe getMovementResponse()
-    }
-    "read max JSON to a model" in {
-      maxGetMovementJson.as[GetMovementResponse] shouldBe maxGetMovementResponse
     }
   }
 
@@ -249,7 +243,97 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |				</urn:EADESADContainer>
             |			</urn:Body>
             |		</urn:IE801>
+            |        <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+            |      <urn:Header>
+            |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+            |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+            |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+            |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+            |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+            |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+            |      </urn:Header>
+            |      <urn:Body>
+            |        <urn:AcceptedOrRejectedReportOfReceiptExport>
+            |          <urn:Attributes>
+            |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+            |          </urn:Attributes>
+            |          <urn:ConsigneeTrader language="en">
+            |            <urn:Traderid>XIWK000000206</urn:Traderid>
+            |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
+            |            <urn:StreetName>Catherdral</urn:StreetName>
+            |            <urn:StreetNumber>1</urn:StreetNumber>
+            |            <urn:Postcode>BT3 7BF</urn:Postcode>
+            |            <urn:City>Salford</urn:City>
+            |          </urn:ConsigneeTrader>
+            |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+            |            <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
+            |            <urn:SequenceNumber>2</urn:SequenceNumber>
+            |          </ie:ExciseMovement>
+            |          <urn:DeliveryPlaceTrader language="en">
+            |            <urn:Traderid>XI00000000207</urn:Traderid>
+            |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
+            |            <urn:StreetNumber>2</urn:StreetNumber>
+            |            <urn:StreetName>Catherdral</urn:StreetName>
+            |            <urn:Postcode>BT3 7BF</urn:Postcode>
+            |            <urn:City>Salford</urn:City>
+            |          </urn:DeliveryPlaceTrader>
+            |          <urn:DestinationOffice>
+            |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
+            |          </urn:DestinationOffice>
+            |          <urn:ReportOfReceiptExport>
+            |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
+            |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
+            |          </urn:ReportOfReceiptExport>
+            |        </urn:AcceptedOrRejectedReportOfReceiptExport>
+            |      </urn:Body>
+            |    </urn:IE818>
             |	</mov:currentMovement>
+            | <mov:eventHistory>
+            |   <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+            |      <urn:Header>
+            |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+            |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+            |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+            |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+            |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+            |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+            |      </urn:Header>
+            |      <urn:Body>
+            |        <urn:AcceptedOrRejectedReportOfReceiptExport>
+            |          <urn:Attributes>
+            |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+            |          </urn:Attributes>
+            |          <urn:ConsigneeTrader language="en">
+            |            <urn:Traderid>XIWK000000206</urn:Traderid>
+            |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
+            |            <urn:StreetName>Catherdral</urn:StreetName>
+            |            <urn:StreetNumber>1</urn:StreetNumber>
+            |            <urn:Postcode>BT3 7BF</urn:Postcode>
+            |            <urn:City>Salford</urn:City>
+            |          </urn:ConsigneeTrader>
+            |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+            |            <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
+            |            <urn:SequenceNumber>2</urn:SequenceNumber>
+            |          </ie:ExciseMovement>
+            |          <urn:DeliveryPlaceTrader language="en">
+            |            <urn:Traderid>XI00000000207</urn:Traderid>
+            |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
+            |            <urn:StreetNumber>2</urn:StreetNumber>
+            |            <urn:StreetName>Catherdral</urn:StreetName>
+            |            <urn:Postcode>BT3 7BF</urn:Postcode>
+            |            <urn:City>Salford</urn:City>
+            |          </urn:DeliveryPlaceTrader>
+            |          <urn:DestinationOffice>
+            |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
+            |          </urn:DestinationOffice>
+            |          <urn:ReportOfReceiptExport>
+            |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
+            |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
+            |          </urn:ReportOfReceiptExport>
+            |        </urn:AcceptedOrRejectedReportOfReceiptExport>
+            |      </urn:Body>
+            |    </urn:IE818>
+            |    </mov:eventHistory>
             |</mov:movementView>""".stripMargin)) shouldBe
           ParseSuccess(getMovementResponse().copy(
             items = getMovementResponse().items :+ MovementItem(
@@ -287,8 +371,58 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
               ),
               wineProduct = None
             ),
-            numberOfItems = 3
-          ))
+            numberOfItems = 3,
+            movementViewHistoryAndExtraData = MovementViewHistoryAndExtraDataModel(
+              arc = "13AB7778889991ABCDEF9",
+              serialNumberOfCertificateOfExemption = None,
+              dispatchImportOfficeReferenceNumber = None,
+              deliveryPlaceCustomsOfficeReferenceNumber = Some("FR000003"),
+              competentAuthorityDispatchOfficeReferenceNumber = Some("GB000002"),
+              eadStatus = "Accepted",
+              dateAndTimeOfValidationOfEadEsad = "2008-09-04T10:22:50",
+              numberOfItems = 3,
+              reportOfReceipt = Some(SubmitReportOfReceiptModel(
+                arc = "13AB7778889991ABCDEF9",
+                sequenceNumber = 2,
+                dateAndTimeOfValidationOfReportOfReceiptExport = Some("2021-09-10T11:11:12"),
+                consigneeTrader = Some(
+                  TraderModel(
+                    traderExciseNumber = Some("XIWK000000206"),
+                    traderName = Some("SEED TRADER NI"),
+                    address = Some(
+                      AddressModel(
+                        streetNumber = Some("1"),
+                        street = Some("Catherdral"),
+                        postcode = Some("BT3 7BF"),
+                        city = Some("Salford")
+                      )),
+                    vatNumber = None,
+                    eoriNumber = None
+                  )
+                ),
+                deliveryPlaceTrader = Some(
+                  TraderModel(
+                    traderExciseNumber = Some("XI00000000207"),
+                    traderName = Some("SEED TRADER NI 2"),
+                    address = Some(
+                      AddressModel(
+                        streetNumber = Some("2"),
+                        street = Some("Catherdral"),
+                        postcode = Some("BT3 7BF"),
+                        city = Some("Salford")
+                      )),
+                    vatNumber = None,
+                    eoriNumber = None
+                  )
+                ),
+                destinationOffice = "XI004098",
+                dateOfArrival = LocalDate.parse("2021-09-08"),
+                otherInformation = None,
+                individualItems = Seq(),
+                destinationType = None,
+                acceptMovement = Satisfactory
+              ))
+            )))
       }
 
       "handle hours and days" in {
@@ -450,6 +584,52 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |        </urn:Body>
             |      </urn:IE801>
             |    </mov:currentMovement>
+            |     <mov:eventHistory>
+            |   <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+            |      <urn:Header>
+            |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+            |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+            |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+            |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+            |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+            |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+            |      </urn:Header>
+            |      <urn:Body>
+            |        <urn:AcceptedOrRejectedReportOfReceiptExport>
+            |          <urn:Attributes>
+            |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+            |          </urn:Attributes>
+            |          <urn:ConsigneeTrader language="en">
+            |            <urn:Traderid>XIWK000000206</urn:Traderid>
+            |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
+            |            <urn:StreetName>Catherdral</urn:StreetName>
+            |            <urn:StreetNumber>1</urn:StreetNumber>
+            |            <urn:Postcode>BT3 7BF</urn:Postcode>
+            |            <urn:City>Salford</urn:City>
+            |          </urn:ConsigneeTrader>
+            |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+            |            <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
+            |            <urn:SequenceNumber>2</urn:SequenceNumber>
+            |          </ie:ExciseMovement>
+            |          <urn:DeliveryPlaceTrader language="en">
+            |            <urn:Traderid>XI00000000207</urn:Traderid>
+            |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
+            |            <urn:StreetNumber>2</urn:StreetNumber>
+            |            <urn:StreetName>Catherdral</urn:StreetName>
+            |            <urn:Postcode>BT3 7BF</urn:Postcode>
+            |            <urn:City>Salford</urn:City>
+            |          </urn:DeliveryPlaceTrader>
+            |          <urn:DestinationOffice>
+            |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
+            |          </urn:DestinationOffice>
+            |          <urn:ReportOfReceiptExport>
+            |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
+            |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
+            |          </urn:ReportOfReceiptExport>
+            |        </urn:AcceptedOrRejectedReportOfReceiptExport>
+            |      </urn:Body>
+            |    </urn:IE818>
+            |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 
         modelWithHours shouldBe ParseSuccess(getMovementResponse(journeyTimeValue = "20 hours"))
@@ -612,6 +792,52 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |        </urn:Body>
             |      </urn:IE801>
             |    </mov:currentMovement>
+            |     <mov:eventHistory>
+            |   <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+            |      <urn:Header>
+            |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+            |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+            |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+            |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+            |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+            |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+            |      </urn:Header>
+            |      <urn:Body>
+            |        <urn:AcceptedOrRejectedReportOfReceiptExport>
+            |          <urn:Attributes>
+            |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+            |          </urn:Attributes>
+            |          <urn:ConsigneeTrader language="en">
+            |            <urn:Traderid>XIWK000000206</urn:Traderid>
+            |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
+            |            <urn:StreetName>Catherdral</urn:StreetName>
+            |            <urn:StreetNumber>1</urn:StreetNumber>
+            |            <urn:Postcode>BT3 7BF</urn:Postcode>
+            |            <urn:City>Salford</urn:City>
+            |          </urn:ConsigneeTrader>
+            |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+            |            <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
+            |            <urn:SequenceNumber>2</urn:SequenceNumber>
+            |          </ie:ExciseMovement>
+            |          <urn:DeliveryPlaceTrader language="en">
+            |            <urn:Traderid>XI00000000207</urn:Traderid>
+            |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
+            |            <urn:StreetNumber>2</urn:StreetNumber>
+            |            <urn:StreetName>Catherdral</urn:StreetName>
+            |            <urn:Postcode>BT3 7BF</urn:Postcode>
+            |            <urn:City>Salford</urn:City>
+            |          </urn:DeliveryPlaceTrader>
+            |          <urn:DestinationOffice>
+            |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
+            |          </urn:DestinationOffice>
+            |          <urn:ReportOfReceiptExport>
+            |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
+            |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
+            |          </urn:ReportOfReceiptExport>
+            |        </urn:AcceptedOrRejectedReportOfReceiptExport>
+            |      </urn:Body>
+            |    </urn:IE818>
+            |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 
         modelWithDays shouldBe ParseSuccess(getMovementResponse(journeyTimeValue = "20 days"))

@@ -17,12 +17,16 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json._
+import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.DestinationType._
+import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
 import uk.gov.hmrc.emcstfe.models.response.getMovement._
 import uk.gov.hmrc.emcstfe.models.response.{Packaging, RawGetMovementResponse, WineProduct}
 
+import java.time.LocalDate
 import java.util.Base64
 import scala.xml.XML
 
@@ -410,6 +414,50 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |          </body:ExplanationOnDelayForDelivery>
                                                |        </body:Body>
                                                |      </body:IE837>
+                                               |      <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+                                               |      <urn:Header>
+                                               |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+                                               |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+                                               |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+                                               |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+                                               |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+                                               |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+                                               |      </urn:Header>
+                                               |      <urn:Body>
+                                               |        <urn:AcceptedOrRejectedReportOfReceiptExport>
+                                               |          <urn:Attributes>
+                                               |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+                                               |          </urn:Attributes>
+                                               |          <urn:ConsigneeTrader language="en">
+                                               |            <urn:Traderid>XIWK000000206</urn:Traderid>
+                                               |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
+                                               |            <urn:StreetName>Catherdral</urn:StreetName>
+                                               |            <urn:StreetNumber>1</urn:StreetNumber>
+                                               |            <urn:Postcode>BT3 7BF</urn:Postcode>
+                                               |            <urn:City>Salford</urn:City>
+                                               |          </urn:ConsigneeTrader>
+                                               |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+                                               |            <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
+                                               |            <urn:SequenceNumber>2</urn:SequenceNumber>
+                                               |          </ie:ExciseMovement>
+                                               |          <urn:DeliveryPlaceTrader language="en">
+                                               |            <urn:Traderid>XI00000000207</urn:Traderid>
+                                               |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
+                                               |            <urn:StreetNumber>2</urn:StreetNumber>
+                                               |            <urn:StreetName>Catherdral</urn:StreetName>
+                                               |            <urn:Postcode>BT3 7BF</urn:Postcode>
+                                               |            <urn:City>Salford</urn:City>
+                                               |          </urn:DeliveryPlaceTrader>
+                                               |          <urn:DestinationOffice>
+                                               |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
+                                               |          </urn:DestinationOffice>
+                                               |          <urn:ReportOfReceiptExport>
+                                               |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
+                                               |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
+                                               |          </urn:ReportOfReceiptExport>
+                                               |        </urn:AcceptedOrRejectedReportOfReceiptExport>
+                                               |      </urn:Body>
+                                               |    </urn:IE818>
                                                |    </mov:eventHistory>
                                                |  </mov:movementView>""".stripMargin
 
@@ -593,6 +641,57 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         complementaryInformation = Some("Cans"),
         sealInformation = Some("Seal")
       )
+    ),
+    movementViewHistoryAndExtraData = MovementViewHistoryAndExtraDataModel(
+      arc = "13AB7778889991ABCDEF9",
+      serialNumberOfCertificateOfExemption = None,
+      dispatchImportOfficeReferenceNumber = None,
+      deliveryPlaceCustomsOfficeReferenceNumber = Some("FR000003"),
+      competentAuthorityDispatchOfficeReferenceNumber = Some("GB000002"),
+      eadStatus = "Accepted",
+      dateAndTimeOfValidationOfEadEsad = "2008-09-04T10:22:50",
+      numberOfItems = 2,
+      reportOfReceipt = Some(SubmitReportOfReceiptModel(
+        arc = "13AB7778889991ABCDEF9",
+        sequenceNumber = 2,
+        dateAndTimeOfValidationOfReportOfReceiptExport = Some("2021-09-10T11:11:12"),
+        consigneeTrader = Some(
+          TraderModel(
+            traderExciseNumber = Some("XIWK000000206"),
+            traderName = Some("SEED TRADER NI"),
+            address = Some(
+              AddressModel(
+                streetNumber = Some("1"),
+                street = Some("Catherdral"),
+                postcode = Some("BT3 7BF"),
+                city = Some("Salford")
+              )),
+            vatNumber = None,
+            eoriNumber = None
+          )
+        ),
+        deliveryPlaceTrader = Some(
+          TraderModel(
+            traderExciseNumber = Some("XI00000000207"),
+            traderName = Some("SEED TRADER NI 2"),
+            address = Some(
+              AddressModel(
+                streetNumber = Some("2"),
+                street = Some("Catherdral"),
+                postcode = Some("BT3 7BF"),
+                city = Some("Salford")
+              )),
+            vatNumber = None,
+            eoriNumber = None
+          )
+        ),
+        destinationOffice = "XI004098",
+        dateOfArrival = LocalDate.parse("2021-09-08"),
+        otherInformation = None,
+        individualItems = Seq(),
+        destinationType = None,
+        acceptMovement = Satisfactory
+      ))
     )
   )
 
@@ -714,6 +813,35 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         "complementaryInformation"     -> "Cans",
         "sealInformation"              -> "Seal"
       )
+    ),
+    "reportOfReceipt" -> Json.obj(
+      "arc" -> "13AB7778889991ABCDEF9",
+      "sequenceNumber" -> 2,
+      "dateAndTimeOfValidationOfReportOfReceiptExport" -> "2021-09-10T11:11:12",
+      "consigneeTrader" -> Json.obj(
+        "traderExciseNumber" -> "XIWK000000206",
+        "traderName"         -> "SEED TRADER NI",
+        "address" -> Json.obj(
+          "streetNumber" -> "1",
+          "street"       -> "Catherdral",
+          "postcode"     -> "BT3 7BF",
+          "city"         -> "Salford"
+        )
+      ),
+      "deliveryPlaceTrader" -> Json.obj(
+        "traderExciseNumber" -> "XI00000000207",
+        "traderName"         -> "SEED TRADER NI 2",
+        "address" -> Json.obj(
+          "streetNumber" -> "2",
+          "street"       -> "Catherdral",
+          "postcode"     -> "BT3 7BF",
+          "city"         -> "Salford"
+        )
+      ),
+      "destinationOffice" -> "XI004098",
+      "dateOfArrival" -> "2021-09-08",
+      "acceptMovement" -> "satisfactory",
+      "individualItems" -> Json.arr()
     )
   )
 
@@ -963,7 +1091,67 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |        </body:Body>
                                          |      </body:IE801>
                                          |    </mov:currentMovement>
-                                         |    <mov:eventHistory></mov:eventHistory>
+                                         |    <mov:eventHistory>
+                                         |          <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+                                         |      <urn:Header>
+                                         |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+                                         |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+                                         |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+                                         |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+                                         |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+                                         |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+                                         |      </urn:Header>
+                                         |      <urn:Body>
+                                         |        <urn:AcceptedOrRejectedReportOfReceiptExport>
+                                         |          <urn:Attributes>
+                                         |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+                                         |          </urn:Attributes>
+                                         |          <urn:ConsigneeTrader language="en">
+                                         |            <urn:Traderid>XIWK000000206</urn:Traderid>
+                                         |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
+                                         |            <urn:StreetNumber>1</urn:StreetNumber>
+                                         |            <urn:StreetName>Catherdral</urn:StreetName>
+                                         |            <urn:Postcode>BT3 7BF</urn:Postcode>
+                                         |            <urn:City>Salford</urn:City>
+                                         |          </urn:ConsigneeTrader>
+                                         |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+                                         |            <urn:AdministrativeReferenceCode>21GB00000000000351266</urn:AdministrativeReferenceCode>
+                                         |            <urn:SequenceNumber>2</urn:SequenceNumber>
+                                         |          </ie:ExciseMovement>
+                                         |          <urn:DeliveryPlaceTrader language="en">
+                                         |            <urn:Traderid>XI00000000207</urn:Traderid>
+                                         |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
+                                         |            <urn:StreetNumber>2</urn:StreetNumber>
+                                         |            <urn:StreetName>Catherdral</urn:StreetName>
+                                         |            <urn:Postcode>BT3 7BF</urn:Postcode>
+                                         |            <urn:City>Salford</urn:City>
+                                         |          </urn:DeliveryPlaceTrader>
+                                         |          <urn:DestinationOffice>
+                                         |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
+                                         |          </urn:DestinationOffice>
+                                         |          <urn:ReportOfReceiptExport>
+                                         |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
+                                         |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
+                                         |            <urn:ComplementaryInformation>some great reason</urn:ComplementaryInformation>
+                                         |          </urn:ReportOfReceiptExport>
+                                         |          <urn:BodyReportOfReceiptExport>
+                                         |            <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
+                                         |            <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
+                                         |            <urn:ObservedShortageOrExcess>21</urn:ObservedShortageOrExcess>
+                                         |            <urn:ExciseProductCode>W300</urn:ExciseProductCode>
+                                         |            <urn:RefusedQuantity>1</urn:RefusedQuantity>
+                                         |            <urn:UnsatisfactoryReason>
+                                         |              <urn:UnsatisfactoryReasonCode>1</urn:UnsatisfactoryReasonCode>
+                                         |              <urn:ComplementaryInformation>some info</urn:ComplementaryInformation>
+                                         |            </urn:UnsatisfactoryReason>
+                                         |            <urn:UnsatisfactoryReason>
+                                         |              <urn:UnsatisfactoryReasonCode>2</urn:UnsatisfactoryReasonCode>
+                                         |            </urn:UnsatisfactoryReason>
+                                         |          </urn:BodyReportOfReceiptExport>
+                                         |        </urn:AcceptedOrRejectedReportOfReceiptExport>
+                                         |      </urn:Body>
+                                         |    </urn:IE818>
+                                         |    </mov:eventHistory>
                                          |  </mov:movementView>""".stripMargin
 
   lazy val maxGetMovementResponse: GetMovementResponse = GetMovementResponse(
@@ -1230,6 +1418,67 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         complementaryInformation = Some("TransportDetailsComplementaryInformation2"),
         sealInformation = Some("TransportDetailsSealInformation2")
       )
+    ),
+    movementViewHistoryAndExtraData = MovementViewHistoryAndExtraDataModel(
+      arc = "ExciseMovementArc",
+      serialNumberOfCertificateOfExemption = Some("CCTSerialNumber"),
+      dispatchImportOfficeReferenceNumber = Some("DispatchImportOfficeErn"),
+      deliveryPlaceCustomsOfficeReferenceNumber = Some("DeliveryPlaceCustomsOfficeErn"),
+      competentAuthorityDispatchOfficeReferenceNumber = Some("CompetentAuthorityDispatchOfficeErn"),
+      eadStatus = "Beans",
+      dateAndTimeOfValidationOfEadEsad = "ExciseMovementDateTime",
+      numberOfItems = 2,
+      reportOfReceipt = Some(SubmitReportOfReceiptModel(
+        arc = "21GB00000000000351266",
+        sequenceNumber = 2,
+        dateAndTimeOfValidationOfReportOfReceiptExport = Some("2021-09-10T11:11:12"),
+        consigneeTrader = Some(
+          TraderModel(
+            traderExciseNumber = Some("XIWK000000206"),
+            traderName = Some("SEED TRADER NI"),
+            address = Some(
+              AddressModel(
+                streetNumber = Some("1"),
+                street = Some("Catherdral"),
+                postcode = Some("BT3 7BF"),
+                city = Some("Salford")
+              )),
+            vatNumber = None,
+            eoriNumber = None
+          )
+        ),
+        deliveryPlaceTrader = Some(
+          TraderModel(
+            traderExciseNumber = Some("XI00000000207"),
+            traderName = Some("SEED TRADER NI 2"),
+            address = Some(
+              AddressModel(
+                streetNumber = Some("2"),
+                street = Some("Catherdral"),
+                postcode = Some("BT3 7BF"),
+                city = Some("Salford")
+              )),
+            vatNumber = None,
+            eoriNumber = None
+          )
+        ),
+        destinationOffice = "XI004098",
+        dateOfArrival = LocalDate.parse("2021-09-08"),
+        acceptMovement = Satisfactory,
+        otherInformation = Some("some great reason"),
+        destinationType = None,
+        individualItems = Seq(ReceiptedItemsModel(
+          eadBodyUniqueReference = 1,
+          excessAmount = Some(21),
+          shortageAmount = None,
+          productCode = "W300",
+          refusedAmount = Some(1),
+          unsatisfactoryReasons = Seq(
+            UnsatisfactoryModel(Excess, Some("some info")),
+            UnsatisfactoryModel(Shortage, None),
+          )
+        ))
+      ))
     )
   )
 
@@ -1470,6 +1719,52 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         "complementaryInformation"     -> "TransportDetailsComplementaryInformation2",
         "sealInformation"              -> "TransportDetailsSealInformation2"
       )
+    ),
+    "reportOfReceipt" -> Json.obj(
+      "arc" -> "21GB00000000000351266",
+      "sequenceNumber" -> 2,
+      "dateAndTimeOfValidationOfReportOfReceiptExport" -> "2021-09-10T11:11:12",
+      "consigneeTrader" -> Json.obj(
+        "traderExciseNumber" -> "XIWK000000206",
+        "traderName"         -> "SEED TRADER NI",
+        "address" -> Json.obj(
+          "streetNumber" -> "1",
+          "street"       -> "Catherdral",
+          "postcode"     -> "BT3 7BF",
+          "city"         -> "Salford"
+        )
+      ),
+      "deliveryPlaceTrader" -> Json.obj(
+        "traderExciseNumber" -> "XI00000000207",
+        "traderName"         -> "SEED TRADER NI 2",
+        "address" -> Json.obj(
+          "streetNumber" -> "2",
+          "street"       -> "Catherdral",
+          "postcode"     -> "BT3 7BF",
+          "city"         -> "Salford"
+        )
+      ),
+      "destinationOffice" -> "XI004098",
+      "dateOfArrival" -> "2021-09-08",
+      "acceptMovement" -> "satisfactory",
+      "individualItems" -> Json.arr(
+        Json.obj(
+          "eadBodyUniqueReference" -> 1,
+          "productCode" -> "W300",
+          "excessAmount" -> 21,
+          "refusedAmount" -> 1,
+          "unsatisfactoryReasons" -> Json.arr(
+            Json.obj(
+              "reason" -> "excess",
+              "additionalInformation" -> "some info"
+            ),
+            Json.obj(
+              "reason" -> "shortage"
+            )
+        )
+        )
+      ),
+      "otherInformation" -> "some great reason"
     )
   )
 

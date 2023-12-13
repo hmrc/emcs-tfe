@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement._
@@ -40,5 +42,16 @@ case class UnsatisfactoryModel(reason: WrongWithMovement,
 }
 
 object UnsatisfactoryModel {
+
+  val xmlReads: XmlReader[UnsatisfactoryModel] = (
+    (__ \\ "UnsatisfactoryReasonCode").read[Int],
+    (__ \\ "ComplementaryInformation").read[Option[String]]
+  ).mapN {
+    case (reasonCode, optComplementaryInformation) => {
+      val reason = WrongWithMovement.apply(reasonCode)
+      UnsatisfactoryModel(reason, optComplementaryInformation)
+    }
+  }
+
   implicit val fmt: Format[UnsatisfactoryModel] = Json.format
 }
