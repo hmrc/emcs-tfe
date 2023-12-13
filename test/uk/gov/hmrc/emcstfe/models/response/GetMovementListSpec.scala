@@ -24,11 +24,11 @@ import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader.LocalDateTimeParseFailur
 
 import scala.xml.{Elem, XML}
 
-class GetMovementListResponseSpec extends TestBaseSpec with GetMovementListFixture {
+class GetMovementListSpec extends TestBaseSpec with GetMovementListFixture {
 
   "writes" should {
     "write a model to JSON" in {
-      Json.toJson(getMovementListResponse) shouldBe getMovementListJson
+      Json.toJson(getMovementList) shouldBe getMovementListJson
     }
   }
 
@@ -37,12 +37,12 @@ class GetMovementListResponseSpec extends TestBaseSpec with GetMovementListFixtu
     "successfully read a movement list response" when {
 
       "all fields are valid" in {
-        GetMovementListResponse.xmlReader.read(XML.loadString(getMovementListXMLResponseBody)) shouldBe ParseSuccess(getMovementListResponse)
+        GetMovementList.xmlReader.read(XML.loadString(getMovementListXMLResponseBody)) shouldBe ParseSuccess(getMovementList)
       }
 
       "there are no Movements returned" in {
 
-        GetMovementListResponse.xmlReader.read(noMovements) shouldBe ParseSuccess(GetMovementListResponse(movements = Seq(), count = 0))
+        GetMovementList.xmlReader.read(noMovements) shouldBe ParseSuccess(GetMovementList(movements = Seq(), count = 0))
       }
     }
 
@@ -54,7 +54,7 @@ class GetMovementListResponseSpec extends TestBaseSpec with GetMovementListFixtu
           <MovementListDataResponse>
           </MovementListDataResponse>
 
-        GetMovementListResponse.xmlReader.read(badXml) shouldBe ParseFailure(Seq(EmptyError(__ \ "CountOfMovementsAvailable")))
+        GetMovementList.xmlReader.read(badXml) shouldBe ParseFailure(Seq(EmptyError(__ \ "CountOfMovementsAvailable")))
       }
 
       "One of the Movement is invalid" in {
@@ -75,7 +75,7 @@ class GetMovementListResponseSpec extends TestBaseSpec with GetMovementListFixtu
             <CountOfMovementsAvailable>1</CountOfMovementsAvailable>
           </MovementListDataResponse>
 
-        GetMovementListResponse.xmlReader.read(badXml) shouldBe ParseFailure(Seq(LocalDateTimeParseFailure("Text '' could not be parsed at index 0")))
+        GetMovementList.xmlReader.read(badXml) shouldBe ParseFailure(Seq(LocalDateTimeParseFailure("Text '' could not be parsed at index 0")))
       }
     }
   }

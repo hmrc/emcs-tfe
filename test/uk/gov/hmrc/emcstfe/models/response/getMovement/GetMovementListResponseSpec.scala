@@ -20,24 +20,24 @@ import play.api.libs.json.{JsResult, JsSuccess, Json}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class RawGetMovementListResponseSpec extends TestBaseSpec with GetMovementListFixture {
+class GetMovementListResponseSpec extends TestBaseSpec with GetMovementListFixture {
 
   "reads" should {
 
     "successfully read a list of movements" when {
 
       "all fields are valid (and message is base64 encoded)" in {
-        RawGetMovementListResponse.reads.reads(getRawMovementListJsonResponse) shouldBe JsSuccess(getRawMovementListResponse)
+        GetMovementListResponse.reads.reads(getMovementListJsonResponse) shouldBe JsSuccess(getMovementListResponse)
       }
     }
 
     "return an error" when {
       "the ERN is not defined" in {
-        RawGetMovementListResponse.reads.reads(getRawMovementListJsonResponse - "exciseRegistrationNumber").isError shouldBe true
+        GetMovementListResponse.reads.reads(getMovementListJsonResponse - "exciseRegistrationNumber").isError shouldBe true
       }
 
       "the date time is not defined" in {
-        RawGetMovementListResponse.reads.reads(getRawMovementListJsonResponse - "dateTime").isError shouldBe true
+        GetMovementListResponse.reads.reads(getMovementListJsonResponse - "dateTime").isError shouldBe true
       }
 
       "the message is not base64 encoded" in {
@@ -46,7 +46,7 @@ class RawGetMovementListResponseSpec extends TestBaseSpec with GetMovementListFi
           "dateTime" -> "2023-09-07T12:39:20.354Z",
           "message" -> getMovementListXMLResponseBody
         )
-        intercept[JsResult.Exception](RawGetMovementListResponse.reads.reads(response))
+        intercept[JsResult.Exception](GetMovementListResponse.reads.reads(response))
       }
 
       "the message is base 64 encoded but the decoded value can't be parsed to XML" in {
@@ -55,7 +55,7 @@ class RawGetMovementListResponseSpec extends TestBaseSpec with GetMovementListFi
           "dateTime" -> "2023-09-07T12:39:20.354Z",
           "message" -> "PHZhbHVlPm5ldmVyIGdvbm5hIGdpdmUgeW91IHVwPC92YWx1ZT4="
         )
-        intercept[JsResult.Exception](RawGetMovementListResponse.reads.reads(response))
+        intercept[JsResult.Exception](GetMovementListResponse.reads.reads(response))
       }
     }
   }

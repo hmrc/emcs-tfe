@@ -37,9 +37,9 @@ class GetMovementListServiceSpec extends TestBaseSpec with GetMovementListFixtur
 
           MockChrisConnector
             .postChrisSOAPRequestAndExtractToModel(getMovementListRequest)
-            .returns(Future.successful(Right(getMovementListResponse)))
+            .returns(Future.successful(Right(getMovementList)))
 
-          await(service.getMovementList(getMovementListRequest)) shouldBe Right(getMovementListResponse)
+          await(service.getMovementList(getMovementListRequest)) shouldBe Right(getMovementList)
         }
       }
       "return a Left" when {
@@ -71,9 +71,9 @@ class GetMovementListServiceSpec extends TestBaseSpec with GetMovementListFixtur
 
           MockEisConnector
             .getMovementList(request)
-            .returns(Future.successful(Right(getRawMovementListResponse)))
+            .returns(Future.successful(Right(getMovementListResponse)))
 
-          await(service.getMovementList(request)) shouldBe Right(getMovementListResponse)
+          await(service.getMovementList(request)) shouldBe Right(getMovementList)
         }
       }
 

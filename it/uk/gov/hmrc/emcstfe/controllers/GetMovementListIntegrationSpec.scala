@@ -161,7 +161,7 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
             override def setupStubs(): StubMapping = {
               enable(SendToEIS)
               AuthStub.authorised()
-              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.OK, getRawMovementListJsonResponse)
+              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.OK, getMovementListJsonResponse)
             }
 
             val response: WSResponse = await(request().get())

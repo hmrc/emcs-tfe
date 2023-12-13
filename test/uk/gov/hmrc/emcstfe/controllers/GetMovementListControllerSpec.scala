@@ -51,7 +51,7 @@ class GetMovementListControllerSpec extends TestBaseSpec
 
         MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-        MockService.getMovementList(getMovementListRequest).returns(Future.successful(Right(getMovementListResponse)))
+        MockService.getMovementList(getMovementListRequest).returns(Future.successful(Right(getMovementList)))
 
         val result = controller.getMovementList(testErn, searchOptions)(fakeRequest)
 
@@ -64,7 +64,7 @@ class GetMovementListControllerSpec extends TestBaseSpec
         MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
         MockService.getMovementList(getMovementListRequest.copy(isEISFeatureEnabled = true))
-          .returns(Future.successful(Right(getMovementListResponse)))
+          .returns(Future.successful(Right(getMovementList)))
 
         val result = controller.getMovementList(testErn, searchOptions)(fakeRequest)
 

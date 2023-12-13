@@ -30,7 +30,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK) 
 
-**Body**: [GetMovementListResponse Model](app/uk/gov/hmrc/emcstfe/models/response/GetMovementListResponse.scala)
+**Body**: [GetMovementListResponse Model](app/uk/gov/hmrc/emcstfe/models/response/GetMovementList.scala)
 
 #### Error Response(s)
 

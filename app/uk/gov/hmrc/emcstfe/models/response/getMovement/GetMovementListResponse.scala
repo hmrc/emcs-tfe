@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.response.getMovement
 import com.lucidchart.open.xtract.XmlReader
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
-import uk.gov.hmrc.emcstfe.models.response.GetMovementListResponse
+import uk.gov.hmrc.emcstfe.models.response.GetMovementList
 import uk.gov.hmrc.emcstfe.utils.XmlResultParser
 
 import java.nio.charset.StandardCharsets
@@ -27,17 +27,17 @@ import java.util.Base64
 import scala.util.{Failure, Right, Success, Try}
 import scala.xml.XML
 
-case class RawGetMovementListResponse(dateTime: String, exciseRegistrationNumber: String, movementList: GetMovementListResponse)
+case class GetMovementListResponse(dateTime: String, exciseRegistrationNumber: String, movementList: GetMovementList)
 
-object RawGetMovementListResponse {
-  implicit val reads: Reads[RawGetMovementListResponse] = (
+object GetMovementListResponse {
+  implicit val reads: Reads[GetMovementListResponse] = (
     (__ \ "dateTime").read[String] and
     (__ \ "exciseRegistrationNumber").read[String] and
     (__ \ "message").read[String].map {
       message =>
         Try {
           val decodedMessage: String = new String(Base64.getDecoder.decode(message), StandardCharsets.UTF_8)
-          XmlResultParser.handleParseResult(XmlReader.of[GetMovementListResponse].read(XML.loadString(decodedMessage))) match {
+          XmlResultParser.handleParseResult(XmlReader.of[GetMovementList].read(XML.loadString(decodedMessage))) match {
             case Left(value) => throw JsResult.Exception(JsError(value.message))
             case Right(value) => value
           }
@@ -46,5 +46,5 @@ object RawGetMovementListResponse {
           case Success(value) => value
         }
     }
-    )(RawGetMovementListResponse.apply _)
+    )(GetMovementListResponse.apply _)
 }

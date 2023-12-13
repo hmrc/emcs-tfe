@@ -1540,9 +1540,9 @@ class EisConnectorSpec
               EisHeaders.authorization -> "Bearer value-movements"
             ),
             bearerToken = "Bearer value-movements"
-          ).returns(Future.successful(Right(getRawMovementListResponse)))
+          ).returns(Future.successful(Right(getMovementListResponse)))
 
-          await(connector.getMovementList(getMovementListRequest)) shouldBe Right(getRawMovementListResponse)
+          await(connector.getMovementList(getMovementListRequest)) shouldBe Right(getMovementListResponse)
         }
       }
       "return a Left" when {

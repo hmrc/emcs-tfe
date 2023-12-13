@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.models.request.GetMovementListRequest
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementListResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementList}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -30,11 +30,11 @@ class GetMovementListService @Inject()(chrisConnector: ChrisConnector,
                                        eisConnector: EisConnector) extends Logging {
 
   def getMovementList(getMovementListRequest: GetMovementListRequest)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementListResponse]] = {
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementList]] = {
     if(getMovementListRequest.isEISFeatureEnabled) {
       eisConnector.getMovementList(getMovementListRequest).map(_.map(_.movementList))
     } else {
-      chrisConnector.postChrisSOAPRequestAndExtractToModel[GetMovementListResponse](getMovementListRequest)
+      chrisConnector.postChrisSOAPRequestAndExtractToModel[GetMovementList](getMovementListRequest)
     }
   }
 }
