@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.mocks.services
 import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.request.GetMovementListRequest
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementListResponse}
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementList}
 import uk.gov.hmrc.emcstfe.services.GetMovementListService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -30,7 +30,7 @@ trait MockGetMovementListService extends MockFactory  {
   lazy val mockService: GetMovementListService = mock[GetMovementListService]
 
   object MockService {
-    def getMovementList(getMovementListRequest: GetMovementListRequest): CallHandler3[GetMovementListRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, GetMovementListResponse]]] =
+    def getMovementList(getMovementListRequest: GetMovementListRequest): CallHandler3[GetMovementListRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, GetMovementList]]] =
       (mockService.getMovementList(_: GetMovementListRequest)(_: HeaderCarrier, _: ExecutionContext))
         .expects(getMovementListRequest, *, *)
   }

@@ -53,13 +53,8 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
   }
 
   override def beforeEach(): Unit = {
-    disable(SendToEIS)
     super.beforeEach()
-  }
-
-  override protected def afterAll(): Unit = {
-    sys.props -= SendToEIS.configName
-    super.afterAll()
+    disable(SendToEIS)
   }
 
   "Calling the submit change destination endpoint" must {

@@ -21,14 +21,14 @@ import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, Writes}
 
-case class GetMovementListResponse(movements: Seq[GetMovementListItem], count: Int)
+case class GetMovementList(movements: Seq[GetMovementListItem], count: Int)
 
-object GetMovementListResponse {
+object GetMovementList {
 
-  implicit val xmlReader: XmlReader[GetMovementListResponse] = (
+  implicit val xmlReader: XmlReader[GetMovementList] = (
     (__ \ "Movement").read[Seq[GetMovementListItem]](strictReadSeq),
     (__ \ "CountOfMovementsAvailable").read[Int]
-  ).mapN(GetMovementListResponse.apply)
+  ).mapN(GetMovementList.apply)
 
-  implicit val writes: Writes[GetMovementListResponse] = Json.writes
+  implicit val writes: Writes[GetMovementList] = Json.writes
 }
