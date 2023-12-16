@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
+import com.lucidchart.open.xtract.ParseSuccess
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.ReceiptedItemsModelFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -35,6 +36,10 @@ class ReceiptedItemsModelSpec extends TestBaseSpec with ReceiptedItemsModelFixtu
       "write to XML" in {
         trim(shortageReceiptedItemsModel.toXml).toString shouldBe trim(shortageReceiptedItemsModelXML).toString
       }
+
+      "read from XML" in {
+        ReceiptedItemsModel.xmlReads.read(shortageReceiptedItemsModelXML) shouldBe ParseSuccess(shortageReceiptedItemsModel)
+      }
     }
 
     "for a excess with no other reasons" must {
@@ -46,6 +51,10 @@ class ReceiptedItemsModelSpec extends TestBaseSpec with ReceiptedItemsModelFixtu
       "write to XML" in {
         trim(excessReceiptedItemsModel.toXml).toString shouldBe trim(excessReceiptedItemsModelXML).toString
       }
+
+      "read from XML" in {
+        ReceiptedItemsModel.xmlReads.read(excessReceiptedItemsModelXML) shouldBe ParseSuccess(excessReceiptedItemsModel)
+      }
     }
 
     "for the minimum amount of info" must {
@@ -56,6 +65,10 @@ class ReceiptedItemsModelSpec extends TestBaseSpec with ReceiptedItemsModelFixtu
 
       "write to XML" in {
         trim(minReceiptedItemsModel.toXml).toString shouldBe trim(minReceiptedItemsModelXML).toString
+      }
+
+      "read from XML" in {
+        ReceiptedItemsModel.xmlReads.read(minReceiptedItemsModelXML) shouldBe ParseSuccess(minReceiptedItemsModel)
       }
     }
   }

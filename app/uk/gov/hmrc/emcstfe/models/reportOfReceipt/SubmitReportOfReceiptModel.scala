@@ -16,10 +16,14 @@
 
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
+import cats.implicits.catsSyntaxTuple10Semigroupal
+import com.lucidchart.open.xtract.XmlReader.strictReadSeq
+import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement._
 import uk.gov.hmrc.emcstfe.models.common._
+import uk.gov.hmrc.emcstfe.utils.LocalDateXMLReader._
 import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
 
 import java.time.LocalDate
@@ -27,7 +31,8 @@ import scala.xml.Elem
 
 case class SubmitReportOfReceiptModel(arc: String,
                                       sequenceNumber: Int,
-                                      destinationType: DestinationType,
+                                      dateAndTimeOfValidationOfReportOfReceiptExport: Option[String],
+                                      destinationType: Option[DestinationType],
                                       consigneeTrader: Option[TraderModel],
                                       deliveryPlaceTrader: Option[TraderModel],
                                       destinationOffice: String,
@@ -83,5 +88,43 @@ case class SubmitReportOfReceiptModel(arc: String,
 }
 
 object SubmitReportOfReceiptModel {
+  private[reportOfReceipt] lazy val arc = __ \ "ExciseMovement" \ "AdministrativeReferenceCode"
+  private[reportOfReceipt] lazy val sequenceNumber = __ \ "ExciseMovement" \ "SequenceNumber"
+  private[reportOfReceipt] lazy val dateAndTimeOfValidationOfReportOfReceiptExport = __ \ "Attributes" \ "DateAndTimeOfValidationOfReportOfReceiptExport"
+  private[reportOfReceipt] lazy val consigneeTrader = __ \ "ConsigneeTrader"
+  private[reportOfReceipt] lazy val deliveryPlaceTrader = __ \ "DeliveryPlaceTrader"
+  private[reportOfReceipt] lazy val destinationOffice = __ \ "DestinationOffice" \ "ReferenceNumber"
+  private[reportOfReceipt] lazy val dateOfArrival: XPath = __ \ "ReportOfReceiptExport" \ "DateOfArrivalOfExciseProducts"
+  private[reportOfReceipt] lazy val globalConclusionOfReceipt: XPath = __ \ "ReportOfReceiptExport" \ "GlobalConclusionOfReceipt"
+  private[reportOfReceipt] lazy val complementaryInformation: XPath = __ \ "ReportOfReceiptExport" \ "ComplementaryInformation"
+  private[reportOfReceipt] lazy val receiptedItems: XPath = __ \\ "BodyReportOfReceiptExport"
+
+
+  val xmlReads: XmlReader[SubmitReportOfReceiptModel] = (
+    arc.read[String],
+    sequenceNumber.read[Int],
+    dateAndTimeOfValidationOfReportOfReceiptExport.read[Option[String]],
+    consigneeTrader.read[Option[TraderModel]](TraderModel.reportOfReceiptXMLReads.optional).map(model => if (model.exists(_.isEmpty)) None else model),
+    deliveryPlaceTrader.read[Option[TraderModel]](TraderModel.reportOfReceiptXMLReads.optional).map(model => if (model.exists(_.isEmpty)) None else model),
+    destinationOffice.read[String],
+    dateOfArrival.read[LocalDate],
+    globalConclusionOfReceipt.read[Int],
+    receiptedItems.read[Seq[ReceiptedItemsModel]](strictReadSeq(ReceiptedItemsModel.xmlReads)),
+    complementaryInformation.read[Option[String]]
+  ).mapN {
+    case (arc,
+    sequenceNumber,
+    dateAndTimeOfValidationOfReportOfReceiptExport,
+    consigneeTrader,
+    deliveryPlaceTrader,
+    destinationOffice,
+    dateOfArrival,
+    receiptStatus,
+    items,
+    optOtherInformation) =>
+      val movementStatus = AcceptMovement.apply(receiptStatus)
+      SubmitReportOfReceiptModel(arc, sequenceNumber, dateAndTimeOfValidationOfReportOfReceiptExport, None, consigneeTrader, deliveryPlaceTrader, destinationOffice, dateOfArrival, movementStatus, items, optOtherInformation)
+  }
+
   implicit val fmt: Format[SubmitReportOfReceiptModel] = Json.format
 }

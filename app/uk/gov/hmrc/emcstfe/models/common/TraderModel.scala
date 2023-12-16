@@ -101,5 +101,13 @@ object TraderModel {
     (__ \\ "EoriNumber").read[Option[String]]
   ).mapN(TraderModel.apply)
 
+  def reportOfReceiptXMLReads: XmlReader[TraderModel] = (
+    (__ \\ "Traderid").read[Option[String]],
+    (__ \\ "TraderName").read[Option[String]],
+    __.read[Option[AddressModel]],
+    XmlReader.pure(None),
+    (__ \\ "EoriNumber").read[Option[String]]
+  ).mapN(TraderModel.apply)
+
   implicit val fmt: Format[TraderModel] = Json.format
 }

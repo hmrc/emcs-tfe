@@ -18,23 +18,20 @@ package uk.gov.hmrc.emcstfe.utils
 
 import com.lucidchart.open.xtract.{ParseError, ParseFailure, ParseSuccess, XmlReader}
 
+import java.time.LocalDate
 import scala.util.{Failure, Success, Try}
 import scala.xml.NodeSeq
 
-trait XmlReaderUtils {
+object LocalDateXMLReader {
 
-  case class BigDecimalParseFailure(message: String) extends ParseError
+  case class LocalDateParseFailure(message: String) extends ParseError
 
-  implicit class SeqExtensions[A](reader: XmlReader[Seq[A]]) {
-    def seqToOptionSeq: XmlReader[Option[Seq[A]]] = reader.map {
-      case Nil => None
-      case other => Some(other)
-    }
-  }
-
-  implicit val xmlBigDecimalReads: XmlReader[BigDecimal] = (xml: NodeSeq) =>
-    Try(BigDecimal.apply(xml.text)) match {
+  implicit val xmlLocalDateReads: XmlReader[LocalDate] = (xml: NodeSeq) => {
+    Try(LocalDate.parse(xml.text)) match {
       case Success(value) => ParseSuccess(value)
-      case Failure(e)     => ParseFailure(BigDecimalParseFailure(e.getMessage))
+      case Failure(e) => ParseFailure(LocalDateParseFailure(e.getMessage))
+
     }
+    }
+
 }

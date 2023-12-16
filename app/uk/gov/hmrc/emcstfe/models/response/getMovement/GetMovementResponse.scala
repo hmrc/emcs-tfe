@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple22Semigroupal
+import cats.implicits.catsSyntaxTuple15Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader}
 import play.api.libs.json._
@@ -50,7 +50,8 @@ case class GetMovementResponse(
     movementGuarantee: MovementGuaranteeModel,
     items: Seq[MovementItem],
     numberOfItems: Int,
-    transportDetails: Seq[TransportDetailsModel]
+    transportDetails: Seq[TransportDetailsModel],
+    movementViewHistoryAndExtraData: MovementViewHistoryAndExtraDataModel
 )
 
 object GetMovementResponse extends JsonUtils with XmlReaderUtils {
@@ -82,70 +83,56 @@ object GetMovementResponse extends JsonUtils with XmlReaderUtils {
 
   implicit lazy val xmlReader: XmlReader[GetMovementResponse] = {
     (
-      arc.read[String],
       memberStateCode.read[Option[String]],
-      serialNumberOfCertificateOfExemption.read[Option[String]],
       consignorTrader.read[TraderModel](TraderModel.xmlReads(ConsignorTrader)),
       consigneeTrader.read[Option[TraderModel]](TraderModel.xmlReads(ConsigneeTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
       deliveryPlaceTrader.read[Option[TraderModel]](TraderModel.xmlReads(DeliveryPlaceTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
       placeOfDispatchTrader.read[Option[TraderModel]](TraderModel.xmlReads(PlaceOfDispatchTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
       transportArrangerTrader.read[Option[TraderModel]](TraderModel.xmlReads(TransportTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
       firstTransporterTrader.read[Option[TraderModel]](TraderModel.xmlReads(TransportTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
-      dispatchImportOfficeReferenceNumber.read[Option[String]],
-      deliveryPlaceCustomsOfficeReferenceNumber.read[Option[String]],
-      competentAuthorityDispatchOfficeReferenceNumber.read[Option[String]],
-      eadStatus.read[String],
-      dateAndTimeOfValidationOfEadEsad.read[String],
       documentCertificate.read[Seq[DocumentCertificateModel]](strictReadSeq(DocumentCertificateModel.xmlReads)).seqToOptionSeq,
       eadEsad.read[EadEsadModel],
       headerEadEsad.read[HeaderEadEsadModel],
       transportMode.read[TransportModeModel],
       movementGuarantee.read[MovementGuaranteeModel],
       items.read[Seq[MovementItem]](strictReadSeq),
-      numberOfItems.read[Seq[String]](strictReadSeq).map(_.length),
-      transportDetails.read[Seq[TransportDetailsModel]](strictReadSeq)
+      transportDetails.read[Seq[TransportDetailsModel]](strictReadSeq),
+      XPath.read[MovementViewHistoryAndExtraDataModel](MovementViewHistoryAndExtraDataModel.xmlReader)
     ).mapN {
       case (
-            arc,
             memberStateCode,
-            serialNumberOfCertificateOfExemption,
             consignorTrader,
             consigneeTrader,
             deliveryPlaceTrader,
             placeOfDispatchTrader,
             transportArrangerTrader,
             firstTransporterTrader,
-            dispatchImportOfficeReferenceNumber,
-            deliveryPlaceCustomsOfficeReferenceNumber,
-            competentAuthorityDispatchOfficeReferenceNumber,
-            eadStatus,
-            dateAndTimeOfValidationOfEadEsad,
             documentCertificate,
             eadEsad,
             headerEadEsad,
             transportMode,
             movementGuarantee,
             items,
-            numberOfItems,
-            transportDetails) =>
+            transportDetails,
+            movementViewHistoryAndExtraData) =>
         GetMovementResponse(
-          arc = arc,
+          arc = movementViewHistoryAndExtraData.arc,
           sequenceNumber = headerEadEsad.sequenceNumber,
           destinationType = headerEadEsad.destinationType,
           memberStateCode = memberStateCode,
-          serialNumberOfCertificateOfExemption = serialNumberOfCertificateOfExemption,
+          serialNumberOfCertificateOfExemption = movementViewHistoryAndExtraData.serialNumberOfCertificateOfExemption,
           consignorTrader = consignorTrader,
           consigneeTrader = consigneeTrader,
           deliveryPlaceTrader = deliveryPlaceTrader,
           placeOfDispatchTrader = placeOfDispatchTrader,
           transportArrangerTrader = transportArrangerTrader,
           firstTransporterTrader = firstTransporterTrader,
-          dispatchImportOfficeReferenceNumber = dispatchImportOfficeReferenceNumber,
-          deliveryPlaceCustomsOfficeReferenceNumber = deliveryPlaceCustomsOfficeReferenceNumber,
-          competentAuthorityDispatchOfficeReferenceNumber = competentAuthorityDispatchOfficeReferenceNumber,
+          dispatchImportOfficeReferenceNumber = movementViewHistoryAndExtraData.dispatchImportOfficeReferenceNumber,
+          deliveryPlaceCustomsOfficeReferenceNumber = movementViewHistoryAndExtraData.deliveryPlaceCustomsOfficeReferenceNumber,
+          competentAuthorityDispatchOfficeReferenceNumber = movementViewHistoryAndExtraData.competentAuthorityDispatchOfficeReferenceNumber,
           localReferenceNumber = eadEsad.localReferenceNumber,
-          eadStatus = eadStatus,
-          dateAndTimeOfValidationOfEadEsad = dateAndTimeOfValidationOfEadEsad,
+          eadStatus = movementViewHistoryAndExtraData.eadStatus,
+          dateAndTimeOfValidationOfEadEsad = movementViewHistoryAndExtraData.dateAndTimeOfValidationOfEadEsad,
           dateOfDispatch = eadEsad.dateOfDispatch,
           journeyTime = headerEadEsad.journeyTime,
           documentCertificate = documentCertificate,
@@ -154,70 +141,11 @@ object GetMovementResponse extends JsonUtils with XmlReaderUtils {
           transportMode = transportMode,
           movementGuarantee = movementGuarantee,
           items = items,
-          numberOfItems = numberOfItems,
-          transportDetails = transportDetails
+          numberOfItems = movementViewHistoryAndExtraData.numberOfItems,
+          transportDetails = transportDetails,
+          movementViewHistoryAndExtraData = movementViewHistoryAndExtraData
         )
     }
-  }
-
-  implicit lazy val reads: Reads[GetMovementResponse] = for {
-    arc                                             <- (__ \ "arc").read[String]
-    sequenceNumber                                  <- (__ \ "sequenceNumber").read[Int]
-    destinationType                                 <- (__ \ "destinationType").read[DestinationType]
-    memberStateCode                                 <- (__ \ "memberStateCode").readNullable[String]
-    serialNumberOfCertificateOfExemption            <- (__ \ "serialNumberOfCertificateOfExemption").readNullable[String]
-    consignorTrader                                 <- (__ \ "consignorTrader").read[TraderModel]
-    consigneeTrader                                 <- (__ \ "consigneeTrader").readNullable[TraderModel]
-    deliveryPlaceTrader                             <- (__ \ "deliveryPlaceTrader").readNullable[TraderModel]
-    placeOfDispatchTrader                           <- (__ \ "placeOfDispatchTrader").readNullable[TraderModel]
-    transportArrangerTrader                         <- (__ \ "transportArrangerTrader").readNullable[TraderModel]
-    firstTransporterTrader                          <- (__ \ "firstTransporterTrader").readNullable[TraderModel]
-    dispatchImportOfficeReferenceNumber             <- (__ \ "dispatchImportOfficeReferenceNumber").readNullable[String]
-    deliveryPlaceCustomsOfficeReferenceNumber       <- (__ \ "deliveryPlaceCustomsOfficeReferenceNumber").readNullable[String]
-    competentAuthorityDispatchOfficeReferenceNumber <- (__ \ "competentAuthorityDispatchOfficeReferenceNumber").readNullable[String]
-    localReferenceNumber                            <- (__ \ "localReferenceNumber").read[String]
-    eadStatus                                       <- (__ \ "eadStatus").read[String]
-    dateAndTimeOfValidationOfEadEsad                <- (__ \ "dateAndTimeOfValidationOfEadEsad").read[String]
-    dateOfDispatch                                  <- (__ \ "dateOfDispatch").read[String]
-    journeyTime                                     <- (__ \ "journeyTime").read[String]
-    documentCertificate                             <- (__ \ "documentCertificate").readNullable[Seq[DocumentCertificateModel]]
-    eadEsad                                         <- (__ \ "eadEsad").read[EadEsadModel]
-    headerEadEsad                                   <- (__ \ "headerEadEsad").read[HeaderEadEsadModel]
-    transportMode                                   <- (__ \ "transportMode").read[TransportModeModel]
-    movementGuarantee                               <- (__ \ "movementGuarantee").read[MovementGuaranteeModel]
-    items                                           <- (__ \ "items").read[Seq[MovementItem]]
-    numberOfItems                                   <- (__ \ "numberOfItems").read[Int]
-    transportDetails                                <- (__ \ "transportDetails").read[Seq[TransportDetailsModel]]
-  } yield {
-    GetMovementResponse(
-      arc = arc,
-      sequenceNumber = sequenceNumber,
-      destinationType = destinationType,
-      memberStateCode = memberStateCode,
-      serialNumberOfCertificateOfExemption = serialNumberOfCertificateOfExemption,
-      consignorTrader = consignorTrader,
-      consigneeTrader = consigneeTrader,
-      deliveryPlaceTrader = deliveryPlaceTrader,
-      placeOfDispatchTrader = placeOfDispatchTrader,
-      transportArrangerTrader = transportArrangerTrader,
-      firstTransporterTrader = firstTransporterTrader,
-      dispatchImportOfficeReferenceNumber = dispatchImportOfficeReferenceNumber,
-      deliveryPlaceCustomsOfficeReferenceNumber = deliveryPlaceCustomsOfficeReferenceNumber,
-      competentAuthorityDispatchOfficeReferenceNumber = competentAuthorityDispatchOfficeReferenceNumber,
-      localReferenceNumber = localReferenceNumber,
-      eadStatus = eadStatus,
-      dateAndTimeOfValidationOfEadEsad = dateAndTimeOfValidationOfEadEsad,
-      dateOfDispatch = dateOfDispatch,
-      journeyTime = journeyTime,
-      documentCertificate = documentCertificate,
-      eadEsad = eadEsad,
-      headerEadEsad = headerEadEsad,
-      transportMode = transportMode,
-      movementGuarantee = movementGuarantee,
-      items = items,
-      numberOfItems = numberOfItems,
-      transportDetails = transportDetails
-    )
   }
 
   implicit lazy val writes: OWrites[GetMovementResponse] = (o: GetMovementResponse) =>
@@ -237,11 +165,11 @@ object GetMovementResponse extends JsonUtils with XmlReaderUtils {
         "dispatchImportOfficeReferenceNumber"             -> o.dispatchImportOfficeReferenceNumber,
         "deliveryPlaceCustomsOfficeReferenceNumber"       -> o.deliveryPlaceCustomsOfficeReferenceNumber,
         "competentAuthorityDispatchOfficeReferenceNumber" -> o.competentAuthorityDispatchOfficeReferenceNumber,
-        "localReferenceNumber"                            -> o.localReferenceNumber,
+        "localReferenceNumber"                            -> o.eadEsad.localReferenceNumber,
         "eadStatus"                                       -> o.eadStatus,
         "dateAndTimeOfValidationOfEadEsad"                -> o.dateAndTimeOfValidationOfEadEsad,
         "dateOfDispatch"                                  -> o.dateOfDispatch,
-        "journeyTime"                                     -> o.journeyTime,
+        "journeyTime"                                     -> o.headerEadEsad.journeyTime,
         "documentCertificate"                             -> o.documentCertificate,
         "eadEsad"                                         -> o.eadEsad,
         "headerEadEsad"                                   -> o.headerEadEsad,
@@ -249,7 +177,8 @@ object GetMovementResponse extends JsonUtils with XmlReaderUtils {
         "movementGuarantee"                               -> o.movementGuarantee,
         "items"                                           -> o.items,
         "numberOfItems"                                   -> o.numberOfItems,
-        "transportDetails"                                -> o.transportDetails
+        "transportDetails"                                -> o.transportDetails,
+        "reportOfReceipt"                                 -> o.movementViewHistoryAndExtraData.reportOfReceipt
       )
       .removeNullValues()
 

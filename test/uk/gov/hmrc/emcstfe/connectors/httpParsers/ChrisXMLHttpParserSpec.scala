@@ -88,9 +88,6 @@ class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMove
           val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
           result shouldBe Left(XmlParseError(Seq(
-            EmptyError(GetMovementResponse.arc),
-            EmptyError(GetMovementResponse.eadStatus),
-            EmptyError(EADESADContainer \ "ExciseMovement" \ "DateAndTimeOfValidationOfEadEsad"),
             EmptyError(EADESADContainer \ "EadEsad" \\ "LocalReferenceNumber"),
             EmptyError(EADESADContainer \ "EadEsad" \\ "InvoiceNumber"),
             EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'EadEsad/OriginTypeCode'"),
@@ -101,7 +98,10 @@ class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMove
             JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''"),
             EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'HeaderEadEsad/TransportArrangement'"),
             EmptyError(EADESADContainer \ "TransportMode" \\ "TransportModeCode"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'MovementGuarantee/GuarantorTypeCode'")
+            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'MovementGuarantee/GuarantorTypeCode'"),
+            EmptyError(GetMovementResponse.arc),
+            EmptyError(GetMovementResponse.eadStatus),
+            EmptyError(EADESADContainer \ "ExciseMovement" \ "DateAndTimeOfValidationOfEadEsad")
           )))
         }
       }

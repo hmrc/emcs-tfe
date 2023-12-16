@@ -29,6 +29,13 @@ object AcceptMovement extends Enumerable.Implicits {
     Satisfactory, Unsatisfactory, Refused, PartiallyRefused
   )
 
+  def apply(globalConclusion: Int): AcceptMovement = globalConclusion match {
+    case 1 | 21 => Satisfactory
+    case 2 | 22 => Unsatisfactory
+    case 3 | 23 => Refused
+    case 4 => PartiallyRefused
+  }
+
   implicit val enumerable: Enumerable[AcceptMovement] =
     Enumerable(values.map(v => v.toString -> v): _*)
 }

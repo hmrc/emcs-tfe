@@ -72,5 +72,11 @@ class TraderModelSpec extends TestBaseSpec with TraderModelFixtures {
         maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("a")).countryCode shouldBe None
       }
     }
+
+    ".reportOfReceiptXMLReads" must {
+      "be able to read valid XML and parse to a TraderModel" in {
+        TraderModel.reportOfReceiptXMLReads.read(maxTraderModelXML(ConsigneeTrader)) shouldBe ParseSuccess(maxTraderModel(ConsigneeTrader))
+      }
+    }
   }
 }

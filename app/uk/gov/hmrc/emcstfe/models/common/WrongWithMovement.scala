@@ -26,6 +26,15 @@ object WrongWithMovement extends Enumerable.Implicits {
   case object BrokenSeals extends WithName("brokenSeals") with WrongWithMovement
   case object Other extends WithName("other") with WrongWithMovement
 
+  //apply method to reverse lookup
+  def apply(code: Int): WrongWithMovement = code match {
+    case 0 => Other
+    case 1 => Excess
+    case 2 => Shortage
+    case 3 => Damaged
+    case 4 => BrokenSeals
+  }
+
   val values: Seq[WrongWithMovement] = Seq(
     Shortage,
     Excess,

@@ -91,13 +91,13 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
           "use the Consignee Trader ID for the Country Code" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = DirectDelivery))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(DirectDelivery)))
             request.messageRecipient shouldBe "NDEA.FR"
           }
 
           "use GB as default if the Consignee Trader ID does not exist" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = DirectDelivery, consigneeTrader = None))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(DirectDelivery), consigneeTrader = None))
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }
@@ -106,7 +106,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
           "use the ARC for the Country Code" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TaxWarehouse))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TaxWarehouse)))
             request.messageRecipient shouldBe "NDEA.DE"
           }
         }
@@ -118,13 +118,13 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
           "use the Delivery Place Trader ID for the Country Code" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TaxWarehouse))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TaxWarehouse)))
             request.messageSender shouldBe "NDEA.IT"
           }
 
           "use GB as default when Delivery Place Trader ID does NOT exist" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TaxWarehouse, deliveryPlaceTrader = None))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TaxWarehouse), deliveryPlaceTrader = None))
             request.messageSender shouldBe "NDEA.GB"
           }
         }
@@ -133,13 +133,13 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
           "use the Consignee Trader Id for the Country Code when it exists" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TemporaryRegisteredConsignee))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TemporaryRegisteredConsignee)))
             request.messageSender shouldBe "NDEA.FR"
           }
 
           "use GB as default when consignee trader ID does NOT exist" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = TemporaryRegisteredConsignee, consigneeTrader = None))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TemporaryRegisteredConsignee), consigneeTrader = None))
             request.messageSender shouldBe "NDEA.GB"
           }
         }
@@ -148,13 +148,13 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
           "use the Consignee Trader Id for the Country Code when it exists" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = RegisteredConsignee))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(RegisteredConsignee)))
             request.messageSender shouldBe "NDEA.FR"
           }
 
           "use GB as default when consignee trader ID does NOT exist" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = RegisteredConsignee, consigneeTrader = None))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(RegisteredConsignee), consigneeTrader = None))
             request.messageSender shouldBe "NDEA.GB"
           }
         }
@@ -163,7 +163,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
           "use the ARC for the Country Code" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = DirectDelivery))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(DirectDelivery)))
             request.messageSender shouldBe "NDEA.DE"
           }
         }
@@ -172,7 +172,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
           "use GB" in {
 
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Export))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(Export)))
             request.messageSender shouldBe "NDEA.GB"
           }
         }

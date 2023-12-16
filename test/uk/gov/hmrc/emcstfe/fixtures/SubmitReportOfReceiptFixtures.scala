@@ -35,7 +35,8 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
 
   val maxSubmitReportOfReceiptModel = SubmitReportOfReceiptModel(
     arc = testArc,
-    destinationType = TaxWarehouse,
+    destinationType = Some(TaxWarehouse),
+    dateAndTimeOfValidationOfReportOfReceiptExport = None,
     sequenceNumber = 1,
     consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
     deliveryPlaceTrader = Some(maxTraderModel(DeliveryPlaceTrader)),
@@ -73,7 +74,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
       </urn:DestinationOffice>
       <urn:ReportOfReceiptExport>
         <urn:DateOfArrivalOfExciseProducts>
-          {arrivalDate.toString}
+          {arrivalDate}
         </urn:DateOfArrivalOfExciseProducts>
         <urn:GlobalConclusionOfReceipt>
           {maxSubmitReportOfReceiptModel.globalConclusion}
@@ -114,7 +115,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
 
   val minSubmitReportOfReceiptModel = SubmitReportOfReceiptModel(
     arc = testArc,
-    destinationType = TaxWarehouse,
+    destinationType = Some(TaxWarehouse),
     sequenceNumber = 1,
     consigneeTrader = None,
     deliveryPlaceTrader = None,
@@ -122,7 +123,8 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
     dateOfArrival = arrivalDate,
     acceptMovement = Satisfactory,
     individualItems = Seq(),
-    otherInformation = None
+    otherInformation = None,
+    dateAndTimeOfValidationOfReportOfReceiptExport = None
   )
 
   val minSubmitReportOfReceiptModelXML =
@@ -141,7 +143,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
       </urn:DestinationOffice>
       <urn:ReportOfReceiptExport>
         <urn:DateOfArrivalOfExciseProducts>
-          {arrivalDate.toString}
+          {arrivalDate}
         </urn:DateOfArrivalOfExciseProducts>
         <urn:GlobalConclusionOfReceipt>
           {minSubmitReportOfReceiptModel.globalConclusion}

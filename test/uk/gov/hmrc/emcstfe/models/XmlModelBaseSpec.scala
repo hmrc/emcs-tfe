@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models
 
+import com.lucidchart.open.xtract.{ParseSuccess, XmlReader}
 import play.api.libs.json.{JsObject, Reads}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
@@ -42,6 +43,21 @@ trait XmlModelBaseSpec extends TestBaseSpec {
         }
         "convert a model to XML correctly" in {
           trim(model.toXml).toString shouldBe trim(xml).toString
+        }
+      }
+    }
+  }
+
+  def testXmlToModel[Model <: XmlBaseModel](scenario: String,
+                                                  model: Model,
+                                                  xml: Elem)(implicit reads: XmlReader[Model]): Unit = {
+
+    s"${model.getClass.getSimpleName}" when {
+
+      s"$scenario" must {
+
+        "convert XML to a model correctly" in {
+          reads.read(trim(xml)) shouldBe ParseSuccess(model)
         }
       }
     }

@@ -35,7 +35,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
   private val messageNumber = 818
 
   val messageRecipient =
-    Constants.NDEA ++ (if (body.destinationType == DirectDelivery) {
+    Constants.NDEA ++ (if (body.destinationType.contains(DirectDelivery)) {
       traderModelCountryCode(body.consigneeTrader)
     } else {
       arcCountryCode
@@ -43,9 +43,9 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
 
   val messageSender =
     Constants.NDEA ++ (body.destinationType match {
-      case TaxWarehouse => traderModelCountryCode(body.deliveryPlaceTrader)
-      case TemporaryRegisteredConsignee | RegisteredConsignee => traderModelCountryCode(body.consigneeTrader)
-      case DirectDelivery => arcCountryCode
+      case Some(TaxWarehouse) => traderModelCountryCode(body.deliveryPlaceTrader)
+      case Some(TemporaryRegisteredConsignee) | Some(RegisteredConsignee) => traderModelCountryCode(body.consigneeTrader)
+      case Some(DirectDelivery) => arcCountryCode
       case _ => Constants.GB
     })
 

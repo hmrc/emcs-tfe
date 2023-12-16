@@ -16,12 +16,14 @@
 
 package uk.gov.hmrc.emcstfe.models.reportOfReceipt
 
+import com.lucidchart.open.xtract.ParseSuccess
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.UnsatisfactoryModelFixtures
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.Utility.trim
+
 class UnsatisfactoryModelSpec extends TestBaseSpec with UnsatisfactoryModelFixtures {
 
   "UnsatisfactoryModel" must {
@@ -43,6 +45,10 @@ class UnsatisfactoryModelSpec extends TestBaseSpec with UnsatisfactoryModelFixtu
           "write to XML" in {
             trim(maxUnsatisfactoryModel(reason).toXml) shouldBe trim(maxUnsatisfactoryModelXML(reason))
           }
+
+          "read from XML" in {
+            UnsatisfactoryModel.xmlReads.read(maxUnsatisfactoryModelXML(reason)) shouldBe ParseSuccess(maxUnsatisfactoryModel(reason))
+          }
         }
 
         "for the minimum number of fields" must {
@@ -54,7 +60,12 @@ class UnsatisfactoryModelSpec extends TestBaseSpec with UnsatisfactoryModelFixtu
           "write to XML" in {
             trim(minUnsatisfactoryModel(reason).toXml) shouldBe trim(minUnsatisfactoryModelXML(reason))
           }
+
+          "read from XML" in {
+            UnsatisfactoryModel.xmlReads.read(minUnsatisfactoryModelXML(reason)) shouldBe ParseSuccess(minUnsatisfactoryModel(reason))
+          }
         }
+
       }
     }
   }
