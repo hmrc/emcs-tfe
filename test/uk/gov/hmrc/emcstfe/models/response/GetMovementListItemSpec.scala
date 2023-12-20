@@ -20,6 +20,7 @@ import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess, __}
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
+import uk.gov.hmrc.emcstfe.utils.InstantXMLReader.InstantParseFailure
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader.LocalDateTimeParseFailure
 
 import scala.xml.Elem
@@ -36,8 +37,12 @@ class GetMovementListItemSpec extends TestBaseSpec with GetMovementListFixture {
 
     "successfully read a movement list item" when {
 
-      "all fields are valid" in {
+      "all fields are valid (DateOfDispatch in LocalDateTime format)" in {
         GetMovementListItem.xmlReader.read(movement1XML) shouldBe ParseSuccess(movement1)
+      }
+
+      "all fields are valid (DateOfDispatch in Instant format)" in {
+        GetMovementListItem.xmlReader.read(movement1XMLWithoutZulu) shouldBe ParseSuccess(movement1)
       }
     }
 
@@ -64,7 +69,10 @@ class GetMovementListItemSpec extends TestBaseSpec with GetMovementListFixture {
             <OtherTraderID>ABCD1234</OtherTraderID>
           </Movement>
 
-        GetMovementListItem.xmlReader.read(badXml) shouldBe ParseFailure(Seq(LocalDateTimeParseFailure("Text '' could not be parsed at index 0")))
+        GetMovementListItem.xmlReader.read(badXml) shouldBe ParseFailure(Seq(
+          LocalDateTimeParseFailure("Text '' could not be parsed at index 0"),
+          InstantParseFailure("Text '' could not be parsed at index 0")
+        ))
       }
 
       "DateOfDispatch is invalid date format" in {
@@ -77,7 +85,10 @@ class GetMovementListItemSpec extends TestBaseSpec with GetMovementListFixture {
             <OtherTraderID>ABCD1234</OtherTraderID>
           </Movement>
 
-        GetMovementListItem.xmlReader.read(badXml) shouldBe ParseFailure(Seq(LocalDateTimeParseFailure("Text '2009-01-26T14:11:00BANG' could not be parsed, unparsed text found at index 19")))
+        GetMovementListItem.xmlReader.read(badXml) shouldBe ParseFailure(Seq(
+          LocalDateTimeParseFailure("Text '2009-01-26T14:11:00BANG' could not be parsed, unparsed text found at index 19"),
+          InstantParseFailure("Text '2009-01-26T14:11:00BANG' could not be parsed at index 19")
+        ))
       }
 
       "MovementStatus is missing" in {

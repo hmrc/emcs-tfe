@@ -23,9 +23,9 @@ import uk.gov.hmrc.emcstfe.utils.LocalDateXMLReader.LocalDateParseFailure
 import java.time.LocalDate
 import scala.xml.Elem
 
-class LocalDateXMLParserSpec extends TestBaseSpec {
+class LocalDateXMLReaderSpec extends TestBaseSpec {
 
-  "LocalDateXMLParser" must {
+  "LocalDateXMLReader" must {
 
     "successfully parse a LocalDate" when {
 
