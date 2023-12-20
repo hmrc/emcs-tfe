@@ -20,6 +20,7 @@ import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess, __}
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
+import uk.gov.hmrc.emcstfe.utils.InstantXMLReader.InstantParseFailure
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader.LocalDateTimeParseFailure
 
 import scala.xml.{Elem, XML}
@@ -75,7 +76,10 @@ class GetMovementListSpec extends TestBaseSpec with GetMovementListFixture {
             <CountOfMovementsAvailable>1</CountOfMovementsAvailable>
           </MovementListDataResponse>
 
-        GetMovementList.xmlReader.read(badXml) shouldBe ParseFailure(Seq(LocalDateTimeParseFailure("Text '' could not be parsed at index 0")))
+        GetMovementList.xmlReader.read(badXml) shouldBe ParseFailure(Seq(
+          LocalDateTimeParseFailure("Text '' could not be parsed at index 0"),
+          InstantParseFailure("Text '' could not be parsed at index 0")
+        ))
       }
     }
   }

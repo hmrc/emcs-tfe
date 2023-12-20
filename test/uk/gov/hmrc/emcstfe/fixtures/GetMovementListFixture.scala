@@ -33,7 +33,7 @@ trait GetMovementListFixture extends BaseFixtures {
   lazy val getMovementListXMLResponseBody: String = """<MovementListDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementListData/3" xmlns:ns1="http://hmrc/emcs/tfe/data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                                                    |	<Movement>
                                                    |		<Arc>18GB00000000000232361</Arc>
-                                                   |		<DateOfDispatch>2009-01-26T14:11:00</DateOfDispatch>
+                                                   |		<DateOfDispatch>2009-01-26T14:11:00Z</DateOfDispatch>
                                                    |		<MovementStatus>Accepted</MovementStatus>
                                                    |		<OtherTraderID>ABCD1234</OtherTraderID>
                                                    |	</Movement>
@@ -83,6 +83,14 @@ trait GetMovementListFixture extends BaseFixtures {
   )
 
   lazy val movement1XML: Elem =
+    <Movement>
+      <Arc>18GB00000000000232361</Arc>
+      <DateOfDispatch>2009-01-26T14:11:00Z</DateOfDispatch>
+      <MovementStatus>Accepted</MovementStatus>
+      <OtherTraderID>ABCD1234</OtherTraderID>
+    </Movement>
+
+  lazy val movement1XMLWithoutZulu: Elem =
     <Movement>
       <Arc>18GB00000000000232361</Arc>
       <DateOfDispatch>2009-01-26T14:11:00</DateOfDispatch>

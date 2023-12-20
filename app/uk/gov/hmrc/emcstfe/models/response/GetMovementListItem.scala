@@ -19,9 +19,10 @@ package uk.gov.hmrc.emcstfe.models.response
 import cats.implicits.catsSyntaxTuple4Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, Writes}
+import uk.gov.hmrc.emcstfe.utils.InstantXMLReader._
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader._
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime, ZoneId}
 
 
 case class GetMovementListItem(arc: String,
@@ -30,10 +31,10 @@ case class GetMovementListItem(arc: String,
                                otherTraderID: String)
 
 object GetMovementListItem {
-
   implicit val xmlReader: XmlReader[GetMovementListItem] = (
     (__ \ "Arc").read[String],
-      (__ \ "DateOfDispatch").read[LocalDateTime],
+      (__ \ "DateOfDispatch").read[LocalDateTime]
+        or (__ \ "DateOfDispatch").read[Instant].map(_.atZone(ZoneId.of("UTC")).toLocalDateTime),
       (__ \ "MovementStatus").read[String],
       (__ \ "OtherTraderID").read[String]
     ).mapN(GetMovementListItem.apply)
