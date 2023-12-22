@@ -28,7 +28,7 @@ import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MinifyXmlError, SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -63,7 +63,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
-          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
           MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
@@ -95,7 +95,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
           MockXmlUtils.readXml().returns(Right(XML.loadString(getMovementIfChangedResponseBody)))
 
-          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementIfChangedResponseBody))))
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementIfChangedResponseBody)))
 
           MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
@@ -113,7 +113,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
             .getRawMovement(getMovementRequest)
             .returns(Future.successful(Right(getRawMovementIfChangedMongoResponse)))
 
-          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementIfChangedResponseBody))))
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementIfChangedResponseBody)))
 
           MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
@@ -155,7 +155,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
-          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
           MockGetMovementRepository.set().returns(Future.failed(new MongoException("Some error")))
 
@@ -171,7 +171,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
-          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
           MockGetMovementRepository.set().returns(Future.failed(new Exception("Some error")))
 
@@ -191,7 +191,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           .postChrisSOAPRequest(getMovementRequest)
           .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
-        MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+        MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
@@ -208,7 +208,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
           .getRawMovement(getMovementRequest)
           .returns(Future.successful(Right(getRawMovementResponse)))
 
-        MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+        MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
@@ -241,7 +241,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
   "storeAndReturn" should {
     "return a Right" when {
       "repository returns a success" in new Test {
-        MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+        MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
@@ -249,20 +249,15 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
       }
     }
     "return a Left" when {
-      "trimWhitespaceFromXml returns a Left" in new Test {
-        MockXmlUtils.trimWhitespaceFromXml().returns(Left(MinifyXmlError))
-
-        await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Left(MinifyXmlError)
-      }
       "repository returns Mongo Exception, still return Right as doesn't matter if storage fails" in new Test {
-        MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+        MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().returns(Future.failed(new MongoException("Some error")))
 
         await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse())
       }
       "repository returns some other failed future, still return Right as doesn't matter if storage fails" in new Test {
-        MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+        MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().returns(Future.failed(new Exception("Some error")))
 
@@ -287,7 +282,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
             .getRawMovement(getMovementRequest)
             .returns(Future.successful(Right(getRawMovementResponse)))
 
-          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
           MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
@@ -306,7 +301,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
             .postChrisSOAPRequest(getMovementRequest)
             .returns(Future.successful(Right(XML.loadString(getMovementResponseBody))))
 
-          MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
           MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
@@ -335,7 +330,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
         MockXmlUtils.readXml().returns(Right(XML.loadString(getMovementIfChangedResponseBody)))
 
-        MockXmlUtils.trimWhitespaceFromXml().returns(Right(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody))))
+        MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 

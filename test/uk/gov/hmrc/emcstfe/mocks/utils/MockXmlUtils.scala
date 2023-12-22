@@ -39,7 +39,7 @@ trait MockXmlUtils extends MockFactory {
       (mockXmlUtils.prepareXmlForSubmission(_: Elem))
         .expects(*)
 
-    def trimWhitespaceFromXml(): CallHandler1[Elem, Either[ErrorResponse, NodeSeq]] =
+    def trimWhitespaceFromXml(): CallHandler1[Elem, NodeSeq] =
       (mockXmlUtils.trimWhitespaceFromXml(_: Elem))
         .expects(*)
   }

@@ -17,14 +17,14 @@
 package uk.gov.hmrc.emcstfe.utils
 
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MarkPlacementError, MinifyXmlError, SoapExtractionError, XmlParseError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MarkPlacementError, SoapExtractionError, XmlParseError}
 
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Right, Success, Try}
 import scala.xml.{Elem, Node, NodeSeq, XML}
 
 @Singleton
-class XmlUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
+class XmlUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging with XmlWriterUtils {
 
   def readXml(xmlString: String): Either[ErrorResponse, NodeSeq] = {
     Try {
@@ -74,19 +74,10 @@ class XmlUtils @Inject()(hmrcMarkUtil: HMRCMarkUtil) extends Logging {
     if ((xml \\ "Envelope" \ "Header" \ "Info").isEmpty) Left(MarkPlacementError) else Right(recurse(xml))
   }
 
-  def trimWhitespaceFromXml(xml: NodeSeq): Either[ErrorResponse, NodeSeq] = Try {
-    scala.xml.Utility.trim(xml.head)
-  } match {
-    case Failure(exception) =>
-      logger.warn(exception.getMessage)
-      Left(MinifyXmlError)
-    case Success(value) => Right(value)
-  }
-
   def prepareXmlForSubmission(xml: Elem): Either[ErrorResponse, String] = for {
     mark <- hmrcMarkUtil.createHmrcMark(xml)
     xmlWithMarkAdded <- addMarkToXml(xml, mark)
-    trimmedXml <- trimWhitespaceFromXml(xmlWithMarkAdded)
+    trimmedXml = trimWhitespaceFromXml(xmlWithMarkAdded)
   } yield {
     s"""<?xml version='1.0' encoding='UTF-8'?>
        |${trimmedXml.toString()}""".stripMargin

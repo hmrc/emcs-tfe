@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.utils
 
 import scala.xml.NodeSeq
 
-trait XmlWriterUtils {
+trait XmlWriterUtils extends Logging {
 
   implicit class OptionExtensions[T](x: Option[T]) {
     def mapNodeSeq(f: T => NodeSeq): NodeSeq = x.map(f).getOrElse(NodeSeq.Empty)
@@ -31,5 +31,8 @@ trait XmlWriterUtils {
   implicit class StringExtensions(x: String) {
     def fromFlag: Boolean = x == "1"
   }
+
+  def trimWhitespaceFromXml(xml: NodeSeq): NodeSeq =
+    xml.headOption.fold(NodeSeq.Empty)(scala.xml.Utility.trim)
 
 }

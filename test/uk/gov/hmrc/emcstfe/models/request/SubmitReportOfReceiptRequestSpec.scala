@@ -231,7 +231,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
       }
 
 
-      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val requestXml = XML.loadString(request.eisXMLBody())
       val expectedXml = trim(expectedRequest)
 
       requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()

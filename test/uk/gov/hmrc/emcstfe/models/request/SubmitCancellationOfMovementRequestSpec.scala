@@ -164,7 +164,7 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
           </urn:Body>
         </urn:IE810>)
 
-      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val requestXml = XML.loadString(request.eisXMLBody())
       val expectedXml = trim(expectedRequest)
 
       requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()

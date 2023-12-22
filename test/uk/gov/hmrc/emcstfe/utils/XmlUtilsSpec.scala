@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.utils
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.mocks.utils.MockHMRCMarkUtil
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MarkCreationError, MarkPlacementError, MinifyXmlError, SoapExtractionError, XmlParseError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, MarkCreationError, MarkPlacementError, SoapExtractionError, XmlParseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.{Elem, NodeSeq, XML}
@@ -149,22 +149,22 @@ class XmlUtilsSpec extends TestBaseSpec with GetMovementFixture with MockHMRCMar
 
   "trimWhitespaceFromXml" should {
     "return minified XML" when {
-      "provided XML it can minify" in new Test {
+      "has XML" in new Test {
         val inputXml: Elem = <Node1>
           <Node2>
             <Field1>123</Field1>
             <Field2>456</Field2>
           </Node2>
         </Node1>
-        val res: Either[ErrorResponse, NodeSeq] = xmlUtils.trimWhitespaceFromXml(inputXml)
-        res.map(_.toString()) shouldBe Right("""<Node1><Node2><Field1>123</Field1><Field2>456</Field2></Node2></Node1>""")
+        val res = xmlUtils.trimWhitespaceFromXml(inputXml)
+        res.head.toString() shouldBe """<Node1><Node2><Field1>123</Field1><Field2>456</Field2></Node2></Node1>"""
       }
     }
-    "return an error" when {
-      "provided XML it cannot minify" in new Test {
+    "return Empty NodeSeq" when {
+      "NoXML" in new Test {
         val inputXml: NodeSeq = NodeSeq.Empty
-        val res: Either[ErrorResponse, NodeSeq] = xmlUtils.trimWhitespaceFromXml(inputXml)
-        res shouldBe Left(MinifyXmlError)
+        val res = xmlUtils.trimWhitespaceFromXml(inputXml)
+        res shouldBe NodeSeq.Empty
       }
     }
   }

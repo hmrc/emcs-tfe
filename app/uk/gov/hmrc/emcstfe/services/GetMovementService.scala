@@ -153,7 +153,7 @@ class GetMovementService @Inject()(
       for {
         res <- EitherT.fromEither[Future](response)
 
-        resString <- EitherT.fromEither[Future](xmlUtils.trimWhitespaceFromXml(res))
+        resString = xmlUtils.trimWhitespaceFromXml(res)
 
         getMovementMongoResponse = response.map(_ => GetMovementMongoResponse(getMovementRequest.arc, JsString(resString.toString())))
 
