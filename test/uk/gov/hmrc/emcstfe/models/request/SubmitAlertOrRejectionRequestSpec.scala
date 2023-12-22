@@ -145,7 +145,7 @@ class SubmitAlertOrRejectionRequestSpec extends TestBaseSpec with SubmitAlertOrR
         </urn:IE819>
       )
 
-      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val requestXml = XML.loadString(request.eisXMLBody())
       val expectedXml = trim(expectedRequest)
 
       requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()

@@ -50,20 +50,18 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
 
   override def metricName = "explain-delay"
 
-  override def eisXMLBody(): String = {
+  override def eisXMLBody(): String =
     withEisMessage(
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
       messageRecipient = messageRecipient
-    ).toString()
-  }
+    )
 
-  override def toJson: JsObject = {
+  override def toJson: JsObject =
     Json.obj(
       "user" -> exciseRegistrationNumber,
       "messageType" -> s"IE$messageNumber",
       "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
     )
-  }
 }

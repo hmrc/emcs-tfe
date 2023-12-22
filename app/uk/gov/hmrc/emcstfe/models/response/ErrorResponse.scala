@@ -56,10 +56,6 @@ object ErrorResponse {
     val message = "Error placing an HMRC Mark into the supplied XML"
   }
 
-  case object MinifyXmlError extends ErrorResponse {
-    val message = "Error minifying the supplied XML"
-  }
-
   case class MongoError(msg: String) extends ErrorResponse {
     val message = s"Error from Mongo with message: $msg"
   }

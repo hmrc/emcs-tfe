@@ -188,7 +188,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
         </urn:IE813>
       )
 
-      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val requestXml = XML.loadString(request.eisXMLBody())
       val expectedXml = trim(expectedRequest)
 
       requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()

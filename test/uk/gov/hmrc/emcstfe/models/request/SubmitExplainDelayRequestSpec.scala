@@ -136,7 +136,7 @@ class SubmitExplainDelayRequestSpec extends TestBaseSpec with SubmitExplainDelay
           </urn:Body>
         </urn:IE837>)
 
-      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val requestXml = XML.loadString(request.eisXMLBody())
       val expectedXml = trim(expectedRequest)
 
       requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()

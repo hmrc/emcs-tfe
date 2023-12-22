@@ -361,7 +361,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
       }
 
 
-      val requestXml = trim(XML.loadString(request.eisXMLBody()))
+      val requestXml = XML.loadString(request.eisXMLBody())
       val expectedXml = trim(expectedRequest)
 
       requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()

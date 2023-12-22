@@ -82,20 +82,18 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
         body.consignorTrader.countryCode
     }
 
-  override def eisXMLBody(): String = {
+  override def eisXMLBody(): String =
     withEisMessage(
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
       messageRecipient = messageRecipient
-    ).toString()
-  }
+    )
 
-  override def toJson: JsValue = {
+  override def toJson: JsValue =
     Json.obj(
       "user" -> exciseRegistrationNumber,
       "messageType" -> s"IE$messageNumber",
       "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
     )
-  }
 }
