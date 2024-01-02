@@ -15,6 +15,7 @@
  */
 
 package uk.gov.hmrc.emcstfe.models.createMovement
+
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
@@ -34,7 +35,7 @@ case class WineProductModel(
     {wineGrowingZoneCode.mapNodeSeq(value => <urn:WineGrowingZoneCode>{value}</urn:WineGrowingZoneCode>)}
     {thirdCountryOfOrigin.mapNodeSeq(value => <urn:ThirdCountryOfOrigin>{value}</urn:ThirdCountryOfOrigin>)}
     {otherInformation.mapNodeSeq(value => <urn:OtherInformation language="en">{value}</urn:OtherInformation>)}
-    {wineOperations.mapNodeSeq(_.map(value => <urn:WineOperation>{value}</urn:WineOperation>))}
+    {wineOperations.mapNodeSeq(_.map(value => <urn:WineOperation><urn:WineOperationCode>{value}</urn:WineOperationCode></urn:WineOperation>))}
   </urn:WineProduct>
 }
 

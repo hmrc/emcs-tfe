@@ -221,8 +221,12 @@ trait CreateMovementFixtures extends BaseFixtures
       <urn:WineGrowingZoneCode>zone</urn:WineGrowingZoneCode>
       <urn:ThirdCountryOfOrigin>country</urn:ThirdCountryOfOrigin>
       <urn:OtherInformation language="en">info</urn:OtherInformation>
-      <urn:WineOperation>op 1</urn:WineOperation>
-      <urn:WineOperation>op 2</urn:WineOperation>
+      <urn:WineOperation>
+        <urn:WineOperationCode>op 1</urn:WineOperationCode>
+      </urn:WineOperation>
+      <urn:WineOperation>
+        <urn:WineOperationCode>op 2</urn:WineOperationCode>
+      </urn:WineOperation>
     </urn:WineProduct>
     lazy val wineProductXmlMin: Elem = <urn:WineProduct>
       <urn:WineProductCategory>1</urn:WineProductCategory>
