@@ -32,6 +32,7 @@ class EisJsonHttpParser @Inject()() extends Logging {
   def modelFromJsonHttpReads[A](implicit jsonReads: Reads[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
     response.status match {
       case OK => Try {
+        logger.debug(s"Response received with body ${response.json}")
         jsonReads.reads(response.json).fold(
           errors => Left(EISJsonParsingError(errors.flatMap(_._2).toSeq)),
           Right(_)
