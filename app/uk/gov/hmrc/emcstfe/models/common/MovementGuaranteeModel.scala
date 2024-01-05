@@ -32,9 +32,7 @@ case class MovementGuaranteeModel(
     with XmlWriterUtils {
 
   def toXml(implicit request: UserRequest[_]): Elem = <urn:MovementGuarantee>
-    <urn:GuarantorTypeCode>
-      {guarantorTypeCode.toString}
-    </urn:GuarantorTypeCode>
+    <urn:GuarantorTypeCode>{guarantorTypeCode.toString}</urn:GuarantorTypeCode>
     {guarantorTrader.mapNodeSeq(_.map(trader => <urn:GuarantorTrader language="en">{trader.toXml(GuarantorTrader)}</urn:GuarantorTrader>))}
   </urn:MovementGuarantee>
 
