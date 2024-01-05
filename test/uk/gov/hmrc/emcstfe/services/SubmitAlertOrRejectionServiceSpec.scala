@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
@@ -28,7 +29,7 @@ import scala.concurrent.Future
 
 class SubmitAlertOrRejectionServiceSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
   trait Test extends MockChrisConnector with MockEisConnector {
-    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+    implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitAlertOrRejectionRequest: SubmitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
     val service: SubmitAlertOrRejectionService = new SubmitAlertOrRejectionService(mockChrisConnector, mockEisConnector)
   }

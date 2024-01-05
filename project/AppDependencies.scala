@@ -1,12 +1,12 @@
-import sbt._
+import sbt.*
 
 object AppDependencies {
 
-  val playSuffix        = s"-play-28"
+  val playSuffix        = s"-play-30"
 
-  val boostrapVersion   =  "7.22.0"
+  val boostrapVersion   =  "8.4.0"
   val xtractVersion     =  "2.3.0"
-  val hmrcMongoVersion  =  "1.3.0"
+  val hmrcMongoVersion  =  "1.6.0"
   val scalamockVersion  =  "5.2.0"
   val catsCoreVersion   =  "2.9.0"
   val flexmarkVersion   =  "0.62.2"

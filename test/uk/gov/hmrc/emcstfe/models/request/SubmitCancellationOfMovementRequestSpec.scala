@@ -28,7 +28,7 @@ import scala.xml.XML
 
 class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCancellationOfMovementFixtures {
 
-  implicit val request = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
+  implicit val request: SubmitCancellationOfMovementRequest = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
 
   "requestBody" should {
     "generate the correct request XML" in {

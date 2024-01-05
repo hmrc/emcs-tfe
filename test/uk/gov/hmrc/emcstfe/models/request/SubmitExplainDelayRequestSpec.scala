@@ -26,7 +26,7 @@ import scala.xml.XML
 
 class SubmitExplainDelayRequestSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
 
-  implicit val request = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
+  implicit val request: SubmitExplainDelayRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
 
   "requestBody" should {
 

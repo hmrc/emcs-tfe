@@ -51,7 +51,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
   val deliveryPlaceCustomsOfficeCountryCode = "EE"
   val consignorTraderCountryCode = "FF"
 
-  implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
+  implicit val request: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
 
   s".messageRecipientCountryCode()" when {
 

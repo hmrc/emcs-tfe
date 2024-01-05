@@ -26,7 +26,7 @@ import scala.xml.Utility.trim
 
 class SubmitExplainDelayModelSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
 
-  implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+  implicit val request: UserRequest[_] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
 
   "SubmitExplainDelayModel" must {
 
@@ -52,4 +52,5 @@ class SubmitExplainDelayModelSpec extends TestBaseSpec with SubmitExplainDelayFi
       }
     }
   }
+
 }

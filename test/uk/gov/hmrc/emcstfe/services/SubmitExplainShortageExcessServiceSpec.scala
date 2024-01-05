@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
@@ -33,7 +34,7 @@ class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExp
   import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
   trait Test extends MockChrisConnector with MockEisConnector {
-    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+    implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
     val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockChrisConnector, mockEisConnector)
   }
