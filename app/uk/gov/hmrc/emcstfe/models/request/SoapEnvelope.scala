@@ -26,7 +26,9 @@ trait SoapEnvelope { _: ChrisRequest =>
   def withSoapEnvelope[T <: XmlBaseModel](body: T,
                                           messageNumber: Int,
                                           messageSender: String,
-                                          messageRecipient: String)(implicit request: UserRequest[_]): Elem =
+                                          messageRecipient: String,
+                                          isFS41SchemaVersion: Boolean)(implicit request: UserRequest[_]): Elem = {
+    val schemaVersion = if(isFS41SchemaVersion) "V3.13" else "V3.01"
     XML.loadString(
       s"""<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
          |<soapenv:Header>
@@ -43,7 +45,7 @@ trait SoapEnvelope { _: ChrisRequest =>
          |</MetaData>
          |</soapenv:Header>
          |<soapenv:Body>
-         |<urn:IE$messageNumber xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE$messageNumber:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+         |<urn:IE$messageNumber xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE$messageNumber:$schemaVersion" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:$schemaVersion">
          |<urn:Header>
          |<urn1:MessageSender>$messageSender</urn1:MessageSender>
          |<urn1:MessageRecipient>$messageRecipient</urn1:MessageRecipient>
@@ -56,4 +58,5 @@ trait SoapEnvelope { _: ChrisRequest =>
          |</urn:IE$messageNumber>
          |</soapenv:Body>
          |</soapenv:Envelope>""".stripMargin)
+  }
 }
