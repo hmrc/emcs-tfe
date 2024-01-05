@@ -33,53 +33,122 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
   import SubmitChangeDestinationFixtures._
   import UpdateEadEsadFixtures._
 
-  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
+  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = false)
 
-  "requestBody" should {
+  "requestBody" when {
 
-    "generate the correct request XML" in {
+    "useFS41SchemaVersion is enabled" should {
 
-      val expectedSoapRequest =
-        <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-          <soapenv:Header>
-            <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
-              <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
-              <ns:VendorID>1259</ns:VendorID>
-              <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
-              <ns:ServiceID>1138</ns:ServiceID>
-              <ns:ServiceMessageType>HMRC-EMCS-IE813-DIRECT</ns:ServiceMessageType>
-            </ns:Info>
-            <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-              <CredentialID>{testCredId}</CredentialID>
-              <Identifier>{testErn}</Identifier>
-            </MetaData>
-          </soapenv:Header>
-          <soapenv:Body>
-            <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01">
-              <urn:Header>
-                <urn1:MessageSender>{request.messageSender}</urn1:MessageSender>
-                <urn1:MessageRecipient>{request.messageRecipient}</urn1:MessageRecipient>
-                <urn1:DateOfPreparation>
-                  {request.preparedDate.toString}
-                </urn1:DateOfPreparation>
-                <urn1:TimeOfPreparation>
-                  {request.preparedTime.toString}
-                </urn1:TimeOfPreparation>
-                <urn1:MessageIdentifier>
-                  {request.messageUUID}
-                </urn1:MessageIdentifier>
-                <urn1:CorrelationIdentifier>
-                  {request.legacyCorrelationUUID}
-                </urn1:CorrelationIdentifier>
-              </urn:Header>
-              <urn:Body>
-                {submitChangeDestinationXmlMax}
-              </urn:Body>
-            </urn:IE813>
-          </soapenv:Body>
-        </soapenv:Envelope>
+      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = true)
 
-      trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+      "generate the correct request XML" in {
+
+        val expectedSoapRequest =
+          <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+            <soapenv:Header>
+              <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
+                <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
+                <ns:VendorID>1259</ns:VendorID>
+                <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
+                <ns:ServiceID>1138</ns:ServiceID>
+                <ns:ServiceMessageType>HMRC-EMCS-IE813-DIRECT</ns:ServiceMessageType>
+              </ns:Info>
+              <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
+                <CredentialID>
+                  {testCredId}
+                </CredentialID>
+                <Identifier>
+                  {testErn}
+                </Identifier>
+              </MetaData>
+            </soapenv:Header>
+            <soapenv:Body>
+              <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.13">
+                <urn:Header>
+                  <urn1:MessageSender>
+                    {request.messageSender}
+                  </urn1:MessageSender>
+                  <urn1:MessageRecipient>
+                    {request.messageRecipient}
+                  </urn1:MessageRecipient>
+                  <urn1:DateOfPreparation>
+                    {request.preparedDate.toString}
+                  </urn1:DateOfPreparation>
+                  <urn1:TimeOfPreparation>
+                    {request.preparedTime.toString}
+                  </urn1:TimeOfPreparation>
+                  <urn1:MessageIdentifier>
+                    {request.messageUUID}
+                  </urn1:MessageIdentifier>
+                  <urn1:CorrelationIdentifier>
+                    {request.legacyCorrelationUUID}
+                  </urn1:CorrelationIdentifier>
+                </urn:Header>
+                <urn:Body>
+                  {submitChangeDestinationXmlMax}
+                </urn:Body>
+              </urn:IE813>
+            </soapenv:Body>
+          </soapenv:Envelope>
+
+        trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+      }
+    }
+
+    "useFS41SchemaVersion is disabled" should {
+
+      "generate the correct request XML" in {
+
+        val expectedSoapRequest =
+          <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+            <soapenv:Header>
+              <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
+                <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
+                <ns:VendorID>1259</ns:VendorID>
+                <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
+                <ns:ServiceID>1138</ns:ServiceID>
+                <ns:ServiceMessageType>HMRC-EMCS-IE813-DIRECT</ns:ServiceMessageType>
+              </ns:Info>
+              <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
+                <CredentialID>
+                  {testCredId}
+                </CredentialID>
+                <Identifier>
+                  {testErn}
+                </Identifier>
+              </MetaData>
+            </soapenv:Header>
+            <soapenv:Body>
+              <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01">
+                <urn:Header>
+                  <urn1:MessageSender>
+                    {request.messageSender}
+                  </urn1:MessageSender>
+                  <urn1:MessageRecipient>
+                    {request.messageRecipient}
+                  </urn1:MessageRecipient>
+                  <urn1:DateOfPreparation>
+                    {request.preparedDate.toString}
+                  </urn1:DateOfPreparation>
+                  <urn1:TimeOfPreparation>
+                    {request.preparedTime.toString}
+                  </urn1:TimeOfPreparation>
+                  <urn1:MessageIdentifier>
+                    {request.messageUUID}
+                  </urn1:MessageIdentifier>
+                  <urn1:CorrelationIdentifier>
+                    {request.legacyCorrelationUUID}
+                  </urn1:CorrelationIdentifier>
+                </urn:Header>
+                <urn:Body>
+                  {submitChangeDestinationXmlMax}
+                </urn:Body>
+              </urn:IE813>
+            </soapenv:Body>
+          </soapenv:Envelope>
+
+        trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+      }
     }
 
     "for the MessageSender and MessageRecipient headers" when {
@@ -94,7 +163,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
       "generating MessageSender" should {
         "use the country code from the ARC" in {
-          val request = SubmitChangeDestinationRequest(model)
+          val request = SubmitChangeDestinationRequest(model, useFS41SchemaVersion = false)
           request.messageSender shouldBe "NDEA.DE"
         }
       }
@@ -102,37 +171,37 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
       "generating MessageRecipient" when {
         "destination type is TaxWarehouse" should {
           "use the newConsigneeTrader traderId for the Country Code" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)))
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.FR"
           }
 
           "use GB as default when newConsigneeTrader does NOT exist" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse, newConsigneeTrader = None)))
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse, newConsigneeTrader = None)), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
 
           "use GB as default when newConsigneeTrader traderId does NOT exist" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse, newConsigneeTrader = Some(minTraderModel))))
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse, newConsigneeTrader = Some(minTraderModel))), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }
 
         "destination type is Export" should {
           "use the deliveryPlaceCustomsOffice referenceNumber for the Country Code when it exists" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export)))
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export)), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.IT"
           }
 
           "use GB as default when deliveryPlaceCustomsOffice does NOT exist" in {
 
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)))
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }
 
         "destination type is anything else" should {
           "use GB" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)))
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }
@@ -158,41 +227,86 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
     }
   }
 
-  ".eisXMLBody" should {
-    "generate the correct XML body" in {
-      val expectedRequest = wrapInControlDoc(
-        <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01">
-          <urn:Header>
-            <urn1:MessageSender>
-              {request.messageSender}
-            </urn1:MessageSender>
-            <urn1:MessageRecipient>
-              {request.messageRecipient}
-            </urn1:MessageRecipient>
-            <urn1:DateOfPreparation>
-              {request.preparedDate.toString}
-            </urn1:DateOfPreparation>
-            <urn1:TimeOfPreparation>
-              {request.preparedTime.toString}
-            </urn1:TimeOfPreparation>
-            <urn1:MessageIdentifier>
-              {request.messageUUID}
-            </urn1:MessageIdentifier>
-            <urn1:CorrelationIdentifier>
-              {request.correlationUUID}
-            </urn1:CorrelationIdentifier>
-          </urn:Header>
-          <urn:Body>
-            {submitChangeDestinationXmlMax}
-          </urn:Body>
-        </urn:IE813>
-      )
+  ".eisXMLBody" when {
 
-      val requestXml = XML.loadString(request.eisXMLBody())
-      val expectedXml = trim(expectedRequest)
+    "useFS41SchemaVersion is enabled" should {
 
-      requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
-      requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
+      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = true)
+
+      "generate the correct XML body" in {
+        val expectedRequest = wrapInControlDoc(
+          <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.13">
+            <urn:Header>
+              <urn1:MessageSender>
+                {request.messageSender}
+              </urn1:MessageSender>
+              <urn1:MessageRecipient>
+                {request.messageRecipient}
+              </urn1:MessageRecipient>
+              <urn1:DateOfPreparation>
+                {request.preparedDate.toString}
+              </urn1:DateOfPreparation>
+              <urn1:TimeOfPreparation>
+                {request.preparedTime.toString}
+              </urn1:TimeOfPreparation>
+              <urn1:MessageIdentifier>
+                {request.messageUUID}
+              </urn1:MessageIdentifier>
+              <urn1:CorrelationIdentifier>
+                {request.correlationUUID}
+              </urn1:CorrelationIdentifier>
+            </urn:Header>
+            <urn:Body>
+              {submitChangeDestinationXmlMax}
+            </urn:Body>
+          </urn:IE813>
+        )
+
+        val requestXml = XML.loadString(request.eisXMLBody())
+        val expectedXml = trim(expectedRequest)
+
+        requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
+        requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
+      }
+    }
+
+    "useFS41SchemaVersion is disabled" should {
+
+      "generate the correct XML body" in {
+        val expectedRequest = wrapInControlDoc(
+          <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01">
+            <urn:Header>
+              <urn1:MessageSender>
+                {request.messageSender}
+              </urn1:MessageSender>
+              <urn1:MessageRecipient>
+                {request.messageRecipient}
+              </urn1:MessageRecipient>
+              <urn1:DateOfPreparation>
+                {request.preparedDate.toString}
+              </urn1:DateOfPreparation>
+              <urn1:TimeOfPreparation>
+                {request.preparedTime.toString}
+              </urn1:TimeOfPreparation>
+              <urn1:MessageIdentifier>
+                {request.messageUUID}
+              </urn1:MessageIdentifier>
+              <urn1:CorrelationIdentifier>
+                {request.correlationUUID}
+              </urn1:CorrelationIdentifier>
+            </urn:Header>
+            <urn:Body>
+              {submitChangeDestinationXmlMax}
+            </urn:Body>
+          </urn:IE813>
+        )
+
+        val requestXml = XML.loadString(request.eisXMLBody())
+        val expectedXml = trim(expectedRequest)
+
+        requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
+        requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
+      }
     }
   }
 

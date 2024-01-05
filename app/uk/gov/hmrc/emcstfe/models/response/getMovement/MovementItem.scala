@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple18Semigroupal
+import cats.implicits.catsSyntaxTuple19Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -39,6 +39,7 @@ case class MovementItem(itemUniqueReference: Int,
                         commercialDescription: Option[String],
                         brandNameOfProduct: Option[String],
                         maturationAge: Option[String],
+                        independentSmallProducersDeclaration: Option[String],
                         packaging: Seq[Packaging],
                         wineProduct: Option[WineProduct])
 
@@ -61,6 +62,7 @@ object MovementItem extends XmlWriterUtils {
     (__ \ "CommercialDescription").read[String].optional,
     (__ \ "BrandNameOfProducts").read[String].optional,
     (__ \ "MaturationPeriodOrAgeOfProducts").read[String].optional,
+    (__ \ "IndependentSmallProducersDeclaration").read[String].optional,
     (__ \ "Package").read[Seq[Packaging]](strictReadSeq),
     (__ \ "WineProduct").read[WineProduct].optional
   ).mapN(MovementItem.apply)

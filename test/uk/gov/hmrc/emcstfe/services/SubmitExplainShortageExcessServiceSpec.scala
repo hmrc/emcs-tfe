@@ -18,9 +18,10 @@ package uk.gov.hmrc.emcstfe.services
 
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockChrisConnector
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
@@ -29,62 +30,66 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExplainShortageExcessFixtures {
+class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExplainShortageExcessFixtures with MockAppConfig {
 
   import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
-  trait Test extends MockChrisConnector with MockEisConnector {
+  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
     implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
-    val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockChrisConnector, mockEisConnector)
+    val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor), useFS41SchemaVersion = useFS41SchemaVersion)
+    val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockChrisConnector, mockEisConnector, mockAppConfig)
+    MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
   }
 
-  "SubmitExplainShortageExcessService" should {
-    "submit" should {
-      "return a Right" when {
-        "connector call to Chris is successful and XML is the correct format" in new Test {
+  "SubmitExplainShortageExcessService" when {
+    Seq(true, false).foreach { useFS41SchemaVersion =>
+      s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
+        "when calling submit" must {
+          "return a Right" when {
+            "connector call to Chris is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
 
-          MockChrisConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
-            Future.successful(Right(chrisSuccessResponse))
-          )
+              MockChrisConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
+                Future.successful(Right(chrisSuccessResponse))
+              )
 
-          await(service.submit(submitExplainShortageExcessModelMax(Consignor))) shouldBe Right(chrisSuccessResponse)
+              await(service.submit(submitExplainShortageExcessModelMax(Consignor))) shouldBe Right(chrisSuccessResponse)
+            }
+          }
+          "return a Left" when {
+            "connector call to Chris is unsuccessful" in new Test(useFS41SchemaVersion) {
+
+              MockChrisConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
+                Future.successful(Left(XmlValidationError))
+              )
+
+              await(service.submit(submitExplainShortageExcessModelMax(Consignor))) shouldBe Left(XmlValidationError)
+            }
+          }
         }
-      }
-      "return a Left" when {
-        "connector call to Chris is unsuccessful" in new Test {
 
-          MockChrisConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
-            Future.successful(Left(XmlValidationError))
-          )
+        "when calling submitViaEIS" must {
+          "return a Right" when {
+            "connector call to EIS is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
 
-          await(service.submit(submitExplainShortageExcessModelMax(Consignor))) shouldBe Left(XmlValidationError)
+              MockEisConnector.submit(submitExplainShortageExcessRequest).returns(
+                Future.successful(Right(chrisSuccessResponse))
+              )
+
+              await(service.submitViaEIS(submitExplainShortageExcessModelMax(Consignor))) shouldBe Right(chrisSuccessResponse)
+            }
+          }
+          "return a Left" when {
+            "connector call to EIS is unsuccessful" in new Test(useFS41SchemaVersion) {
+
+              MockEisConnector.submit(submitExplainShortageExcessRequest).returns(
+                Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+              )
+
+              await(service.submitViaEIS(submitExplainShortageExcessModelMax(Consignor))) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+            }
+          }
         }
       }
     }
-
-    "submitViaEis" should {
-      "return a Right" when {
-        "connector call to EIS is successful and XML is the correct format" in new Test {
-
-          MockEisConnector.submit(submitExplainShortageExcessRequest).returns(
-            Future.successful(Right(chrisSuccessResponse))
-          )
-
-          await(service.submitViaEIS(submitExplainShortageExcessModelMax(Consignor))) shouldBe Right(chrisSuccessResponse)
-        }
-      }
-      "return a Left" when {
-        "connector call to EIS is unsuccessful" in new Test {
-
-          MockEisConnector.submit(submitExplainShortageExcessRequest).returns(
-           Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-          )
-
-          await(service.submitViaEIS(submitExplainShortageExcessModelMax(Consignor))) shouldBe Left(EISUnknownError("Downstream failed to respond"))
-        }
-      }
-    }
-
   }
 }

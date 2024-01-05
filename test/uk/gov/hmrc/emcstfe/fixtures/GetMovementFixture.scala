@@ -108,6 +108,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
                                                |              <body:DegreePlato>1.2</body:DegreePlato>
                                                |              <body:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</body:MaturationPeriodOrAgeOfProducts>
+                                               |              <body:IndependentSmallProducersDeclaration language="EN">Independent Small Producers Declaration</body:IndependentSmallProducersDeclaration>
                                                |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
                                                |              <body:SizeOfProducer>20000</body:SizeOfProducer>
                                                |              <body:Density>880</body:Density>
@@ -562,6 +563,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         commercialDescription = Some("Retsina"),
         brandNameOfProduct = Some("MALAMATINA"),
         maturationAge = Some("Maturation Period"),
+        independentSmallProducersDeclaration = Some("Independent Small Producers Declaration"),
         packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
@@ -598,6 +600,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         commercialDescription = Some("Retsina"),
         brandNameOfProduct = Some("BrandName"),
         maturationAge = None,
+        independentSmallProducersDeclaration = None,
         packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
@@ -760,6 +763,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         "commercialDescription" -> "Retsina",
         "brandNameOfProduct"    -> "MALAMATINA",
         "maturationAge"         -> "Maturation Period",
+        "independentSmallProducersDeclaration" -> "Independent Small Producers Declaration",
         "packaging" -> Json.arr(
           Json.obj(fields = "typeOfPackage" -> "BO", "quantity" -> 125, "shippingMarks" -> "MARKS", "identityOfCommercialSeal" -> "SEAL456789321", "sealInformation" -> "Red Strip")
         ),
@@ -1002,6 +1006,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |              <body:CommercialDescription>BodyEadEsadCommercialDescription1</body:CommercialDescription>
                                          |              <body:BrandNameOfProducts>BodyEadEsadBrandNameOfProducts1</body:BrandNameOfProducts>
                                          |              <body:MaturationPeriodOrAgeOfProducts>BodyEadEsadMaturationPeriodOrAgeOfProducts1</body:MaturationPeriodOrAgeOfProducts>
+                                         |              <body:IndependentSmallProducersDeclaration>BodyEadEsadIndependentSmallProducersDeclaration1</body:IndependentSmallProducersDeclaration>
                                          |              <body:Package>
                                          |                <body:KindOfPackages>PackageKindOfPackages11</body:KindOfPackages>
                                          |                <body:NumberOfPackages>1</body:NumberOfPackages>
@@ -1046,6 +1051,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |              <body:CommercialDescription>BodyEadEsadCommercialDescription2</body:CommercialDescription>
                                          |              <body:BrandNameOfProducts>BodyEadEsadBrandNameOfProducts2</body:BrandNameOfProducts>
                                          |              <body:MaturationPeriodOrAgeOfProducts>BodyEadEsadMaturationPeriodOrAgeOfProducts2</body:MaturationPeriodOrAgeOfProducts>
+                                         |              <body:IndependentSmallProducersDeclaration>BodyEadEsadIndependentSmallProducersDeclaration2</body:IndependentSmallProducersDeclaration>
                                          |              <body:Package>
                                          |                <body:KindOfPackages>PackageKindOfPackages21</body:KindOfPackages>
                                          |                <body:NumberOfPackages>3</body:NumberOfPackages>
@@ -1334,6 +1340,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         commercialDescription = Some("BodyEadEsadCommercialDescription1"),
         brandNameOfProduct = Some("BodyEadEsadBrandNameOfProducts1"),
         maturationAge = Some("BodyEadEsadMaturationPeriodOrAgeOfProducts1"),
+        independentSmallProducersDeclaration = Some("BodyEadEsadIndependentSmallProducersDeclaration1"),
         packaging = Seq(
           Packaging(
             typeOfPackage = "PackageKindOfPackages11",
@@ -1376,6 +1383,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         commercialDescription = Some("BodyEadEsadCommercialDescription2"),
         brandNameOfProduct = Some("BodyEadEsadBrandNameOfProducts2"),
         maturationAge = Some("BodyEadEsadMaturationPeriodOrAgeOfProducts2"),
+        independentSmallProducersDeclaration = Some("BodyEadEsadIndependentSmallProducersDeclaration2"),
         packaging = Seq(
           Packaging(
             typeOfPackage = "PackageKindOfPackages21",
@@ -1637,6 +1645,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         "commercialDescription" -> "BodyEadEsadCommercialDescription1",
         "brandNameOfProduct"    -> "BodyEadEsadBrandNameOfProducts1",
         "maturationAge"         -> "BodyEadEsadMaturationPeriodOrAgeOfProducts1",
+        "independentSmallProducersDeclaration" -> "BodyEadEsadIndependentSmallProducersDeclaration1",
         "packaging" -> Json.arr(
           Json.obj(
             "typeOfPackage"            -> "PackageKindOfPackages11",
@@ -1678,6 +1687,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         "commercialDescription" -> "BodyEadEsadCommercialDescription2",
         "brandNameOfProduct"    -> "BodyEadEsadBrandNameOfProducts2",
         "maturationAge"         -> "BodyEadEsadMaturationPeriodOrAgeOfProducts2",
+        "independentSmallProducersDeclaration" -> "BodyEadEsadIndependentSmallProducersDeclaration2",
         "packaging" -> Json.arr(
           Json.obj(
             "typeOfPackage"            -> "PackageKindOfPackages21",

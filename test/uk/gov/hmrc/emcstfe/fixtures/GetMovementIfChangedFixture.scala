@@ -532,6 +532,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
         commercialDescription = Some("Retsina"),
         brandNameOfProduct = Some("MALAMATINA"),
         maturationAge = None,
+        independentSmallProducersDeclaration = None,
         packaging = Seq(
           Packaging(
             typeOfPackage = "BO",
@@ -568,6 +569,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
         commercialDescription = Some("Retsina"),
         brandNameOfProduct = Some("BrandName"),
         maturationAge = None,
+        independentSmallProducersDeclaration = None,
         packaging = Seq(
           Packaging(
             typeOfPackage = "BO",

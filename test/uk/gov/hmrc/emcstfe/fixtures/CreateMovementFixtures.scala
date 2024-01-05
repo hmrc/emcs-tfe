@@ -264,6 +264,7 @@ trait CreateMovementFixtures extends BaseFixtures
       commercialDescription = Some("description"),
       brandNameOfProducts = Some("name"),
       maturationPeriodOrAgeOfProducts = Some("age"),
+      independentSmallProducersDeclaration = Some("independent small producers declaration"),
       packages = Seq(packageModelMax, packageModelMin),
       wineProduct = Some(wineProductModelMax)
     )
@@ -284,6 +285,7 @@ trait CreateMovementFixtures extends BaseFixtures
       commercialDescription = None,
       brandNameOfProducts = None,
       maturationPeriodOrAgeOfProducts = None,
+      independentSmallProducersDeclaration = None,
       packages = Seq(packageModelMin),
       wineProduct = None
     )
@@ -304,6 +306,7 @@ trait CreateMovementFixtures extends BaseFixtures
       <urn:CommercialDescription language="en">description</urn:CommercialDescription>
       <urn:BrandNameOfProducts language="en">name</urn:BrandNameOfProducts>
       <urn:MaturationPeriodOrAgeOfProducts language="en">age</urn:MaturationPeriodOrAgeOfProducts>
+      <urn:IndependentSmallProducersDeclaration language="en">independent small producers declaration</urn:IndependentSmallProducersDeclaration>
       {packageXmlMax}
       {packageXmlMin}
       {wineProductXmlMax}
@@ -334,6 +337,7 @@ trait CreateMovementFixtures extends BaseFixtures
       "commercialDescription" -> "description",
       "brandNameOfProducts" -> "name",
       "maturationPeriodOrAgeOfProducts" -> "age",
+      "independentSmallProducersDeclaration" -> "independent small producers declaration",
       "packages" -> Json.arr(packageJsonMax, packageJsonMin),
       "wineProduct" -> wineProductJsonMax
     )
