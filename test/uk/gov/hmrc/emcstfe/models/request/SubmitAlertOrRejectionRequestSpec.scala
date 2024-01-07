@@ -29,6 +29,8 @@ class SubmitAlertOrRejectionRequestSpec extends TestBaseSpec with SubmitAlertOrR
 
   implicit val request: SubmitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel, useFS41SchemaVersion = false)
 
+  "requestBody" when {
+
     "useFS41SchemaVersion is enabled" should {
 
       implicit val request = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel, useFS41SchemaVersion = true)
