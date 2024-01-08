@@ -34,6 +34,10 @@
         </encoder>
     </appender>
 
+    <logger name="connectorlog" level="OFF" additivity="false">
+        <appender-ref ref="CONNECTOR_LOG_FILE" />
+    </logger>
+
     <logger name="accesslog" level="OFF" additivity="false">
         <appender-ref ref="ACCESS_LOG_FILE" />
     </logger>
