@@ -38,6 +38,10 @@
         <appender-ref ref="ACCESS_LOG_FILE" />
     </logger>
 
+    <logger name="connectorlog" level="OFF" additivity="false">
+        <appender-ref ref="CONNECTOR_LOG_FILE" />
+    </logger>
+
     <logger name="com.ning.http.client.providers.netty" additivity="false">
         <appender-ref ref="STDOUT_IGNORE_NETTY" />
     </logger>
