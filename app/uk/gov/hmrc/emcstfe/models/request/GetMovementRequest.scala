@@ -57,6 +57,6 @@ case class GetMovementRequest(exciseRegistrationNumber: String, arc: String, seq
   override val queryParams: Seq[(String, String)] = Seq(
     "exciseregistrationnumber" -> exciseRegistrationNumber,
     "arc" -> arc,
-    "sequencenumber" -> sequenceNumber.getOrElse(1).toString
+    "sequencenumber" -> sequenceNumber.getOrElse(0).toString
   )
 }

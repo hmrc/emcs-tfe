@@ -62,7 +62,7 @@ class GetMovementIntegrationSpec extends IntegrationBaseSpec with GetMovementFix
     def downstreamEisGetMovementQueryParam: Map[String, String] = Map(
       "exciseregistrationnumber" -> testErn,
       "arc" -> testArc,
-      "sequencenumber" -> "1"
+      "sequencenumber" -> "0"
     )
 
     def generateHeaders(action: String) = Map(HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="$action"""")
