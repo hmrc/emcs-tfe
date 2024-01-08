@@ -3,12 +3,11 @@ import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 
 lazy val ItTest = config("it") extend Test
 
+ThisBuild / scalaVersion := "2.13.12"
+
 lazy val microservice = Project("emcs-tfe", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
-  .settings(
-    ThisBuild / scalaVersion := "2.13.12"
-  )
   .settings(
     majorVersion := 0,
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
