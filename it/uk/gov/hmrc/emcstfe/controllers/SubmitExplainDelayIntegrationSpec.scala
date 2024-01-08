@@ -142,7 +142,7 @@ class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitE
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe Json.obj(
-          "message" -> "Errors parsing JSON, errors: List(JsonValidationError(List(error.path.missing),ArraySeq()))"
+          "message" -> "Errors parsing JSON, errors: List(JsonValidationError(List(error.path.missing),List()))"
         )
       }
       "downstream call returns a non-200 HTTP response" in new Test {

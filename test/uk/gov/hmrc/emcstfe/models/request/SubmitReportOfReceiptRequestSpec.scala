@@ -28,7 +28,7 @@ import scala.xml.XML
 
 class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfReceiptFixtures {
 
-  implicit val request = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
+  implicit val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
   "requestBody" should {
 

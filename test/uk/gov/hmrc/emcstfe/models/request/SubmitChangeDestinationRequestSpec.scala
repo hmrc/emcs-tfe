@@ -33,7 +33,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
   import SubmitChangeDestinationFixtures._
   import UpdateEadEsadFixtures._
 
-  implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
+  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
 
   "requestBody" should {
 

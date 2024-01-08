@@ -27,7 +27,7 @@ import scala.xml.XML
 
 class SubmitAlertOrRejectionRequestSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
 
-  implicit val request = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
+  implicit val request: SubmitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
 
   "requestBody" should {
 

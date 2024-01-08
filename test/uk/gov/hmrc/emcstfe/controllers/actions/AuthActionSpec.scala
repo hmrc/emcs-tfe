@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.controllers.actions
 
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
+import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Organisation}
@@ -35,11 +35,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthActionSpec extends TestBaseSpec with BaseFixtures {
 
   lazy val bodyParsers = app.injector.instanceOf[BodyParsers.Default]
-  implicit lazy val messagesApi = app.injector.instanceOf[MessagesApi]
+  implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
   type AuthRetrieval = ~[~[~[Option[AffinityGroup], Enrolments], Option[String]], Option[Credentials]]
 
-  implicit val fakeRequest = FakeRequest()
+  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait Harness {
 

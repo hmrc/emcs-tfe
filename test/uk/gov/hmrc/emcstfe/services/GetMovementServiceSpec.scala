@@ -233,7 +233,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
     }
     "return a Left" when {
       "XML is invalid" in new Test {
-        service.generateGetMovementResponse(JsNull) shouldBe Left(XmlParseError(Seq(GenericParseError("JsResultException(errors:List((,List(JsonValidationError(List(error.expected.jsstring),ArraySeq())))))"))))
+        service.generateGetMovementResponse(JsNull) shouldBe Left(XmlParseError(Seq(GenericParseError("JsResultException(errors:List((,List(JsonValidationError(List(error.expected.jsstring),List())))))"))))
       }
     }
   }
@@ -340,7 +340,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
     "return a Left" when {
       "data stored in Mongo can't be converted into a String so no call to ChRIS is made and the call fails early" in new Test {
-        await(service.getMovementIfChanged(getMovementRequest, GetMovementMongoResponse(testArc, JsNull))) shouldBe Left(XmlParseError(Seq(GenericParseError("JsResultException(errors:List((,List(JsonValidationError(List(error.expected.jsstring),ArraySeq())))))"))))
+        await(service.getMovementIfChanged(getMovementRequest, GetMovementMongoResponse(testArc, JsNull))) shouldBe Left(XmlParseError(Seq(GenericParseError("JsResultException(errors:List((,List(JsonValidationError(List(error.expected.jsstring),List())))))"))))
       }
     }
   }

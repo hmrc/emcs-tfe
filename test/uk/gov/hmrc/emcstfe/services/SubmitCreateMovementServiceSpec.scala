@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
@@ -28,7 +29,7 @@ import scala.concurrent.Future
 
 class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures {
   trait Test extends MockChrisConnector with MockEisConnector {
-    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+    implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
     val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector)
   }

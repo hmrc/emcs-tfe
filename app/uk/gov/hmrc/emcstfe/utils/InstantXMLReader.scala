@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.utils
 
 import com.lucidchart.open.xtract.{ParseError, ParseFailure, ParseSuccess, XmlReader}
 
-import java.time.{Instant, LocalDateTime}
+import java.time.Instant
 import scala.util.{Failure, Success, Try}
 import scala.xml.NodeSeq
 
