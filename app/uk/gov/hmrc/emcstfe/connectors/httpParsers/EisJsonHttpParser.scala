@@ -47,8 +47,11 @@ class EisJsonHttpParser @Inject()() extends Logging {
       case UNPROCESSABLE_ENTITY =>
         logger.debug(s"[modelFromJsonHttpReads] Business/RIM validation error (422) from EIS: ${response.body}")
         Left(EISBusinessError(response.body))
-      case INTERNAL_SERVER_ERROR => Left(EISInternalServerError(response.body))
-      case SERVICE_UNAVAILABLE => Left(EISServiceUnavailableError(response.body))
+      case INTERNAL_SERVER_ERROR =>
+        logger.debug(s"[modelFromJsonHttpReads] INTERNAL_SERVER_ERROR (500) from EIS: ${response.body}")
+        Left(EISInternalServerError(response.body))
+      case SERVICE_UNAVAILABLE =>
+        Left(EISServiceUnavailableError(response.body))
       case _ => {
         logger.warn(s"[modelFromJsonHttpReads] Received unexpected status: ${response.status}")
         logger.debug(s"[modelFromJsonHttpReads] Error response body: ${response.body}")
