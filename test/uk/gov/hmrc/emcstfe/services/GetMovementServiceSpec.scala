@@ -240,12 +240,39 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
   "storeAndReturn" should {
     "return a Right" when {
-      "repository returns a success" in new Test {
-        MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
+      "and update the cache" when {
 
-        MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
+        "repository returns a success and no cache value exists" in new Test {
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
-        await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse())
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse)).once()
+
+          await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)), None)(getMovementRequest)) shouldBe Right(getMovementResponse())
+        }
+
+        "repository returns a success and response from core is different to the cache value" in new Test {
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
+
+          MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse)).once()
+
+          await(service.storeAndReturn(
+            response = Right(XML.loadString(getMovementResponseBody)),
+            cachedMovement = Some(Right(getMovementResponse("1day"))))(getMovementRequest)
+          ) shouldBe Right(getMovementResponse())
+        }
+      }
+
+      "and NOT update the cache" when {
+        "repository returns a success and response from core is the same as the existing cache value" in new Test {
+          MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
+
+          MockGetMovementRepository.set().never()
+
+          await(service.storeAndReturn(
+            response = Right(XML.loadString(getMovementResponseBody)),
+            cachedMovement = Some(Right(getMovementResponse())))(getMovementRequest)
+          ) shouldBe Right(getMovementResponse())
+        }
       }
     }
     "return a Left" when {
@@ -254,17 +281,17 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
         MockGetMovementRepository.set().returns(Future.failed(new MongoException("Some error")))
 
-        await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse())
+        await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)), None)(getMovementRequest)) shouldBe Right(getMovementResponse())
       }
       "repository returns some other failed future, still return Right as doesn't matter if storage fails" in new Test {
         MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody)))
 
         MockGetMovementRepository.set().returns(Future.failed(new Exception("Some error")))
 
-        await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)))(getMovementRequest)) shouldBe Right(getMovementResponse())
+        await(service.storeAndReturn(Right(XML.loadString(getMovementResponseBody)), None)(getMovementRequest)) shouldBe Right(getMovementResponse())
       }
       "chrisResponse is a Left" in new Test {
-        await(service.storeAndReturn(Left(UnexpectedDownstreamResponseError))(getMovementRequest)) shouldBe Left(UnexpectedDownstreamResponseError)
+        await(service.storeAndReturn(Left(UnexpectedDownstreamResponseError), None)(getMovementRequest)) shouldBe Left(UnexpectedDownstreamResponseError)
       }
     }
   }
@@ -286,7 +313,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
           MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
-          await(service.getNewMovement(getMovementRequest)) shouldBe Right(getMovementResponse())
+          await(service.getNewMovement(getMovementRequest, None)) shouldBe Right(getMovementResponse())
         }
       }
 
@@ -305,7 +332,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
           MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse))
 
-          await(service.getNewMovement(getMovementRequest)) shouldBe Right(getMovementResponse())
+          await(service.getNewMovement(getMovementRequest, None)) shouldBe Right(getMovementResponse())
         }
       }
     }
