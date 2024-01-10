@@ -18,8 +18,9 @@ package uk.gov.hmrc.emcstfe.featureswitch.core.config
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.models.FeatureSwitch
+import uk.gov.hmrc.emcstfe.utils.Logging
 
-trait FeatureSwitching {
+trait FeatureSwitching extends Logging {
 
   val config: AppConfig
 
@@ -32,10 +33,14 @@ trait FeatureSwitching {
       case None => config.getFeatureSwitchValue(featureSwitch.configName)
     }
 
-  def enable(featureSwitch: FeatureSwitch): Unit =
+  def enable(featureSwitch: FeatureSwitch): Unit = {
+    logger.warn(s"[enable] $featureSwitch")
     sys.props += featureSwitch.configName -> FEATURE_SWITCH_ON
+  }
 
-  def disable(featureSwitch: FeatureSwitch): Unit =
+  def disable(featureSwitch: FeatureSwitch): Unit = {
+    logger.warn(s"[disable] $featureSwitch")
     sys.props += featureSwitch.configName -> FEATURE_SWITCH_OFF
+  }
 
 }
