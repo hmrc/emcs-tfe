@@ -28,10 +28,12 @@ trait EisMessage extends XmlWriterUtils {
   def withEisMessage[T <: XmlBaseModel](body: T,
                                         messageNumber: Int,
                                         messageSender: String,
-                                        messageRecipient: String)(implicit request: UserRequest[_]): String =
+                                        messageRecipient: String,
+                                        isFS41SchemaVersion: Boolean)(implicit request: UserRequest[_]): String = {
+    val schemaVersion = if(isFS41SchemaVersion) "V3.13" else "V3.01"
     trimWhitespaceFromXml(controlDocument(
       XML.loadString(
-        s"""<urn:IE$messageNumber xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE$messageNumber:V3.01" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">
+        s"""<urn:IE$messageNumber xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE$messageNumber:$schemaVersion" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:$schemaVersion">
            |<urn:Header>
            |<urn1:MessageSender>$messageSender</urn1:MessageSender>
            |<urn1:MessageRecipient>$messageRecipient</urn1:MessageRecipient>
@@ -43,6 +45,7 @@ trait EisMessage extends XmlWriterUtils {
            |<urn:Body>${body.toXml}</urn:Body>
            |</urn:IE$messageNumber>""".stripMargin)
     )).toString()
+  }
 
   //TODO when we have the updated spec update
   private def controlDocument(xml: Node): Elem = {

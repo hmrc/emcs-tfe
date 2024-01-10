@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
@@ -28,14 +30,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitExplainShortageExcessService @Inject()(chrisConnector: ChrisConnector, eisConnector: EisConnector) extends Logging {
+class SubmitExplainShortageExcessService @Inject()(chrisConnector: ChrisConnector,
+                                                   eisConnector: EisConnector,
+                                                   val config: AppConfig) extends Logging with FeatureSwitching {
   def submit(submission: SubmitExplainShortageExcessModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    chrisConnector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainShortageExcessRequest(submission))
+    chrisConnector.submitExplainShortageExcessChrisSOAPRequest[ChRISSuccessResponse](SubmitExplainShortageExcessRequest(submission, isEnabled(ValidateUsingFS41Schema)))
 
   def submitViaEIS(submission: SubmitExplainShortageExcessModel)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submit[EISSubmissionSuccessResponse](SubmitExplainShortageExcessRequest(submission), "submitExplainShortageExcessEISRequest")
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitExplainShortageExcessRequest(submission, isEnabled(ValidateUsingFS41Schema)), "submitExplainShortageExcessEISRequest")
 
 
 }

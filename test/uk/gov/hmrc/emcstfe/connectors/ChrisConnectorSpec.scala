@@ -191,7 +191,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
   "submitCreateMovementChrisSOAPRequest" should {
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
+    val submitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = false)
 
     "return a Right" when {
       "downstream call is successful" in new Test {
@@ -272,7 +272,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
   "submitReportOfReceiptChrisSOAPRequest" should {
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
+    val submitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = false)
 
     "return a Right" when {
       "downstream call is successful" in new Test {
@@ -353,7 +353,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
   "submitExplainDelayChrisSOAPRequest" should {
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitExplainDelayRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
+    val submitExplainDelayRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel, useFS41SchemaVersion = false)
 
     "return a Right" when {
       "downstream call is successful" in new Test {
@@ -436,7 +436,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
+    val submitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = false)
 
     "return a Right" when {
       "downstream call is successful" in new Test {
@@ -519,7 +519,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
     import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
+    val submitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor), useFS41SchemaVersion = false)
 
     "return a Right" when {
       "downstream call is successful" in new Test {
@@ -600,7 +600,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
   "submitAlertOrRejectionChrisSOAPRequest" should {
 
     implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
+    val submitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel, useFS41SchemaVersion = false)
 
     "return a Right" when {
       "downstream call is successful" in new Test {
@@ -681,7 +681,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
   "submitCancellationOfMovementChrisSOAPRequest" should {
 
     implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitCancellationOfMovementRequest: SubmitCancellationOfMovementRequest = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
+    val submitCancellationOfMovementRequest: SubmitCancellationOfMovementRequest = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel, useFS41SchemaVersion = false)
 
     "return a Right" when {
       "downstream call is successful" in new Test {

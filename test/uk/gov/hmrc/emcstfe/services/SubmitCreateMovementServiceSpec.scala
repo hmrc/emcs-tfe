@@ -18,7 +18,9 @@ package uk.gov.hmrc.emcstfe.services
 
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
@@ -27,57 +29,64 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures {
-  trait Test extends MockChrisConnector with MockEisConnector {
+class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures with MockAppConfig {
+  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
     implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
-    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector)
+    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = useFS41SchemaVersion)
+    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector, mockAppConfig)
+    MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
   }
 
-  "submit" should {
+  "SubmitCreateMovementService" when {
+    Seq(true, false).foreach { useFS41SchemaVersion =>
+      s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
+        "when calling submit" must {
 
-      "return a Right" when {
-        "connector call is successful and XML is the correct format" in new Test {
+          "return a Right" when {
+            "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
 
-          MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-            Future.successful(Right(chrisSuccessResponse))
-          )
+              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
+                Future.successful(Right(chrisSuccessResponse))
+              )
 
-          await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(chrisSuccessResponse)
+              await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(chrisSuccessResponse)
+            }
+          }
+          "return a Left" when {
+            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
+
+              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
+                Future.successful(Left(XmlValidationError))
+              )
+
+              await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(XmlValidationError)
+            }
+          }
         }
-      }
-      "return a Left" when {
-        "connector call is unsuccessful" in new Test {
 
-          MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-            Future.successful(Left(XmlValidationError))
-          )
+        "when calling submitViaEIS" must {
+          "return a Right" when {
+            "connector call is successful and Json is the correct format" in new Test(useFS41SchemaVersion) {
 
-          await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(XmlValidationError)
+              MockEisConnector.submit(submitCreateMovementRequest).returns(
+                Future.successful(Right(eisSuccessResponse))
+              )
+
+              await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(eisSuccessResponse)
+            }
+          }
+
+          "return a Left" when {
+            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
+
+              MockEisConnector.submit(submitCreateMovementRequest).returns(
+                Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+              )
+
+              await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+            }
+          }
         }
-      }
-    }
-
-  "submitViaEIS" should {
-    "return a Right" when {
-      "connector call is successful and Json is the correct format" in new Test {
-
-        MockEisConnector.submit(submitCreateMovementRequest).returns(
-          Future.successful(Right(eisSuccessResponse))
-        )
-
-        await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(eisSuccessResponse)
-      }
-    }
-
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
-
-        MockEisConnector.submit(submitCreateMovementRequest).returns(
-          Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-        )
-
-        await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
       }
     }
   }

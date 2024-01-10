@@ -39,6 +39,7 @@ case class BodyEadEsadModel(
                              commercialDescription: Option[String],
                              brandNameOfProducts: Option[String],
                              maturationPeriodOrAgeOfProducts: Option[String],
+                             independentSmallProducersDeclaration: Option[String],
                              packages: Seq[PackageModel],
                              wineProduct: Option[WineProductModel]
                            ) extends XmlBaseModel with XmlWriterUtils {
@@ -59,6 +60,7 @@ case class BodyEadEsadModel(
     {commercialDescription.mapNodeSeq(value => <urn:CommercialDescription language="en">{value}</urn:CommercialDescription>)}
     {brandNameOfProducts.mapNodeSeq(value => <urn:BrandNameOfProducts language="en">{value}</urn:BrandNameOfProducts>)}
     {maturationPeriodOrAgeOfProducts.mapNodeSeq(value => <urn:MaturationPeriodOrAgeOfProducts language="en">{value}</urn:MaturationPeriodOrAgeOfProducts>)}
+    {independentSmallProducersDeclaration.mapNodeSeq(value => <urn:IndependentSmallProducersDeclaration language="en">{value}</urn:IndependentSmallProducersDeclaration>)}
     {packages.map(_.toXml)}
     {wineProduct.mapNodeSeq(_.toXml)}
   </urn:BodyEadEsad>

@@ -18,7 +18,9 @@ package uk.gov.hmrc.emcstfe.services
 
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
@@ -27,59 +29,67 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitChangeDestinationServiceSpec extends TestBaseSpec with SubmitChangeDestinationFixtures {
+class SubmitChangeDestinationServiceSpec extends TestBaseSpec with SubmitChangeDestinationFixtures with MockAppConfig {
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
-  trait Test extends MockChrisConnector with MockEisConnector {
+  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
     implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax)
-    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockChrisConnector, mockEisConnector)
+    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = useFS41SchemaVersion)
+    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockChrisConnector, mockEisConnector, mockAppConfig)
+    MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
   }
 
-  "submit" should {
-    "return a Right" when {
-      "connector call is successful and XML is the correct format" in new Test {
+  "SubmitChangeDestinationService" when {
+    Seq(true, false).foreach { useFS41SchemaVersion =>
+      s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
 
-        MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
-          Future.successful(Right(chrisSuccessResponse))
-        )
+        "when calling submit" must {
+          "return a Right" when {
+            "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
 
-        await(service.submit(submitChangeDestinationModelMax)) shouldBe Right(chrisSuccessResponse)
-      }
-    }
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
+              MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
+                Future.successful(Right(chrisSuccessResponse))
+              )
 
-        MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
-          Future.successful(Left(XmlValidationError))
-        )
+              await(service.submit(submitChangeDestinationModelMax)) shouldBe Right(chrisSuccessResponse)
+            }
+          }
+          "return a Left" when {
+            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
 
-        await(service.submit(submitChangeDestinationModelMax)) shouldBe Left(XmlValidationError)
-      }
-    }
-  }
+              MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
+                Future.successful(Left(XmlValidationError))
+              )
 
-  "submitViaEIS" should {
-    "return a Right" when {
-      "connector call is successful and Json is the correct format" in new Test {
+              await(service.submit(submitChangeDestinationModelMax)) shouldBe Left(XmlValidationError)
+            }
+          }
+        }
 
-        MockEisConnector.submit(submitChangeDestinationRequest).returns(
-          Future.successful(Right(eisSuccessResponse))
-        )
+        "when calling submitViaEIS" must {
+          "return a Right" when {
+            "connector call is successful and Json is the correct format" in new Test(useFS41SchemaVersion) {
 
-        await(service.submitViaEIS(submitChangeDestinationModelMax)) shouldBe Right(eisSuccessResponse)
-      }
-    }
+              MockEisConnector.submit(submitChangeDestinationRequest).returns(
+                Future.successful(Right(eisSuccessResponse))
+              )
 
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
+              await(service.submitViaEIS(submitChangeDestinationModelMax)) shouldBe Right(eisSuccessResponse)
+            }
+          }
 
-        MockEisConnector.submit(submitChangeDestinationRequest).returns(
-          Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-        )
+          "return a Left" when {
+            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
 
-        await(service.submitViaEIS(submitChangeDestinationModelMax)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+              MockEisConnector.submit(submitChangeDestinationRequest).returns(
+                Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+              )
+
+              await(service.submitViaEIS(submitChangeDestinationModelMax)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+            }
+          }
+        }
       }
     }
   }

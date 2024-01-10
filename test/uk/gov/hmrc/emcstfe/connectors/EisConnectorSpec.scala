@@ -87,7 +87,7 @@ class EisConnectorSpec
     "submit is called" should {
 
       implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
-      val submitReportOfReceiptRequest                          = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
+      val submitReportOfReceiptRequest                          = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = false)
 
       "return a Right" when {
         "downstream call is successful" in new Test {

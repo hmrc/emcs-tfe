@@ -135,6 +135,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |           <urn:FiscalMark language="en">FM564789 Fiscal Mark</urn:FiscalMark>
             |           <urn:FiscalMarkUsedFlag>1</urn:FiscalMarkUsedFlag>
             |           <urn:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</urn:MaturationPeriodOrAgeOfProducts>
+            |           <urn:IndependentSmallProducersDeclaration language="EN">Independent Small Producers Declaration</urn:IndependentSmallProducersDeclaration>
             |           <urn:DesignationOfOrigin language="en">Designation of Origin</urn:DesignationOfOrigin>
             |           <urn:DegreePlato>1.2</urn:DegreePlato>
             |           <urn:SizeOfProducer>20000</urn:SizeOfProducer>
@@ -353,6 +354,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
               commercialDescription = Some("Retsina"),
               brandNameOfProduct = Some("BrandName"),
               maturationAge = None,
+              independentSmallProducersDeclaration = None,
               packaging = Seq(
                 Packaging(
                   typeOfPackage = "BO",
@@ -502,6 +504,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |              <urn:FiscalMark language="en">FM564789 Fiscal Mark</urn:FiscalMark>
             |              <urn:FiscalMarkUsedFlag>1</urn:FiscalMarkUsedFlag>
             |              <urn:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</urn:MaturationPeriodOrAgeOfProducts>
+            |              <urn:IndependentSmallProducersDeclaration language="EN">Independent Small Producers Declaration</urn:IndependentSmallProducersDeclaration>
             |              <urn:DesignationOfOrigin language="en">Designation of Origin</urn:DesignationOfOrigin>
             |              <urn:DegreePlato>1.2</urn:DegreePlato>
             |              <urn:SizeOfProducer>20000</urn:SizeOfProducer>
@@ -710,6 +713,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |              <urn:FiscalMark language="en">FM564789 Fiscal Mark</urn:FiscalMark>
             |              <urn:FiscalMarkUsedFlag>1</urn:FiscalMarkUsedFlag>
             |              <urn:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</urn:MaturationPeriodOrAgeOfProducts>
+            |              <urn:IndependentSmallProducersDeclaration language="EN">Independent Small Producers Declaration</urn:IndependentSmallProducersDeclaration>
             |              <urn:DesignationOfOrigin language="en">Designation of Origin</urn:DesignationOfOrigin>
             |              <urn:DegreePlato>1.2</urn:DegreePlato>
             |              <urn:SizeOfProducer>20000</urn:SizeOfProducer>

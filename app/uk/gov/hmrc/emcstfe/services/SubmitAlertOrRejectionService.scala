@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitAlertOrRejectionRequest
@@ -28,16 +30,18 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitAlertOrRejectionService @Inject()(chrisConnector: ChrisConnector, eisConnector: EisConnector) extends Logging {
+class SubmitAlertOrRejectionService @Inject()(chrisConnector: ChrisConnector,
+                                              eisConnector: EisConnector,
+                                              val config: AppConfig) extends Logging with FeatureSwitching {
   def submit(submission: SubmitAlertOrRejectionModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    chrisConnector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](SubmitAlertOrRejectionRequest(submission))
+    chrisConnector.submitAlertOrRejectionChrisSOAPRequest[ChRISSuccessResponse](SubmitAlertOrRejectionRequest(submission, isEnabled(ValidateUsingFS41Schema)))
 
   def submitViaEIS(submission: SubmitAlertOrRejectionModel)
                   (implicit hc: HeaderCarrier,
                    ec: ExecutionContext,
                    request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submit[EISSubmissionSuccessResponse](SubmitAlertOrRejectionRequest(submission), "submitAlertOrRejectionEISRequest")
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitAlertOrRejectionRequest(submission, isEnabled(ValidateUsingFS41Schema)), "submitAlertOrRejectionEISRequest")
 
 
 }
