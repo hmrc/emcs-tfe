@@ -52,8 +52,8 @@ class GetMovementService @Inject()(
         logger.info("[getMovement] Matching movement found")
         if (forceFetchNew) {
           logger.info("[getMovement] GetMovementIfChanged")
-          if(isEnabled(SendToEIS)) {
-            getNewMovement(getMovementRequest)
+          if (isEnabled(SendToEIS)) {
+            getNewMovement(getMovementRequest, Some(generateGetMovementResponse(value.data)))
           } else {
             getMovementIfChanged(getMovementRequest, value)
           }
@@ -63,7 +63,7 @@ class GetMovementService @Inject()(
         }
       case None =>
         logger.info("[getMovement] No matching movement found, calling GetMovement")
-        getNewMovement(getMovementRequest)
+        getNewMovement(getMovementRequest, None)
     }
   }
 
@@ -108,7 +108,7 @@ class GetMovementService @Inject()(
               logger.info("[getMovementIfChanged] Change to movement found, updating and returning new movement")
               val newResult: Either[ErrorResponse, NodeSeq] = xmlUtils.readXml(getMovementIfChangedResponse.result)
 
-              storeAndReturn(newResult)(getMovementRequest)
+              storeAndReturn(newResult, None)(getMovementRequest)
             }
         }.sequence.map(_.flatten)
     }
@@ -129,44 +129,32 @@ class GetMovementService @Inject()(
       handleParseResult(XmlReader.of[GetMovementResponse].read(value))
   }
 
-  private[services] def getNewMovement(getMovementRequest: GetMovementRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
-    if(isEnabled(SendToEIS)) {
-      val eisResponseF: Future[Either[ErrorResponse, RawGetMovementResponse]] = eisConnector.getRawMovement(getMovementRequest)
-
-      eisResponseF.flatMap {
-        eisResponse =>
-          storeAndReturn(eisResponse.map(_.movementView))(getMovementRequest)
+  private[services] def getNewMovement(getMovementRequest: GetMovementRequest, cachedMovement: Option[Either[ErrorResponse, GetMovementResponse]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
+    if (isEnabled(SendToEIS)) {
+      eisConnector.getRawMovement(getMovementRequest).flatMap { eisResponse =>
+        storeAndReturn(eisResponse.map(_.movementView), cachedMovement)(getMovementRequest)
       }
     } else {
-      val chrisResponseF: Future[Either[ErrorResponse, NodeSeq]] = chrisConnector.postChrisSOAPRequest(getMovementRequest)
-
-      chrisResponseF.flatMap {
-        chrisResponse =>
-          storeAndReturn(chrisResponse)(getMovementRequest)
+      chrisConnector.postChrisSOAPRequest(getMovementRequest).flatMap { chrisResponse =>
+        storeAndReturn(chrisResponse, cachedMovement)(getMovementRequest)
       }
     }
   }
 
-  private[services] def storeAndReturn(response: Either[ErrorResponse, NodeSeq])(getMovementRequest: GetMovementRequest)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
-
-    val responseAfterStoringInMongo: EitherT[Future, ErrorResponse, GetMovementResponse] = {
+  private[services] def storeAndReturn(response: Either[ErrorResponse, NodeSeq], cachedMovement: Option[Either[ErrorResponse, GetMovementResponse]])(getMovementRequest: GetMovementRequest)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] =
+    {
       for {
         res <- EitherT.fromEither[Future](response)
-
+        movement <- EitherT.fromEither[Future](handleParseResult(XmlReader.of[GetMovementResponse].read(res)))
         resString = xmlUtils.trimWhitespaceFromXml(res)
-
         getMovementMongoResponse = response.map(_ => GetMovementMongoResponse(getMovementRequest.arc, JsString(resString.toString())))
-
         getMovementMongoResponseRight <- EitherT.fromEither[Future](getMovementMongoResponse)
-
-        _ <- EitherT.right(repository.set(getMovementMongoResponseRight).recover(recovery))
-
-        value <- EitherT.fromEither[Future](handleParseResult(XmlReader.of[GetMovementResponse].read(res)))
-      } yield {
-        value
-      }
-    }
-
-    responseAfterStoringInMongo.value
-  }
+        _ = cachedMovement match {
+          case Some(Right(cache)) if cache == movement =>
+            Future.successful(getMovementMongoResponseRight)
+          case _ =>
+            repository.set(getMovementMongoResponseRight)
+        }
+      } yield movement
+    }.value
 }
