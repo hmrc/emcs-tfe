@@ -1,3 +1,6 @@
 repoVisibility: public_0C3F0CE3E6E6448FAD341E7BFA50FCD333E06A20CFF05FCACE61154DDBBADF71
 digital-service: EMCS TFE
 type: service
+test-repositories:
+  - emcs-tfe-journey-tests
+  - emcs-tfe-contract-tests
