@@ -62,7 +62,12 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
 
   override val queryParams: Seq[(String, String)] = Seq(
     "exciseregistrationnumber" -> Some(exciseRegistrationNumber),
-    "traderrole" -> Some(if(isEISFeatureEnabled) searchOptions.traderRole.getOrElse(EIS_DEFAULT_TRADER_ROLE) else searchOptions.traderRole.getOrElse(DEFAULT_TRADER_ROLE)),
+    "traderrole" -> Some(if(isEISFeatureEnabled) {
+      // EIS requires lowercase, ChRIS requires sentence-case
+      searchOptions.traderRole.getOrElse(EIS_DEFAULT_TRADER_ROLE).toLowerCase
+    } else {
+      searchOptions.traderRole.getOrElse(DEFAULT_TRADER_ROLE)
+    }),
     "sortfield" -> Some(if(isEISFeatureEnabled) searchOptions.sortField.getOrElse(EIS_DEFAULT_SORT_FIELD) else searchOptions.sortField.getOrElse(DEFAULT_SORT_FIELD)),
     "sortorder" -> Some(searchOptions.sortOrder),
     "startposition" -> Some(if(isEISFeatureEnabled) searchOptions.startPosition.getOrElse(EIS_DEFAULT_START_POSITION).toString else searchOptions.startPosition.getOrElse(DEFAULT_START_POSITION).toString),
