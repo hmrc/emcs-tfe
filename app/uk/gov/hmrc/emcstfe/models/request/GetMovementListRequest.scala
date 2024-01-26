@@ -68,7 +68,12 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
     } else {
       searchOptions.traderRole.getOrElse(DEFAULT_TRADER_ROLE)
     }),
-    "sortfield" -> Some(if(isEISFeatureEnabled) searchOptions.sortField.getOrElse(EIS_DEFAULT_SORT_FIELD) else searchOptions.sortField.getOrElse(DEFAULT_SORT_FIELD)),
+    "sortfield" -> Some(if(isEISFeatureEnabled) {
+      // EIS requires lowercase, ChRIS requires sentence-case
+      searchOptions.sortField.getOrElse(EIS_DEFAULT_SORT_FIELD).toLowerCase
+    } else {
+      searchOptions.sortField.getOrElse(DEFAULT_SORT_FIELD)
+    }),
     "sortorder" -> Some(searchOptions.sortOrder),
     "startposition" -> Some(if(isEISFeatureEnabled) searchOptions.startPosition.getOrElse(EIS_DEFAULT_START_POSITION).toString else searchOptions.startPosition.getOrElse(DEFAULT_START_POSITION).toString),
     "maxnotoreturn" -> Some(searchOptions.maxRows.toString),
