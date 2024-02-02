@@ -39,15 +39,17 @@ class GetMovementHistoryEventsControllerSpec extends TestBaseSpec with MockGetMo
 
   "GET /movement-history/:ern/:arc" should {
     "return 200" when {
+
       "service returns a Right" in {
 
-        MockService.getMovementHistoryEvent(getMovementHistoryEventsRequest).returns(Future.successful(Right(getMovementHistoryEventsResponseModel)))
+        MockService.getMovementHistoryEvent(getMovementHistoryEventsRequest).returns(Future.successful(Right(getMovementHistoryEvents)))
 
         val result = controller.getMovementHistoryEvents(testErn, testArc)(fakeRequest)
 
         status(result) shouldBe Status.OK
         contentAsJson(result) shouldBe getMovementHistoryEventsControllerResponseJson
       }
+
     }
     "return 500" when {
       "service returns a Left" in {

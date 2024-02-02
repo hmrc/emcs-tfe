@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsArray, JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.{GetMovementHistoryEventsResponse, MovementHistoryEvent}
 
 import java.util.Base64
@@ -57,48 +57,78 @@ trait GetMovementHistoryEventsFixture extends BaseFixtures {
     </Events>
   </MovementHistory>
 
-  val emptyGetMovementHistoryEventsResponseJson: JsObject = Json.obj(
+  def responseWithSoapWrapper(xmlBody: Elem): String =
+    s"""<tns:Envelope
+      |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
+      |	<tns:Body>
+      |		<con:Control
+      |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+      |			<con:MetaData>
+      |				<con:MessageId>String</con:MessageId>
+      |				<con:Source>String</con:Source>
+      |				<con:Identity>String</con:Identity>
+      |				<con:Partner>String</con:Partner>
+      |				<con:CorrelationId>String</con:CorrelationId>
+      |				<con:BusinessKey>String</con:BusinessKey>
+      |				<con:MessageDescriptor>String</con:MessageDescriptor>
+      |				<con:QualityOfService>String</con:QualityOfService>
+      |				<con:Destination>String</con:Destination>
+      |				<con:Priority>0</con:Priority>
+      |			</con:MetaData>
+      |			<con:OperationResponse>
+      |				<con:Results>
+      |					<con:Result Name="">
+      |						<![CDATA[$xmlBody]]>
+      |					</con:Result>
+      |				</con:Results>
+      |			</con:OperationResponse>
+      |		</con:Control>
+      |	</tns:Body>
+      |</tns:Envelope>
+      |""".stripMargin
+
+  val emptyGetMovementHistoryEventsEISResponseJson: JsObject = Json.obj(
     "dateTime" -> "now",
     "exciseRegistrationNumber" -> testErn,
     "message" -> Base64.getEncoder.encodeToString(emptyGetMovementHistoryEventsResponseXml.toString().getBytes())
   )
 
-  val getMovementHistoryEventsResponseJson: JsObject = Json.obj(
+  val getMovementHistoryEventsEISResponseJson: JsObject = Json.obj(
     "dateTime" -> "now",
     "exciseRegistrationNumber" -> testErn,
     "message" -> Base64.getEncoder.encodeToString(getMovementHistoryEventsResponseXml.toString().getBytes())
   )
 
-  val notEncodedGetMovementHistoryEventsJson: JsObject  = Json.obj(
+  val notEncodedGetMovementHistoryEISEventsJson: JsObject  = Json.obj(
     "dateTime" -> "now",
     "exciseRegistrationNumber" -> testErn,
     "message" -> getMovementHistoryEventsResponseXml.toString()
   )
 
-  val invalidGetMovementHistoryEventsResponseJson: JsObject = Json.obj(
+  val invalidGetMovementHistoryEventsEISResponseJson: JsObject = Json.obj(
     "dateTime" -> "now",
     "exciseRegistrationNumber" -> testErn,
     "message" -> Base64.getEncoder.encodeToString(invalidGetMovementHistoryEventsResponseXml.toString().getBytes())
   )
 
-  val emptyGetMovementHistoryEventsResponseModel: GetMovementHistoryEventsResponse = GetMovementHistoryEventsResponse(
+  val emptyGetMovementHistoryEventsEISResponseModel: GetMovementHistoryEventsResponse = GetMovementHistoryEventsResponse(
     "now",
     testErn,
     Nil
   )
 
+  val getMovementHistoryEvents: Seq[MovementHistoryEvent] =
+    Seq(MovementHistoryEvent("IE801", "2010-06-02T10:22:53", 2, 1, None), MovementHistoryEvent("IE818", "2010-06-02T10:22:53", 2, 1, None))
+
   val getMovementHistoryEventsResponseModel: GetMovementHistoryEventsResponse = GetMovementHistoryEventsResponse(
     "now",
     testErn,
-    Seq(MovementHistoryEvent("IE801", "2010-06-02T10:22:53", 2, 1, None), MovementHistoryEvent("IE818", "2010-06-02T10:22:53", 2, 1, None))
+    getMovementHistoryEvents
   )
 
-  val getMovementHistoryEventsControllerResponseJson: JsObject = Json.obj(
-    "dateTime" -> "now",
-    "exciseRegistrationNumber" -> testErn,
-    "movementHistory" -> Json.arr(
-      Json.obj("eventType" -> "IE801", "eventDate" -> "2010-06-02T10:22:53", "sequenceNumber" -> 2, "messageRole" -> 1),
-      Json.obj("eventType" -> "IE818", "eventDate" -> "2010-06-02T10:22:53", "sequenceNumber" -> 2, "messageRole" -> 1),
-    )
+  val getMovementHistoryEventsControllerResponseJson: JsArray = Json.arr(
+    Json.obj("eventType" -> "IE801", "eventDate" -> "2010-06-02T10:22:53", "sequenceNumber" -> 2, "messageRole" -> 1),
+    Json.obj("eventType" -> "IE818", "eventDate" -> "2010-06-02T10:22:53", "sequenceNumber" -> 2, "messageRole" -> 1),
   )
 }

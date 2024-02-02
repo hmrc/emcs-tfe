@@ -29,8 +29,8 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class GetMovementHistoryEventsController @Inject()(cc: ControllerComponents,
                                                    service: GetMovementHistoryEventsService,
-                                                   override val auth: AuthAction
-                                     )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
+                                                   override val auth: AuthAction)
+                                                  (implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
   def getMovementHistoryEvents(exciseRegistrationNumber: String, arc: String): Action[AnyContent] = authorisedUserRequest(exciseRegistrationNumber) { implicit request =>
     service.getMovementHistoryEvent(GetMovementHistoryEventsRequest(exciseRegistrationNumber = exciseRegistrationNumber, arc = arc)).map {

@@ -16,9 +16,43 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-case class GetMovementHistoryEventsRequest(exciseRegistrationNumber: String, arc: String) extends EisConsumptionRequest {
+case class GetMovementHistoryEventsRequest(exciseRegistrationNumber: String,
+                                           arc: String) extends ChrisRequest with EisConsumptionRequest {
+
+  override def requestBody: String =
+    s"""<?xml version='1.0' encoding='UTF-8'?>
+       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+       |  <soapenv:Header>
+       |    <VersionNo>2.1</VersionNo>
+       |  </soapenv:Header>
+       |  <soapenv:Body>
+       |    <Control xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+       |      <MetaData>
+       |        <MessageId>$uuid</MessageId>
+       |        <Source>emcs_tfe</Source>
+       |        <Identity>portal</Identity>
+       |        <Partner>UK</Partner>
+       |      </MetaData>
+       |      <OperationRequest>
+       |        <Parameters>
+       |          <Parameter Name="ExciseRegistrationNumber">$exciseRegistrationNumber</Parameter>
+       |          <Parameter Name="ARC">$arc</Parameter>
+       |        </Parameters>
+       |        <ReturnData>
+       |          <Data Name="schema" />
+       |        </ReturnData>
+       |      </OperationRequest>
+       |    </Control>
+       |  </soapenv:Body>
+       |</soapenv:Envelope>""".stripMargin
+
+  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementHistoryEvents"
+
+  override def shouldExtractFromSoap: Boolean = true
+
   override def metricName: String = "getMovementHistoryEvents"
 
   override val queryParams: Seq[(String, String)] = Seq(
