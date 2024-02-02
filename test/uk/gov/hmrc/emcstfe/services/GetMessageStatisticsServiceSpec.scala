@@ -16,40 +16,72 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.GetMessageStatisticsFixtures
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.request.GetMessageStatisticsRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class GetMessageStatisticsServiceSpec extends TestBaseSpec with GetMessageStatisticsFixtures {
+class GetMessageStatisticsServiceSpec extends TestBaseSpec with GetMessageStatisticsFixtures with MockEisConnector with MockChrisConnector with MockAppConfig {
 
-  trait Test extends MockEisConnector {
-    val getMessageStatisticsRequest: GetMessageStatisticsRequest = GetMessageStatisticsRequest(testErn)
-    val service: GetMessageStatisticsService = new GetMessageStatisticsService(mockEisConnector)
-  }
+  lazy val getMessageStatisticsRequest: GetMessageStatisticsRequest = GetMessageStatisticsRequest(testErn)
+  lazy val service: GetMessageStatisticsService = new GetMessageStatisticsService(mockEisConnector, mockChrisConnector, mockAppConfig)
 
-  "getMessageStatistics" should {
-    "return a Right" when {
-      "connector call is successful and XML is the correct format" in new Test {
+  "getMessageStatistics" when {
+    "send request to EIS is true" should {
+      "return a Right" when {
+        "connector call to EIS is successful and XML is the correct format" in {
 
-        MockEisConnector.getMessageStatistics(getMessageStatisticsRequest).returns(
-          Future.successful(Right(getMessageStatisticsResponseModel))
-        )
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-        await(service.getMessageStatistics(getMessageStatisticsRequest)) shouldBe Right(getMessageStatisticsResponseModel)
+          MockEisConnector.getMessageStatistics(getMessageStatisticsRequest).returns(
+            Future.successful(Right(getMessageStatisticsResponseModel))
+          )
+
+          await(service.getMessageStatistics(getMessageStatisticsRequest)) shouldBe Right(getMessageStatisticsResponseModel)
+        }
+      }
+      "return a Left" when {
+        "connector call to EIS is unsuccessful" in {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+          MockEisConnector.getMessageStatistics(getMessageStatisticsRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
+
+          await(service.getMessageStatistics(getMessageStatisticsRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
       }
     }
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
+    "send request to EIS is false" should {
+      "return a Right" when {
+        "connector call to ChRIS is successful and XML is the correct format" in {
 
-        MockEisConnector.getMessageStatistics(getMessageStatisticsRequest).returns(
-          Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-        )
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-        await(service.getMessageStatistics(getMessageStatisticsRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+          MockChrisConnector.postChrisSOAPRequestAndExtractToModel(getMessageStatisticsRequest).returns(
+            Future.successful(Right(getMessageStatisticsResponseModel))
+          )
+
+          await(service.getMessageStatistics(getMessageStatisticsRequest)) shouldBe Right(getMessageStatisticsResponseModel)
+        }
+      }
+      "return a Left" when {
+        "connector call to ChRIS is unsuccessful" in {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+          MockChrisConnector.postChrisSOAPRequestAndExtractToModel(getMessageStatisticsRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
+
+          await(service.getMessageStatistics(getMessageStatisticsRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
       }
     }
   }
