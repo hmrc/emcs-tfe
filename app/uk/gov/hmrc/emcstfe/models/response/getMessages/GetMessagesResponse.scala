@@ -16,19 +16,28 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMessages
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.Reads._
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import com.lucidchart.open.xtract.XmlReader.strictReadSeq
+import com.lucidchart.open.xtract.{XPath, XmlReader, __ => XMLPath}
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.response.Base64Model
 
-case class GetMessagesResponse(dateTime: String, exciseRegistrationNumber: String, messagesData: MessagesData)
+case class GetMessagesResponse(messages: Seq[Message],
+                               totalNumberOfMessagesAvailable: Long)
 
 object GetMessagesResponse {
   implicit val writes: OWrites[GetMessagesResponse] = Json.writes
 
-  implicit val reads: Reads[GetMessagesResponse] = (
-    (__ \ "dateTime").read[String] and
-      (__ \ "exciseRegistrationNumber").read[String] and
-      (__ \ "message").read[Base64Model[MessagesData]].map(_.value)
-    )(GetMessagesResponse.apply _)
+  private val message: XPath = XMLPath \\ "MessagesDataResponse" \\ "Message"
+  private val totalNumberOfMessagesAvailable: XPath = XMLPath \\ "MessagesDataResponse" \\ "TotalNumberOfMessagesAvailable"
+
+  //ChRIS Reads (also used by EIS JSON reads below as an implicit XMLReader is required to Base64Model)
+  implicit val xmlReader: XmlReader[GetMessagesResponse] = (
+    message.read[Seq[Message]](strictReadSeq),
+    totalNumberOfMessagesAvailable.read[Long],
+  ).mapN(GetMessagesResponse.apply)
+
+  //EIS Reads
+  implicit val reads: Reads[GetMessagesResponse] =
+    (__ \ "message").read[Base64Model[GetMessagesResponse]].map(_.value)
 }
