@@ -17,10 +17,11 @@
 package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.EisConnector
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.request.GetMovementHistoryEventsRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
+import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.MovementHistoryEvent
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,11 +29,17 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetMovementHistoryEventsService @Inject()(connector: EisConnector,
-                                                val config: AppConfig) extends Logging {
+class GetMovementHistoryEventsService @Inject()(eisConnector: EisConnector,
+                                                chrisConnector: ChrisConnector,
+                                                val config: AppConfig) extends Logging with FeatureSwitching {
 
   def getMovementHistoryEvent(getMovementHistoryEventsRequest: GetMovementHistoryEventsRequest)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementHistoryEventsResponse]] =
-    connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Seq[MovementHistoryEvent]]] = {
+    if(isEnabled(SendToEIS)) {
+      eisConnector.getMovementHistoryEvents(getMovementHistoryEventsRequest).map(_.map(_.movementHistory))
+    } else {
+      chrisConnector.postChrisSOAPRequestAndExtractToModel[Seq[MovementHistoryEvent]](getMovementHistoryEventsRequest)
+    }
+  }
 
 }

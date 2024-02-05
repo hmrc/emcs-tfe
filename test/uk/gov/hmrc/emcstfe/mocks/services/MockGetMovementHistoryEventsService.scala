@@ -20,7 +20,7 @@ import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.request.GetMovementHistoryEventsRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
+import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.MovementHistoryEvent
 import uk.gov.hmrc.emcstfe.services.GetMovementHistoryEventsService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -30,7 +30,7 @@ trait MockGetMovementHistoryEventsService extends MockFactory {
   lazy val mockService: GetMovementHistoryEventsService = mock[GetMovementHistoryEventsService]
 
   object MockService {
-    def getMovementHistoryEvent(getMovementHistoryEventsRequest: GetMovementHistoryEventsRequest): CallHandler3[GetMovementHistoryEventsRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, GetMovementHistoryEventsResponse]]] = {
+    def getMovementHistoryEvent(getMovementHistoryEventsRequest: GetMovementHistoryEventsRequest): CallHandler3[GetMovementHistoryEventsRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Seq[MovementHistoryEvent]]]] = {
       (mockService.getMovementHistoryEvent(_: GetMovementHistoryEventsRequest)(_: HeaderCarrier, _: ExecutionContext))
         .expects(getMovementHistoryEventsRequest, *, *)
     }
