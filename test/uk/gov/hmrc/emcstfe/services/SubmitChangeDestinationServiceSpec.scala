@@ -16,13 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -34,7 +31,6 @@ class SubmitChangeDestinationServiceSpec extends TestBaseSpec with SubmitChangeD
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
   class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
-    implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = useFS41SchemaVersion)
     val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockChrisConnector, mockEisConnector, mockAppConfig)
     MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)

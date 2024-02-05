@@ -42,5 +42,11 @@ trait MockAppConfig extends MockFactory {
 
     def createMovementUserAnswersTTL: CallHandler0[Duration] = (() => mockAppConfig.createMovementUserAnswersTTL()).expects()
     def createMovementUserAnswersReplaceIndexes: CallHandler0[Boolean] = (() => mockAppConfig.createMovementUserAnswersReplaceIndexes()).expects()
+
+    def publicBetaTrafficPercentageForService(serviceName: String): CallHandler1[String, Option[Int]] = (mockAppConfig.publicBetaTrafficPercentageForService(_: String)).expects(serviceName)
+    def isPrivateBetaEnabled: CallHandler0[Boolean] = ((() => mockAppConfig.isPrivateBetaEnabled()): () => Boolean).expects()
+    def isPublicBetaEnabled: CallHandler0[Boolean] = ((() => mockAppConfig.isPublicBetaEnabled()): () => Boolean).expects()
+    def internalAuthToken: CallHandler0[String] = ((() => mockAppConfig.internalAuthToken()): () => String).expects()
+    def userAllowListBaseUrl: CallHandler0[String] = ((() => mockAppConfig.userAllowListBaseUrl()): () => String).expects()
   }
 }

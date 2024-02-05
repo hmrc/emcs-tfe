@@ -108,4 +108,8 @@ object ErrorResponse {
     val message = s"no action found in the request"
   }
 
+  case class UserAllowListError(errorResponse: String) extends ErrorResponse {
+    val message = s"An error response was returned from user-allow-list, error message: $errorResponse"
+  }
+
 }

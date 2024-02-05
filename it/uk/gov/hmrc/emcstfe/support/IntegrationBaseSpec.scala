@@ -43,6 +43,7 @@ trait IntegrationBaseSpec
     "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
     "microservice.services.chris.port" -> WireMockHelper.wireMockPort,
     "microservice.services.eis.port" -> WireMockHelper.wireMockPort,
+    "microservice.services.user-allow-list.port" -> WireMockHelper.wireMockPort,
     "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort,
     "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
     "createMovementUserAnswers.TTL" -> testTtl,
