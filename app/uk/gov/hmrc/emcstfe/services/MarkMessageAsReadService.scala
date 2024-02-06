@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.EisConnector
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.request.MarkMessageAsReadRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.MarkMessageAsReadResponse
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, MarkMessageAsReadResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -27,9 +28,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MarkMessageAsReadService @Inject()(connector: EisConnector) extends Logging {
+class MarkMessageAsReadService @Inject()(eisConnector: EisConnector,
+                                         chrisConnector: ChrisConnector,
+                                         override val config: AppConfig) extends Logging with FeatureSwitching {
   def markMessageAsRead(markMessageAsReadRequest: MarkMessageAsReadRequest)
-                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, MarkMessageAsReadResponse]] =
-    connector.markMessageAsRead(markMessageAsReadRequest)
+                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, MarkMessageAsReadResponse]] = {
+    if(isEnabled(SendToEIS)) {
+      eisConnector.markMessageAsRead(markMessageAsReadRequest)
+    } else {
+      chrisConnector.postChrisSOAPRequestAndExtractToModel(markMessageAsReadRequest)
+    }
+  }
 
 }

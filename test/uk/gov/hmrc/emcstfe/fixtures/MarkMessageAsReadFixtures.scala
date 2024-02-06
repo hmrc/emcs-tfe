@@ -18,19 +18,25 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.MarkMessageAsReadResponse
+import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
-trait MarkMessageAsReadFixtures extends BaseFixtures {
-  val markMessageAsReadDownstreamJson: JsValue = Json.obj(
+trait MarkMessageAsReadFixtures extends BaseFixtures with SoapXmlFactory {
+
+  lazy val markMessageAsReadChrisXml: String = responseSoapEnvelope(
+    <con:Results>
+      <con:Result Name="recordsAffected">1</con:Result>
+    </con:Results>
+  )
+
+  val markMessageAsReadEisJson: JsValue = Json.obj(
     "dateTime" -> now,
     "exciseRegistrationNumber" -> testErn,
     "recordsAffected" -> 1
   )
   val markMessageAsReadResponseModel: MarkMessageAsReadResponse = MarkMessageAsReadResponse(
-    dateTime = now, exciseRegistrationNumber = testErn, recordsAffected = 1
+    recordsAffected = 1
   )
   val markMessageAsReadJson: JsValue = Json.obj(
-    "dateTime" -> now,
-    "exciseRegistrationNumber" -> testErn,
     "recordsAffected" -> 1
   )
 }

@@ -176,7 +176,7 @@ class LegacyMessagesControllerIntegrationSpec extends IntegrationBaseSpec with L
       "return the response" when {
         "all is successful" in new Test {
           override def setupStubs(): StubMapping = {
-            DownstreamStub.onSuccess(DownstreamStub.PUT, messageUrl, downstreamMessageOperationQueryParams, OK, markMessageAsReadDownstreamJson)
+            DownstreamStub.onSuccess(DownstreamStub.PUT, messageUrl, downstreamMessageOperationQueryParams, OK, markMessageAsReadEisJson)
           }
 
           val result: WSResponse = await(request().withHttpHeaders("Content-Type" -> "application/soap+xml; charset=UTF-8; action=\"http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/MarkMessagesAsRead\"").post(validMessageOperationXMLRequest))

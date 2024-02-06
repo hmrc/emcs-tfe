@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
 trait GetMessageStatisticsFixtures extends BaseFixtures with SoapXmlFactory {
 
-  lazy val getMessageStatisticsXMLResponse: String = responseWithSoapEnvelope(
+  lazy val getMessageStatisticsXMLResponse: String = responseSoapEnvelopeWithCDATA(
     <MessageStatisticsDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MessageStatisticsData/3"
                                    targetNamespace="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MessageStatisticsData/3"
                                    xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">

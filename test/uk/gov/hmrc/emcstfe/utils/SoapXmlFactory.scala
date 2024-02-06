@@ -20,7 +20,34 @@ import scala.xml.Elem
 
 trait SoapXmlFactory {
 
-  def responseWithSoapEnvelope(xmlBody: Elem): String =
+  def responseSoapEnvelope(resultsBody: Elem): String =
+    s"""<tns:Envelope
+       |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
+       |	<tns:Body>
+       |		<con:Control
+       |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+       |			<con:MetaData>
+       |				<con:MessageId>String</con:MessageId>
+       |				<con:Source>String</con:Source>
+       |				<con:Identity>String</con:Identity>
+       |				<con:Partner>String</con:Partner>
+       |				<con:CorrelationId>String</con:CorrelationId>
+       |				<con:BusinessKey>String</con:BusinessKey>
+       |				<con:MessageDescriptor>String</con:MessageDescriptor>
+       |				<con:QualityOfService>String</con:QualityOfService>
+       |				<con:Destination>String</con:Destination>
+       |				<con:Priority>0</con:Priority>
+       |			</con:MetaData>
+       |			<con:OperationResponse>
+       |				$resultsBody
+       |			</con:OperationResponse>
+       |		</con:Control>
+       |	</tns:Body>
+       |</tns:Envelope>
+       |""".stripMargin
+
+  def responseSoapEnvelopeWithCDATA(xmlBody: Elem): String =
     s"""<tns:Envelope
        |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
