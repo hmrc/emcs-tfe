@@ -52,7 +52,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel, useFS4
   override def exciseRegistrationNumber: String = request.ern
 
   override def requestBody: String =
-    withSoapEnvelope(
+    withSubmissionRequestSoapEnvelope(
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,

@@ -18,11 +18,12 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsArray, JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.{GetMovementHistoryEventsResponse, MovementHistoryEvent}
+import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
 import java.util.Base64
 import scala.xml.Elem
 
-trait GetMovementHistoryEventsFixture extends BaseFixtures {
+trait GetMovementHistoryEventsFixture extends BaseFixtures with SoapXmlFactory {
 
   val emptyGetMovementHistoryEventsResponseXml: Elem = <MovementHistory xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementHistoryEvents/3"
                                                                         xmlns:ns1="http://hmrc/emcs/tfe/data"
@@ -56,37 +57,6 @@ trait GetMovementHistoryEventsFixture extends BaseFixtures {
       <MessageRole>1</MessageRole>
     </Events>
   </MovementHistory>
-
-  def responseWithSoapWrapper(xmlBody: Elem): String =
-    s"""<tns:Envelope
-      |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
-      |	<tns:Body>
-      |		<con:Control
-      |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
-      |			<con:MetaData>
-      |				<con:MessageId>String</con:MessageId>
-      |				<con:Source>String</con:Source>
-      |				<con:Identity>String</con:Identity>
-      |				<con:Partner>String</con:Partner>
-      |				<con:CorrelationId>String</con:CorrelationId>
-      |				<con:BusinessKey>String</con:BusinessKey>
-      |				<con:MessageDescriptor>String</con:MessageDescriptor>
-      |				<con:QualityOfService>String</con:QualityOfService>
-      |				<con:Destination>String</con:Destination>
-      |				<con:Priority>0</con:Priority>
-      |			</con:MetaData>
-      |			<con:OperationResponse>
-      |				<con:Results>
-      |					<con:Result Name="">
-      |						<![CDATA[$xmlBody]]>
-      |					</con:Result>
-      |				</con:Results>
-      |			</con:OperationResponse>
-      |		</con:Control>
-      |	</tns:Body>
-      |</tns:Envelope>
-      |""".stripMargin
 
   val emptyGetMovementHistoryEventsEISResponseJson: JsObject = Json.obj(
     "dateTime" -> "now",

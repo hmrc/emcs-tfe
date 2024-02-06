@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.request.chris
 
-import uk.gov.hmrc.emcstfe.models.request.BaseRequest
+import uk.gov.hmrc.emcstfe.models.request.{BaseRequest, SoapEnvelope}
 
-trait ChrisRequest extends BaseRequest {
+trait ChrisRequest extends BaseRequest with SoapEnvelope {
   def requestBody: String
 
   def exciseRegistrationNumber: String
