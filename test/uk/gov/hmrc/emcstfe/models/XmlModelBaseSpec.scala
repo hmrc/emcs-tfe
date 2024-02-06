@@ -18,8 +18,6 @@ package uk.gov.hmrc.emcstfe.models
 
 import com.lucidchart.open.xtract.{ParseSuccess, XmlReader}
 import play.api.libs.json.{JsObject, Reads}
-import play.api.test.FakeRequest
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -31,8 +29,6 @@ trait XmlModelBaseSpec extends TestBaseSpec {
                                                   json: JsObject,
                                                   model: Model,
                                                   xml: Elem)(implicit reads: Reads[Model]): Unit = {
-
-    implicit val request = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
 
     s"${model.getClass.getSimpleName}" when {
 

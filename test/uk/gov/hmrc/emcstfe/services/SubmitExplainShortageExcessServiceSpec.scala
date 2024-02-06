@@ -16,13 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
@@ -35,7 +32,6 @@ class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExp
   import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
   class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
-    implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
     val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor), useFS41SchemaVersion = useFS41SchemaVersion)
     val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockChrisConnector, mockEisConnector, mockAppConfig)
     MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)

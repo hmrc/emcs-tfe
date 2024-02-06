@@ -19,8 +19,6 @@ package uk.gov.hmrc.emcstfe.connectors
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.libs.json.JsonValidationError
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDownstreamStub}
@@ -28,7 +26,6 @@ import uk.gov.hmrc.emcstfe.fixtures._
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisHeaders
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
@@ -86,7 +83,7 @@ class EisConnectorSpec
 
     "submit is called" should {
 
-      implicit val request: UserRequest[AnyContentAsEmpty.type] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
+
       val submitReportOfReceiptRequest                          = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = false)
 
       "return a Right" when {

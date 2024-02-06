@@ -21,6 +21,8 @@ POST          /explain-shortage-excess/:ern/:arc                 uk.gov.hmrc.emc
 POST          /cancel-movement/:ern/:arc                         uk.gov.hmrc.emcstfe.controllers.SubmitCancellationOfMovementController.submit(ern, arc)
 POST          /create-movement/:ern/:draftId                     uk.gov.hmrc.emcstfe.controllers.SubmitCreateMovementController.submit(ern, draftId)
 
+# User allow list
+GET           /beta/eligibility/:ern/:serviceName                uk.gov.hmrc.emcstfe.controllers.userAllowList.UserAllowListController.checkEligibility(ern, serviceName)
 
 
 # User answers

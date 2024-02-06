@@ -18,14 +18,12 @@ package uk.gov.hmrc.emcstfe.services
 
 import com.mongodb.MongoException
 import play.api.libs.json.{JsNull, JsString}
-import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, GetMovementIfChangedFixture}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.mocks.repository.MockGetMovementRepository
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementIfChangedRequest, GetMovementRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
@@ -46,8 +44,6 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
       mockXmlUtils,
       mockAppConfig
     )
-
-    lazy implicit val userRequest: UserRequest[_] = UserRequest(FakeRequest(), testErn, testInternalId, testCredId)
   }
 
   "getMovement" when {
