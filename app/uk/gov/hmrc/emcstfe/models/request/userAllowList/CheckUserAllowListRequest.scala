@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.request.userAllowList
 
 import play.api.libs.json.{Json, Writes}
 
-final case class CheckUserAllowListRequest(ern: String)
+final case class CheckUserAllowListRequest(value: String)
 
 object CheckUserAllowListRequest {
 
