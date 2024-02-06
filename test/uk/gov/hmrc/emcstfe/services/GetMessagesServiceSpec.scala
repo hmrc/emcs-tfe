@@ -16,42 +16,75 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.GetMessagesFixtures
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.request.GetMessagesRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class GetMessagesServiceSpec extends TestBaseSpec with GetMessagesFixtures {
+class GetMessagesServiceSpec extends TestBaseSpec with GetMessagesFixtures with MockEisConnector with MockChrisConnector with MockAppConfig {
 
   import GetMessagesResponseFixtures.getMessagesResponseModel
 
-  trait Test extends MockEisConnector {
-    val getMessagesRequest: GetMessagesRequest = GetMessagesRequest(testErn, "arc", "A", 1)
-    val service: GetMessagesService = new GetMessagesService(mockEisConnector)
-  }
+  lazy val getMessagesRequest: GetMessagesRequest = GetMessagesRequest(testErn, "arc", "A", 1)
+  lazy val service: GetMessagesService = new GetMessagesService(mockEisConnector, mockChrisConnector, mockAppConfig)
 
-  "getMessages" should {
-    "return a Right" when {
-      "connector call is successful and XML is the correct format" in new Test {
+  "getMessages" when {
+    "calling EIS" should {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in {
 
-        MockEisConnector.getMessages(getMessagesRequest).returns(
-          Future.successful(Right(getMessagesResponseModel))
-        )
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-        await(service.getMessages(getMessagesRequest)) shouldBe Right(getMessagesResponseModel)
+          MockEisConnector.getMessages(getMessagesRequest).returns(
+            Future.successful(Right(getMessagesResponseModel))
+          )
+
+          await(service.getMessages(getMessagesRequest)) shouldBe Right(getMessagesResponseModel)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+          MockEisConnector.getMessages(getMessagesRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
+
+          await(service.getMessages(getMessagesRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
       }
     }
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
 
-        MockEisConnector.getMessages(getMessagesRequest).returns(
-          Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-        )
+    "calling ChRIS" should {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in {
 
-        await(service.getMessages(getMessagesRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+          MockChrisConnector.postChrisSOAPRequestAndExtractToModel(getMessagesRequest).returns(
+            Future.successful(Right(getMessagesResponseModel))
+          )
+
+          await(service.getMessages(getMessagesRequest)) shouldBe Right(getMessagesResponseModel)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+          MockChrisConnector.postChrisSOAPRequestAndExtractToModel(getMessagesRequest).returns(
+            Future.successful(Left(UnexpectedDownstreamResponseError))
+          )
+
+          await(service.getMessages(getMessagesRequest)) shouldBe Left(UnexpectedDownstreamResponseError)
+        }
       }
     }
   }

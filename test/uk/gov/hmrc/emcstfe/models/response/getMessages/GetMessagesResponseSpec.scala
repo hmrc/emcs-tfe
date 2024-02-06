@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMessages
 
-import play.api.libs.json.{JsError, JsResult, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsResult, JsSuccess, Json, __}
 import uk.gov.hmrc.emcstfe.fixtures.GetMessagesFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -26,11 +26,11 @@ class GetMessagesResponseSpec extends TestBaseSpec with GetMessagesFixtures {
 
   "reads" should {
     "turn JSON into a model" in {
-      GetMessagesResponse.reads.reads(getMessagesResponseDownstreamJson) shouldBe JsSuccess(getMessagesResponseModel)
+      GetMessagesResponse.reads.reads(getMessagesResponseDownstreamJson) shouldBe JsSuccess(getMessagesResponseModel, __ \ "message")
     }
 
     "turn minimal JSON into a model" in {
-      GetMessagesResponse.reads.reads(getMessagesResponseMinimumDownstreamJson) shouldBe JsSuccess(getMessagesResponseMinimumModel)
+      GetMessagesResponse.reads.reads(getMessagesResponseMinimumDownstreamJson) shouldBe JsSuccess(getMessagesResponseMinimumModel, __ \ "message")
     }
 
     "fail" when {

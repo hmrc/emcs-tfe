@@ -16,9 +16,15 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-case class GetMessagesRequest(exciseRegistrationNumber: String, sortField: String, sortOrder: String, page: Int, maxNoToReturn: Int = 10, startPosition: Option[Int] = None) extends EisConsumptionRequest {
+case class GetMessagesRequest(exciseRegistrationNumber: String,
+                              sortField: String,
+                              sortOrder: String,
+                              page: Int,
+                              maxNoToReturn: Int = 10,
+                              startPosition: Option[Int] = None) extends EisConsumptionRequest with ChrisRequest {
   require(page >= 1, "page cannot be less than 1")
   require(GetMessagesRequest.validSortFields.contains(sortField), s"sortField of $sortField is invalid. Valid sort fields: ${GetMessagesRequest.validSortFields}")
   require(GetMessagesRequest.validSortOrders.contains(sortOrder), s"sortOrder of $sortOrder is invalid. Valid sort orders: ${GetMessagesRequest.validSortOrders}")
@@ -28,10 +34,44 @@ case class GetMessagesRequest(exciseRegistrationNumber: String, sortField: Strin
   // page 1 -> start at 0
   // page 2 -> start at 10
   // page 3 -> start at 20
-  // etc if no start position is provided
+  // NOTE: Chris starts from `1` not `0`. So, in the ChRIS Request Body a +1 is added to the result
   private def startPos: BigInt = startPosition.getOrElse[Int]((page - 1) * maxNoToReturn)
 
   override def metricName: String = "messages"
+
+  override def requestBody: String =
+    s"""<?xml version='1.0' encoding='UTF-8'?>
+       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+       |  <soapenv:Header>
+       |    <VersionNo>2.1</VersionNo>
+       |  </soapenv:Header>
+       |  <soapenv:Body>
+       |    <Control xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+       |      <MetaData>
+       |        <MessageId>$uuid</MessageId>
+       |        <Source>emcs_tfe</Source>
+       |        <Identity>portal</Identity>
+       |        <Partner>UK</Partner>
+       |      </MetaData>
+       |      <OperationRequest>
+       |        <Parameters>
+       |          <Parameter Name="ExciseRegistrationNumber">$exciseRegistrationNumber</Parameter>
+       |          <Parameter Name="SortField">${GetMessagesRequest.toChRISSortField(sortField)}</Parameter>
+       |          <Parameter Name="SortOrder">$sortOrder</Parameter>
+       |          <Parameter Name="StartPosition">${startPos + 1}</Parameter>
+       |          <Parameter Name="MaxNoToReturn">$maxNoToReturn</Parameter>
+       |        </Parameters>
+       |        <ReturnData>
+       |          <Data Name="schema" />
+       |        </ReturnData>
+       |      </OperationRequest>
+       |    </Control>
+       |  </soapenv:Body>
+       |</soapenv:Envelope>""".stripMargin
+
+  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMessages"
+
+  override def shouldExtractFromSoap: Boolean = true
 
   override val queryParams: Seq[(String, String)] = Seq(
     "exciseregistrationnumber" -> exciseRegistrationNumber,
@@ -43,6 +83,15 @@ case class GetMessagesRequest(exciseRegistrationNumber: String, sortField: Strin
 }
 
 object GetMessagesRequest {
+
+  val toChRISSortField: String => String = {
+    //Note this is exhaustive due to the `require` on the class checking - ideally this could be more typesafe in future with enum
+    case "messagetype" => "MessageType"
+    case "datereceived" => "DateReceived"
+    case "arc" => "ARC"
+    case "readindicator" => "ReadIndicator"
+  }
+
   val validSortFields: Seq[String] = Seq(
     "messagetype", "datereceived", "arc", "readindicator"
   )
