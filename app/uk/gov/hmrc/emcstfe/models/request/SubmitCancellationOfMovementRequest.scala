@@ -46,7 +46,7 @@ case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovemen
   val messageSender: String = Constants.NDEA ++ arcCountryCode
 
   override def requestBody: String =
-    withSoapEnvelope(
+    withSubmissionRequestSoapEnvelope(
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,

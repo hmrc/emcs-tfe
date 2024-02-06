@@ -18,8 +18,19 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.GetMessageStatisticsResponse
+import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
-trait GetMessageStatisticsFixtures extends BaseFixtures {
+trait GetMessageStatisticsFixtures extends BaseFixtures with SoapXmlFactory {
+
+  lazy val getMessageStatisticsXMLResponse: String = responseWithSoapEnvelope(
+    <MessageStatisticsDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MessageStatisticsData/3"
+                                   targetNamespace="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MessageStatisticsData/3"
+                                   xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+      <CountOfAllMessages>10</CountOfAllMessages>
+      <CountOfNewMessages>5</CountOfNewMessages>
+    </MessageStatisticsDataResponse>
+  )
+
   val getMessageStatisticsDownstreamJson: JsValue = Json.obj(
     "dateTime" -> now,
     "exciseRegistrationNumber" -> testErn,
@@ -27,11 +38,9 @@ trait GetMessageStatisticsFixtures extends BaseFixtures {
     "countOfNewMessages" -> 5
   )
   val getMessageStatisticsResponseModel: GetMessageStatisticsResponse = GetMessageStatisticsResponse(
-    dateTime = now, exciseRegistrationNumber = testErn, countOfAllMessages = 10, countOfNewMessages = 5
+    countOfAllMessages = 10, countOfNewMessages = 5
   )
   val getMessageStatisticsJson: JsValue = Json.obj(
-    "dateTime" -> now,
-    "exciseRegistrationNumber" -> testErn,
     "countOfAllMessages" -> 10,
     "countOfNewMessages" -> 5
   )

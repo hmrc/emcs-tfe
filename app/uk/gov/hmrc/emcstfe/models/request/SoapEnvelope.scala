@@ -20,14 +20,39 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 
-import scala.xml.{Elem, XML}
+import scala.xml.{Elem, Node, XML}
 
 trait SoapEnvelope { _: ChrisRequest =>
-  def withSoapEnvelope[T <: XmlBaseModel](body: T,
-                                          messageNumber: Int,
-                                          messageSender: String,
-                                          messageRecipient: String,
-                                          isFS41SchemaVersion: Boolean)(implicit request: UserRequest[_]): Elem = {
+
+  def withGetRequestSoapEnvelope(operationRequestParameters: Node): String =
+    s"""<?xml version='1.0' encoding='UTF-8'?>
+       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+       |  <soapenv:Header>
+       |    <VersionNo>2.1</VersionNo>
+       |  </soapenv:Header>
+       |  <soapenv:Body>
+       |    <Control xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+       |      <MetaData>
+       |        <MessageId>$uuid</MessageId>
+       |        <Source>emcs_tfe</Source>
+       |        <Identity>portal</Identity>
+       |        <Partner>UK</Partner>
+       |      </MetaData>
+       |      <OperationRequest>
+       |        $operationRequestParameters
+       |        <ReturnData>
+       |          <Data Name="schema"/>
+       |        </ReturnData>
+       |      </OperationRequest>
+       |    </Control>
+       |  </soapenv:Body>
+       |</soapenv:Envelope>""".stripMargin
+
+  def withSubmissionRequestSoapEnvelope[T <: XmlBaseModel](body: T,
+                                                           messageNumber: Int,
+                                                           messageSender: String,
+                                                           messageRecipient: String,
+                                                           isFS41SchemaVersion: Boolean)(implicit request: UserRequest[_]): Elem = {
     val schemaVersion = if(isFS41SchemaVersion) "V3.13" else "V3.01"
     XML.loadString(
       s"""<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">

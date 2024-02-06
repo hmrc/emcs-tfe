@@ -49,7 +49,7 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
   }
 
   override def requestBody: String =
-    withSoapEnvelope(
+    withSubmissionRequestSoapEnvelope(
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,

@@ -36,7 +36,7 @@ case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel, useF
   val messageRecipient = Constants.NDEA ++ arcCountryCode
   val messageSender: String = Constants.NDEA ++ consigneeCountryCode
 
-  override def requestBody: String = withSoapEnvelope(
+  override def requestBody: String = withSubmissionRequestSoapEnvelope(
     body = body,
     messageNumber = messageNumber,
     messageSender = messageSender,

@@ -43,7 +43,7 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
   override val correlationUUID: String = draftId
 
   override def requestBody: String =
-    withSoapEnvelope(
+    withSubmissionRequestSoapEnvelope(
       body = body,
       messageNumber = 815,
       messageSender = messageSender,

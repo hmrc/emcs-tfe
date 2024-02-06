@@ -37,7 +37,7 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel, useFS41Schem
   val messageSender: String = Constants.NDEA ++ ernCountryCode
 
   override def requestBody: String =
-    withSoapEnvelope(
+    withSubmissionRequestSoapEnvelope(
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,

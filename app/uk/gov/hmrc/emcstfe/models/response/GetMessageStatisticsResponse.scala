@@ -16,11 +16,15 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
+import com.lucidchart.open.xtract.XmlReader.strictReadSeq
+import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
+import cats.implicits.catsSyntaxTuple2Semigroupal
 
 import scala.xml.NodeSeq
 
-case class GetMessageStatisticsResponse(dateTime: String, exciseRegistrationNumber: String, countOfAllMessages: Int, countOfNewMessages: Int) extends LegacyMessage {
+case class GetMessageStatisticsResponse(countOfAllMessages: Int,
+                                        countOfNewMessages: Int) extends LegacyMessage {
   override def xmlBody: NodeSeq = {
     schemaResultBody(
       <MessageStatisticsDataResponse xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MessageStatisticsData/3" xmlns:ns1="http://hmrc/emcs/tfe/data" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
@@ -32,5 +36,11 @@ case class GetMessageStatisticsResponse(dateTime: String, exciseRegistrationNumb
 }
 
 object GetMessageStatisticsResponse {
+
+  implicit val xmlReader: XmlReader[GetMessageStatisticsResponse] = (
+    (__ \ "CountOfAllMessages").read[Int],
+    (__ \ "CountOfNewMessages").read[Int]
+  ).mapN(GetMessageStatisticsResponse.apply)
+
   implicit val fmt: OFormat[GetMessageStatisticsResponse] = Json.format
 }

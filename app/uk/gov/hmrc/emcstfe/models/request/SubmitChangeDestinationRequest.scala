@@ -45,7 +45,7 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, us
   private val messageNumber: Int = 813
 
   override def requestBody: String =
-    withSoapEnvelope(
+    withSubmissionRequestSoapEnvelope(
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
