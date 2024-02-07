@@ -17,20 +17,30 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.response.SetMessageAsLogicallyDeletedResponse
+import uk.gov.hmrc.emcstfe.models.response.{GetMovementListItem, SetMessageAsLogicallyDeletedResponse}
+
+import java.time.LocalDateTime
+import scala.xml.{Elem, NodeSeq}
 
 trait SetMessageAsLogicallyDeletedFixtures extends BaseFixtures {
+
+  lazy val deletedMessage = SetMessageAsLogicallyDeletedResponse(1)
+
+  lazy val deletedMessageXML: Elem =
+    <Results>
+      <Result Name="schema">
+        <recordsAffected>1
+          </recordsAffected>
+          </Result>
+        </Results>
+
   val setMessageAsLogicallyDeletedDownstreamJson: JsValue = Json.obj(
-    "dateTime" -> now,
-    "exciseRegistrationNumber" -> testErn,
     "recordsAffected" -> 1
   )
   val setMessageAsLogicallyDeletedResponseModel: SetMessageAsLogicallyDeletedResponse = SetMessageAsLogicallyDeletedResponse(
-    dateTime = now, exciseRegistrationNumber = testErn, recordsAffected = 1
+    recordsAffected = 1
   )
   val setMessageAsLogicallyDeletedJson: JsValue = Json.obj(
-    "dateTime" -> now,
-    "exciseRegistrationNumber" -> testErn,
     "recordsAffected" -> 1
   )
 }
