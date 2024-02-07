@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.EisConnector
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.request.GetSubmissionFailureMessageRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmissionFailureMessageResponse
@@ -27,9 +29,17 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetSubmissionFailureMessageService @Inject()(connector: EisConnector) extends Logging {
+class GetSubmissionFailureMessageService @Inject()(eisConnector: EisConnector,
+                                                   chrisConnector: ChrisConnector,
+                                                   override val config: AppConfig) extends Logging with FeatureSwitching {
+
   def getSubmissionFailureMessage(getSubmissionFailureMessageRequest: GetSubmissionFailureMessageRequest)
-                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetSubmissionFailureMessageResponse]] =
-    connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)
+                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetSubmissionFailureMessageResponse]] = {
+    if(isEnabled(SendToEIS)) {
+      eisConnector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)
+    } else {
+      chrisConnector.postChrisSOAPRequestAndExtractToModel(getSubmissionFailureMessageRequest)
+    }
+  }
 
 }

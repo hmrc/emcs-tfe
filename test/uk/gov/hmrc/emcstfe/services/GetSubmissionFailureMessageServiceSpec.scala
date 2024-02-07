@@ -16,42 +16,75 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.GetSubmissionFailureMessageFixtures
-import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
+import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.models.request.GetSubmissionFailureMessageRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class GetSubmissionFailureMessageServiceSpec extends TestBaseSpec with GetSubmissionFailureMessageFixtures {
+class GetSubmissionFailureMessageServiceSpec extends TestBaseSpec with GetSubmissionFailureMessageFixtures with MockEisConnector with MockChrisConnector with MockAppConfig {
 
   import GetSubmissionFailureMessageResponseFixtures.getSubmissionFailureMessageResponseModel
 
-  trait Test extends MockEisConnector {
-    val getSubmissionFailureMessageRequest: GetSubmissionFailureMessageRequest = GetSubmissionFailureMessageRequest(testErn, testMessageId)
-    val service: GetSubmissionFailureMessageService = new GetSubmissionFailureMessageService(mockEisConnector)
-  }
+  lazy val getSubmissionFailureMessageRequest: GetSubmissionFailureMessageRequest = GetSubmissionFailureMessageRequest(testErn, testMessageId)
+  lazy val service: GetSubmissionFailureMessageService = new GetSubmissionFailureMessageService(mockEisConnector, mockChrisConnector, mockAppConfig)
 
-  "getSubmissionFailureMessage" should {
-    "return a Right" when {
-      "connector call is successful and XML is the correct format" in new Test {
+  "getSubmissionFailureMessage" when {
+    "send to EIS is switched on" should {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in {
 
-        MockEisConnector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(
-          Future.successful(Right(getSubmissionFailureMessageResponseModel))
-        )
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-        await(service.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe Right(getSubmissionFailureMessageResponseModel)
+          MockEisConnector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(
+            Future.successful(Right(getSubmissionFailureMessageResponseModel))
+          )
+
+          await(service.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe Right(getSubmissionFailureMessageResponseModel)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+          MockEisConnector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
+
+          await(service.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
       }
     }
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
 
-        MockEisConnector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(
-          Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-        )
+    "send to EIS is switched off (send to ChRIS)" should {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in {
 
-        await(service.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+          MockChrisConnector.postChrisSOAPRequestAndExtractToModel(getSubmissionFailureMessageRequest).returns(
+            Future.successful(Right(getSubmissionFailureMessageResponseModel))
+          )
+
+          await(service.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe Right(getSubmissionFailureMessageResponseModel)
+        }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+          MockChrisConnector.postChrisSOAPRequestAndExtractToModel(getSubmissionFailureMessageRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
+
+          await(service.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
       }
     }
   }

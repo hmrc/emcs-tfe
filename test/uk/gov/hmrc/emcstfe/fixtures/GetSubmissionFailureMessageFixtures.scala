@@ -18,13 +18,14 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsArray, JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage._
+import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-trait GetSubmissionFailureMessageFixtures extends BaseFixtures {
+trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFactory {
 
   object IE704Xml {
     val fullXML: String =
@@ -343,64 +344,43 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures {
     )
   }
 
-  object SubmissionFailureMessageDataFixtures {
+  object GetSubmissionFailureMessageResponseFixtures {
+
     val submissionFailureMessageDataXmlBody: String =
       s"""
-        |<p:SubmissionFailureMessageDataResponse xmlns:emcs="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:EMCS:V2.02" xmlns:ie="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/ie704uk/3" xmlns:p="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3" xmlns:p1="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/EmcsUkCodes/3" xmlns:p2="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/Types/3" xmlns:tms="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3 SubmissionFailureMessageData.xsd ">
-        |  ${IE704ModelFixtures.ie704ModelXmlBody}
-        |  <ie:RelatedMessageType>IE815</ie:RelatedMessageType>
-        |</p:SubmissionFailureMessageDataResponse>
-        |""".stripMargin
-        
-    val submissionFailureMessageDataModel: SubmissionFailureMessageData = SubmissionFailureMessageData(
-      ie704 = IE704ModelFixtures.ie704ModelModel,
-      relatedMessageType = Some("IE815")
-    )
-        
-    val submissionFailureMessageDataJson: JsValue = Json.obj(
-      "ie704" -> IE704ModelFixtures.ie704ModelJson,
-      "relatedMessageType" -> "IE815"
-    )
-    
+         |<p:SubmissionFailureMessageDataResponse xmlns:emcs="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:EMCS:V2.02" xmlns:ie="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/ie704uk/3" xmlns:p="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3" xmlns:p1="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/EmcsUkCodes/3" xmlns:p2="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/Types/3" xmlns:tms="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3 SubmissionFailureMessageData.xsd ">
+         |  ${IE704ModelFixtures.ie704ModelXmlBody}
+         |  <ie:RelatedMessageType>IE815</ie:RelatedMessageType>
+         |</p:SubmissionFailureMessageDataResponse>
+         |""".stripMargin
+
     val submissionFailureMessageDataNoRelatedMessageTypeXmlBody: String =
       s"""
-        |<p:SubmissionFailureMessageDataResponse xmlns:emcs="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:EMCS:V2.02" xmlns:ie="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/ie704uk/3" xmlns:p="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3" xmlns:p1="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/EmcsUkCodes/3" xmlns:p2="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/Types/3" xmlns:tms="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3 SubmissionFailureMessageData.xsd ">
-        |  ${IE704ModelFixtures.ie704ModelXmlBody}
-        |  <ie:RelatedMessageType></ie:RelatedMessageType>
-        |</p:SubmissionFailureMessageDataResponse>
-        |""".stripMargin
-        
-    val submissionFailureMessageDataNoRelatedMessageTypeModel: SubmissionFailureMessageData = SubmissionFailureMessageData(
-      ie704 = IE704ModelFixtures.ie704ModelModel,
-      relatedMessageType = None
-    )
-        
-    val submissionFailureMessageDataNoRelatedMessageTypeJson: JsValue = Json.obj(
-      "ie704" -> IE704ModelFixtures.ie704ModelJson
-    )
-    
-  }
+         |<p:SubmissionFailureMessageDataResponse xmlns:emcs="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:EMCS:V2.02" xmlns:ie="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/ie704uk/3" xmlns:p="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3" xmlns:p1="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/EmcsUkCodes/3" xmlns:p2="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/Types/3" xmlns:tms="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3 SubmissionFailureMessageData.xsd ">
+         |  ${IE704ModelFixtures.ie704ModelXmlBody}
+         |  <ie:RelatedMessageType></ie:RelatedMessageType>
+         |</p:SubmissionFailureMessageDataResponse>
+         |""".stripMargin
 
-  object GetSubmissionFailureMessageResponseFixtures {
     val getSubmissionFailureMessageResponseDownstreamJson: JsValue = Json.obj(
       "dateTime" -> "now",
       "exciseRegistrationNumber" -> testErn,
       "message" ->
-        Base64.getEncoder.encodeToString(trim(XML.loadString(SubmissionFailureMessageDataFixtures.submissionFailureMessageDataXmlBody)).toString().getBytes(StandardCharsets.UTF_8))
+        Base64.getEncoder.encodeToString(trim(XML.loadString(submissionFailureMessageDataXmlBody)).toString().getBytes(StandardCharsets.UTF_8))
     )
 
     val getSubmissionFailureMessageResponseDownstreamJsonWrongEncoding: JsValue = Json.obj(
       "dateTime" -> "now",
       "exciseRegistrationNumber" -> testErn,
       "message" ->
-        Base64.getEncoder.encodeToString(trim(XML.loadString(SubmissionFailureMessageDataFixtures.submissionFailureMessageDataXmlBody)).toString().getBytes(StandardCharsets.UTF_16))
+        Base64.getEncoder.encodeToString(trim(XML.loadString(submissionFailureMessageDataXmlBody)).toString().getBytes(StandardCharsets.UTF_16))
     )
 
     val getSubmissionFailureMessageResponseDownstreamJsonNotEncoded: JsValue = Json.obj(
       "dateTime" -> "now",
       "exciseRegistrationNumber" -> testErn,
       "message" ->
-        trim(XML.loadString(SubmissionFailureMessageDataFixtures.submissionFailureMessageDataXmlBody)).toString()
+        trim(XML.loadString(submissionFailureMessageDataXmlBody)).toString()
     )
 
     val getSubmissionFailureMessageResponseDownstreamJsonBadXml: JsValue = Json.obj(
@@ -410,33 +390,28 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures {
     )
 
     val getSubmissionFailureMessageResponseModel: GetSubmissionFailureMessageResponse = GetSubmissionFailureMessageResponse(
-      dateTime = "now",
-      exciseRegistrationNumber = testErn,
-      submissionFailureMessageData = SubmissionFailureMessageDataFixtures.submissionFailureMessageDataModel
+      ie704 = IE704ModelFixtures.ie704ModelModel,
+      relatedMessageType = Some("IE815")
     )
 
     val getSubmissionFailureMessageResponseJson: JsValue = Json.obj(
-      "dateTime" -> "now",
-      "exciseRegistrationNumber" -> testErn,
-      "submissionFailureMessageData" -> SubmissionFailureMessageDataFixtures.submissionFailureMessageDataJson
+      "ie704" -> IE704ModelFixtures.ie704ModelJson,
+      "relatedMessageType" -> "IE815"
     )
 
     val getSubmissionFailureMessageResponseMinimumDownstreamJson: JsValue = Json.obj(
       "dateTime" -> "now",
       "exciseRegistrationNumber" -> testErn,
-      "message" -> Base64.getEncoder.encodeToString(trim(XML.loadString(SubmissionFailureMessageDataFixtures.submissionFailureMessageDataNoRelatedMessageTypeXmlBody)).toString().getBytes(StandardCharsets.UTF_8))
+      "message" -> Base64.getEncoder.encodeToString(trim(XML.loadString(submissionFailureMessageDataNoRelatedMessageTypeXmlBody)).toString().getBytes(StandardCharsets.UTF_8))
     )
 
     val getSubmissionFailureMessageResponseMinimumModel: GetSubmissionFailureMessageResponse = GetSubmissionFailureMessageResponse(
-      dateTime = "now",
-      exciseRegistrationNumber = testErn,
-      submissionFailureMessageData = SubmissionFailureMessageDataFixtures.submissionFailureMessageDataNoRelatedMessageTypeModel
+      ie704 = IE704ModelFixtures.ie704ModelModel,
+      relatedMessageType = None
     )
 
     val getSubmissionFailureMessageResponseMinimumJson: JsValue = Json.obj(
-      "dateTime" -> "now",
-      "exciseRegistrationNumber" -> testErn,
-      "submissionFailureMessageData" -> SubmissionFailureMessageDataFixtures.submissionFailureMessageDataNoRelatedMessageTypeJson
+      "ie704" -> IE704ModelFixtures.ie704ModelJson
     )
   }
 }
