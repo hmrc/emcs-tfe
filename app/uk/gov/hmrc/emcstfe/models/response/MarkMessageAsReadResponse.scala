@@ -16,14 +16,19 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
+import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 
 import scala.xml.NodeSeq
 
-case class MarkMessageAsReadResponse(dateTime: String, exciseRegistrationNumber: String, recordsAffected: Int) extends LegacyMessage {
+case class MarkMessageAsReadResponse(recordsAffected: Int) extends LegacyMessage {
   override def xmlBody: NodeSeq = recordsAffectedBody(recordsAffected)
 }
 
 object MarkMessageAsReadResponse {
+
+  implicit val xmlReader: XmlReader[MarkMessageAsReadResponse] =
+    (__ \\ "Result").read[Int].map(MarkMessageAsReadResponse.apply)
+
   implicit val fmt: OFormat[MarkMessageAsReadResponse] = Json.format
 }

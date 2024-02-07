@@ -16,9 +16,23 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
+import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-case class MarkMessageAsReadRequest(exciseRegistrationNumber: String, messageId: String) extends EisConsumptionRequest {
+case class MarkMessageAsReadRequest(exciseRegistrationNumber: String, messageId: String) extends EisConsumptionRequest with ChrisRequest {
+
+  override def requestBody: String =
+    withGetRequestSoapEnvelope(
+      <Parameters>
+        <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
+        <Parameter Name="UniqueMessageId">{messageId}</Parameter>
+      </Parameters>
+    )
+
+  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/MarkMessagesAsRead"
+
+  override def shouldExtractFromSoap: Boolean = false
+
   override def metricName: String = "markMessageAsRead"
 
   override val queryParams: Seq[(String, String)] = Seq()

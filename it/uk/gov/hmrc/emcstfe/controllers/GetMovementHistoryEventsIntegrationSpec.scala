@@ -174,7 +174,7 @@ class GetMovementHistoryEventsIntegrationSpec extends IntegrationBaseSpec with G
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
               disable(SendToEIS)
-              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(responseWithSoapEnvelope(getMovementHistoryEventsResponseXml)))
+              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(responseSoapEnvelopeWithCDATA(getMovementHistoryEventsResponseXml)))
             }
 
             val response: WSResponse = await(request().get())
@@ -185,7 +185,7 @@ class GetMovementHistoryEventsIntegrationSpec extends IntegrationBaseSpec with G
           "all downstream calls are successful with no events" in new Test {
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
-              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK,  XML.loadString(responseWithSoapEnvelope(emptyGetMovementHistoryEventsResponseXml)))
+              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK,  XML.loadString(responseSoapEnvelopeWithCDATA(emptyGetMovementHistoryEventsResponseXml)))
             }
 
             val response: WSResponse = await(request().get())
