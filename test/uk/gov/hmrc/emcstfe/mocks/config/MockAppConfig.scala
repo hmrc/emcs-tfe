@@ -30,8 +30,8 @@ trait MockAppConfig extends MockFactory {
     def chrisUrl: CallHandler[String] = ((() => mockAppConfig.chrisUrl): () => String).expects()
     def downstreamStubUrl: CallHandler[String] = ((() => mockAppConfig.downstreamStubUrl): () => String).expects()
 
-    def isEnabled(feature: FeatureSwitch): CallHandler1[FeatureSwitch, Boolean] = {
-      (mockAppConfig.isEnabled(_: FeatureSwitch)).expects(feature)
+    def isEnabled(featureName: String): CallHandler1[String, Boolean] = {
+      (mockAppConfig.getFeatureSwitchValue(_: String)).expects(featureName)
     }
 
     def getFeatureSwitchValue(feature: FeatureSwitch): CallHandler1[String, Boolean] = {
@@ -44,8 +44,6 @@ trait MockAppConfig extends MockFactory {
     def createMovementUserAnswersReplaceIndexes: CallHandler0[Boolean] = (() => mockAppConfig.createMovementUserAnswersReplaceIndexes()).expects()
 
     def publicBetaTrafficPercentageForService(serviceName: String): CallHandler1[String, Option[Int]] = (mockAppConfig.publicBetaTrafficPercentageForService(_: String)).expects(serviceName)
-    def isPrivateBetaEnabled: CallHandler0[Boolean] = ((() => mockAppConfig.isPrivateBetaEnabled()): () => Boolean).expects()
-    def isPublicBetaEnabled: CallHandler0[Boolean] = ((() => mockAppConfig.isPublicBetaEnabled()): () => Boolean).expects()
     def internalAuthToken: CallHandler0[String] = ((() => mockAppConfig.internalAuthToken()): () => String).expects()
     def userAllowListBaseUrl: CallHandler0[String] = ((() => mockAppConfig.userAllowListBaseUrl()): () => String).expects()
   }

@@ -49,7 +49,10 @@ trait IntegrationBaseSpec
     "createMovementUserAnswers.TTL" -> testTtl,
     "createMovementUserAnswers.replaceIndexes" -> testReplaceIndexes,
     "getMovement.TTL" -> testTtl,
-    "getMovement.replaceIndexes" -> testReplaceIndexes.toString
+    "getMovement.replaceIndexes" -> testReplaceIndexes.toString,
+    "beta.public.createMovement.trafficPercentage" -> "50",
+    "beta.public.changeDestination.trafficPercentage" -> "50",
+    "beta.public.navHub.trafficPercentage" -> "50"
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
