@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import com.lucidchart.open.xtract.XmlReader.strictReadSeq
+import cats.implicits.catsSyntaxTuple2Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
-import cats.implicits.catsSyntaxTuple2Semigroupal
 
 import scala.xml.NodeSeq
 
