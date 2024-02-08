@@ -132,9 +132,5 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   def internalAuthToken(): String = configuration.get[String]("internal-auth.token")
 
-  def isPrivateBetaEnabled(): Boolean = configuration.get[Boolean]("beta.private.enabled")
-
-  def isPublicBetaEnabled(): Boolean = configuration.get[Boolean]("beta.public.enabled")
-
   def publicBetaTrafficPercentageForService(serviceName: String): Option[Int] = configuration.getOptional[Int](s"beta.public.$serviceName.trafficPercentage")
 }

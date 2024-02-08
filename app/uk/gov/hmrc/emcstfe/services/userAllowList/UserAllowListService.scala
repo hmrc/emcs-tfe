@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.services.userAllowList
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.UserAllowListConnector
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnablePrivateBeta, EnablePublicBeta, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.userAllowList.CheckUserAllowListRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
@@ -27,11 +28,11 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserAllowListService @Inject()(connector: UserAllowListConnector,
-                                     config: AppConfig)(implicit ec: ExecutionContext) {
+                                     val config: AppConfig)(implicit ec: ExecutionContext) extends FeatureSwitching {
 
   def isEligible(ern: String, service: String)(implicit hc: HeaderCarrier, request: UserRequest[_]): Future[Either[ErrorResponse, Boolean]] = {
-    lazy val isPrivateBetaEnabled = config.isPrivateBetaEnabled()
-    lazy val isPublicBetaEnabled = config.isPublicBetaEnabled()
+    lazy val isPrivateBetaEnabled = isEnabled(EnablePrivateBeta)
+    lazy val isPublicBetaEnabled = isEnabled(EnablePublicBeta)
     val userAllowListRequestModel = CheckUserAllowListRequest(ern)
     if(isPrivateBetaEnabled) {
       connector.check(service, userAllowListRequestModel)
