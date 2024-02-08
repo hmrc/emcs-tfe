@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage
 
+import com.lucidchart.open.xtract.ParseSuccess
 import play.api.libs.json.{JsError, JsPath, JsResult, JsSuccess, Json}
 import uk.gov.hmrc.emcstfe.fixtures.GetSubmissionFailureMessageFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
+
+import scala.xml.XML
 
 class GetSubmissionFailureMessageResponseSpec extends TestBaseSpec with GetSubmissionFailureMessageFixtures {
 
@@ -49,6 +52,16 @@ class GetSubmissionFailureMessageResponseSpec extends TestBaseSpec with GetSubmi
 
         result.cause shouldBe JsError("""{"obj":[{"msg":["XML failed to parse, with the following errors:\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageSender)\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageRecipient)\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//DateOfPreparation)\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//TimeOfPreparation)\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageIdentifier)\n - EmptyError(//SubmissionFailureMessageDataResponse//RelatedMessageType)"],"args":[]}]}""")
       }
+    }
+  }
+
+  "chrisReads" should {
+    "turn XML into a model (related message type present)" in {
+      GetSubmissionFailureMessageResponse.chrisReads.read(XML.loadString(submissionFailureMessageDataXmlBody)) shouldBe ParseSuccess(getSubmissionFailureMessageResponseModel)
+    }
+
+    "turn XML into a model (without related message type present)" in {
+      GetSubmissionFailureMessageResponse.chrisReads.read(XML.loadString(submissionFailureMessageDataNoRelatedMessageTypeXmlBody)) shouldBe ParseSuccess(getSubmissionFailureMessageResponseMinimumModel)
     }
   }
 
