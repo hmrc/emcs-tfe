@@ -20,6 +20,8 @@ import uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions.{DEFAULT_
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
+import scala.xml.Elem
+
 case class GetMovementListRequest(exciseRegistrationNumber: String,
                                   searchOptions: GetMovementListSearchOptions,
                                   isEISFeatureEnabled: Boolean) extends ChrisRequest with EisConsumptionRequest {
@@ -32,8 +34,28 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
         <Parameter Name="SortOrder">{searchOptions.sortOrder}</Parameter>
         <Parameter Name="StartPosition">{searchOptions.startPosition.getOrElse(DEFAULT_START_POSITION)}</Parameter>
         <Parameter Name="MaxNoToReturn">{searchOptions.maxRows}</Parameter>
+        {formatSearchParameters()}
       </Parameters>
     )
+  }
+
+  private def formatSearchParameters(): Seq[Elem] = {
+    Seq(
+      searchOptions.arc -> "ARC",
+      searchOptions.otherTraderId -> "OtherTraderId",
+      searchOptions.lrn -> "LocalReferenceNumber",
+      searchOptions.dateOfDispatchFrom -> "DateOfDispatchFrom",
+      searchOptions.dateOfDispatchTo -> "DateOfDispatchTo",
+      searchOptions.dateOfReceiptTo -> "DateOfReceiptTo",
+      searchOptions.countryOfOrigin -> "CountryOfOrigin",
+      searchOptions.movementStatus -> "MovementStatus",
+      searchOptions.transporterTraderName -> "TransporterTraderName",
+      searchOptions.undischargedMovements -> "UndischargedMovements",
+      searchOptions.exciseProductCode -> "ExciseProductCode"
+    ).flatMap(optionalFieldWithParamName => {
+      val (fieldOpt, paramName) = optionalFieldWithParamName
+      fieldOpt.map(searchOptionField => <Parameter Name={paramName}>{searchOptionField}</Parameter>)
+    })
   }
 
   override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementList"
