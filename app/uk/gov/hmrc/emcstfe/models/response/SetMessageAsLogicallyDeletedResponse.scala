@@ -28,7 +28,7 @@ case class SetMessageAsLogicallyDeletedResponse(recordsAffected: Int) extends Le
 object SetMessageAsLogicallyDeletedResponse {
 
   implicit val xmlReader: XmlReader[SetMessageAsLogicallyDeletedResponse] =
-    (__ \ "RecordsAffected").read[Int].map(SetMessageAsLogicallyDeletedResponse.apply)
+    (__ \\ "recordsAffected").read[Int].map(SetMessageAsLogicallyDeletedResponse.apply)
 
   implicit val fmt: OFormat[SetMessageAsLogicallyDeletedResponse] = Json.format
 }
