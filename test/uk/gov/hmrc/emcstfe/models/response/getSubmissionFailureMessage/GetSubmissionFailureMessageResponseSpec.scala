@@ -16,39 +16,52 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage
 
-import play.api.libs.json.{JsError, JsResult, JsSuccess, Json}
+import com.lucidchart.open.xtract.ParseSuccess
+import play.api.libs.json.{JsError, JsPath, JsResult, JsSuccess, Json}
 import uk.gov.hmrc.emcstfe.fixtures.GetSubmissionFailureMessageFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
+
+import scala.xml.XML
 
 class GetSubmissionFailureMessageResponseSpec extends TestBaseSpec with GetSubmissionFailureMessageFixtures {
 
   import GetSubmissionFailureMessageResponseFixtures._
 
-  "reads" should {
+  "eisReads" should {
     "turn JSON into a model" in {
-      GetSubmissionFailureMessageResponse.reads.reads(getSubmissionFailureMessageResponseDownstreamJson) shouldBe JsSuccess(getSubmissionFailureMessageResponseModel)
+      GetSubmissionFailureMessageResponse.eisReads.reads(getSubmissionFailureMessageResponseDownstreamJson) shouldBe JsSuccess(getSubmissionFailureMessageResponseModel, JsPath \ "message")
     }
 
     "turn minimal JSON into a model" in {
-      GetSubmissionFailureMessageResponse.reads.reads(getSubmissionFailureMessageResponseMinimumDownstreamJson) shouldBe JsSuccess(getSubmissionFailureMessageResponseMinimumModel)
+      GetSubmissionFailureMessageResponse.eisReads.reads(getSubmissionFailureMessageResponseMinimumDownstreamJson) shouldBe JsSuccess(getSubmissionFailureMessageResponseMinimumModel, JsPath \ "message")
     }
 
     "fail" when {
       "XML is encoded with the wrong encoding" in {
-        val result = intercept[JsResult.Exception](GetSubmissionFailureMessageResponse.reads.reads(getSubmissionFailureMessageResponseDownstreamJsonWrongEncoding))
+        val result = intercept[JsResult.Exception](GetSubmissionFailureMessageResponse.eisReads.reads(getSubmissionFailureMessageResponseDownstreamJsonWrongEncoding))
 
         result.cause shouldBe JsError("Content is not allowed in prolog.")
       }
       "XML is not encoded" in {
-        val result = intercept[JsResult.Exception](GetSubmissionFailureMessageResponse.reads.reads(getSubmissionFailureMessageResponseDownstreamJsonNotEncoded))
+        val result = intercept[JsResult.Exception](GetSubmissionFailureMessageResponse.eisReads.reads(getSubmissionFailureMessageResponseDownstreamJsonNotEncoded))
 
         result.cause shouldBe JsError("Illegal base64 character 3c")
       }
       "XML cannot be mapped to a valid model - complete nonsense" in {
-        val result = intercept[JsResult.Exception](GetSubmissionFailureMessageResponse.reads.reads(getSubmissionFailureMessageResponseDownstreamJsonBadXml))
+        val result = intercept[JsResult.Exception](GetSubmissionFailureMessageResponse.eisReads.reads(getSubmissionFailureMessageResponseDownstreamJsonBadXml))
 
         result.cause shouldBe JsError("""{"obj":[{"msg":["XML failed to parse, with the following errors:\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageSender)\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageRecipient)\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//DateOfPreparation)\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//TimeOfPreparation)\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageIdentifier)\n - EmptyError(//SubmissionFailureMessageDataResponse//RelatedMessageType)"],"args":[]}]}""")
       }
+    }
+  }
+
+  "chrisReads" should {
+    "turn XML into a model (related message type present)" in {
+      GetSubmissionFailureMessageResponse.chrisReads.read(XML.loadString(submissionFailureMessageDataXmlBody)) shouldBe ParseSuccess(getSubmissionFailureMessageResponseModel)
+    }
+
+    "turn XML into a model (without related message type present)" in {
+      GetSubmissionFailureMessageResponse.chrisReads.read(XML.loadString(submissionFailureMessageDataNoRelatedMessageTypeXmlBody)) shouldBe ParseSuccess(getSubmissionFailureMessageResponseMinimumModel)
     }
   }
 

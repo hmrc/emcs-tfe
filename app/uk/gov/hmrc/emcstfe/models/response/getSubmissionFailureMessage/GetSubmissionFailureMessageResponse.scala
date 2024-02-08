@@ -16,18 +16,26 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage
 
-import play.api.libs.functional.syntax._
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import com.lucidchart.open.xtract.{XPath, XmlReader}
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.response.Base64Model
 
-case class GetSubmissionFailureMessageResponse(dateTime: String, exciseRegistrationNumber: String, submissionFailureMessageData: SubmissionFailureMessageData)
+case class GetSubmissionFailureMessageResponse(ie704: IE704Model, relatedMessageType: Option[String])
 
 object GetSubmissionFailureMessageResponse {
-  implicit val writes: OWrites[GetSubmissionFailureMessageResponse] = Json.writes
 
-  implicit val reads: Reads[GetSubmissionFailureMessageResponse] = (
-    (__ \ "dateTime").read[String] and
-      (__ \ "exciseRegistrationNumber").read[String] and
-      (__ \ "message").read[Base64Model[SubmissionFailureMessageData]].map(_.value)
-    )(GetSubmissionFailureMessageResponse.apply _)
+  private val ie704: XPath = XPath \\ "SubmissionFailureMessageDataResponse" \\ "IE704"
+  private val relatedMessageType: XPath = XPath \\ "SubmissionFailureMessageDataResponse" \\ "RelatedMessageType"
+
+  implicit val chrisReads: XmlReader[GetSubmissionFailureMessageResponse] = (
+    ie704.read[IE704Model],
+    relatedMessageType.read[String].map(s => if (s.nonEmpty) Some(s) else None)
+  ).mapN(GetSubmissionFailureMessageResponse.apply)
+
+  implicit val jsonWrites: OWrites[GetSubmissionFailureMessageResponse] = Json.writes
+
+  implicit val eisReads: Reads[GetSubmissionFailureMessageResponse] =
+    (JsPath \ "message").read[Base64Model[GetSubmissionFailureMessageResponse]].map(_.value)
+
 }

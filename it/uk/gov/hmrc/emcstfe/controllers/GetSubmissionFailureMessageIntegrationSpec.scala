@@ -21,28 +21,36 @@ import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.{Json, JsonValidationError}
 import play.api.libs.ws.{WSRequest, WSResponse}
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.GetSubmissionFailureMessageFixtures
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
-class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec with GetSubmissionFailureMessageFixtures {
+import scala.xml.XML
+
+class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec with GetSubmissionFailureMessageFixtures with FeatureSwitching {
+
+  override lazy val config = app.injector.instanceOf[AppConfig]
 
   import GetSubmissionFailureMessageResponseFixtures._
 
-  private trait Test {
+  private abstract class Test(sendToEIS: Boolean = true) {
     def setupStubs(): StubMapping
 
     def uri: String = s"/submission-failure-message/$testErn/$testMessageId"
 
-    def downstreamUri: String = s"/emcs/messages/v1/submission-failure-message"
+    def eisUri: String = "/emcs/messages/v1/submission-failure-message"
+    def chrisUri: String = "/ChRISOSB/EMCS/EMCSApplicationService/2"
 
-    def downstreamQueryParams: Map[String, String] = Map(
+    def eisQueryParams: Map[String, String] = Map(
       "exciseregistrationnumber" -> testErn,
       "uniquemessageid" -> testMessageId
     )
 
     def request(): WSRequest = {
+      if(sendToEIS) enable(SendToEIS) else disable(SendToEIS)
       setupStubs()
       buildRequest(uri)
     }
@@ -74,63 +82,125 @@ class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec wit
         }
       }
 
-      "return a success" when {
-        "all downstream calls are successful" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJson)
-          }
+      "sending data to EIS" when {
+        "return a success" when {
+          "all downstream calls are successful" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, eisUri, eisQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJson)
+            }
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.OK
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe getSubmissionFailureMessageResponseJson
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getSubmissionFailureMessageResponseJson
+          }
+        }
+        "return an error" when {
+          "downstream call returns XML with the wrong encoding" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, eisUri, eisQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJsonWrongEncoding)
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"Content is not allowed in prolog.\"],\"args\":[]}]}"))))
+          }
+          "downstream call returns unencoded XML" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, eisUri, eisQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJsonNotEncoded)
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"Illegal base64 character 3c\"],\"args\":[]}]}"))))
+          }
+          "downstream call returns XML which can't be parsed to JSON" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, eisUri, eisQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJsonBadXml)
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"{\\\"obj\\\":[{\\\"msg\\\":[\\\"XML failed to parse, with the following errors:\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageSender)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageRecipient)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//DateOfPreparation)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//TimeOfPreparation)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageIdentifier)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//RelatedMessageType)\\\"],\\\"args\\\":[]}]}\"],\"args\":[]}]}"))))
+          }
+          "downstream call returns an unexpected HTTP response" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, eisUri, eisQueryParams, Status.NO_CONTENT, Json.obj())
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(EISUnknownError(""))
+          }
         }
       }
-      "return an error" when {
-        "downstream call returns XML with the wrong encoding" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJsonWrongEncoding)
-          }
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"Content is not allowed in prolog.\"],\"args\":[]}]}"))))
+      "sending data to ChRIS" when {
+        "return a success" when {
+          "all downstream calls are successful" in new Test(sendToEIS = false) {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.OK, XML.loadString(responseSoapEnvelopeWithCDATA(XML.loadString(submissionFailureMessageDataXmlBody))))
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getSubmissionFailureMessageResponseJson
+          }
         }
-        "downstream call returns unencoded XML" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJsonNotEncoded)
-          }
+        "return an error" when {
+          "downstream call returns unexpected XML" in new Test(sendToEIS = false) {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(
+                DownstreamStub.POST,
+                chrisUri,
+                Status.OK,
+                <Errors>
+                  <Error>Something went wrong</Error>
+                </Errors>
+              )
+            }
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"Illegal base64 character 3c\"],\"args\":[]}]}"))))
-        }
-        "downstream call returns XML which can't be parsed to JSON" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJsonBadXml)
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(SoapExtractionError)
           }
+          "downstream call returns something other than XML" in new Test(sendToEIS = false) {
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"{\\\"obj\\\":[{\\\"msg\\\":[\\\"XML failed to parse, with the following errors:\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageSender)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageRecipient)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//DateOfPreparation)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//TimeOfPreparation)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//IE704//IE704//Header//MessageIdentifier)\\\\n - EmptyError(//SubmissionFailureMessageDataResponse//RelatedMessageType)\\\"],\\\"args\\\":[]}]}\"],\"args\":[]}]}"))))
-        }
-        "downstream call returns an unexpected HTTP response" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, Status.NO_CONTENT, Json.obj())
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.OK, Json.obj())
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(XmlValidationError)
           }
+          "downstream call returns a non-200 HTTP response" in new Test(sendToEIS = false) {
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(EISUnknownError(""))
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.INTERNAL_SERVER_ERROR, Json.obj())
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
+          }
         }
       }
     }

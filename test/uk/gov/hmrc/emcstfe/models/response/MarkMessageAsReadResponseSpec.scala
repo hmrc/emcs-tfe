@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import com.lucidchart.open.xtract.ParseSuccess
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.fixtures.{GetMessagesFixtures, MarkMessageAsReadFixtures}
+import uk.gov.hmrc.emcstfe.fixtures.MarkMessageAsReadFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.xml.XML
