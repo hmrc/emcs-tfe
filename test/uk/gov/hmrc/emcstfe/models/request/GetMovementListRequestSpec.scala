@@ -63,6 +63,8 @@ class GetMovementListRequestSpec extends TestBaseSpec {
       paramFromXml(xml, "ARC") shouldBe testArc
       paramFromXml(xml, "OtherTraderId") shouldBe "GB123456789"
       paramFromXml(xml, "LocalReferenceNumber") shouldBe testLrn
+      paramFromXml(xml, "DateOfReceiptFrom") shouldBe "08/07/2020"
+      paramFromXml(xml, "DateOfReceiptTo") shouldBe "09/07/2020"
       paramFromXml(xml, "DateOfDispatchFrom") shouldBe "06/07/2020"
       paramFromXml(xml, "DateOfDispatchTo") shouldBe "07/07/2020"
       paramFromXml(xml, "CountryOfOrigin") shouldBe "GB"
@@ -70,11 +72,6 @@ class GetMovementListRequestSpec extends TestBaseSpec {
       paramFromXml(xml, "TransporterTraderName") shouldBe "Trader 1"
       paramFromXml(xml, "UndischargedMovements") shouldBe "Accepted"
       paramFromXml(xml, "ExciseProductCode") shouldBe "6000"
-
-      /*
-          TODO does DateOfReceiptTo need adding in GetMovementListRequest?
-       */
-
     }
 
     "generate the correct request XML, if search options are not defined" in {
@@ -94,6 +91,8 @@ class GetMovementListRequestSpec extends TestBaseSpec {
       paramFromXml(xml, "ARC") shouldBe ""
       paramFromXml(xml, "OtherTraderId") shouldBe ""
       paramFromXml(xml, "LocalReferenceNumber") shouldBe ""
+      paramFromXml(xml, "DateOfReceiptFrom") shouldBe ""
+      paramFromXml(xml, "DateOfReceiptTo") shouldBe ""
       paramFromXml(xml, "DateOfDispatchFrom") shouldBe ""
       paramFromXml(xml, "DateOfDispatchTo") shouldBe ""
       paramFromXml(xml, "CountryOfOrigin") shouldBe ""
