@@ -31,7 +31,7 @@ case class SetMessageAsLogicallyDeletedRequest(exciseRegistrationNumber: String,
 
   override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/SetMessageAsLogicallyDeleted"
 
-  override def shouldExtractFromSoap: Boolean = true
+  override def shouldExtractFromSoap: Boolean = false
 
   override def metricName: String = "setMessageAsLogicallyDeleted"
 

@@ -26,8 +26,13 @@ trait SetMessageAsLogicallyDeletedFixtures extends BaseFixtures with SoapXmlFact
 
   lazy val deletedMessage = SetMessageAsLogicallyDeletedResponse(1)
 
-  lazy val setMessageAsLogicallyDeletedXMLResponse: String = responseSoapEnvelopeWithCDATA(
-    <recordsAffected>1</recordsAffected>
+  lazy val setMessageAsLogicallyDeletedXMLResponse: String = responseSoapEnvelope(
+    <Results>
+      <Result Name="schema">
+        <recordsAffected>1
+        </recordsAffected>
+      </Result>
+    </Results>
   )
 
   lazy val deletedMessageXML: Elem =
