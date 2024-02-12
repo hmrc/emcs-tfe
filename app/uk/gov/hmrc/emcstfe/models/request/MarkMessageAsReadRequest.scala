@@ -31,7 +31,7 @@ case class MarkMessageAsReadRequest(exciseRegistrationNumber: String, messageId:
 
   override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/MarkMessagesAsRead"
 
-  override def shouldExtractFromSoap: Boolean = false
+  override def shouldExtractFromSoap: Boolean = true
 
   override def metricName: String = "markMessageAsRead"
 

@@ -46,7 +46,7 @@ class SetMessageAsLogicallyDeletedRequestSpec extends TestBaseSpec {
 
   "shouldExtractFromSoap" should {
     "be correct" in {
-      request.shouldExtractFromSoap shouldBe false
+      request.shouldExtractFromSoap shouldBe true
     }
   }
 

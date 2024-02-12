@@ -167,7 +167,7 @@ class MarkMessageAsReadIntegrationSpec extends IntegrationBaseSpec with MarkMess
             val response: WSResponse = await(request().put(""))
             response.status shouldBe Status.INTERNAL_SERVER_ERROR
             response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(XPath \\ "Result"))))
+            response.json shouldBe Json.toJson(SoapExtractionError)
           }
           "downstream call returns something other than XML" in new Test(sendToEis = false) {
 

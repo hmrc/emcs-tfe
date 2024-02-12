@@ -21,13 +21,11 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.MarkMessageAsReadFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-import scala.xml.XML
-
 class MarkMessageAsReadResponseSpec extends TestBaseSpec with MarkMessageAsReadFixtures {
 
   "xmlReader" should {
     "turn XML into a model" in {
-      MarkMessageAsReadResponse.xmlReader.read(XML.loadString(markMessageAsReadChrisXml)) shouldBe ParseSuccess(markMessageAsReadResponseModel)
+      MarkMessageAsReadResponse.xmlReader.read(markMessageAsReadParsedChrisXml) shouldBe ParseSuccess(markMessageAsReadResponseModel)
     }
   }
 

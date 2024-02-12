@@ -17,7 +17,6 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import com.lucidchart.open.xtract.{EmptyError, __}
 import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.{JsValue, Json}
@@ -56,7 +55,7 @@ class SetMessageAsLogicallyDeletedIntegrationSpec extends IntegrationBaseSpec wi
     }
   }
 
-  "Calling the get messages endpoint" when {
+  "Calling the set message as logically deleted endpoint" when {
 
     "user is unauthorised" must {
       s"return FORBIDDEN ($FORBIDDEN)" in new Test {
@@ -119,7 +118,6 @@ class SetMessageAsLogicallyDeletedIntegrationSpec extends IntegrationBaseSpec wi
             }
 
             val response: WSResponse = await(request().delete())
-            println(Console.BLUE + response.body + Console.RESET)
             response.status shouldBe Status.OK
             response.header("Content-Type") shouldBe Some("application/json")
             response.json shouldBe setMessageAsLogicallyDeletedJson
@@ -141,7 +139,7 @@ class SetMessageAsLogicallyDeletedIntegrationSpec extends IntegrationBaseSpec wi
               val response: WSResponse = await(request().delete())
               response.status shouldBe Status.INTERNAL_SERVER_ERROR
               response.header("Content-Type") shouldBe Some("application/json")
-              response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(__ \\ "recordsAffected"))))
+              response.json shouldBe Json.toJson(SoapExtractionError)
             }
             "downstream call returns something other than XML" in new Test(sendToEIS = false) {
               val referenceDataResponseBody: JsValue = Json.obj("message" -> "Success!")
