@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,32 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import com.lucidchart.open.xtract.{EmptyError, __}
 import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.SetMessageAsLogicallyDeletedFixtures
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
-class SetMessageAsLogicallyDeletedIntegrationSpec extends IntegrationBaseSpec with SetMessageAsLogicallyDeletedFixtures {
-  
-  private trait Test {
+import scala.xml.XML
+
+class SetMessageAsLogicallyDeletedIntegrationSpec extends IntegrationBaseSpec with SetMessageAsLogicallyDeletedFixtures with FeatureSwitching {
+
+  override val config = app.injector.instanceOf[AppConfig]
+
+  private abstract class Test(sendToEIS: Boolean = true) {
     def setupStubs(): StubMapping
 
     def uri: String = s"/message/$testErn/$testMessageId"
 
-    def downstreamUri: String = s"/emcs/messages/v1/message"
+    def eisUri: String = s"/emcs/messages/v1/message"
+
+    def chrisUri: String = "/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     def downstreamQueryParams: Map[String, String] = Map(
       "exciseregistrationnumber" -> testErn,
@@ -41,6 +50,7 @@ class SetMessageAsLogicallyDeletedIntegrationSpec extends IntegrationBaseSpec wi
     )
 
     def request(): WSRequest = {
+      if (sendToEIS) enable(SendToEIS) else disable(SendToEIS)
       setupStubs()
       buildRequest(uri)
     }
@@ -73,29 +83,92 @@ class SetMessageAsLogicallyDeletedIntegrationSpec extends IntegrationBaseSpec wi
       }
 
       "return a success" when {
-        "all downstream calls are successful" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.DELETE, downstreamUri, downstreamQueryParams, Status.OK, setMessageAsLogicallyDeletedDownstreamJson)
+        "calls are sent to EIS" when {
+          "all downstream calls are successful" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.DELETE, eisUri, downstreamQueryParams, Status.OK, setMessageAsLogicallyDeletedDownstreamJson)
+            }
+
+            val response: WSResponse = await(request().delete())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe setMessageAsLogicallyDeletedJson
           }
 
-          val response: WSResponse = await(request().delete())
-          response.status shouldBe Status.OK
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe setMessageAsLogicallyDeletedJson
+          "return an error" when {
+            "downstream call returns an unexpected HTTP response" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+                DownstreamStub.onSuccess(DownstreamStub.DELETE, eisUri, downstreamQueryParams, Status.NO_CONTENT, Json.obj())
+              }
+
+              val response: WSResponse = await(request().delete())
+              response.status shouldBe Status.INTERNAL_SERVER_ERROR
+              response.header("Content-Type") shouldBe Some("application/json")
+              response.json shouldBe Json.toJson(EISUnknownError(""))
+            }
+          }
         }
-      }
-      "return an error" when {
-        "downstream call returns an unexpected HTTP response" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.DELETE, downstreamUri, downstreamQueryParams, Status.NO_CONTENT, Json.obj())
-          }
 
-          val response: WSResponse = await(request().delete())
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(EISUnknownError(""))
+        "calls are sent to ChRIS" when {
+          "all downstream calls are successful" in new Test(sendToEIS = false) {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.OK, XML.loadString(setMessageAsLogicallyDeletedXMLResponse))
+            }
+
+            val response: WSResponse = await(request().delete())
+            println(Console.BLUE + response.body + Console.RESET)
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe setMessageAsLogicallyDeletedJson
+          }
+          "return an error" when {
+            "downstream call returns unexpected XML" in new Test(sendToEIS = false) {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+                DownstreamStub.onSuccess(
+                  DownstreamStub.POST,
+                  chrisUri,
+                  Status.OK,
+                  <Errors>
+                    <Error>Something went wrong</Error>
+                  </Errors>
+                )
+              }
+
+              val response: WSResponse = await(request().delete())
+              response.status shouldBe Status.INTERNAL_SERVER_ERROR
+              response.header("Content-Type") shouldBe Some("application/json")
+              response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(__ \\ "recordsAffected"))))
+            }
+            "downstream call returns something other than XML" in new Test(sendToEIS = false) {
+              val referenceDataResponseBody: JsValue = Json.obj("message" -> "Success!")
+
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+                DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.OK, referenceDataResponseBody)
+              }
+
+              val response: WSResponse = await(request().delete())
+              response.status shouldBe Status.INTERNAL_SERVER_ERROR
+              response.header("Content-Type") shouldBe Some("application/json")
+              response.json shouldBe Json.toJson(XmlValidationError)
+            }
+            "downstream call returns a non-200 HTTP response" in new Test(sendToEIS = false) {
+
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+                DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.INTERNAL_SERVER_ERROR, Json.obj())
+              }
+
+              val response: WSResponse = await(request().delete())
+              response.status shouldBe Status.INTERNAL_SERVER_ERROR
+              response.header("Content-Type") shouldBe Some("application/json")
+              response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
+            }
+          }
         }
       }
     }
