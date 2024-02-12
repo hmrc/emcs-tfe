@@ -31,7 +31,7 @@ object IE704FunctionalError {
   private val originalAttributeValue: XPath = __ \\ "OriginalAttributeValue"
 
   implicit val xmlReader: XmlReader[IE704FunctionalError] = (
-    errorType.read[String].map(FunctionalErrorCodes.apply),
+    errorType.read[String],
     errorReason.read[String],
     errorLocation.read[Option[String]],
     originalAttributeValue.read[Option[String]]

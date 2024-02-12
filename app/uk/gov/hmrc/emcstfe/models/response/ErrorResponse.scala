@@ -92,12 +92,6 @@ object ErrorResponse {
     val message = s"Invalid query parameters provided. Query parameters: $queryParams"
   }
 
-  case class UnknownFunctionalErrorCode(errorCode: String) extends ErrorResponse {
-    val message = s"Unknown functional error code in IE704 message: $errorCode"
-
-    def throwError: JsResult.Exception = JsResult.Exception(JsError(message))
-  }
-
   case class InvalidLegacyRequestProvided(message: String) extends ErrorResponse
 
   case class InvalidLegacyActionProvided(action: String) extends ErrorResponse {
@@ -106,10 +100,6 @@ object ErrorResponse {
 
   case object NoLegacyActionProvided extends ErrorResponse {
     val message = s"no action found in the request"
-  }
-
-  case class UserAllowListError(errorResponse: String) extends ErrorResponse {
-    val message = s"An error response was returned from user-allow-list, error message: $errorResponse"
   }
 
 }
