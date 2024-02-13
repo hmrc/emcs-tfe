@@ -28,7 +28,7 @@ case class MarkMessageAsReadResponse(recordsAffected: Int) extends LegacyMessage
 object MarkMessageAsReadResponse {
 
   implicit val xmlReader: XmlReader[MarkMessageAsReadResponse] =
-    (__ \\ "Result").read[Int].map(MarkMessageAsReadResponse.apply)
+    (__ \\ "recordsAffected").read[Int].map(MarkMessageAsReadResponse.apply)
 
   implicit val fmt: OFormat[MarkMessageAsReadResponse] = Json.format
 }

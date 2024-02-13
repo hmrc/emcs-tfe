@@ -20,13 +20,21 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.MarkMessageAsReadResponse
 import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
+import scala.xml.Elem
+
 trait MarkMessageAsReadFixtures extends BaseFixtures with SoapXmlFactory {
 
+
   lazy val markMessageAsReadChrisXml: String = responseSoapEnvelope(
-    <con:Results>
-      <con:Result Name="recordsAffected">1</con:Result>
-    </con:Results>
+    <Results>
+      <Result Name="schema">&lt;recordsAffected&gt;1&lt;/recordsAffected&gt;</Result>
+    </Results>
   )
+
+  lazy val markMessageAsReadParsedChrisXml: Elem =
+    <Results>
+      <Result Name="schema"><recordsAffected>1</recordsAffected></Result>
+    </Results>
 
   val markMessageAsReadEisJson: JsValue = Json.obj(
     "dateTime" -> now,
