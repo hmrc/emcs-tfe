@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage
 
 import com.lucidchart.open.xtract.ParseSuccess
-import play.api.libs.json.{JsResult, Json}
+import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.GetSubmissionFailureMessageFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -46,13 +46,6 @@ class IE704FunctionalErrorSpec extends TestBaseSpec with GetSubmissionFailureMes
       }
     }
 
-    "provided an invalid ErrorType" should {
-      "throw an error" in {
-        val result = intercept[JsResult.Exception](IE704FunctionalError.xmlReader.read(XML.loadString(ie704FunctionalErrorInvalidErrorTypeXmlBody)))
-
-        result.getMessage shouldBe "{\"obj\":[{\"msg\":[\"Unknown functional error code in IE704 message: 1\"],\"args\":[]}]}"
-      }
-    }
   }
 
 }

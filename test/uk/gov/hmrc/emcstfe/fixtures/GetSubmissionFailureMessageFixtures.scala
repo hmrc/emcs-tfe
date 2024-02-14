@@ -190,14 +190,14 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
         |""".stripMargin
 
     val ie704FunctionalErrorModel: IE704FunctionalError = IE704FunctionalError(
-      errorType = "Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
+      errorType = "4402",
       errorReason = "Boooo! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
       errorLocation = Some("/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]"),
       originalAttributeValue = Some("lrnie8155639253")
     )
 
     val ie704FunctionalErrorJson: JsValue = Json.obj(
-      "errorType" -> "Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
+      "errorType" -> "4402",
       "errorReason" -> "Boooo! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
       "errorLocation" -> "/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]",
       "originalAttributeValue" -> "lrnie8155639253"
@@ -212,14 +212,14 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
         |""".stripMargin
 
     val ie704FunctionalErrorMinimumModel: IE704FunctionalError = IE704FunctionalError(
-      errorType = "Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
+      errorType = "4402",
       errorReason = "Boooo! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
       errorLocation = None,
       originalAttributeValue = None
     )
 
     val ie704FunctionalErrorMinimumJson: JsValue = Json.obj(
-      "errorType" -> "Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
+      "errorType" -> "4402",
       "errorReason" -> "Boooo! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules"
     )
   }
@@ -255,7 +255,7 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       functionalError = Seq(
         IE704FunctionalErrorFixtures.ie704FunctionalErrorModel,
         IE704FunctionalError(
-          errorType = "Invalid or missing Consignor on SEED",
+          errorType = "4403",
           errorReason = "Oh no! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
           errorLocation = Some("/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]"),
           originalAttributeValue = Some("lrnie8155639254")
@@ -268,7 +268,7 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       "functionalError" -> JsArray(Seq(
         IE704FunctionalErrorFixtures.ie704FunctionalErrorJson,
         Json.obj(
-          "errorType" -> "Invalid or missing Consignor on SEED",
+          "errorType" -> "4403",
           "errorReason" -> "Oh no! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
           "errorLocation" -> "/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]",
           "originalAttributeValue" -> "lrnie8155639254"
@@ -303,7 +303,7 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       functionalError = Seq(
         IE704FunctionalErrorFixtures.ie704FunctionalErrorModel,
         IE704FunctionalError(
-          errorType = "Invalid or missing Consignor on SEED",
+          errorType = "4403",
           errorReason = "Oh no! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
           errorLocation = Some("/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]"),
           originalAttributeValue = Some("lrnie8155639254")
@@ -315,7 +315,7 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       "functionalError" -> JsArray(Seq(
         IE704FunctionalErrorFixtures.ie704FunctionalErrorJson,
         Json.obj(
-          "errorType" -> "Invalid or missing Consignor on SEED",
+          "errorType" -> "4403",
           "errorReason" -> "Oh no! Duplicate LRN The LRN is already known and is therefore not unique according to the specified rules",
           "errorLocation" -> "/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]",
           "originalAttributeValue" -> "lrnie8155639254"
