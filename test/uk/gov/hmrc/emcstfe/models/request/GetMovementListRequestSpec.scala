@@ -18,27 +18,88 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-import scala.xml.XML
+import scala.xml.{Elem, XML}
 
 class GetMovementListRequestSpec extends TestBaseSpec {
 
   val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions(), isEISFeatureEnabled = false)
 
-  "requestBody" should {
-    "generate the correct request XML" in {
-      val xml = XML.loadString(request.requestBody)
+  private def paramFromXml(xml: Elem, paramName: String): String = {
+    (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == paramName).text
+  }
 
+  "requestBody" should {
+    "generate the correct request XML, if search options are defined" in {
+      val requestWithParams =
+        request.copy(
+          searchOptions = GetMovementListSearchOptions().copy(
+            arc = Some(testArc),
+            otherTraderId = Some("GB123456789"),
+            lrn = Some(testLrn),
+            dateOfDispatchFrom = Some("06/07/2020"),
+            dateOfDispatchTo = Some("07/07/2020"),
+            dateOfReceiptFrom = Some("08/07/2020"),
+            dateOfReceiptTo = Some("09/07/2020"),
+            countryOfOrigin = Some("GB"),
+            movementStatus = Some("e-AD Manually Closed"),
+            transporterTraderName = Some("Trader 1"),
+            undischargedMovements = Some("Accepted"),
+            exciseProductCode = Some("6000")
+          )
+        )
+
+      val xml = XML.loadString(requestWithParams.requestBody)
 
       (xml \\ "Envelope" \\ "Header" \\ "VersionNo").text shouldBe "2.1"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Source").text shouldBe "emcs_tfe"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Identity").text shouldBe "portal"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Partner").text shouldBe "UK"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "ExciseRegistrationNumber").text shouldBe "My ERN"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "TraderRole").text shouldBe GetMovementListSearchOptions.DEFAULT_TRADER_ROLE
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "SortField").text shouldBe GetMovementListSearchOptions.DEFAULT_SORT_FIELD
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "SortOrder").text shouldBe GetMovementListSearchOptions.DEFAULT_SORT_ORDER
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "StartPosition").text shouldBe GetMovementListSearchOptions.DEFAULT_START_POSITION.toString
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "MaxNoToReturn").text shouldBe GetMovementListSearchOptions.DEFAULT_MAX_ROWS.toString
+      (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "MetaData" \\ "Source").text shouldBe "emcs_tfe"
+      (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "MetaData" \\ "Identity").text shouldBe "portal"
+      (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "MetaData" \\ "Partner").text shouldBe "UK"
+      paramFromXml(xml, "ExciseRegistrationNumber") shouldBe "My ERN"
+      paramFromXml(xml, "TraderRole") shouldBe GetMovementListSearchOptions.DEFAULT_TRADER_ROLE
+      paramFromXml(xml, "SortField") shouldBe GetMovementListSearchOptions.DEFAULT_SORT_FIELD
+      paramFromXml(xml, "SortOrder") shouldBe GetMovementListSearchOptions.DEFAULT_SORT_ORDER
+      paramFromXml(xml, "StartPosition") shouldBe GetMovementListSearchOptions.DEFAULT_START_POSITION.toString
+      paramFromXml(xml, "MaxNoToReturn") shouldBe GetMovementListSearchOptions.DEFAULT_MAX_ROWS.toString
+      paramFromXml(xml, "ARC") shouldBe testArc
+      paramFromXml(xml, "OtherTraderId") shouldBe "GB123456789"
+      paramFromXml(xml, "LocalReferenceNumber") shouldBe testLrn
+      paramFromXml(xml, "DateOfReceiptFrom") shouldBe "08/07/2020"
+      paramFromXml(xml, "DateOfReceiptTo") shouldBe "09/07/2020"
+      paramFromXml(xml, "DateOfDispatchFrom") shouldBe "06/07/2020"
+      paramFromXml(xml, "DateOfDispatchTo") shouldBe "07/07/2020"
+      paramFromXml(xml, "CountryOfOrigin") shouldBe "GB"
+      paramFromXml(xml, "MovementStatus") shouldBe "e-AD Manually Closed"
+      paramFromXml(xml, "TransporterTraderName") shouldBe "Trader 1"
+      paramFromXml(xml, "UndischargedMovements") shouldBe "Accepted"
+      paramFromXml(xml, "ExciseProductCode") shouldBe "6000"
+    }
+
+    "generate the correct request XML, if search options are not defined" in {
+
+      val xml = XML.loadString(request.requestBody)
+
+      (xml \\ "Envelope" \\ "Header" \\ "VersionNo").text shouldBe "2.1"
+      (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "MetaData" \\ "Source").text shouldBe "emcs_tfe"
+      (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "MetaData" \\ "Identity").text shouldBe "portal"
+      (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "MetaData" \\ "Partner").text shouldBe "UK"
+      paramFromXml(xml, "ExciseRegistrationNumber") shouldBe "My ERN"
+      paramFromXml(xml, "TraderRole") shouldBe GetMovementListSearchOptions.DEFAULT_TRADER_ROLE
+      paramFromXml(xml, "SortField") shouldBe GetMovementListSearchOptions.DEFAULT_SORT_FIELD
+      paramFromXml(xml, "SortOrder") shouldBe GetMovementListSearchOptions.DEFAULT_SORT_ORDER
+      paramFromXml(xml, "StartPosition") shouldBe GetMovementListSearchOptions.DEFAULT_START_POSITION.toString
+      paramFromXml(xml, "MaxNoToReturn") shouldBe GetMovementListSearchOptions.DEFAULT_MAX_ROWS.toString
+      paramFromXml(xml, "ARC") shouldBe ""
+      paramFromXml(xml, "OtherTraderId") shouldBe ""
+      paramFromXml(xml, "LocalReferenceNumber") shouldBe ""
+      paramFromXml(xml, "DateOfReceiptFrom") shouldBe ""
+      paramFromXml(xml, "DateOfReceiptTo") shouldBe ""
+      paramFromXml(xml, "DateOfDispatchFrom") shouldBe ""
+      paramFromXml(xml, "DateOfDispatchTo") shouldBe ""
+      paramFromXml(xml, "CountryOfOrigin") shouldBe ""
+      paramFromXml(xml, "MovementStatus") shouldBe ""
+      paramFromXml(xml, "TransporterTraderName") shouldBe ""
+      paramFromXml(xml, "UndischargedMovements") shouldBe ""
+      paramFromXml(xml, "ExciseProductCode") shouldBe ""
     }
   }
 
