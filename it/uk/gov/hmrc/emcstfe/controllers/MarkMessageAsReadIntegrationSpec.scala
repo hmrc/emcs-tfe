@@ -17,7 +17,6 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import com.lucidchart.open.xtract.{EmptyError, XPath}
 import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.Json

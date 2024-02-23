@@ -46,28 +46,29 @@ class GetMovementService @Inject()(
                                     xmlUtils: XmlUtils,
                                     val config: AppConfig,
                                   ) extends Logging with FeatureSwitching {
-  def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)
+                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(getMovementRequest.arc).flatMap {
       case Some(value) =>
-        logger.info("[getMovement] Matching movement found")
+        logger.debug("[getMovement] Matching movement found")
         if (forceFetchNew) {
-          logger.info("[getMovement] GetMovementIfChanged")
           if (isEnabled(SendToEIS)) {
             getNewMovement(getMovementRequest, Some(generateGetMovementResponse(value.data)))
           } else {
             getMovementIfChanged(getMovementRequest, value)
           }
         } else {
-          logger.info("[getMovement] generateGetMovementResponse from cached movement")
+          logger.debug("[getMovement] generateGetMovementResponse from cached movement")
           Future.successful(generateGetMovementResponse(value.data))
         }
       case None =>
-        logger.info("[getMovement] No matching movement found, calling GetMovement")
+        logger.debug("[getMovement] No matching movement found, calling GetMovement")
         getNewMovement(getMovementRequest, None)
     }
   }
 
-  private[services] def getMovementIfChanged(getMovementRequest: GetMovementRequest, repositoryResult: GetMovementMongoResponse)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  private[services] def getMovementIfChanged(getMovementRequest: GetMovementRequest, repositoryResult: GetMovementMongoResponse)
+                                            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
     val chrisResponseFutureRaw: Future[Either[ErrorResponse, NodeSeq]] = {
       Try {
         XML.loadString(repositoryResult.data.as[String])
@@ -97,7 +98,7 @@ class GetMovementService @Inject()(
           getMovementIfChangedResponse =>
             if (getMovementIfChangedResponse.result.trim.isEmpty) {
               // if Results is empty, return `value`
-              logger.info("[getMovementIfChanged] No change to movement, returning movement from mongo")
+              logger.debug("[getMovementIfChanged] No change to movement, returning movement from mongo")
               val model: Either[ErrorResponse, GetMovementResponse] = generateGetMovementResponse(repositoryResult.data)
 
               Future.successful(model)
@@ -105,7 +106,7 @@ class GetMovementService @Inject()(
               // if Results is not empty:
               //  - store new results
               //  - return new results
-              logger.info("[getMovementIfChanged] Change to movement found, updating and returning new movement")
+              logger.debug("[getMovementIfChanged] Change to movement found, updating and returning new movement")
               val newResult: Either[ErrorResponse, NodeSeq] = xmlUtils.readXml(getMovementIfChangedResponse.result)
 
               storeAndReturn(newResult, None)(getMovementRequest)
@@ -129,7 +130,9 @@ class GetMovementService @Inject()(
       handleParseResult(XmlReader.of[GetMovementResponse].read(value))
   }
 
-  private[services] def getNewMovement(getMovementRequest: GetMovementRequest, cachedMovement: Option[Either[ErrorResponse, GetMovementResponse]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
+  private[services] def getNewMovement(getMovementRequest: GetMovementRequest, cachedMovement: Option[Either[ErrorResponse, GetMovementResponse]])
+                                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
+    logger.debug("[getNewMovement] retrieving new movement and storing in mongo")
     if (isEnabled(SendToEIS)) {
       eisConnector.getRawMovement(getMovementRequest).flatMap { eisResponse =>
         storeAndReturn(eisResponse.map(_.movementView), cachedMovement)(getMovementRequest)
