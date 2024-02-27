@@ -24,20 +24,23 @@ import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 import scala.concurrent.Future
 
 trait MockCreateMovementUserAnswersRepository extends MockFactory {
-  lazy val mockRepo: CreateMovementUserAnswersRepository = mock[CreateMovementUserAnswersRepository]
+  lazy val mockCreateMovementUserAnswersRepository: CreateMovementUserAnswersRepository = mock[CreateMovementUserAnswersRepository]
 
-  object MockRepository {
+  object MockCreateMovementUserAnswersRepository {
     def set(answers: CreateMovementUserAnswers): CallHandler1[CreateMovementUserAnswers, Future[Boolean]] =
-      (mockRepo.set(_: CreateMovementUserAnswers)).expects(answers)
+      (mockCreateMovementUserAnswersRepository.set(_: CreateMovementUserAnswers)).expects(answers)
 
-    def get(ern: String, lrn: String): CallHandler2[String, String, Future[Option[CreateMovementUserAnswers]]] =
-      (mockRepo.get(_: String, _: String)).expects(ern, lrn)
+    def get(ern: String, draftId: String): CallHandler2[String, String, Future[Option[CreateMovementUserAnswers]]] =
+      (mockCreateMovementUserAnswersRepository.get(_: String, _: String)).expects(ern, draftId)
 
-    def clear(ern: String, lrn: String): CallHandler2[String, String, Future[Boolean]] =
-      (mockRepo.clear(_: String, _: String)).expects(ern, lrn)
+    def clear(ern: String, draftId: String): CallHandler2[String, String, Future[Boolean]] =
+      (mockCreateMovementUserAnswersRepository.clear(_: String, _: String)).expects(ern, draftId)
 
     def checkForExistingLrn(ern: String, lrn: String): CallHandler2[String, String, Future[Boolean]] =
-      (mockRepo.checkForExistingLrn(_: String, _: String)).expects(ern, lrn)
+      (mockCreateMovementUserAnswersRepository.checkForExistingLrn(_: String, _: String)).expects(ern, lrn)
+
+    def markDraftAsUnsubmitted(ern: String, draftId: String): CallHandler2[String, String, Future[Boolean]] =
+      (mockCreateMovementUserAnswersRepository.markDraftAsUnsubmitted(_: String, _: String)).expects(ern, draftId)
   }
 }
 
