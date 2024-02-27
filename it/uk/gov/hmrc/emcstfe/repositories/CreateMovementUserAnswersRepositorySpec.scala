@@ -29,7 +29,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = CreateMovementUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswers = CreateMovementUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1), hasBeenSubmitted = true)
 
   protected override val repository = new CreateMovementUserAnswersRepositoryImpl(
     mongoComponent = mongoComponent,

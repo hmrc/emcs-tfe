@@ -34,7 +34,8 @@ class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures {
     data = Json.obj(
       "foo" -> "bar"
     ),
-    lastUpdated = instant
+    lastUpdated = instant,
+    hasBeenSubmitted = true
   )
 
   val userAnswersJson: JsObject = Json.obj(
@@ -43,7 +44,8 @@ class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures {
     "data" -> Json.obj(
       "foo" -> "bar"
     ),
-    "lastUpdated" -> Json.toJson(instant)(MongoJavatimeFormats.instantWrites)
+    "lastUpdated" -> Json.toJson(instant)(MongoJavatimeFormats.instantWrites),
+    "hasBeenSubmitted" -> true
   )
 
   "ReportReceiptUserAnswers" should {

@@ -40,7 +40,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
   )
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true)
 
   "GET /user-answers/create-movement/:ern/:lrn" should {
     s"return $OK (OK)" when {

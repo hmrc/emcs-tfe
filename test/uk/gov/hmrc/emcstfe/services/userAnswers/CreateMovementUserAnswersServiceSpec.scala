@@ -32,7 +32,7 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
   }
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now())
+    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now(), hasBeenSubmitted = true)
 
   ".get" should {
     "return a Right(Some(answers))" when {

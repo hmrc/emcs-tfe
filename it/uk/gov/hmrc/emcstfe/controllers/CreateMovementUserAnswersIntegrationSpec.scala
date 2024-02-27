@@ -33,7 +33,7 @@ import java.time.temporal.ChronoUnit
 
 class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
-  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true)
 
   def uri: String = s"/user-answers/create-movement/$testErn/$testDraftId"
 
