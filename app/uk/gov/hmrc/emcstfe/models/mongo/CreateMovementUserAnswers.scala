@@ -25,7 +25,8 @@ import java.time.Instant
 final case class CreateMovementUserAnswers(ern: String,
                                            draftId: String,
                                            data: JsObject,
-                                           lastUpdated: Instant)
+                                           lastUpdated: Instant,
+                                           hasBeenSubmitted: Boolean)
 
 object CreateMovementUserAnswers {
 
@@ -33,14 +34,16 @@ object CreateMovementUserAnswers {
       (__ \ "ern").read[String] and
       (__ \ "draftId").read[String] and
       (__ \ "data").read[JsObject] and
-      (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
+      (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat) and
+      (__ \ "hasBeenSubmitted").read[Boolean]
     )(CreateMovementUserAnswers.apply _)
 
   val writes: OWrites[CreateMovementUserAnswers] = (
       (__ \ "ern").write[String] and
       (__ \ "draftId").write[String] and
       (__ \ "data").write[JsObject] and
-      (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
+      (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat) and
+      (__ \ "hasBeenSubmitted").write[Boolean]
     )(unlift(CreateMovementUserAnswers.unapply))
 
   implicit val format: OFormat[CreateMovementUserAnswers] = OFormat(reads, writes)

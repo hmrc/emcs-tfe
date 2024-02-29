@@ -28,18 +28,21 @@ trait MockCreateMovementUserAnswersService extends MockFactory  {
 
   lazy val mockService: CreateMovementUserAnswersService = mock[CreateMovementUserAnswersService]
 
-  object MockUserAnswers {
+  object MockCreateMovementUserAnswersService {
     def set(answers: CreateMovementUserAnswers): CallHandler2[CreateMovementUserAnswers, ExecutionContext, Future[Either[ErrorResponse, CreateMovementUserAnswers]]] =
       (mockService.set(_: CreateMovementUserAnswers)(_: ExecutionContext)).expects(answers, *)
 
-    def get(ern: String, lrn: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Option[CreateMovementUserAnswers]]]] =
-      (mockService.get(_: String, _: String)(_: ExecutionContext)).expects(ern, lrn, *)
+    def get(ern: String, draftId: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Option[CreateMovementUserAnswers]]]] =
+      (mockService.get(_: String, _: String)(_: ExecutionContext)).expects(ern, draftId, *)
 
-    def clear(ern: String, lrn: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
-      (mockService.clear(_: String, _: String)(_: ExecutionContext)).expects(ern, lrn, *)
+    def clear(ern: String, draftId: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
+      (mockService.clear(_: String, _: String)(_: ExecutionContext)).expects(ern, draftId, *)
 
     def checkForExistingLrn(ern: String, lrn: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
       (mockService.checkForExistingLrn(_: String, _: String)(_: ExecutionContext)).expects(ern, lrn, *)
+
+    def markDraftAsUnsubmitted(ern: String, draftId: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
+      (mockService.markDraftAsUnsubmitted(_: String, _: String)(_: ExecutionContext)).expects(ern, draftId, *)
   }
 }
 

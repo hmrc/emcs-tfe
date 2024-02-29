@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.controllers
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.mongodb.scala.bson.collection.immutable.Document
 import play.api.http.Status
-import play.api.http.Status.{NO_CONTENT, OK}
+import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
@@ -33,7 +33,7 @@ import java.time.temporal.ChronoUnit
 
 class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
-  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true)
 
   def uri: String = s"/user-answers/create-movement/$testErn/$testDraftId"
 
@@ -287,6 +287,66 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
           response.json shouldBe Json.obj("draftExists" -> true)
 
         }
+      }
+    }
+  }
+
+  s"GET /user-answers/create-movement/draft/$testErn/$testDraftId/mark-as-draft" when {
+
+    def markAsDraftUri(draftId: String = testDraftId): String = s"/user-answers/create-movement/$testErn/$draftId/mark-as-draft"
+
+    "user is unauthenticated" must {
+      "return Forbidden" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.unauthorised()
+        }
+
+        val response: WSResponse = await(request(markAsDraftUri()).get())
+
+        response.status shouldBe Status.FORBIDDEN
+      }
+    }
+
+    "user is authenticated but the ERN requested does not match the ERN of the credential" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised("WrongERN")
+      }
+
+      val response: WSResponse = await(request(markAsDraftUri()).get())
+
+      response.status shouldBe Status.FORBIDDEN
+    }
+
+    "user is authorised" must {
+
+      s"return $OK (OK) when the movement draft can be found" in new Test {
+        override def setupStubs(): StubMapping = {
+          await(mongoRepo.set(userAnswers.copy(hasBeenSubmitted = true))) shouldBe true
+          await(mongoRepo.get(testErn, testDraftId)).map(_.data) shouldBe Some(userAnswers.data)
+          AuthStub.authorised()
+        }
+
+
+        val response: WSResponse = await(request(markAsDraftUri()).get())
+
+        response.status shouldBe OK
+        response.json shouldBe Json.obj("draftId" -> testDraftId)
+        await(mongoRepo.get(testErn, testDraftId)).get.hasBeenSubmitted shouldBe false
+      }
+
+      s"return $NOT_FOUND (NOT_FOUND) when the movement draft cannot be found" in new Test {
+        override def setupStubs(): StubMapping = {
+          await(mongoRepo.set(userAnswers.copy(hasBeenSubmitted = true))) shouldBe true
+          await(mongoRepo.get(testErn, testDraftId)).map(_.data) shouldBe Some(userAnswers.data)
+          AuthStub.authorised()
+        }
+
+
+        val response: WSResponse = await(request(markAsDraftUri("blah")).get())
+
+        response.status shouldBe NOT_FOUND
+        response.body shouldBe "The draft movement could not be found"
       }
     }
   }

@@ -40,4 +40,7 @@ class CreateMovementUserAnswersService @Inject()(repo: CreateMovementUserAnswers
   def checkForExistingLrn(ern: String, lrn: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
     repo.checkForExistingLrn(ern, lrn).map(answers => Right(answers)).recover(recovery)
 
+  def markDraftAsUnsubmitted(ern: String, draftId: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
+    repo.markDraftAsUnsubmitted(ern, draftId).map(Right(_)).recover(recovery)
+
 }

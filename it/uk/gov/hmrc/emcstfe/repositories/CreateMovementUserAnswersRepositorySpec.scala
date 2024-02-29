@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
+import org.mongodb.scala.Document
 import org.mongodb.scala.model.Filters
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
@@ -29,13 +30,18 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = CreateMovementUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswers = CreateMovementUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1), hasBeenSubmitted = true)
 
   protected override val repository = new CreateMovementUserAnswersRepositoryImpl(
     mongoComponent = mongoComponent,
     appConfig = mockAppConfig,
     time = timeMachine
   )
+
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    repository.collection.deleteMany(Document()).toFuture().futureValue
+  }
 
   ".set" must {
 
@@ -145,5 +151,56 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       repository.checkForExistingLrn(userAnswers.ern, "ABC1234").futureValue shouldBe false
     }
 
+  }
+
+  "markDraftAsUnsubmitted" must {
+
+    "return true" when {
+
+      "the update has completed successfully" in {
+
+        insert(userAnswers.copy(hasBeenSubmitted = true)).futureValue
+
+        val result = repository.markDraftAsUnsubmitted(userAnswers.ern, userAnswers.draftId).futureValue
+
+        result shouldBe true
+        val updatedAnswers = find(
+          Filters.and(
+            Filters.equal("ern", userAnswers.ern),
+            Filters.equal("draftId", userAnswers.draftId)
+          )
+        ).futureValue.headOption.value
+        updatedAnswers.lastUpdated.isAfter(userAnswers.lastUpdated) shouldBe true
+        updatedAnswers.hasBeenSubmitted shouldBe false
+      }
+    }
+
+    "return false" when {
+
+      "there are no records in Mongo" in {
+
+        val result = repository.markDraftAsUnsubmitted(userAnswers.ern, userAnswers.draftId).futureValue
+
+        result shouldBe false
+      }
+
+      "the draft ID specified cannot be found" in {
+
+        insert(userAnswers.copy(hasBeenSubmitted = true)).futureValue
+
+        val result = repository.markDraftAsUnsubmitted(userAnswers.ern, "blah").futureValue
+
+        result shouldBe false
+      }
+
+      "the ERN specified cannot be found" in {
+
+        insert(userAnswers.copy(hasBeenSubmitted = true)).futureValue
+
+        val result = repository.markDraftAsUnsubmitted("blah", userAnswers.draftId).futureValue
+
+        result shouldBe false
+      }
+    }
   }
 }

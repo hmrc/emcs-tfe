@@ -40,13 +40,13 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
   )
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true)
 
   "GET /user-answers/create-movement/:ern/:lrn" should {
     s"return $OK (OK)" when {
       "service returns a Right(Some(answers))" in {
 
-        MockUserAnswers.get(testErn, testDraftId).returns(Future.successful(Right(Some(userAnswers))))
+        MockCreateMovementUserAnswersService.get(testErn, testDraftId).returns(Future.successful(Right(Some(userAnswers))))
 
         val result = controller.get(testErn, testDraftId)(fakeRequest)
 
@@ -58,7 +58,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $NO_CONTENT (NO_CONTENT)" when {
       "service returns a Right(None)" in {
 
-        MockUserAnswers.get(testErn, testDraftId).returns(Future.successful(Right(None)))
+        MockCreateMovementUserAnswersService.get(testErn, testDraftId).returns(Future.successful(Right(None)))
 
         val result = controller.get(testErn, testDraftId)(fakeRequest)
 
@@ -69,7 +69,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $INTERNAL_SERVER_ERROR (ISE)" when {
       "service returns a Left" in {
 
-        MockUserAnswers.get(testErn, testDraftId).returns(Future.successful(Left(MongoError("errMsg"))))
+        MockCreateMovementUserAnswersService.get(testErn, testDraftId).returns(Future.successful(Left(MongoError("errMsg"))))
 
         val result = controller.get(testErn, testDraftId)(fakeRequest)
 
@@ -83,7 +83,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $OK (OK)" when {
 
       "service returns a Right(true)" in {
-        MockUserAnswers.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Right(true)))
+        MockCreateMovementUserAnswersService.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Right(true)))
 
         val result = controller.checkForExistingLrn(testErn, testLrn)(fakeRequest)
 
@@ -92,7 +92,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
       }
 
       "service returns a Right(false)" in {
-        MockUserAnswers.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Right(false)))
+        MockCreateMovementUserAnswersService.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Right(false)))
 
         val result = controller.checkForExistingLrn(testErn, testLrn)(fakeRequest)
 
@@ -104,7 +104,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $INTERNAL_SERVER_ERROR (ISE)" when {
       "service returns a Left" in {
 
-        MockUserAnswers.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Left(MongoError("errMsg"))))
+        MockCreateMovementUserAnswersService.checkForExistingLrn(testErn, testLrn).returns(Future.successful(Left(MongoError("errMsg"))))
 
         val result = controller.checkForExistingLrn(testErn, testLrn)(fakeRequest)
 
@@ -118,7 +118,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $OK (OK)" when {
 
       "service returns a Right(None)" in {
-        MockUserAnswers.get(testErn, testDraftId).returns(Future.successful(Right(None)))
+        MockCreateMovementUserAnswersService.get(testErn, testDraftId).returns(Future.successful(Right(None)))
 
         val result = controller.checkForExistingDraft(testErn, testDraftId)(fakeRequest)
 
@@ -127,7 +127,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
       }
 
       "service returns a Right(Some(UserAnswers))" in {
-        MockUserAnswers.get(testErn, testDraftId).returns(Future.successful(Right(Some(userAnswers))))
+        MockCreateMovementUserAnswersService.get(testErn, testDraftId).returns(Future.successful(Right(Some(userAnswers))))
 
         val result = controller.checkForExistingDraft(testErn, testDraftId)(fakeRequest)
 
@@ -139,7 +139,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $INTERNAL_SERVER_ERROR (ISE)" when {
       "service returns a Left" in {
 
-        MockUserAnswers.get(testErn, testDraftId).returns(Future.successful(Left(MongoError("errMsg"))))
+        MockCreateMovementUserAnswersService.get(testErn, testDraftId).returns(Future.successful(Left(MongoError("errMsg"))))
 
         val result = controller.checkForExistingDraft(testErn, testDraftId)(fakeRequest)
 
@@ -153,7 +153,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $OK (OK)" when {
       "service stores the new model returns a Right(answers)" in {
 
-        MockUserAnswers.set(userAnswers).returns(Future.successful(Right(userAnswers)))
+        MockCreateMovementUserAnswersService.set(userAnswers).returns(Future.successful(Right(userAnswers)))
 
         val result = controller.set(testErn, testDraftId)(fakeRequest.withBody(Json.toJson(userAnswers)))
 
@@ -173,7 +173,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $INTERNAL_SERVER_ERROR (ISE)" when {
       "service returns a Left" in {
 
-        MockUserAnswers.set(userAnswers).returns(Future.successful(Left(MongoError("errMsg"))))
+        MockCreateMovementUserAnswersService.set(userAnswers).returns(Future.successful(Left(MongoError("errMsg"))))
 
         val result = controller.set(testErn, testDraftId)(fakeRequest.withBody(Json.toJson(userAnswers)))
 
@@ -187,7 +187,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $NO_CONTENT (NO_CONTENT)" when {
       "service deletes the answers successfully" in {
 
-        MockUserAnswers.clear(testErn, testDraftId).returns(Future.successful(Right(true)))
+        MockCreateMovementUserAnswersService.clear(testErn, testDraftId).returns(Future.successful(Right(true)))
 
         val result = controller.clear(testErn, testDraftId)(fakeRequest)
 
@@ -198,9 +198,51 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     s"return $INTERNAL_SERVER_ERROR (ISE)" when {
       "service returns a Left" in {
 
-        MockUserAnswers.clear(testErn, testDraftId).returns(Future.successful(Left(MongoError("errMsg"))))
+        MockCreateMovementUserAnswersService.clear(testErn, testDraftId).returns(Future.successful(Left(MongoError("errMsg"))))
 
         val result = controller.clear(testErn, testDraftId)(fakeRequest)
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))
+      }
+    }
+  }
+  
+  "GET /user-answers/create-movement/:ern/:draftId/mark-as-draft" should {
+    
+    s"return $OK (OK)" when {
+      
+      "the ERN and draft ID exists" in {
+
+        MockCreateMovementUserAnswersService.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.successful(Right(true)))
+
+        val result = controller.markMovementAsDraft(testErn, testDraftId)(fakeRequest)
+
+        status(result) shouldBe Status.OK
+        contentAsJson(result) shouldBe Json.obj("draftId" -> testDraftId)
+      }
+    }
+    
+    s"return $NOT_FOUND (NOT_FOUND)" when {
+      
+      "the ERN and draft ID cannot be found" in {
+
+        MockCreateMovementUserAnswersService.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.successful(Right(false)))
+
+        val result = controller.markMovementAsDraft(testErn, testDraftId)(fakeRequest)
+
+        status(result) shouldBe Status.NOT_FOUND
+        contentAsString(result) shouldBe "The draft movement could not be found"
+      }
+    }
+    
+    s"return an $INTERNAL_SERVER_ERROR (ISE)" when {
+      
+      "the service / repository call fails" in {
+
+        MockCreateMovementUserAnswersService.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.successful(Left(MongoError("errMsg"))))
+
+        val result = controller.markMovementAsDraft(testErn, testDraftId)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))

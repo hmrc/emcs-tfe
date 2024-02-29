@@ -45,6 +45,8 @@ trait CreateMovementUserAnswersRepository {
   def clear(ern: String, draftId: String): Future[Boolean]
 
   def checkForExistingLrn(ern: String, lrn: String): Future[Boolean]
+
+  def markDraftAsUnsubmitted(ern: String, draftId: String): Future[Boolean]
 }
 
 @Singleton
@@ -116,6 +118,17 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
       .headOption()
       .map(_.isDefined)
 
+
+  def markDraftAsUnsubmitted(ern: String, draftId: String): Future[Boolean] =
+    keepAlive(ern, draftId).flatMap {
+      _ =>
+        collection
+          .updateOne(
+            filter = by(ern, draftId),
+            update = Updates.set("hasBeenSubmitted", false))
+          .headOption()
+          .map(_.exists(_.getModifiedCount == 1L))
+    }
 }
 
 object CreateMovementUserAnswersRepository {

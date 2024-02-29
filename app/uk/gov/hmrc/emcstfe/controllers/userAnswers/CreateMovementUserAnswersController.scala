@@ -80,4 +80,14 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
         }
     }
+
+  def markMovementAsDraft(ern: String, draftId: String): Action[AnyContent] =
+    authorisedUserRequest(ern) {
+      _ =>
+        createMovementUserAnswersService.markDraftAsUnsubmitted(ern, draftId) map {
+          case Right(true) => Ok(Json.obj("draftId" -> draftId))
+          case Right(false) => NotFound("The draft movement could not be found")
+          case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
+        }
+    }
 }

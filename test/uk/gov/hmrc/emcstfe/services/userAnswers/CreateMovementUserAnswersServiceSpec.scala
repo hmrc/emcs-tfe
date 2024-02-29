@@ -28,17 +28,17 @@ import scala.concurrent.Future
 
 class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixture {
   trait Test extends MockCreateMovementUserAnswersRepository {
-    val service: CreateMovementUserAnswersService = new CreateMovementUserAnswersService(mockRepo)
+    val service: CreateMovementUserAnswersService = new CreateMovementUserAnswersService(mockCreateMovementUserAnswersRepository)
   }
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now())
+    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now(), hasBeenSubmitted = true)
 
   ".get" should {
     "return a Right(Some(answers))" when {
       "UserAnswers are successfully returned from Mongo" in new Test {
 
-        MockRepository.get(testErn, testDraftId).returns(Future.successful(Some(userAnswers)))
+        MockCreateMovementUserAnswersRepository.get(testErn, testDraftId).returns(Future.successful(Some(userAnswers)))
         await(service.get(testErn, testDraftId)) shouldBe Right(Some(userAnswers))
       }
     }
@@ -46,14 +46,14 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Right(None)" when {
       "UserAnswers are not found in Mongo" in new Test {
 
-        MockRepository.get(testErn, testDraftId).returns(Future.successful(None))
+        MockCreateMovementUserAnswersRepository.get(testErn, testDraftId).returns(Future.successful(None))
         await(service.get(testErn, testDraftId)) shouldBe Right(None)
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockRepository.get(testErn, testDraftId).returns(Future.failed(new Exception("bang")))
+        MockCreateMovementUserAnswersRepository.get(testErn, testDraftId).returns(Future.failed(new Exception("bang")))
         await(service.get(testErn, testDraftId)) shouldBe Left(MongoError("bang"))
       }
     }
@@ -63,14 +63,14 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Right(boolean)" when {
       "UserAnswers are successfully saved/updated in Mongo" in new Test {
 
-        MockRepository.set(userAnswers).returns(Future.successful(true))
+        MockCreateMovementUserAnswersRepository.set(userAnswers).returns(Future.successful(true))
         await(service.set(userAnswers)) shouldBe Right(userAnswers)
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockRepository.set(userAnswers).returns(Future.failed(new Exception("bang")))
+        MockCreateMovementUserAnswersRepository.set(userAnswers).returns(Future.failed(new Exception("bang")))
         await(service.set(userAnswers)) shouldBe Left(MongoError("bang"))
       }
     }
@@ -80,14 +80,14 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Right(boolean)" when {
       "UserAnswers are successfully saved/updated in Mongo" in new Test {
 
-        MockRepository.clear(testErn, testDraftId).returns(Future.successful(true))
+        MockCreateMovementUserAnswersRepository.clear(testErn, testDraftId).returns(Future.successful(true))
         await(service.clear(testErn, testDraftId)) shouldBe Right(true)
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockRepository.clear(testErn, testDraftId).returns(Future.failed(new Exception("bang")))
+        MockCreateMovementUserAnswersRepository.clear(testErn, testDraftId).returns(Future.failed(new Exception("bang")))
         await(service.clear(testErn, testDraftId)) shouldBe Left(MongoError("bang"))
       }
     }
@@ -96,14 +96,14 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
   ".checkForExistingLrn" should {
     "return a Right(true)" when {
       "there is already a draft with the ERN and LRN" in new Test {
-        MockRepository.checkForExistingLrn(testErn, testLrn).returns(Future.successful(true))
+        MockCreateMovementUserAnswersRepository.checkForExistingLrn(testErn, testLrn).returns(Future.successful(true))
         await(service.checkForExistingLrn(testErn, testLrn)) shouldBe Right(true)
       }
     }
 
     "return a Right(false)" when {
       "there isn't a draft with the ERN and LRN" in new Test {
-        MockRepository.checkForExistingLrn(testErn, testLrn).returns(Future.successful(false))
+        MockCreateMovementUserAnswersRepository.checkForExistingLrn(testErn, testLrn).returns(Future.successful(false))
         await(service.checkForExistingLrn(testErn, testLrn)) shouldBe Right(false)
       }
     }
@@ -111,8 +111,33 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
     "return a Left" when {
       "mongo error is returned" in new Test {
 
-        MockRepository.checkForExistingLrn(testErn, testLrn).returns(Future.failed(new Exception("bang")))
+        MockCreateMovementUserAnswersRepository.checkForExistingLrn(testErn, testLrn).returns(Future.failed(new Exception("bang")))
         await(service.checkForExistingLrn(testErn, testLrn)) shouldBe Left(MongoError("bang"))
+      }
+    }
+  }
+
+  ".markDraftAsUnsubmitted" should {
+
+    "return a Right(true)" when {
+      "there is already a draft with the ERN and draft ID" in new Test {
+        MockCreateMovementUserAnswersRepository.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.successful(true))
+        await(service.markDraftAsUnsubmitted(testErn, testDraftId)) shouldBe Right(true)
+      }
+    }
+
+    "return a Right(false)" when {
+      "there isn't a draft with the ERN and draft ID" in new Test {
+        MockCreateMovementUserAnswersRepository.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.successful(false))
+        await(service.markDraftAsUnsubmitted(testErn, testDraftId)) shouldBe Right(false)
+      }
+    }
+
+    "return a Left" when {
+      "mongo error is returned" in new Test {
+
+        MockCreateMovementUserAnswersRepository.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.failed(new Exception("bang")))
+        await(service.markDraftAsUnsubmitted(testErn, testDraftId)) shouldBe Left(MongoError("bang"))
       }
     }
   }
