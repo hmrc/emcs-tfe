@@ -22,10 +22,11 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{DefaultDraftMovementCorrelationId, SendToEIS, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitCreateMovementService
+import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISServiceUnavailableError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -45,17 +46,25 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
       "when calling ChRIS" should {
 
+        val requestModel: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true, isChRISSubmission = true)
+
         s"return ${Status.OK} (OK)" when {
           "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
             MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-            MockService.submit(CreateMovementFixtures.createMovementModelMax, testDraftId).returns(Future.successful(Right(chrisSuccessResponse)))
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+            MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
+
+            MockService.submit(requestModel).returns(Future.successful(Right(chrisSuccessResponse)))
+
+            MockService.setSubmittedDraftId(testErn, testDraftId, requestModel.legacyCorrelationUUID).returns(Future.successful(true))
 
             val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
             status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe chrisSuccessJson
+            contentAsJson(result) shouldBe chrisSuccessJson(withSubmittedDraftId = true)
           }
         }
         s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
@@ -63,7 +72,11 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
             MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-            MockService.submit(CreateMovementFixtures.createMovementModelMax, testDraftId).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+            MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
+
+            MockService.submit(requestModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
             val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
@@ -74,17 +87,26 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
       }
 
       "when calling EIS" should {
+
+        val requestModel: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true, isChRISSubmission = false)
+
         s"return ${Status.OK} (OK)" when {
           "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
             MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-            MockService.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId).returns(Future.successful(Right(eisSuccessResponse)))
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+            MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
+
+            MockService.submitViaEIS(requestModel).returns(Future.successful(Right(eisSuccessResponse)))
+
+            MockService.setSubmittedDraftId(testErn, testDraftId, requestModel.correlationUUID).returns(Future.successful(true))
 
             val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
             status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe eisSuccessJson
+            contentAsJson(result) shouldBe eisSuccessJson(withSubmittedDraftId = true)
           }
         }
 
@@ -93,13 +115,40 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
             MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-            MockService.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+            MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
+
+            MockService.submitViaEIS(requestModel).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
 
             val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
             status(result) shouldBe Status.INTERNAL_SERVER_ERROR
             contentAsJson(result) shouldBe Json.obj("message" -> EISServiceUnavailableError("SERVICE_UNAVAILABLE").message)
           }
+        }
+      }
+
+      "default the correlation ID" when {
+
+        val requestModel: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true, isChRISSubmission = false)
+
+        "the DefaultDraftMovementCorrelationId is enabled" in new Fixture(FakeSuccessAuthAction) {
+
+          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+          MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(true)
+
+          MockService.submitViaEIS(requestModel).returns(Future.successful(Right(eisSuccessResponse)))
+
+          MockService.setSubmittedDraftId(testErn, testDraftId, "PORTAL1234").returns(Future.successful(true))
+
+          val result = controller.submit(testErn, testDraftId)(fakeRequest)
+
+          status(result) shouldBe Status.OK
+          contentAsJson(result) shouldBe eisSuccessJson(withSubmittedDraftId = true, submittedDraftId = Some("PORTAL1234"))
         }
       }
     }

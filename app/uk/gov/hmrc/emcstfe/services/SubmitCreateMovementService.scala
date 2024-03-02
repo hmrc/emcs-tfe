@@ -18,11 +18,10 @@ package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, ValidateUsingFS41Schema}
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.FeatureSwitching
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -32,13 +31,18 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
                                             eisConnector: EisConnector,
+                                            createMovementUserAnswersRepository: CreateMovementUserAnswersRepository,
                                             val config: AppConfig) extends Logging with FeatureSwitching {
-  def submit(submission: SubmitCreateMovementModel, draftId: String)
-            (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    chrisConnector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](SubmitCreateMovementRequest(submission, draftId, isEnabled(ValidateUsingFS41Schema)))
+  def submit(requestModel: SubmitCreateMovementRequest)
+            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
+    chrisConnector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](requestModel)
 
-  def submitViaEIS(submission: SubmitCreateMovementModel, draftId: String)
-                  (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submit[EISSubmissionSuccessResponse](SubmitCreateMovementRequest(submission, draftId, isEnabled(ValidateUsingFS41Schema)), "submitCreateMovementEISRequest")
+  def submitViaEIS(requestModel: SubmitCreateMovementRequest)
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
+    eisConnector.submit[EISSubmissionSuccessResponse](requestModel, "submitCreateMovementEISRequest")
+
+  def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): Future[Boolean] =
+    createMovementUserAnswersRepository.setSubmittedDraftId(ern, draftId, submittedDraftId)
+
 
 }

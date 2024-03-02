@@ -67,7 +67,7 @@ class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitE
         val response: WSResponse = await(request().post(Json.toJson(maxSubmitExplainDelayModel)))
         response.status shouldBe Status.OK
         response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe chrisSuccessJsonNoLRN
+        response.json shouldBe chrisSuccessJsonNoLRN()
       }
     }
     "return an error from Chris" when {
@@ -121,13 +121,13 @@ class SubmitExplainDelayIntegrationSpec extends IntegrationBaseSpec with SubmitE
         override def setupStubs(): StubMapping = {
           enable(SendToEIS)
           AuthStub.authorised()
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson)
+          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
         }
 
         val response: WSResponse = await(request().post(Json.toJson(maxSubmitExplainDelayModel)))
         response.status shouldBe Status.OK
         response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe eisSuccessJson
+        response.json shouldBe eisSuccessJson()
       }
     }
     "return an error from EIS" when {

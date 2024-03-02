@@ -68,7 +68,7 @@ class SubmitAlertOrRejectionControllerIntegrationSpec extends IntegrationBaseSpe
           val response: WSResponse = await(request().post(maxSubmitAlertOrRejectionModelJson))
           response.status shouldBe Status.OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe chrisSuccessJsonNoLRN
+          response.json shouldBe chrisSuccessJsonNoLRN()
         }
       }
       "return an error" when {
@@ -123,13 +123,13 @@ class SubmitAlertOrRejectionControllerIntegrationSpec extends IntegrationBaseSpe
           override def setupStubs(): StubMapping = {
             enable(SendToEIS)
             AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson)
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
           }
 
           val response: WSResponse = await(request().post(maxSubmitAlertOrRejectionModelJson))
           response.status shouldBe Status.OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe eisSuccessJson
+          response.json shouldBe eisSuccessJson()
         }
 
       }

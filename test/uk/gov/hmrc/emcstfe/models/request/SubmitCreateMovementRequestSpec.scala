@@ -35,7 +35,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
   val deliveryPlaceCustomsOfficeCountryCode = "EE"
   val consignorTraderCountryCode = "FF"
 
-  implicit val request: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = false)
+  implicit val request: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = false, isChRISSubmission = false)
 
   s".messageRecipientCountryCode()" when {
 
@@ -235,7 +235,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
 
     "useFS41SchemaVersion is enabled" should {
 
-      implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true)
+      implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true, isChRISSubmission = true)
 
       "generate the correct request XML" in {
 
@@ -377,7 +377,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
 
     "useFS41SchemaVersion is enabled" should {
 
-      implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true)
+      implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true, isChRISSubmission = false)
 
       "generate the correct XML body" in {
 
@@ -508,7 +508,8 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
         request.copy(placeOfDispatchTrader = None)
       },
       draftId = testDraftId,
-      useFS41SchemaVersion = false
+      useFS41SchemaVersion = false,
+      isChRISSubmission = false
     )
   }
 }

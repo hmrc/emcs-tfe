@@ -16,26 +16,26 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures with MockAppConfig {
+class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures with MockAppConfig with MockCreateMovementUserAnswersRepository {
   class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
-    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = useFS41SchemaVersion)
-    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector, mockAppConfig)
-    MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
+    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = useFS41SchemaVersion, isChRISSubmission = true)
+    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector, mockCreateMovementUserAnswersRepository, mockAppConfig)
   }
 
   "SubmitCreateMovementService" when {
     Seq(true, false).foreach { useFS41SchemaVersion =>
       s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
+
         "when calling submit" must {
 
           "return a Right" when {
@@ -45,7 +45,8 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
                 Future.successful(Right(chrisSuccessResponse))
               )
 
-              await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(chrisSuccessResponse)
+
+              await(service.submit(submitCreateMovementRequest)) shouldBe Right(chrisSuccessResponse)
             }
           }
           "return a Left" when {
@@ -55,12 +56,13 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
                 Future.successful(Left(XmlValidationError))
               )
 
-              await(service.submit(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(XmlValidationError)
+              await(service.submit(submitCreateMovementRequest)) shouldBe Left(XmlValidationError)
             }
           }
         }
 
         "when calling submitViaEIS" must {
+
           "return a Right" when {
             "connector call is successful and Json is the correct format" in new Test(useFS41SchemaVersion) {
 
@@ -68,7 +70,7 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
                 Future.successful(Right(eisSuccessResponse))
               )
 
-              await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Right(eisSuccessResponse)
+              await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Right(eisSuccessResponse)
             }
           }
 
@@ -79,9 +81,36 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
                 Future.successful(Left(EISUnknownError("Downstream failed to respond")))
               )
 
-              await(service.submitViaEIS(CreateMovementFixtures.createMovementModelMax, testDraftId)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+              await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
             }
           }
+        }
+      }
+    }
+
+    "when calling setSubmittedDraftId" should {
+
+      val submittedDraftId = s"PORTAL$testDraftId"
+
+      "return false" when {
+
+        "the repository returns false" in new Test(useFS41SchemaVersion = true) {
+
+          MockCreateMovementUserAnswersRepository.setSubmittedDraftId(testErn, testDraftId, submittedDraftId)
+            .returns(Future.successful(false))
+
+          await(service.setSubmittedDraftId(testErn, testDraftId, submittedDraftId)) shouldBe false
+        }
+      }
+
+      "return true" when {
+
+        "the repository returns true" in new Test(useFS41SchemaVersion = true) {
+
+          MockCreateMovementUserAnswersRepository.setSubmittedDraftId(testErn, testDraftId, submittedDraftId)
+            .returns(Future.successful(true))
+
+          await(service.setSubmittedDraftId(testErn, testDraftId, submittedDraftId)) shouldBe true
         }
       }
     }

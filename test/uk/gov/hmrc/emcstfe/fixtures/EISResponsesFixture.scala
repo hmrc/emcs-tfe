@@ -27,11 +27,12 @@ trait EISResponsesFixture {
     emcsCorrelationId = "3e8dae97-b586-4cef-8511-68ac12da9028"
   )
 
-  lazy val eisSuccessJson: JsValue = Json.parse(
-    """{
+  def eisSuccessJson(withSubmittedDraftId: Boolean = false, submittedDraftId: Option[String] = None): JsValue = Json.parse(
+    s"""{
       | "status": "OK",
       | "message": "Great success",
       | "emcsCorrelationId": "3e8dae97-b586-4cef-8511-68ac12da9028"
+      | ${if(withSubmittedDraftId) s",\"submittedDraftId\": \"${submittedDraftId.getOrElse("1234-5678-9012")}\"" else ""}
       |}""".stripMargin)
 
   lazy val incompleteEisSuccessJson: JsValue = Json.parse(

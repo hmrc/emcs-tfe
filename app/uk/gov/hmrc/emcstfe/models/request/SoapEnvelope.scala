@@ -77,7 +77,7 @@ trait SoapEnvelope { _: ChrisRequest =>
          |<urn1:DateOfPreparation>${preparedDate.toString}</urn1:DateOfPreparation>
          |<urn1:TimeOfPreparation>${preparedTime.toString}</urn1:TimeOfPreparation>
          |<urn1:MessageIdentifier>$messageUUID</urn1:MessageIdentifier>
-         |<urn1:CorrelationIdentifier>$legacyCorrelationUUID</urn1:CorrelationIdentifier>
+         |<urn1:CorrelationIdentifier>${legacyCorrelationUUID}</urn1:CorrelationIdentifier>
          |</urn:Header>
          |<urn:Body>${body.toXml}</urn:Body>
          |</urn:IE$messageNumber>

@@ -70,7 +70,7 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
         val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax(Consignor)))
         response.status shouldBe Status.OK
         response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe chrisSuccessJsonNoLRN
+        response.json shouldBe chrisSuccessJsonNoLRN()
       }
     }
     "return an error" when {
@@ -124,13 +124,13 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec wit
           override def setupStubs(): StubMapping = {
             enable(SendToEIS)
             AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson)
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
           }
 
           val response: WSResponse = await(request().post(Json.toJson(submitExplainShortageExcessJsonMax(Consignor))))
           response.status shouldBe Status.OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe eisSuccessJson
+          response.json shouldBe eisSuccessJson()
         }
 
       }

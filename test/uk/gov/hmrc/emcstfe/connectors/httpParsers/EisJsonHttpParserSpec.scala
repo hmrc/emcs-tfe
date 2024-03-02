@@ -39,7 +39,7 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
 
         "it contains valid Json" in {
 
-          val response = HttpResponse(OK, json = eisSuccessJson, headers = Map.empty)
+          val response = HttpResponse(OK, json = eisSuccessJson(), headers = Map.empty)
 
           val result = TestParser.modelFromJsonHttpReads[EISSubmissionSuccessResponse].read("POST", "/eis/foo/bar", response)
 

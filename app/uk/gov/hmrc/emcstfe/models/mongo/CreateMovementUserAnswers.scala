@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.mongo
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -25,25 +26,31 @@ import java.time.Instant
 final case class CreateMovementUserAnswers(ern: String,
                                            draftId: String,
                                            data: JsObject,
+                                           submissionFailures: Seq[MovementSubmissionFailure],
                                            lastUpdated: Instant,
-                                           hasBeenSubmitted: Boolean)
+                                           hasBeenSubmitted: Boolean,
+                                           submittedDraftId: Option[String])
 
 object CreateMovementUserAnswers {
 
   val reads: Reads[CreateMovementUserAnswers] = (
-      (__ \ "ern").read[String] and
+    (__ \ "ern").read[String] and
       (__ \ "draftId").read[String] and
       (__ \ "data").read[JsObject] and
+      (__ \ "submissionFailures").readNullable[Seq[MovementSubmissionFailure]].map(_.getOrElse(Seq.empty)) and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat) and
-      (__ \ "hasBeenSubmitted").read[Boolean]
+      (__ \ "hasBeenSubmitted").read[Boolean] and
+      (__ \ "submittedDraftId").readNullable[String]
     )(CreateMovementUserAnswers.apply _)
 
   val writes: OWrites[CreateMovementUserAnswers] = (
-      (__ \ "ern").write[String] and
+    (__ \ "ern").write[String] and
       (__ \ "draftId").write[String] and
       (__ \ "data").write[JsObject] and
+      (__ \ "submissionFailures").write[Seq[MovementSubmissionFailure]] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat) and
-      (__ \ "hasBeenSubmitted").write[Boolean]
+      (__ \ "hasBeenSubmitted").write[Boolean] and
+      (__ \ "submittedDraftId").writeNullable[String]
     )(unlift(CreateMovementUserAnswers.unapply))
 
   implicit val format: OFormat[CreateMovementUserAnswers] = OFormat(reads, writes)

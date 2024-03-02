@@ -33,7 +33,18 @@ object GetSubmissionFailureMessageResponse {
     relatedMessageType.read[String].map(s => if (s.nonEmpty) Some(s) else None)
   ).mapN(GetSubmissionFailureMessageResponse.apply)
 
-  implicit val jsonWrites: OWrites[GetSubmissionFailureMessageResponse] = Json.writes
+  def jsonWrites(isTFESubmission: Boolean): OWrites[GetSubmissionFailureMessageResponse] = (response: GetSubmissionFailureMessageResponse) => {
+    Json.obj(
+      "ie704" -> response.ie704,
+      "isTFESubmission" -> isTFESubmission
+    ).deepMerge(
+      response.relatedMessageType.map(
+        relatedMessageType =>
+          Json.obj("relatedMessageType" -> relatedMessageType
+        )
+      ).getOrElse(Json.obj())
+    )
+  }
 
   implicit val eisReads: Reads[GetSubmissionFailureMessageResponse] =
     (JsPath \ "message").read[Base64Model[GetSubmissionFailureMessageResponse]].map(_.value)

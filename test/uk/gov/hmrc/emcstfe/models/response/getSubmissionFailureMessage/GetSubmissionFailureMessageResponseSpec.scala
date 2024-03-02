@@ -66,13 +66,18 @@ class GetSubmissionFailureMessageResponseSpec extends TestBaseSpec with GetSubmi
   }
 
   "writes" should {
-    "turn a model into JSON" in {
-      Json.toJson(getSubmissionFailureMessageResponseModel) shouldBe getSubmissionFailureMessageResponseJson
+
+    Seq(true, false).foreach {
+      isTFESubmission =>
+        s"turn a model into JSON (is TFE Submission = $isTFESubmission)" in {
+          Json.toJson(getSubmissionFailureMessageResponseModel)(GetSubmissionFailureMessageResponse.jsonWrites(isTFESubmission)) shouldBe getSubmissionFailureMessageResponseJson(isTFESubmission)
+        }
+
+        s"turn a minimal model into JSON (is TFE Submission = $isTFESubmission)" in {
+          Json.toJson(getSubmissionFailureMessageResponseMinimumModel)(GetSubmissionFailureMessageResponse.jsonWrites(isTFESubmission)) shouldBe getSubmissionFailureMessageResponseMinimumJson(isTFESubmission)
+        }
     }
 
-    "turn a minimal model into JSON" in {
-      Json.toJson(getSubmissionFailureMessageResponseMinimumModel) shouldBe getSubmissionFailureMessageResponseMinimumJson
-    }
   }
 
 }

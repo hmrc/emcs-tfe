@@ -17,14 +17,14 @@
 package uk.gov.hmrc.emcstfe.models.mongo
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
+import uk.gov.hmrc.emcstfe.fixtures.{BaseFixtures, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures {
+class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures with MovementSubmissionFailureFixtures {
 
   val instant: Instant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
@@ -34,8 +34,10 @@ class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures {
     data = Json.obj(
       "foo" -> "bar"
     ),
+    submissionFailures = Seq(movementSubmissionFailureModel),
     lastUpdated = instant,
-    hasBeenSubmitted = true
+    hasBeenSubmitted = true,
+    submittedDraftId = Some(testDraftId)
   )
 
   val userAnswersJson: JsObject = Json.obj(
@@ -44,11 +46,13 @@ class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures {
     "data" -> Json.obj(
       "foo" -> "bar"
     ),
+    "submissionFailures" -> Json.arr(movementSubmissionFailureJson),
     "lastUpdated" -> Json.toJson(instant)(MongoJavatimeFormats.instantWrites),
-    "hasBeenSubmitted" -> true
+    "hasBeenSubmitted" -> true,
+    "submittedDraftId" -> testDraftId
   )
 
-  "ReportReceiptUserAnswers" should {
+  "CreateMovementUserAnswers" should {
 
     "serialise to JSON as expected" in {
       Json.toJson(userAnswersModel) shouldBe userAnswersJson

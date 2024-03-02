@@ -50,7 +50,7 @@ class SubmitExplainDelayControllerSpec extends TestBaseSpec with MockSubmitExpla
             val result = controller.submit(testErn, testArc)(fakeRequest)
 
             status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe chrisSuccessJson
+            contentAsJson(result) shouldBe chrisSuccessJson()
           }
         }
         s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
@@ -88,7 +88,7 @@ class SubmitExplainDelayControllerSpec extends TestBaseSpec with MockSubmitExpla
             val result = controller.submit(testErn, testArc)(fakeRequest)
 
             status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe eisSuccessJson
+            contentAsJson(result) shouldBe eisSuccessJson()
           }
         }
         s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {

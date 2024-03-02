@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services.userAnswers
 
+import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
@@ -43,4 +44,6 @@ class CreateMovementUserAnswersService @Inject()(repo: CreateMovementUserAnswers
   def markDraftAsUnsubmitted(ern: String, draftId: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
     repo.markDraftAsUnsubmitted(ern, draftId).map(Right(_)).recover(recovery)
 
+  def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure])(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[String]]] =
+    repo.setErrorMessagesForDraftMovement(ern, submittedDraftId, errors).map(Right(_)).recover(recovery)
 }

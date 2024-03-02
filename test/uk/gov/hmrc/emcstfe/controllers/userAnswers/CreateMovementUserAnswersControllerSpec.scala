@@ -21,7 +21,9 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
+import uk.gov.hmrc.emcstfe.fixtures.MovementSubmissionFailureFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockCreateMovementUserAnswersService
+import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -30,7 +32,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.Future
 
-class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCreateMovementUserAnswersService with FakeAuthAction {
+class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCreateMovementUserAnswersService with FakeAuthAction with MovementSubmissionFailureFixtures {
 
   private val fakeRequest = FakeRequest("GET", "/user-answers/create-movement/:ern/:lrn")
   private val controller = new CreateMovementUserAnswersController(
@@ -40,7 +42,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
   )
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true)
+    CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   "GET /user-answers/create-movement/:ern/:lrn" should {
     s"return $OK (OK)" when {
@@ -207,11 +209,11 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
       }
     }
   }
-  
-  "GET /user-answers/create-movement/:ern/:draftId/mark-as-draft" should {
-    
+
+  "PUT /user-answers/create-movement/:ern/:draftId/mark-as-draft" should {
+
     s"return $OK (OK)" when {
-      
+
       "the ERN and draft ID exists" in {
 
         MockCreateMovementUserAnswersService.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.successful(Right(true)))
@@ -222,9 +224,9 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
         contentAsJson(result) shouldBe Json.obj("draftId" -> testDraftId)
       }
     }
-    
+
     s"return $NOT_FOUND (NOT_FOUND)" when {
-      
+
       "the ERN and draft ID cannot be found" in {
 
         MockCreateMovementUserAnswersService.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.successful(Right(false)))
@@ -235,14 +237,58 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
         contentAsString(result) shouldBe "The draft movement could not be found"
       }
     }
-    
+
     s"return an $INTERNAL_SERVER_ERROR (ISE)" when {
-      
+
       "the service / repository call fails" in {
 
         MockCreateMovementUserAnswersService.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.successful(Left(MongoError("errMsg"))))
 
         val result = controller.markMovementAsDraft(testErn, testDraftId)(fakeRequest)
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))
+      }
+    }
+  }
+
+  "PUT /user-answers/create-movement/:ern/:lrn/error-messages" should {
+
+    val movementSubmissionFailures: Seq[MovementSubmissionFailure] = Seq(movementSubmissionFailureModel)
+
+    s"return $OK (OK)" when {
+
+      "the draft can be found and the error messages are inserted successfully" in {
+
+        MockCreateMovementUserAnswersService.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.successful(Right(Some(testDraftId))))
+
+        val result = controller.setErrorMessages(testErn, testLrn)(fakeRequest.withBody(Json.toJson(movementSubmissionFailures)))
+
+        status(result) shouldBe Status.OK
+        contentAsJson(result) shouldBe Json.obj("draftId" -> testDraftId)
+      }
+    }
+
+    s"return $NOT_FOUND (NOT_FOUND)" when {
+
+      "the draft cannot be found" in {
+
+        MockCreateMovementUserAnswersService.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.successful(Right(None)))
+
+        val result = controller.setErrorMessages(testErn, testLrn)(fakeRequest.withBody(Json.toJson(movementSubmissionFailures)))
+
+        status(result) shouldBe Status.NOT_FOUND
+        contentAsString(result) shouldBe "The draft movement could not be found"
+      }
+    }
+
+    s"return $INTERNAL_SERVER_ERROR (ISE)" when {
+
+      "the update operation failed" in {
+
+        MockCreateMovementUserAnswersService.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.successful(Left(MongoError("errMsg"))))
+
+        val result = controller.setErrorMessages(testErn, testLrn)(fakeRequest.withBody(Json.toJson(movementSubmissionFailures)))
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))

@@ -54,7 +54,7 @@ class SubmitAlertOrRejectionControllerSpec extends TestBaseSpec
             val result = controller.submit(testErn, testArc)(fakeRequest)
 
             status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe chrisSuccessJson
+            contentAsJson(result) shouldBe chrisSuccessJson()
           }
         }
 
@@ -81,7 +81,7 @@ class SubmitAlertOrRejectionControllerSpec extends TestBaseSpec
             val result = controller.submit(testErn, testArc)(fakeRequest)
 
             status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe eisSuccessJson
+            contentAsJson(result) shouldBe eisSuccessJson()
           }
         }
 
