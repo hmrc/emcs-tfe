@@ -140,7 +140,7 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec with Creat
           val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
           response.status shouldBe Status.OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe eisSuccessJson(withSubmittedDraftId = true, submittedDraftId = Some("PORTAL1234"))
+          response.json shouldBe eisSuccessJson(withSubmittedDraftId = true, submittedDraftId = Some("PORTAL123"))
         }
 
       }

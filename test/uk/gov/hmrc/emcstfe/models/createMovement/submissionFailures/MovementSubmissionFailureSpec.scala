@@ -32,9 +32,9 @@ class MovementSubmissionFailureSpec extends TestBaseSpec with BaseFixtures with 
       movementSubmissionFailureJson.as[MovementSubmissionFailure] shouldBe movementSubmissionFailureModel
     }
 
-    "default 'hasFixed' to false when not provided in a JSON payload" in {
+    "default 'hasBeenFixed' to false when not provided in a JSON payload" in {
 
-      (movementSubmissionFailureJson.as[JsObject] - "hasFixed").as[MovementSubmissionFailure] shouldBe movementSubmissionFailureModel.copy(hasFixed = false)
+      (movementSubmissionFailureJson.as[JsObject] - "hasBeenFixed").as[MovementSubmissionFailure] shouldBe movementSubmissionFailureModel.copy(hasBeenFixed = false)
     }
   }
 

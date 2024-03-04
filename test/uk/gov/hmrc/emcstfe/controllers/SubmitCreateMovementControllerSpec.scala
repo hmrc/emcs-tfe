@@ -143,12 +143,12 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
           MockService.submitViaEIS(requestModel).returns(Future.successful(Right(eisSuccessResponse)))
 
-          MockService.setSubmittedDraftId(testErn, testDraftId, "PORTAL1234").returns(Future.successful(true))
+          MockService.setSubmittedDraftId(testErn, testDraftId, "PORTAL123").returns(Future.successful(true))
 
           val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
           status(result) shouldBe Status.OK
-          contentAsJson(result) shouldBe eisSuccessJson(withSubmittedDraftId = true, submittedDraftId = Some("PORTAL1234"))
+          contentAsJson(result) shouldBe eisSuccessJson(withSubmittedDraftId = true, submittedDraftId = Some("PORTAL123"))
         }
       }
     }

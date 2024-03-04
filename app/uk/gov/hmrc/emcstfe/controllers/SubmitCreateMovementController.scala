@@ -68,7 +68,7 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
                                isDefaultDraftMovementCorrelationIdEnabled: Boolean,
                                requestModel: SubmitCreateMovementRequest): String = {
     (isDefaultDraftMovementCorrelationIdEnabled, isEISFeatureEnabled) match {
-      case (true, _) => "PORTAL1234"
+      case (true, _) => "PORTAL123"
       case (_, true) => requestModel.correlationUUID
       case (_, false) => requestModel.legacyCorrelationUUID
     }

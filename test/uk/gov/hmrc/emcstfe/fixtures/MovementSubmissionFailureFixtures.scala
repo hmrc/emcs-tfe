@@ -26,7 +26,7 @@ trait MovementSubmissionFailureFixtures {
     errorReason = "Incorrect (code) value. Value of an element in a message is outside the predefined domain or not part of the applicable code list.",
     errorLocation = Some("/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]"),
     originalAttributeValue = Some("lrnie8155639253"),
-    hasFixed = true
+    hasBeenFixed = true
   )
 
   val movementSubmissionFailureJson: JsValue = Json.obj(
@@ -34,7 +34,7 @@ trait MovementSubmissionFailureFixtures {
     "errorReason" -> "Incorrect (code) value. Value of an element in a message is outside the predefined domain or not part of the applicable code list.",
     "errorLocation" -> "/IE813[1]/Body[1]/SubmittedDraftOfEADESAD[1]/EadEsadDraft[1]/LocalReferenceNumber[1]",
     "originalAttributeValue" -> "lrnie8155639253",
-    "hasFixed" -> true
+    "hasBeenFixed" -> true
   )
 
 }

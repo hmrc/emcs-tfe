@@ -61,7 +61,7 @@ trait ChRISResponsesFixture {
     s"""{
       |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
       |    "receiptDate": "2009-01-01T10:10:10.000"
-      |    ${if(withSubmittedDraftId) ",\"submittedDraftId\": \"PORTAL1234\"" else ""}
+      |    ${if(withSubmittedDraftId) ",\"submittedDraftId\": \"PORTAL123\"" else ""}
       |}""".stripMargin)
 
 }

@@ -24,7 +24,7 @@ case class MovementSubmissionFailure(
                                       errorReason: String,
                                       errorLocation: Option[String],
                                       originalAttributeValue: Option[String],
-                                      hasFixed: Boolean = false
+                                      hasBeenFixed: Boolean = false
                                     )
 
 object MovementSubmissionFailure {
@@ -34,7 +34,7 @@ object MovementSubmissionFailure {
       (__ \ "errorReason").read[String] and
       (__ \ "errorLocation").readNullable[String] and
       (__ \ "originalAttributeValue").readNullable[String] and
-      (__ \ "hasFixed").readNullable[Boolean].map(_.getOrElse(false))
+      (__ \ "hasBeenFixed").readNullable[Boolean].map(_.getOrElse(false))
     )(MovementSubmissionFailure.apply _)
 
   val writes: Writes[MovementSubmissionFailure] = (
@@ -42,7 +42,7 @@ object MovementSubmissionFailure {
       (__ \ "errorReason").write[String] and
       (__ \ "errorLocation").writeNullable[String] and
       (__ \ "originalAttributeValue").writeNullable[String] and
-      (__ \ "hasFixed").write[Boolean]
+      (__ \ "hasBeenFixed").write[Boolean]
     )(unlift(MovementSubmissionFailure.unapply))
 
   implicit val format: Format[MovementSubmissionFailure] = Format(reads, writes)
