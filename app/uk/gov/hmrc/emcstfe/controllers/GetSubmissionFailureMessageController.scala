@@ -39,15 +39,14 @@ class GetSubmissionFailureMessageController @Inject()(cc: ControllerComponents,
     service.getSubmissionFailureMessage(GetSubmissionFailureMessageRequest(exciseRegistrationNumber = exciseRegistrationNumber, messageId = messageId)).flatMap {
       case Left(error) => Future(InternalServerError(Json.toJson(error)))
       case Right(response) =>
-        val correlationID = response.ie704.header.correlationIdentifier.getOrElse("")
-        if(correlationID.startsWith("PORTAL")) {
-          Future(returnResponse(response, isTFESubmission = true))
-        } else {
-          createMovementUserAnswersRepository.get(exciseRegistrationNumber, correlationID).map {
+        response.ie704.header.correlationIdentifier match {
+          case Some(correlationId) if correlationId.startsWith("PORTAL") =>  Future(returnResponse(response, isTFESubmission = true))
+          case Some(correlationId) => createMovementUserAnswersRepository.get(exciseRegistrationNumber, correlationId).map {
             optDraftMovement => {
               returnResponse(response, isTFESubmission = optDraftMovement.isDefined)
             }
           }
+          case None => Future(returnResponse(response, isTFESubmission = false))
         }
     }
   }

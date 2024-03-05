@@ -101,6 +101,27 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
         status(result) shouldBe Status.OK
         contentAsJson(result) shouldBe getSubmissionFailureMessageResponseJson(isTFESubmission = false)
       }
+
+      "service returns a Right (no correlation ID exists - isTFESubmission = false)" in {
+
+        MockService.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(Future.successful(Right(
+          getSubmissionFailureMessageResponseModel.copy(ie704 = IE704ModelFixtures.ie704ModelModel.copy(
+            header = IE704HeaderFixtures.ie704HeaderModel.copy(correlationIdentifier = None)
+          ))
+        )))
+
+        val result = controller.getSubmissionFailureMessage(testErn, testArc)(fakeRequest)
+
+        status(result) shouldBe Status.OK
+        contentAsJson(result) shouldBe Json.obj(
+          "ie704" -> Json.obj(
+            "header" -> IE704HeaderFixtures.ie704HeaderMinimumJson,
+            "body" -> IE704BodyFixtures.ie704BodyJson
+          ),
+          "relatedMessageType" -> "IE815",
+          "isTFESubmission" -> false
+        )
+      }
     }
     "return 500" when {
       "service returns a Left" in {
