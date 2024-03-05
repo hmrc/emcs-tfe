@@ -189,7 +189,9 @@ object CreateMovementUserAnswersRepository {
         Indexes.ascending(ernField),
         Indexes.ascending(draftIdField)
       ),
-      IndexOptions().name("ernDraftIdIdx")
+      IndexOptions()
+        .unique(true)
+        .name("ernDraftIdIdx")
     ),
     IndexModel(
       Indexes.compoundIndex(
