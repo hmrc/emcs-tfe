@@ -1,3 +1,6 @@
-GET        /api/feature-switches    uk.gov.hmrc.emcstfe.featureswitch.api.controllers.FeatureSwitchApiController.getFeatureSwitches()
+GET        /api/feature-switches                             uk.gov.hmrc.emcstfe.featureswitch.api.controllers.FeatureSwitchApiController.getFeatureSwitches()
 + nocsrf
-POST       /api/feature-switches    uk.gov.hmrc.emcstfe.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches()
+POST       /api/feature-switches                             uk.gov.hmrc.emcstfe.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches()
+
++ nocsrf
+PUT        /user-answers/create-movement/:ern/:draftId       uk.gov.hmrc.emcstfe.testOnly.controllers.InsertCreateMovementUserAnswersController.set(ern, draftId)
