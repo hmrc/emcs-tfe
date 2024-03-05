@@ -61,5 +61,5 @@ case object EnablePublicBeta extends FeatureSwitch {
 
 case object DefaultDraftMovementCorrelationId extends FeatureSwitch {
   override val configName: String = "features.defaultDraftMovementCorrelationId"
-  override val displayName: String = "Defaults the draft movement correlation ID (ONLY ENABLE LOCALLY)"
+  override val displayName: String = "Defaults the draft movement correlation ID (local/staging only)"
 }
