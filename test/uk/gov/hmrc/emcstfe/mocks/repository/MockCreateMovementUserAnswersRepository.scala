@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.mocks.repository
 
-import org.scalamock.handlers.{CallHandler1, CallHandler2}
+import org.scalamock.handlers.{CallHandler1, CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
+import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 
@@ -41,6 +42,13 @@ trait MockCreateMovementUserAnswersRepository extends MockFactory {
 
     def markDraftAsUnsubmitted(ern: String, draftId: String): CallHandler2[String, String, Future[Boolean]] =
       (mockCreateMovementUserAnswersRepository.markDraftAsUnsubmitted(_: String, _: String)).expects(ern, draftId)
+
+    def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, movementSubmissionFailures: Seq[MovementSubmissionFailure]): CallHandler3[String, String, Seq[MovementSubmissionFailure], Future[Option[String]]] =
+      (mockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(_: String, _: String, _: Seq[MovementSubmissionFailure])).expects(ern, submittedDraftId, movementSubmissionFailures)
+
+    def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): CallHandler3[String, String, String, Future[Boolean]] =
+      (mockCreateMovementUserAnswersRepository.setSubmittedDraftId(_: String, _: String, _: String))
+        .expects(ern, draftId, submittedDraftId)
   }
 }
 

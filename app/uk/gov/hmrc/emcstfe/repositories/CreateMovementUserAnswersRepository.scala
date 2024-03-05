@@ -21,12 +21,13 @@ import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
-import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository.mongoIndexes
+import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository._
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -47,6 +48,10 @@ trait CreateMovementUserAnswersRepository {
   def checkForExistingLrn(ern: String, lrn: String): Future[Boolean]
 
   def markDraftAsUnsubmitted(ern: String, draftId: String): Future[Boolean]
+
+  def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]]
+
+  def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): Future[Boolean]
 }
 
 @Singleton
@@ -64,17 +69,29 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  private def by(ern: String, draftId: String): Bson =
+  private def byDraftId(ern: String, draftId: String): Bson =
     Filters.and(
-      Filters.equal("ern", ern),
-      Filters.equal("draftId", draftId)
+      Filters.equal(ernField, ern),
+      Filters.equal(draftIdField, draftId)
+    )
+
+  private def byLrn(ern: String, lrn: String): Bson =
+    Filters.and(
+      Filters.equal(ernField, ern),
+      Filters.equal(lrnField, lrn)
+    )
+
+  private def bySubmittedDraftId(ern: String, submittedDraftId: String): Bson =
+    Filters.and(
+      Filters.equal(ernField, ern),
+      Filters.equal(submittedDraftIdField, submittedDraftId)
     )
 
   def keepAlive(ern: String, draftId: String): Future[Boolean] =
     collection
       .updateOne(
-        filter = by(ern: String, draftId: String),
-        update = Updates.set("lastUpdated", time.instant()),
+        filter = byDraftId(ern: String, draftId: String),
+        update = Updates.set(lastUpdatedField, time.instant()),
       )
       .toFuture()
       .map(_ => true)
@@ -83,7 +100,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
     keepAlive(ern, draftId).flatMap {
       _ =>
         collection
-          .find(by(ern, draftId))
+          .find(byDraftId(ern, draftId))
           .headOption()
     }
 
@@ -93,7 +110,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
 
     collection
       .replaceOne(
-        filter = by(updatedAnswers.ern, updatedAnswers.draftId),
+        filter = byDraftId(updatedAnswers.ern, updatedAnswers.draftId),
         replacement = updatedAnswers,
         options = ReplaceOptions().upsert(true)
       )
@@ -103,18 +120,13 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
 
   def clear(ern: String, draftId: String): Future[Boolean] =
     collection
-      .deleteOne(by(ern, draftId))
+      .deleteOne(byDraftId(ern, draftId))
       .toFuture()
       .map(_ => true)
 
   def checkForExistingLrn(ern: String, lrn: String): Future[Boolean] =
     collection
-      .find(
-        Filters.and(
-          Filters.equal("ern", ern),
-          Filters.equal("data.info.localReferenceNumber", lrn)
-        )
-      )
+      .find(byLrn(ern, lrn))
       .headOption()
       .map(_.isDefined)
 
@@ -124,27 +136,78 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
       _ =>
         collection
           .updateOne(
-            filter = by(ern, draftId),
-            update = Updates.set("hasBeenSubmitted", false))
+            filter = byDraftId(ern, draftId),
+            update = Updates.set(hasBeenSubmittedField, false))
           .headOption()
           .map(_.exists(_.getModifiedCount == 1L))
     }
+
+  def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]] =
+    collection
+      .findOneAndUpdate(
+        filter = bySubmittedDraftId(ern, submittedDraftId),
+        update = Updates.set(submissionFailuresField, Codecs.toBson(errors))
+      )
+      .headOption()
+      .map(_.map(_.draftId))
+
+  def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): Future[Boolean] =
+    collection
+      .updateOne(
+        filter = byDraftId(ern, draftId),
+        update = Updates.set(submittedDraftIdField, submittedDraftId)
+      )
+      .toFuture()
+      .map(_ => true)
 }
 
 object CreateMovementUserAnswersRepository {
+
+  val ernField = "ern"
+
+  val draftIdField = "draftId"
+
+  val submittedDraftIdField = "submittedDraftId"
+
+  val lrnField = "data.info.localReferenceNumber"
+
+  val lastUpdatedField = "lastUpdated"
+
+  val submissionFailuresField = "submissionFailures"
+
+  val hasBeenSubmittedField = "hasBeenSubmitted"
+
   def mongoIndexes(timeToLive: Duration): Seq[IndexModel] = Seq(
     IndexModel(
-      Indexes.ascending("lastUpdated"),
+      Indexes.ascending(lastUpdatedField),
       IndexOptions()
         .name("lastUpdatedIdx")
         .expireAfter(timeToLive.toSeconds, TimeUnit.SECONDS)
     ),
     IndexModel(
       Indexes.compoundIndex(
-        Indexes.ascending("ern"),
-        Indexes.ascending("draftId")
+        Indexes.ascending(ernField),
+        Indexes.ascending(draftIdField)
       ),
-      IndexOptions().name("uniqueIdx")
+      IndexOptions()
+        .unique(true)
+        .name("ernDraftIdIdx")
+    ),
+    IndexModel(
+      Indexes.compoundIndex(
+        Indexes.ascending(ernField),
+        Indexes.ascending(submittedDraftIdField)
+      ),
+      IndexOptions()
+        .sparse(true)
+        .name("ernSubmittedDraftIdIdx")
+    ),
+    IndexModel(
+      Indexes.compoundIndex(
+        Indexes.ascending(ernField),
+        Indexes.ascending(lrnField)
+      ),
+      IndexOptions().name("ernLrnIdx")
     )
   )
 }

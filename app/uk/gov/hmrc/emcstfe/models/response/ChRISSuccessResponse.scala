@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import cats.implicits.catsSyntaxTuple3Semigroupal
+import cats.implicits.catsSyntaxTuple4Semigroupal
 import com.google.common.io.BaseEncoding
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OWrites}
@@ -26,7 +26,8 @@ import java.util.Base64
 
 case class ChRISSuccessResponse(receipt: String,
                                 receiptDate: String,
-                                lrn: Option[String] = None)
+                                lrn: Option[String] = None,
+                                submittedDraftId: Option[String] = None)
 
 object ChRISSuccessResponse {
 
@@ -44,7 +45,8 @@ object ChRISSuccessResponse {
     (
       digestValue.read[String].map(digestValueToReceipt),
       receiptDateTime.read[String],
-      digestValue.read[String].map(_ => None) // can't think of a way to Reads.pure with xtract. TODO: investigate
+      digestValue.read[String].map(_ => None), // can't think of a way to Reads.pure with xtract. TODO: investigate
+      XmlReader.stringReader.map(_ => None)
     ).mapN(ChRISSuccessResponse.apply)
 
   implicit val writes: OWrites[ChRISSuccessResponse] = Json.writes

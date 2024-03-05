@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import org.mongodb.scala.Document
 import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.{Json, JsonValidationError}
@@ -24,19 +25,26 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.GetSubmissionFailureMessageFixtures
+import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
+import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepositoryImpl
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
+import java.time.Instant
 import scala.xml.XML
 
 class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec with GetSubmissionFailureMessageFixtures with FeatureSwitching {
 
   override lazy val config = app.injector.instanceOf[AppConfig]
 
+  lazy val createMovementUserAnswersRepository: CreateMovementUserAnswersRepositoryImpl = app.injector.instanceOf[CreateMovementUserAnswersRepositoryImpl]
+
   import GetSubmissionFailureMessageResponseFixtures._
 
   private abstract class Test(sendToEIS: Boolean = true) {
+    val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("foo" -> "bar"), submissionFailures = Seq.empty, Instant.ofEpochSecond(1), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+
     def setupStubs(): StubMapping
 
     def uri: String = s"/submission-failure-message/$testErn/$testMessageId"
@@ -56,7 +64,12 @@ class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec wit
     }
   }
 
-  "Calling the get messages endpoint" when {
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    await(createMovementUserAnswersRepository.collection.deleteMany(Document()).toFuture())
+  }
+
+  "Calling get submission failure message endpoint" when {
 
     "user is unauthorised" must {
       s"return FORBIDDEN ($FORBIDDEN)" in new Test {
@@ -84,7 +97,21 @@ class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec wit
 
       "sending data to EIS" when {
         "return a success" when {
-          "all downstream calls are successful" in new Test {
+          "all downstream calls are successful - returning isTFESubmission = true when the correlation ID is in Mongo" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, eisUri, eisQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJson)
+            }
+
+            await(createMovementUserAnswersRepository.set(userAnswers))
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getSubmissionFailureMessageResponseJson(isTFESubmission = true)
+          }
+
+          "all downstream calls are successful - returning isTFESubmission = false when the correlation ID is not in Mongo" in new Test {
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
               DownstreamStub.onSuccess(DownstreamStub.GET, eisUri, eisQueryParams, Status.OK, getSubmissionFailureMessageResponseDownstreamJson)
@@ -93,7 +120,7 @@ class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec wit
             val response: WSResponse = await(request().get())
             response.status shouldBe Status.OK
             response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe getSubmissionFailureMessageResponseJson
+            response.json shouldBe getSubmissionFailureMessageResponseJson(isTFESubmission = false)
           }
         }
         "return an error" when {
@@ -146,7 +173,26 @@ class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec wit
 
       "sending data to ChRIS" when {
         "return a success" when {
-          "all downstream calls are successful" in new Test(sendToEIS = false) {
+          "all downstream calls are successful - returning isTFESubmission = true when the correlation ID starts with PORTAL" in new Test(sendToEIS = false) {
+
+            val submissionFailureMessageDataXmlBody: String =
+              s"""
+                 |<p:SubmissionFailureMessageDataResponse xmlns:emcs="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:EMCS:V2.02" xmlns:ie="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/ie704uk/3" xmlns:p="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3" xmlns:p1="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/EmcsUkCodes/3" xmlns:p2="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/Types/3" xmlns:tms="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/SubmissionFailureMessage/3 SubmissionFailureMessageData.xsd ">
+                 |  <ie:IE704>
+                 |    <ie:Header>
+                 |    <tms:MessageSender>NDEA.XI</tms:MessageSender>
+                 |    <tms:MessageRecipient>NDEA.XI</tms:MessageRecipient>
+                 |    <tms:DateOfPreparation>2001-01-01</tms:DateOfPreparation>
+                 |    <tms:TimeOfPreparation>12:00:00</tms:TimeOfPreparation>
+                 |    <tms:MessageIdentifier>XI000001</tms:MessageIdentifier>
+                 |    <tms:CorrelationIdentifier>PORTAL$testDraftId</tms:CorrelationIdentifier>
+                 |  </ie:Header>
+                 |  ${IE704BodyFixtures.ie704BodyXmlBody}
+                 |  </ie:IE704>
+                 |  <ie:RelatedMessageType>IE815</ie:RelatedMessageType>
+                 |</p:SubmissionFailureMessageDataResponse>
+                 |""".stripMargin
+
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
               DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.OK, XML.loadString(responseSoapEnvelopeWithCDATA(XML.loadString(submissionFailureMessageDataXmlBody))))
@@ -155,7 +201,47 @@ class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec wit
             val response: WSResponse = await(request().get())
             response.status shouldBe Status.OK
             response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe getSubmissionFailureMessageResponseJson
+            response.json shouldBe Json.obj(
+              "ie704" -> Json.obj(
+                "header" -> Json.obj(
+                  "messageSender" -> "NDEA.XI",
+                  "messageRecipient" -> "NDEA.XI",
+                  "dateOfPreparation" -> "2001-01-01",
+                  "timeOfPreparation" -> "12:00:00",
+                  "messageIdentifier" -> "XI000001",
+                  "correlationIdentifier" -> s"PORTAL$testDraftId"
+                ),
+                "body" -> IE704BodyFixtures.ie704BodyJson
+              ),
+              "relatedMessageType" -> "IE815",
+              "isTFESubmission" -> true
+            )
+          }
+
+          "all downstream calls are successful - returning isTFESubmission = true when the correlation ID is in Mongo" in new Test(sendToEIS = false) {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.OK, XML.loadString(responseSoapEnvelopeWithCDATA(XML.loadString(submissionFailureMessageDataXmlBody))))
+            }
+
+            await(createMovementUserAnswersRepository.set(userAnswers))
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getSubmissionFailureMessageResponseJson(isTFESubmission = true)
+          }
+
+          "all downstream calls are successful - returning isTFESubmission = false when the correlation ID is not in Mongo" in new Test(sendToEIS = false) {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.POST, chrisUri, Status.OK, XML.loadString(responseSoapEnvelopeWithCDATA(XML.loadString(submissionFailureMessageDataXmlBody))))
+            }
+
+            val response: WSResponse = await(request().get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe getSubmissionFailureMessageResponseJson(isTFESubmission = false)
           }
         }
         "return an error" when {

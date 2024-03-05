@@ -17,8 +17,9 @@
 package uk.gov.hmrc.emcstfe.services.userAnswers
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementListFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
+import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -26,13 +27,13 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import java.time.Instant
 import scala.concurrent.Future
 
-class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixture {
+class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixture with MovementSubmissionFailureFixtures {
   trait Test extends MockCreateMovementUserAnswersRepository {
     val service: CreateMovementUserAnswersService = new CreateMovementUserAnswersService(mockCreateMovementUserAnswersRepository)
   }
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now(), hasBeenSubmitted = true)
+    CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), Instant.now(), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   ".get" should {
     "return a Right(Some(answers))" when {
@@ -138,6 +139,33 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
 
         MockCreateMovementUserAnswersRepository.markDraftAsUnsubmitted(testErn, testDraftId).returns(Future.failed(new Exception("bang")))
         await(service.markDraftAsUnsubmitted(testErn, testDraftId)) shouldBe Left(MongoError("bang"))
+      }
+    }
+  }
+
+  ".setErrorMessagesForDraftMovement" should {
+
+    val movementSubmissionFailures: Seq[MovementSubmissionFailure] = Seq(movementSubmissionFailureModel)
+
+    "return a Right(Some(_))" when {
+      "there is a draft with the ERN and LRN and it's updated successfully" in new Test {
+        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.successful(Some(testDraftId)))
+        await(service.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures)) shouldBe Right(Some(testDraftId))
+      }
+    }
+
+    "return a Right(None)" when {
+      "there isn't a draft with the ERN and LRN" in new Test {
+        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.successful(None))
+        await(service.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures)) shouldBe Right(None)
+      }
+    }
+
+    "return a Left" when {
+      "mongo error is returned" in new Test {
+
+        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.failed(new Exception("bang")))
+        await(service.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures)) shouldBe Left(MongoError("bang"))
       }
     }
   }

@@ -19,8 +19,10 @@ package uk.gov.hmrc.emcstfe.controllers.userAnswers
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
+import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.services.userAnswers.CreateMovementUserAnswersService
+import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
@@ -30,7 +32,7 @@ import scala.concurrent.ExecutionContext
 class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
                                                     createMovementUserAnswersService: CreateMovementUserAnswersService,
                                                     override val auth: AuthAction
-                                                   )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
+                                                   )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
 
   def get(ern: String, draftId: String): Action[AnyContent] =
     authorisedUserRequest(ern) {
@@ -88,6 +90,21 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
           case Right(true) => Ok(Json.obj("draftId" -> draftId))
           case Right(false) => NotFound("The draft movement could not be found")
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
+        }
+    }
+
+  def setErrorMessages(ern: String, submittedDraftId: String): Action[JsValue] =
+    authorisedUserSubmissionRequest(ern) {
+      implicit request =>
+        withJsonBody[Seq[MovementSubmissionFailure]] {
+          errors =>
+            createMovementUserAnswersService.setErrorMessagesForDraftMovement(ern, submittedDraftId, errors) map {
+              case Right(Some(draftId)) => Ok(Json.obj("draftId" -> draftId))
+              case Right(None) => NotFound("The draft movement could not be found")
+              case Left(mongoError) =>
+                logger.warn(s"[setErrorMessages] - An error occurred setting the submission failures into draft: ${mongoError.message}")
+                InternalServerError(Json.toJson(mongoError))
+            }
         }
     }
 }

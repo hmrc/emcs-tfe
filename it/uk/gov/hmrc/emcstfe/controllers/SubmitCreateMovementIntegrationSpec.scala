@@ -22,7 +22,7 @@ import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{DefaultDraftMovementCorrelationId, FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
@@ -53,7 +53,13 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec with Creat
 
   override def beforeEach(): Unit = {
     super.beforeEach()
+    enable(DefaultDraftMovementCorrelationId)
     disable(SendToEIS)
+  }
+
+  override def afterEach(): Unit = {
+    super.beforeEach()
+    sys.props -= DefaultDraftMovementCorrelationId.configName
   }
 
   "Calling the submit draft movement endpoint" must {
@@ -69,7 +75,7 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec with Creat
           val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
           response.status shouldBe Status.OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe chrisSuccessJsonNoLRN
+          response.json shouldBe chrisSuccessJsonNoLRN(withSubmittedDraftId = true)
         }
       }
       "return an error" when {
@@ -128,13 +134,13 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec with Creat
           override def setupStubs(): StubMapping = {
             enable(SendToEIS)
             AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson)
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
           }
 
           val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
           response.status shouldBe Status.OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe eisSuccessJson
+          response.json shouldBe eisSuccessJson(withSubmittedDraftId = true, submittedDraftId = Some("PORTAL123"))
         }
 
       }

@@ -57,7 +57,7 @@ class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmit
             val result = controller.submit(testErn, testArc)(fakeRequest)
 
             status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe chrisSuccessJson
+            contentAsJson(result) shouldBe chrisSuccessJson()
           }
         }
         s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
@@ -86,7 +86,7 @@ class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmit
             val result = controller.submit(testErn, testDraftId)(fakeRequest)
 
             status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe eisSuccessJson
+            contentAsJson(result) shouldBe eisSuccessJson()
           }
         }
 

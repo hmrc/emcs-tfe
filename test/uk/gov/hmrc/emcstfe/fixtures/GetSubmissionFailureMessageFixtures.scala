@@ -81,14 +81,14 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
 
   object IE704HeaderFixtures {
     val ie704HeaderXmlBody: String =
-      """
+      s"""
         |<ie:Header>
         |  <tms:MessageSender>NDEA.XI</tms:MessageSender>
         |  <tms:MessageRecipient>NDEA.XI</tms:MessageRecipient>
         |  <tms:DateOfPreparation>2001-01-01</tms:DateOfPreparation>
         |  <tms:TimeOfPreparation>12:00:00</tms:TimeOfPreparation>
         |  <tms:MessageIdentifier>XI000001</tms:MessageIdentifier>
-        |  <tms:CorrelationIdentifier>corr123</tms:CorrelationIdentifier>
+        |  <tms:CorrelationIdentifier>$testDraftId</tms:CorrelationIdentifier>
         |</ie:Header>
         |""".stripMargin
 
@@ -98,7 +98,7 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       dateOfPreparation = "2001-01-01",
       timeOfPreparation = "12:00:00",
       messageIdentifier = "XI000001",
-      correlationIdentifier = Some("corr123")
+      correlationIdentifier = Some(testDraftId)
     )
 
     val ie704HeaderJson: JsValue = Json.obj(
@@ -107,7 +107,7 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       "dateOfPreparation" -> "2001-01-01",
       "timeOfPreparation" -> "12:00:00",
       "messageIdentifier" -> "XI000001",
-      "correlationIdentifier" -> "corr123"
+      "correlationIdentifier" -> testDraftId
     )
 
     val ie704HeaderMinimumXmlBody: String =
@@ -394,9 +394,10 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       relatedMessageType = Some("IE815")
     )
 
-    val getSubmissionFailureMessageResponseJson: JsValue = Json.obj(
+    def getSubmissionFailureMessageResponseJson(isTFESubmission: Boolean): JsValue = Json.obj(
       "ie704" -> IE704ModelFixtures.ie704ModelJson,
-      "relatedMessageType" -> "IE815"
+      "relatedMessageType" -> "IE815",
+      "isTFESubmission" -> isTFESubmission
     )
 
     val getSubmissionFailureMessageResponseMinimumDownstreamJson: JsValue = Json.obj(
@@ -410,8 +411,9 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       relatedMessageType = None
     )
 
-    val getSubmissionFailureMessageResponseMinimumJson: JsValue = Json.obj(
-      "ie704" -> IE704ModelFixtures.ie704ModelJson
+    def getSubmissionFailureMessageResponseMinimumJson(isTFESubmission: Boolean): JsValue = Json.obj(
+      "ie704" -> IE704ModelFixtures.ie704ModelJson,
+      "isTFESubmission" -> isTFESubmission
     )
   }
 }

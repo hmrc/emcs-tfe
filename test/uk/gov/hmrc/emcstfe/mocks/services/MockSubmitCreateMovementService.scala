@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import org.scalamock.handlers.CallHandler5
+import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
+import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitCreateMovementService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,13 +31,17 @@ trait MockSubmitCreateMovementService extends MockFactory  {
   lazy val mockService: SubmitCreateMovementService = mock[SubmitCreateMovementService]
 
   object MockService extends Matchers {
-    def submit(submission: SubmitCreateMovementModel, draftId: String): CallHandler5[SubmitCreateMovementModel, String, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
-      (mockService.submit(_: SubmitCreateMovementModel, _: String)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(submission, draftId, *, *, *)
+    def submit(requestModel: SubmitCreateMovementRequest): CallHandler3[SubmitCreateMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
+      (mockService.submit(_: SubmitCreateMovementRequest)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(requestModel, *, *)
 
-    def submitViaEIS(submission: SubmitCreateMovementModel, draftId: String): CallHandler5[SubmitCreateMovementModel, String, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
-      (mockService.submitViaEIS(_: SubmitCreateMovementModel, _: String)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(submission, draftId, *, *, *)
+    def submitViaEIS(requestModel: SubmitCreateMovementRequest): CallHandler3[SubmitCreateMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
+      (mockService.submitViaEIS(_: SubmitCreateMovementRequest)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(requestModel, *, *)
+
+    def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): CallHandler3[String, String, String, Future[Boolean]] =
+      (mockService.setSubmittedDraftId(_: String, _: String, _: String))
+        .expects(ern, draftId, submittedDraftId)
   }
 }
 

@@ -20,15 +20,16 @@ import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{DefaultDraftMovementCorrelationId, FeatureSwitching, SendToEIS, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
+import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.SubmitCreateMovementService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
@@ -39,17 +40,37 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
 
   def submit(ern: String, draftId: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitCreateMovementModel] { submission =>
-      if (isEnabled(SendToEIS)) {
-        service.submitViaEIS(submission, draftId).map(handleResponse(_))
+      val isEISFeatureEnabled = isEnabled(SendToEIS)
+      val requestModel = SubmitCreateMovementRequest(submission, draftId, isEnabled(ValidateUsingFS41Schema), isChRISSubmission = !isEISFeatureEnabled)
+      val correlationId = getCorrelationId(isEISFeatureEnabled, isEnabled(DefaultDraftMovementCorrelationId), requestModel)
+      if (isEISFeatureEnabled) {
+        service.submitViaEIS(requestModel).flatMap(responseModel => handleResponse(responseModel.map(_.copy(
+          submittedDraftId = Some(correlationId))), ern, draftId, correlationId
+        ))
       } else {
-        service.submit(submission, draftId).map(handleResponse(_))
+        service.submit(requestModel).flatMap(responseModel => handleResponse(responseModel.map(_.copy(
+          submittedDraftId = Some(correlationId))), ern, draftId, correlationId
+        ))
       }
     }
   }
 
-  def handleResponse[A](response: Either[ErrorResponse, A])(implicit writes: Writes[A]): Result =
+  def handleResponse[A](response: Either[ErrorResponse, A], ern: String, draftId: String, correlationId: String)(implicit writes: Writes[A]): Future[Result] =
     response match {
-      case Left(value) => InternalServerError(Json.toJson(value))
-      case Right(value) => Ok(Json.toJson(value))
+      case Left(value) => Future(InternalServerError(Json.toJson(value)))
+      case Right(value) =>
+        service.setSubmittedDraftId(ern, draftId, correlationId).map {
+          _ => Ok(Json.toJson(value))
+        }
     }
+
+  private def getCorrelationId(isEISFeatureEnabled: Boolean,
+                               isDefaultDraftMovementCorrelationIdEnabled: Boolean,
+                               requestModel: SubmitCreateMovementRequest): String = {
+    (isDefaultDraftMovementCorrelationIdEnabled, isEISFeatureEnabled) match {
+      case (true, _) => "PORTAL123"
+      case (_, true) => requestModel.correlationUUID
+      case (_, false) => requestModel.legacyCorrelationUUID
+    }
+  }
 }

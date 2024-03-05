@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import org.scalamock.handlers.{CallHandler2, CallHandler3}
+import org.scalamock.handlers.{CallHandler2, CallHandler3, CallHandler4}
 import org.scalamock.scalatest.MockFactory
+import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.userAnswers.CreateMovementUserAnswersService
@@ -43,6 +44,9 @@ trait MockCreateMovementUserAnswersService extends MockFactory  {
 
     def markDraftAsUnsubmitted(ern: String, draftId: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Boolean]]] =
       (mockService.markDraftAsUnsubmitted(_: String, _: String)(_: ExecutionContext)).expects(ern, draftId, *)
+
+    def setErrorMessagesForDraftMovement(ern: String, lrn: String, movementSubmissionFailures: Seq[MovementSubmissionFailure]): CallHandler4[String, String, Seq[MovementSubmissionFailure], ExecutionContext, Future[Either[ErrorResponse, Option[String]]]] =
+      (mockService.setErrorMessagesForDraftMovement(_: String, _: String, _: Seq[MovementSubmissionFailure])(_: ExecutionContext)).expects(ern, lrn, movementSubmissionFailures, *)
   }
 }
 

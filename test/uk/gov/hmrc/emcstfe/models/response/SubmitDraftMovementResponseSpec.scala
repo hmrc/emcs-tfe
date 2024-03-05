@@ -27,7 +27,7 @@ class SubmitDraftMovementResponseSpec extends TestBaseSpec with SubmitDraftMovem
 
   "writes" should {
     "write a model to JSON" in {
-      Json.toJson(chrisSuccessResponse) shouldBe chrisSuccessJson
+      Json.toJson(chrisSuccessResponse) shouldBe chrisSuccessJson()
     }
   }
 

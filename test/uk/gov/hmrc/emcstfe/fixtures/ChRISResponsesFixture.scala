@@ -49,17 +49,19 @@ trait ChRISResponsesFixture {
     lrn = Some("EN")
   )
 
-  lazy val chrisSuccessJson: JsValue = Json.parse(
-    """{
+  def chrisSuccessJson(withSubmittedDraftId: Boolean = false): JsValue = Json.parse(
+    s"""{
       |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
       |    "receiptDate": "2009-01-01T10:10:10.000",
       |    "lrn": "EN"
+      |    ${if(withSubmittedDraftId) ",\"submittedDraftId\": \"PORTAL123456789012\"" else ""}
       |}""".stripMargin)
 
-  lazy val chrisSuccessJsonNoLRN: JsValue = Json.parse(
-    """{
+  def chrisSuccessJsonNoLRN(withSubmittedDraftId: Boolean = false): JsValue = Json.parse(
+    s"""{
       |    "receipt": "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
       |    "receiptDate": "2009-01-01T10:10:10.000"
+      |    ${if(withSubmittedDraftId) ",\"submittedDraftId\": \"PORTAL123\"" else ""}
       |}""".stripMargin)
 
 }

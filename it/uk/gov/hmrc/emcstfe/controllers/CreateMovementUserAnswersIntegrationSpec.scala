@@ -22,7 +22,7 @@ import play.api.http.Status
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepositoryImpl
 import uk.gov.hmrc.emcstfe.stubs.AuthStub
@@ -31,9 +31,11 @@ import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
+class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture with MovementSubmissionFailureFixtures {
 
-  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true)
+  val testSubmittedDraftId = "12345-12346-12347"
+
+  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("info" -> Json.obj("localReferenceNumber" -> testLrn)), submissionFailures = Seq.empty, Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testSubmittedDraftId))
 
   def uri: String = s"/user-answers/create-movement/$testErn/$testDraftId"
 
@@ -291,9 +293,9 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
     }
   }
 
-  s"GET /user-answers/create-movement/draft/$testErn/$testDraftId/mark-as-draft" when {
+  s"PUT /user-answers/create-movement/$testErn/$testSubmittedDraftId/error-messages" when {
 
-    def markAsDraftUri(draftId: String = testDraftId): String = s"/user-answers/create-movement/$testErn/$draftId/mark-as-draft"
+    def putErrorMessagesUri(submittedDraftId: String = testSubmittedDraftId): String = s"/user-answers/create-movement/$testErn/$submittedDraftId/error-messages"
 
     "user is unauthenticated" must {
       "return Forbidden" in new Test {
@@ -302,7 +304,7 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
           AuthStub.unauthorised()
         }
 
-        val response: WSResponse = await(request(markAsDraftUri()).get())
+        val response: WSResponse = await(request(putErrorMessagesUri()).put(Json.toJson(Seq(movementSubmissionFailureModel))))
 
         response.status shouldBe Status.FORBIDDEN
       }
@@ -313,7 +315,78 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
         AuthStub.authorised("WrongERN")
       }
 
-      val response: WSResponse = await(request(markAsDraftUri()).get())
+      val response: WSResponse = await(request(putErrorMessagesUri()).put(Json.toJson(Seq(movementSubmissionFailureModel))))
+
+      response.status shouldBe Status.FORBIDDEN
+    }
+
+    "user is authorised" must {
+
+      s"return $NOT_FOUND (NOT_FOUND)" when {
+        "no data exists in mongo" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
+
+          val response: WSResponse = await(request(putErrorMessagesUri()).put(Json.toJson(Seq(movementSubmissionFailureModel))))
+
+          response.status shouldBe NOT_FOUND
+          response.body shouldBe "The draft movement could not be found"
+        }
+
+        "data exists in mongo but not for the ERN / LRN combo" in new Test {
+          override def setupStubs(): StubMapping = {
+            await(mongoRepo.set(userAnswers)) shouldBe true
+            AuthStub.authorised()
+          }
+
+          val response: WSResponse = await(request(putErrorMessagesUri(submittedDraftId = "ABCD")).put(Json.toJson(Seq(movementSubmissionFailureModel))))
+
+          response.status shouldBe NOT_FOUND
+          response.body shouldBe "The draft movement could not be found"
+        }
+      }
+
+      s"return $OK (OK)" when {
+        "data exists in mongo for the LRN / ERN combo" in new Test {
+          override def setupStubs(): StubMapping = {
+            await(mongoRepo.set(userAnswers.copy(submittedDraftId = Some(testSubmittedDraftId)))) shouldBe true
+            AuthStub.authorised()
+          }
+
+          val response: WSResponse = await(request(putErrorMessagesUri()).put(Json.toJson(Seq(movementSubmissionFailureModel))))
+
+          response.status shouldBe OK
+          response.json shouldBe Json.obj("draftId" -> testDraftId)
+
+        }
+      }
+    }
+  }
+
+  s"PUT /user-answers/create-movement/draft/$testErn/$testDraftId/mark-as-draft" when {
+
+    def markAsDraftUri(draftId: String = testDraftId): String = s"/user-answers/create-movement/$testErn/$draftId/mark-as-draft"
+
+    "user is unauthenticated" must {
+      "return Forbidden" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.unauthorised()
+        }
+
+        val response: WSResponse = await(request(markAsDraftUri()).put(""))
+
+        response.status shouldBe Status.FORBIDDEN
+      }
+    }
+
+    "user is authenticated but the ERN requested does not match the ERN of the credential" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised("WrongERN")
+      }
+
+      val response: WSResponse = await(request(markAsDraftUri()).put(""))
 
       response.status shouldBe Status.FORBIDDEN
     }
@@ -328,7 +401,7 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
         }
 
 
-        val response: WSResponse = await(request(markAsDraftUri()).get())
+        val response: WSResponse = await(request(markAsDraftUri()).put(""))
 
         response.status shouldBe OK
         response.json shouldBe Json.obj("draftId" -> testDraftId)
@@ -343,7 +416,7 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
         }
 
 
-        val response: WSResponse = await(request(markAsDraftUri("blah")).get())
+        val response: WSResponse = await(request(markAsDraftUri("blah")).put(""))
 
         response.status shouldBe NOT_FOUND
         response.body shouldBe "The draft movement could not be found"

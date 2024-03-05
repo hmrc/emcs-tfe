@@ -19,18 +19,19 @@ package uk.gov.hmrc.emcstfe.repositories
 import org.mongodb.scala.Document
 import org.mongodb.scala.model.Filters
 import play.api.libs.json.Json
+import uk.gov.hmrc.emcstfe.fixtures.MovementSubmissionFailureFixtures
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateMovementUserAnswers] {
+class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateMovementUserAnswers] with MovementSubmissionFailureFixtures {
 
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = CreateMovementUserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1), hasBeenSubmitted = true)
+  private val userAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("foo" -> "bar"), submissionFailures = Seq.empty, Instant.ofEpochSecond(1), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   protected override val repository = new CreateMovementUserAnswersRepositoryImpl(
     mongoComponent = mongoComponent,
@@ -201,6 +202,44 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         result shouldBe false
       }
+    }
+  }
+
+  ".setErrorMessagesForDraftMovement" must {
+
+    "return Some(_)" when {
+
+      "there is a record with this ern and lrn" in {
+        val mongoEntry = userAnswers.copy(submittedDraftId = Some(testDraftId))
+        insert(mongoEntry).futureValue
+        repository.setErrorMessagesForDraftMovement(userAnswers.ern, testDraftId, Seq(movementSubmissionFailureModel)).futureValue shouldBe Some(testDraftId)
+      }
+    }
+
+
+    "return None" when {
+
+      "there is no record with this ern and lrn" in {
+        val mongoEntry = userAnswers.copy(submittedDraftId = Some(testDraftId))
+        insert(mongoEntry).futureValue
+        repository.setErrorMessagesForDraftMovement(userAnswers.ern, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
+      }
+    }
+  }
+
+  ".setSubmittedDraftId" must {
+
+    "update the record when the there is one" in {
+      insert(userAnswers).futureValue
+      repository.setSubmittedDraftId(userAnswers.ern, userAnswers.draftId, s"PORTAL$testDraftId").futureValue shouldBe true
+      repository.get(userAnswers.ern, userAnswers.draftId).futureValue.get.submittedDraftId.get shouldBe s"PORTAL$testDraftId"
+    }
+
+
+    "not update any records when the search criteria doesn't match any" in {
+
+      insert(userAnswers).futureValue
+      repository.setErrorMessagesForDraftMovement(userAnswers.ern, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
     }
   }
 }
