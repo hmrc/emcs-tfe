@@ -20,12 +20,14 @@ import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
 import uk.gov.hmrc.emcstfe.models.request._
+import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.PreValidateRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.models.response._
 import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, RawGetMessagesResponse}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementListResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.{GetSubmissionFailureMessageResponse, RawGetSubmissionFailureMessageResponse}
+import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderApiResponse
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -38,11 +40,11 @@ class EisConnector @Inject()(val http: HttpClient,
                              httpParser: EisJsonHttpParser
                             ) extends BaseEisConnector {
 
-  private def prepareJsonAndSubmit[A](url: String, request: EisSubmissionRequest, callingMethod: String)
+  private def prepareJsonAndSubmit[A](url: String, request: EisSubmissionRequest, callingMethod: String, bearerToken: String = appConfig.eisSubmitBearerToken)
                                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
     logger.debug(s"[$callingMethod] Sending body: ${request.toJson}")
-    postJson(http, url, request.toJson, request, appConfig.eisSubmitBearerToken)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
+    postJson(http, url, request.toJson, request, bearerToken)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
   }
 
   private def prepareGetRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String, bearerToken: String)
@@ -113,5 +115,11 @@ class EisConnector @Inject()(val http: HttpClient,
                                   (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[SetMessageAsLogicallyDeletedResponse]): Future[Either[ErrorResponse, SetMessageAsLogicallyDeletedResponse]] = {
     val url = appConfig.eisMessageUrl(request.exciseRegistrationNumber, request.messageId)
     prepareDeleteRequestAndSubmit(url, request, "setMessageAsLogicallyDeleted", appConfig.eisMessagesBearerToken)
+  }
+
+  def preValidateTrader(request: PreValidateRequest)
+                       (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[PreValidateTraderApiResponse]): Future[Either[ErrorResponse, PreValidateTraderApiResponse]] = {
+    val url = appConfig.eisPreValidateTraderUrl()
+    prepareJsonAndSubmit(url, request, "preValidateTrader", appConfig.eisPrevalidateBearerToken)
   }
 }
