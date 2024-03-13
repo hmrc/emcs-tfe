@@ -65,7 +65,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
   ".get" when {
 
-    "there is a record for this id" must {
+    "there is a record for this draftId" must {
 
       "update the lastUpdated time and get the record" in {
 
@@ -78,7 +78,22 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       }
     }
 
-    "there is no record for this id" must {
+    "there is a record for this submittedDraftId" must {
+
+      "update the lastUpdated time and get the record" in {
+
+        val submissionId = "submission123456"
+
+        insert(userAnswers.copy(submittedDraftId = Some(submissionId))).futureValue
+
+        val result = repository.get(userAnswers.ern, submissionId).futureValue
+        val expectedResult = userAnswers.copy(lastUpdated = instantNow, submittedDraftId = Some(submissionId))
+
+        result.value shouldBe expectedResult
+      }
+    }
+
+    "there is no record for this draftId or submittedDraftId" must {
 
       "return None" in {
 
