@@ -33,10 +33,10 @@ object GetSubmissionFailureMessageResponse {
     relatedMessageType.read[String].map(s => if (s.nonEmpty) Some(s) else None)
   ).mapN(GetSubmissionFailureMessageResponse.apply)
 
-  def jsonWrites(isTFESubmission: Boolean): OWrites[GetSubmissionFailureMessageResponse] = (response: GetSubmissionFailureMessageResponse) => {
+  def jsonWrites(draftMovementExists: Boolean): OWrites[GetSubmissionFailureMessageResponse] = (response: GetSubmissionFailureMessageResponse) => {
     Json.obj(
       "ie704" -> response.ie704,
-      "isTFESubmission" -> isTFESubmission
+      "draftMovementExists" -> draftMovementExists
     ).deepMerge(
       response.relatedMessageType.map(
         relatedMessageType =>

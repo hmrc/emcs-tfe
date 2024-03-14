@@ -50,7 +50,7 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
 
   "getSubmissionFailureMessage" should {
     "return 200" when {
-      "service returns a Right (not calling repository when correlation ID starts with PORTAL - isTFESubmission = true)" in {
+      "service returns a Right (not calling repository when correlation ID starts with PORTAL - draftMovementExists = true)" in {
 
         val response = getSubmissionFailureMessageResponseModel.copy(
           ie704 = IE704ModelFixtures.ie704ModelModel.copy(
@@ -69,11 +69,11 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
         contentAsJson(result) shouldBe Json.obj(
           "ie704" -> response.ie704,
           "relatedMessageType" -> "IE815",
-          "isTFESubmission" -> true
+          "draftMovementExists" -> true
         )
       }
 
-      "service returns a Right (calling repository when correlation ID does not start with PORTAL - isTFESubmission = true)" in {
+      "service returns a Right (calling repository when correlation ID does not start with PORTAL - draftMovementExists = true)" in {
 
         val userAnswers: CreateMovementUserAnswers =
           CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
@@ -86,10 +86,10 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
         val result = controller.getSubmissionFailureMessage(testErn, testArc)(fakeRequest)
 
         status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe getSubmissionFailureMessageResponseJson(isTFESubmission = true)
+        contentAsJson(result) shouldBe getSubmissionFailureMessageResponseJson(draftMovementExists = true)
       }
 
-      "service returns a Right (calling repository when correlation ID does not start with PORTAL - isTFESubmission = false)" in {
+      "service returns a Right (calling repository when correlation ID does not start with PORTAL - draftMovementExists = false)" in {
 
         MockService.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(Future.successful(Right(getSubmissionFailureMessageResponseModel)))
 
@@ -99,10 +99,10 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
         val result = controller.getSubmissionFailureMessage(testErn, testArc)(fakeRequest)
 
         status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe getSubmissionFailureMessageResponseJson(isTFESubmission = false)
+        contentAsJson(result) shouldBe getSubmissionFailureMessageResponseJson(draftMovementExists = false)
       }
 
-      "service returns a Right (no correlation ID exists - isTFESubmission = false)" in {
+      "service returns a Right (no correlation ID exists - draftMovementExists = false)" in {
 
         MockService.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(Future.successful(Right(
           getSubmissionFailureMessageResponseModel.copy(ie704 = IE704ModelFixtures.ie704ModelModel.copy(
@@ -119,7 +119,7 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
             "body" -> IE704BodyFixtures.ie704BodyJson
           ),
           "relatedMessageType" -> "IE815",
-          "isTFESubmission" -> false
+          "draftMovementExists" -> false
         )
       }
     }

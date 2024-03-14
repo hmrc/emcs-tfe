@@ -394,10 +394,10 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       relatedMessageType = Some("IE815")
     )
 
-    def getSubmissionFailureMessageResponseJson(isTFESubmission: Boolean): JsValue = Json.obj(
+    def getSubmissionFailureMessageResponseJson(draftMovementExists: Boolean): JsValue = Json.obj(
       "ie704" -> IE704ModelFixtures.ie704ModelJson,
       "relatedMessageType" -> "IE815",
-      "isTFESubmission" -> isTFESubmission
+      "draftMovementExists" -> draftMovementExists
     )
 
     val getSubmissionFailureMessageResponseMinimumDownstreamJson: JsValue = Json.obj(
@@ -411,9 +411,9 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFacto
       relatedMessageType = None
     )
 
-    def getSubmissionFailureMessageResponseMinimumJson(isTFESubmission: Boolean): JsValue = Json.obj(
+    def getSubmissionFailureMessageResponseMinimumJson(draftMovementExists: Boolean): JsValue = Json.obj(
       "ie704" -> IE704ModelFixtures.ie704ModelJson,
-      "isTFESubmission" -> isTFESubmission
+      "draftMovementExists" -> draftMovementExists
     )
   }
 }
