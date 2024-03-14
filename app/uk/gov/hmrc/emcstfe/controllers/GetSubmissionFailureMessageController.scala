@@ -40,7 +40,6 @@ class GetSubmissionFailureMessageController @Inject()(cc: ControllerComponents,
       case Left(error) => Future(InternalServerError(Json.toJson(error)))
       case Right(response) =>
         response.ie704.header.correlationIdentifier match {
-          case Some(correlationId) if correlationId.startsWith("PORTAL") =>  Future(returnResponse(response, draftMovementExists = true))
           case Some(correlationId) => createMovementUserAnswersRepository.get(exciseRegistrationNumber, correlationId).map {
             optDraftMovement => {
               returnResponse(response, draftMovementExists = optDraftMovement.isDefined)

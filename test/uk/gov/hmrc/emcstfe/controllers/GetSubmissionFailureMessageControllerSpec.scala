@@ -50,30 +50,7 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
 
   "getSubmissionFailureMessage" should {
     "return 200" when {
-      "service returns a Right (not calling repository when correlation ID starts with PORTAL - draftMovementExists = true)" in {
-
-        val response = getSubmissionFailureMessageResponseModel.copy(
-          ie704 = IE704ModelFixtures.ie704ModelModel.copy(
-            header = IE704HeaderFixtures.ie704HeaderModel.copy(
-              correlationIdentifier = Some("PORTAL123")
-            )
-          )
-        )
-
-        MockService.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)
-          .returns(Future.successful(Right(response)))
-
-        val result = controller.getSubmissionFailureMessage(testErn, testArc)(fakeRequest)
-
-        status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe Json.obj(
-          "ie704" -> response.ie704,
-          "relatedMessageType" -> "IE815",
-          "draftMovementExists" -> true
-        )
-      }
-
-      "service returns a Right (calling repository when correlation ID does not start with PORTAL - draftMovementExists = true)" in {
+      "service returns a Right (calling repository when correlation ID exists within drafts hence draftMovementExists = true)" in {
 
         val userAnswers: CreateMovementUserAnswers =
           CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
@@ -89,7 +66,7 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
         contentAsJson(result) shouldBe getSubmissionFailureMessageResponseJson(draftMovementExists = true)
       }
 
-      "service returns a Right (calling repository when correlation ID does not start with PORTAL - draftMovementExists = false)" in {
+      "service returns a Right (calling repository when correlation ID does not exist within drafts hence draftMovementExists = false)" in {
 
         MockService.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(Future.successful(Right(getSubmissionFailureMessageResponseModel)))
 
