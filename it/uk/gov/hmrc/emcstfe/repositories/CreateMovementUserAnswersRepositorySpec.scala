@@ -65,7 +65,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
   ".get" when {
 
-    "there is a record for this id" must {
+    "there is a record for this id (draftId)" must {
 
       "update the lastUpdated time and get the record" in {
 
@@ -73,6 +73,19 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         val result = repository.get(userAnswers.ern, userAnswers.draftId).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
+
+        result.value shouldBe expectedResult
+      }
+    }
+
+    "there is a record for this id (submittedDraftId)" must {
+
+      "update the lastUpdated time and get the record" in {
+
+        insert(userAnswers.copy(draftId = "foo", submittedDraftId = Some(testDraftId))).futureValue
+
+        val result = repository.get(userAnswers.ern, testDraftId).futureValue
+        val expectedResult = userAnswers.copy(lastUpdated = instantNow, draftId = "foo", submittedDraftId = Some(testDraftId))
 
         result.value shouldBe expectedResult
       }

@@ -90,7 +90,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
   def keepAlive(ern: String, draftId: String): Future[Boolean] =
     collection
       .updateOne(
-        filter = byDraftId(ern: String, draftId: String),
+        filter = Filters.or(byDraftId(ern, draftId), bySubmittedDraftId(ern, draftId)),
         update = Updates.set(lastUpdatedField, time.instant()),
       )
       .toFuture()
@@ -100,7 +100,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
     keepAlive(ern, draftId).flatMap {
       _ =>
         collection
-          .find(byDraftId(ern, draftId))
+          .find(Filters.or(byDraftId(ern, draftId), bySubmittedDraftId(ern, draftId)))
           .headOption()
     }
 
