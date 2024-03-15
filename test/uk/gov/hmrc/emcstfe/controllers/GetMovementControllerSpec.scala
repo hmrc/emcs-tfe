@@ -34,27 +34,28 @@ class GetMovementControllerSpec extends TestBaseSpec with MockGetMovementService
   private val fakeRequest = FakeRequest("GET", "/movement/:ern/:arc")
   private val controller = new GetMovementController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
-  private val getMovementRequest = GetMovementRequest(testErn, testArc)
-
-
   "GET /movement/:ern/:arc" should {
     "return 200" when {
       "service returns a Right" in {
 
-        MockService.getMovement(getMovementRequest).returns(Future.successful(Right(getMovementResponse())))
+        val getMovementRequest = GetMovementRequest(testErn, testArc, Some(1))
 
-        val result = controller.getMovement(testErn, testArc)(fakeRequest)
+        MockService.getMovement(getMovementRequest, forceFetchNew = false).returns(Future.successful(Right(getMovementResponse())))
+
+        val result = controller.getMovement(testErn, testArc, sequenceNumber = Some(1))(fakeRequest)
 
         status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe getMovementJson
+        contentAsJson(result) shouldBe getMovementJson()
       }
     }
     "return 500" when {
       "service returns a Left" in {
 
-        MockService.getMovement(getMovementRequest).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+        val getMovementRequest = GetMovementRequest(testErn, testArc)
 
-        val result = controller.getMovement(testErn, testArc)(fakeRequest)
+        MockService.getMovement(getMovementRequest, forceFetchNew = true).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+
+        val result = controller.getMovement(testErn, testArc, forceFetchNew = true)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)

@@ -19,14 +19,23 @@ package uk.gov.hmrc.emcstfe.models.request
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-case class GetMovementRequest(exciseRegistrationNumber: String, arc: String, sequenceNumber: Option[Int] = None) extends ChrisRequest with EisConsumptionRequest {
+case class GetMovementRequest(exciseRegistrationNumber: String,
+                              arc: String,
+                              sequenceNumber: Option[Int] = None) extends ChrisRequest with EisConsumptionRequest {
   override def requestBody: String =
     withGetRequestSoapEnvelope(
-      <Parameters>
-        <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
-        <Parameter Name="ARC">{arc}</Parameter>
-        {sequenceNumber.map(num => s"""<Parameter Name="SequenceNumber">$num</Parameter>""").getOrElse("")}
-      </Parameters>
+      if(sequenceNumber.isDefined) {
+        <Parameters>
+          <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
+          <Parameter Name="ARC">{arc}</Parameter>
+          <Parameter Name="SequenceNumber">{sequenceNumber.get}</Parameter>
+        </Parameters>
+      } else {
+        <Parameters>
+          <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
+          <Parameter Name="ARC">{arc}</Parameter>
+        </Parameters>
+      }
     )
 
   override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement"
@@ -36,8 +45,8 @@ case class GetMovementRequest(exciseRegistrationNumber: String, arc: String, seq
   override def metricName = "get-movement"
 
   override val queryParams: Seq[(String, String)] = Seq(
-    "exciseregistrationnumber" -> exciseRegistrationNumber,
-    "arc" -> arc,
-    "sequencenumber" -> sequenceNumber.getOrElse(1).toString
-  )
+    Some("exciseregistrationnumber" -> exciseRegistrationNumber),
+    Some("arc" -> arc),
+    sequenceNumber.map(seq => "sequencenumber" -> seq.toString)
+  ).flatten
 }

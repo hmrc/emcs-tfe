@@ -32,8 +32,11 @@ class GetMovementController @Inject()(cc: ControllerComponents,
                                       override val auth: AuthAction
                                      )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
-  def getMovement(exciseRegistrationNumber: String, arc: String, forceFetchNew: Boolean = false): Action[AnyContent] = authorisedUserRequest(exciseRegistrationNumber) { implicit request =>
-    service.getMovement(GetMovementRequest(exciseRegistrationNumber = exciseRegistrationNumber, arc = arc), forceFetchNew = forceFetchNew).map {
+  def getMovement(exciseRegistrationNumber: String,
+                  arc: String,
+                  forceFetchNew: Boolean = false,
+                  sequenceNumber: Option[Int] = None): Action[AnyContent] = authorisedUserRequest(exciseRegistrationNumber) { implicit request =>
+    service.getMovement(GetMovementRequest(exciseRegistrationNumber, arc, sequenceNumber), forceFetchNew = forceFetchNew).map {
       case Left(value) => InternalServerError(Json.toJson(value))
       case Right(value) => Ok(Json.toJson(value))
     }

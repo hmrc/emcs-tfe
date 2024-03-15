@@ -42,10 +42,10 @@ class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMove
 
         "it contains valid XML" in {
 
-          MockXmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper))
-            .returns(Right(XML.loadString(getMovementResponseBody)))
+          MockXmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper()))
+            .returns(Right(XML.loadString(getMovementResponseBody())))
 
-          val response = HttpResponse(OK, body = getMovementSoapWrapper, headers = Map.empty)
+          val response = HttpResponse(OK, body = getMovementSoapWrapper(), headers = Map.empty)
 
           val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
@@ -128,14 +128,14 @@ class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMove
 
         "it contains valid XML" in {
 
-          MockXmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper))
-            .returns(Right(XML.loadString(getMovementResponseBody)))
+          MockXmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper()))
+            .returns(Right(XML.loadString(getMovementResponseBody())))
 
-          val response = HttpResponse(OK, body = getMovementSoapWrapper, headers = Map.empty)
+          val response = HttpResponse(OK, body = getMovementSoapWrapper(), headers = Map.empty)
 
           val result = TestParser.rawXMLHttpReads(shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
-          result shouldBe Right(XML.loadString(getMovementResponseBody))
+          result shouldBe Right(XML.loadString(getMovementResponseBody()))
         }
       }
 

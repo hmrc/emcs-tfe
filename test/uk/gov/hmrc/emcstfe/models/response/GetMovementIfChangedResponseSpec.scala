@@ -29,10 +29,10 @@ class GetMovementIfChangedResponseSpec extends TestBaseSpec with GetMovementFixt
     "successfully read a movement" when {
 
       "Results is not empty" in {
-        val result = GetMovementIfChangedResponse.xmlReader.read(XML.loadString(getMovementSoapWrapper))
+        val result = GetMovementIfChangedResponse.xmlReader.read(XML.loadString(getMovementSoapWrapper()))
           .map(res => res.copy(result = res.result.trim)) // remove whitespace for the test, doesn't matter in practice as will be converted into Scala XML
 
-        result shouldBe ParseSuccess(GetMovementIfChangedResponse(getMovementResponseBody))
+        result shouldBe ParseSuccess(GetMovementIfChangedResponse(getMovementResponseBody()))
       }
 
       "Results is empty" in {

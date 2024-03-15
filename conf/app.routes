@@ -2,7 +2,7 @@
 
 # Consumption
 GET           /movements/:ern                                    uk.gov.hmrc.emcstfe.controllers.GetMovementListController.getMovementList(ern, search: GetMovementListSearchOptions)
-GET           /movement/:ern/:arc                                uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(ern, arc, forceFetchNew: Boolean)
+GET           /movement/:ern/:arc                                uk.gov.hmrc.emcstfe.controllers.GetMovementController.getMovement(ern, arc, forceFetchNew: Boolean, sequenceNumber: Option[Int])
 GET           /movement-history/:ern/:arc                        uk.gov.hmrc.emcstfe.controllers.GetMovementHistoryEventsController.getMovementHistoryEvents(ern, arc)
 GET           /messages/:ern                                     uk.gov.hmrc.emcstfe.controllers.GetMessagesController.getMessages(ern, sortField, sortOrder, page: Int)
 GET           /message-statistics/:ern                           uk.gov.hmrc.emcstfe.controllers.GetMessageStatisticsController.getMessageStatistics(ern)

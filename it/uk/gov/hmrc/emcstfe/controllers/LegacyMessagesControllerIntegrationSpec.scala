@@ -77,19 +77,19 @@ class LegacyMessagesControllerIntegrationSpec extends IntegrationBaseSpec with L
       "return the response" when {
         "all is successful" in new  Test {
           override def setupStubs(): StubMapping = {
-            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamMovementUri, downstreamGetMovementQueryParam, OK, getRawMovementJson)
+            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamMovementUri, downstreamGetMovementQueryParam, OK, getRawMovementJson())
           }
 
           val result: WSResponse = await(request().withHttpHeaders("Content-Type" -> "application/soap+xml; charset=UTF-8; action=\"http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement\"").post(validGetMovementXMLRequest))
           result.status shouldBe OK
-          result.body shouldBe soapEnvelope(schemaResultBody(XML.loadString(getMovementResponseBody))).toString()
+          result.body shouldBe soapEnvelope(schemaResultBody(XML.loadString(getMovementResponseBody()))).toString()
         }
       }
 
       "return a 500" when {
         "message cannot be parsed from json" in new Test {
           override def setupStubs(): StubMapping = {
-            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamMovementUri, downstreamGetMovementQueryParam, OK, getRawMovementInvalidJson)
+            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamMovementUri, downstreamGetMovementQueryParam, OK, getRawMovementInvalidJson())
           }
 
           val result: WSResponse = await(request().withHttpHeaders("Content-Type" -> "application/soap+xml; charset=UTF-8; action=\"http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement\"").post(validGetMovementXMLRequest))
