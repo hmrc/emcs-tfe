@@ -40,18 +40,17 @@ class GetSubmissionFailureMessageController @Inject()(cc: ControllerComponents,
       case Left(error) => Future(InternalServerError(Json.toJson(error)))
       case Right(response) =>
         response.ie704.header.correlationIdentifier match {
-          case Some(correlationId) if correlationId.startsWith("PORTAL") =>  Future(returnResponse(response, isTFESubmission = true))
           case Some(correlationId) => createMovementUserAnswersRepository.get(exciseRegistrationNumber, correlationId).map {
             optDraftMovement => {
-              returnResponse(response, isTFESubmission = optDraftMovement.isDefined)
+              returnResponse(response, draftMovementExists = optDraftMovement.isDefined)
             }
           }
-          case None => Future(returnResponse(response, isTFESubmission = false))
+          case None => Future(returnResponse(response, draftMovementExists = false))
         }
     }
   }
 
-  private def returnResponse(response: GetSubmissionFailureMessageResponse, isTFESubmission: Boolean): Result = {
-    Ok(Json.toJson(response)(GetSubmissionFailureMessageResponse.jsonWrites(isTFESubmission)))
+  private def returnResponse(response: GetSubmissionFailureMessageResponse, draftMovementExists: Boolean): Result = {
+    Ok(Json.toJson(response)(GetSubmissionFailureMessageResponse.jsonWrites(draftMovementExists)))
   }
 }
