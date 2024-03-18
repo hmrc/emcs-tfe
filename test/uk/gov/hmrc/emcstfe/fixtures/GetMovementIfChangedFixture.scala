@@ -50,7 +50,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                                |  </tns:Body>
                                                                |</tns:Envelope>""".stripMargin
 
-  lazy val getMovementIfChangedResponseBody: String =
+  def getMovementIfChangedResponseBody(sequenceNumber: Int = 1): String =
     s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                                |    <mov:currentMovement>
                                                |      <mov:status>Beans</mov:status>
@@ -103,7 +103,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |              <urn:TimeOfDispatch>10:00:00</urn:TimeOfDispatch>
                                                |            </urn:EadEsad>
                                                |            <urn:HeaderEadEsad>
-                                               |              <urn:SequenceNumber>1</urn:SequenceNumber>
+                                               |              <urn:SequenceNumber>$sequenceNumber</urn:SequenceNumber>
                                                |              <urn:DateAndTimeOfUpdateValidation>2008-09-04T10:22:50</urn:DateAndTimeOfUpdateValidation>
                                                |              <urn:DestinationTypeCode>6</urn:DestinationTypeCode>
                                                |              <urn:JourneyTime>D20</urn:JourneyTime>
@@ -430,7 +430,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |    </mov:eventHistory>
                                                |  </mov:movementView>""".stripMargin
 
-  lazy val getMovementIfChangedWithChangeSoapWrapper: String = s"""<tns:Envelope
+  def getMovementIfChangedWithChangeSoapWrapper(sequenceNumber: Int = 1): String = s"""<tns:Envelope
                                                |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                                |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
                                                |	<tns:Body>
@@ -451,7 +451,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |			<con:OperationResponse>
                                                |				<con:Results>
                                                |					<con:Result Name="">
-                                               |						<![CDATA[$getMovementIfChangedResponseBody]]>
+                                               |						<![CDATA[${getMovementIfChangedResponseBody(sequenceNumber)}]]>
                                                |					</con:Result>
                                                |				</con:Results>
                                                |			</con:OperationResponse>
@@ -459,9 +459,9 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |	</tns:Body>
                                                |</tns:Envelope>""".stripMargin
 
-  lazy val getMovementIfChangedResponse: GetMovementResponse = GetMovementResponse(
+  def getMovementIfChangedResponse(sequenceNumber: Int = 1): GetMovementResponse = GetMovementResponse(
     arc = "13AB7778889991ABCDEF9",
-    sequenceNumber = 1,
+    sequenceNumber,
     destinationType = Export,
     memberStateCode = None,
     serialNumberOfCertificateOfExemption = None,
@@ -627,15 +627,17 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
     )
   )
 
-  val getMovementIfChangedMongoResponse: GetMovementMongoResponse = GetMovementMongoResponse(testArc, JsString(getMovementIfChangedResponseBody))
+  def getMovementIfChangedMongoResponse(sequenceNumber: Int = 1): GetMovementMongoResponse =
+    GetMovementMongoResponse(testArc, sequenceNumber, data = JsString(getMovementIfChangedResponseBody(sequenceNumber)))
 
-  lazy val getRawMovementIfChangedJson: JsValue = Json.obj(
+  def getRawMovementIfChangedJson(sequenceNumber: Int = 1): JsValue = Json.obj(
     "dateTime" -> "dateTime",
     "exciseRegistrationNumber" -> testErn,
-    "message" -> Base64.getEncoder.encodeToString(getMovementIfChangedResponseBody.getBytes)
+    "message" -> Base64.getEncoder.encodeToString(getMovementIfChangedResponseBody(sequenceNumber).getBytes)
   )
 
-  val getRawMovementIfChangedMongoResponse: RawGetMovementResponse = RawGetMovementResponse("2023-12-01", testArc, XML.loadString(getMovementIfChangedResponseBody))
+  def getRawMovementIfChangedMongoResponse(sequenceNumber: Int = 1): RawGetMovementResponse =
+    RawGetMovementResponse("2023-12-01", testArc, XML.loadString(getMovementIfChangedResponseBody(sequenceNumber)))
 
 
 }

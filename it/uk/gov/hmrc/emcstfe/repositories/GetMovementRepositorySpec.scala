@@ -32,7 +32,12 @@ class GetMovementRepositorySpec
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = GetMovementMongoResponse(testArc, JsString(getMovementResponseBody), Instant.ofEpochSecond(1))
+  private val userAnswers = GetMovementMongoResponse(
+    arc = testArc,
+    sequenceNumber = 1,
+    data = JsString(getMovementResponseBody()),
+    lastUpdated = Instant.ofEpochSecond(1)
+  )
 
   protected override val repository = new GetMovementRepositoryImpl(
     mongoComponent = mongoComponent,

@@ -30,13 +30,15 @@ class GetMovementMongoResponseSpec extends TestBaseSpec with GetMovementFixture 
 
   val model = GetMovementMongoResponse(
     arc = testArc,
-    data = JsString(getMovementResponseBody),
+    sequenceNumber = 1,
+    data = JsString(getMovementResponseBody()),
     lastUpdated = instant
   )
 
   val json = Json.obj(
     "arc" -> testArc,
-    "data" -> getMovementResponseBody,
+    "sequenceNumber" -> 1,
+    "data" -> getMovementResponseBody(),
     "lastUpdated" -> Json.toJson(instant)(MongoJavatimeFormats.instantWrites)
   )
 
@@ -48,6 +50,10 @@ class GetMovementMongoResponseSpec extends TestBaseSpec with GetMovementFixture 
 
     "deserialise from JSON as expected" in {
       json.as[GetMovementMongoResponse] shouldBe model
+    }
+
+    "deserialise from JSON as expected where sequenceNumber doesn't exist (extract from XML)" in {
+      json.-("sequenceNumber").as[GetMovementMongoResponse] shouldBe model
     }
   }
 }

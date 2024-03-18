@@ -141,9 +141,9 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
             HeaderNames.CONTENT_TYPE -> s"""application/soap+xml; charset=UTF-8; action="${getMovementRequest.action}""""
           )
         )
-          .returns(Future.successful(Right(getMovementSoapWrapper)))
+          .returns(Future.successful(Right(getMovementSoapWrapper())))
 
-        await(connector.postChrisSOAPRequest(getMovementRequest)) shouldBe Right(getMovementSoapWrapper)
+        await(connector.postChrisSOAPRequest(getMovementRequest)) shouldBe Right(getMovementSoapWrapper())
       }
     }
     "return a Left" when {

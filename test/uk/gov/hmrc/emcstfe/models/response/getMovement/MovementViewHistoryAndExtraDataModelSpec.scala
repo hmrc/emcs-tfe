@@ -31,7 +31,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
   "xmlReader" should {
 
     "successfully read a subset of the movement fields" in {
-      MovementViewHistoryAndExtraDataModel.xmlReader.read(XML.loadString(maxGetMovementResponseBody)) shouldBe ParseSuccess(MovementViewHistoryAndExtraDataModel(
+      MovementViewHistoryAndExtraDataModel.xmlReader.read(XML.loadString(maxGetMovementResponseBody())) shouldBe ParseSuccess(MovementViewHistoryAndExtraDataModel(
         arc = "ExciseMovementArc",
         serialNumberOfCertificateOfExemption = Some("CCTSerialNumber"),
         dispatchImportOfficeReferenceNumber = Some("DispatchImportOfficeErn"),

@@ -33,7 +33,7 @@ class XmlUtilsSpec extends TestBaseSpec with GetMovementFixture with MockHMRCMar
     "passed xml" should {
       "return a Success" when {
         "there is CDATA containing XML at the correct path" in new Test {
-          xmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper)) shouldBe Right(XML.loadString(getMovementResponseBody))
+          xmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper())) shouldBe Right(XML.loadString(getMovementResponseBody()))
         }
       }
       "return a Failure" when {
@@ -60,7 +60,7 @@ class XmlUtilsSpec extends TestBaseSpec with GetMovementFixture with MockHMRCMar
                |			<con:OperationResponse>
                |				<con:Results>
                |					<con:MyResult Name="">
-               |						<![CDATA[$getMovementResponseBody]]>
+               |						<![CDATA[${getMovementResponseBody()}]]>
                |					</con:MyResult>
                |				</con:Results>
                |			</con:OperationResponse>
@@ -136,7 +136,7 @@ class XmlUtilsSpec extends TestBaseSpec with GetMovementFixture with MockHMRCMar
     "passed a String" should {
       "return a Success" when {
         "there is CDATA containing XML at the correct path" in new Test {
-          xmlUtils.readXml(getMovementResponseBody) shouldBe Right(XML.loadString(getMovementResponseBody))
+          xmlUtils.readXml(getMovementResponseBody()) shouldBe Right(XML.loadString(getMovementResponseBody()))
         }
       }
       "return a Failure" when {

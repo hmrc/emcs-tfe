@@ -251,9 +251,9 @@ class LegacyMessagesServiceSpec extends TestBaseSpec with LegacyMessagesFixtures
           val messageRequest = GetMovementRequest(testErn, testArc, Some(2))
 
           MockEisConnector.getRawMovement(messageRequest)
-            .returns(Right(getRawMovementResponse).pure[Future])
+            .returns(Right(getRawMovementResponse()).pure[Future])
 
-          await(service.performMessageAction(GetMovement).value) shouldBe Right(getRawMovementResponse)
+          await(service.performMessageAction(GetMovement).value) shouldBe Right(getRawMovementResponse())
         }
       }
 

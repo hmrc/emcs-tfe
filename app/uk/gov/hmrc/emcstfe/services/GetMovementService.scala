@@ -49,23 +49,28 @@ class GetMovementService @Inject()(
   def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean)
                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
     repository.get(getMovementRequest.arc).flatMap {
-      case Some(value) =>
-        logger.debug("[getMovement] Matching movement found")
-        if (forceFetchNew) {
-          if (isEnabled(SendToEIS)) {
-            getNewMovement(getMovementRequest, Some(generateGetMovementResponse(value.data)))
-          } else {
-            getMovementIfChanged(getMovementRequest, value)
-          }
+
+      case Some(cache) if shouldReturnDataFromCache(cache.sequenceNumber, getMovementRequest.sequenceNumber, forceFetchNew) =>
+        logger.debug(s"[getMovement] generateGetMovementResponse from cached movement for sequenceNumber: '${cache.sequenceNumber}'")
+        Future.successful(generateGetMovementResponse(cache.data))
+
+      case Some(cache) =>
+        if(isEnabled(SendToEIS) || getMovementRequest.sequenceNumber.isDefined) {
+          logger.debug(s"[getMovement] generateGetMovementResponse from downstream system" + getMovementRequest.sequenceNumber.fold("")(" for sequenceNumber: " + _))
+          getNewMovement(getMovementRequest, Some(generateGetMovementResponse(cache.data)))
         } else {
-          logger.debug("[getMovement] generateGetMovementResponse from cached movement")
-          Future.successful(generateGetMovementResponse(value.data))
+          logger.debug("[getMovement] generateGetMovementResponse by checking against ChRIS to see if the movement has changed")
+          getMovementIfChanged(getMovementRequest, cache)
         }
-      case None =>
-        logger.debug("[getMovement] No matching movement found, calling GetMovement")
+
+      case _ =>
+        logger.debug("[getMovement] generateGetMovementResponse by calling GetMovement as no matching movement found in cache")
         getNewMovement(getMovementRequest, None)
     }
   }
+
+  private def shouldReturnDataFromCache(cacheSequenceNumber: Int, requestedSequenceNumber: Option[Int], forceFetchNew: Boolean) =
+    requestedSequenceNumber.contains(cacheSequenceNumber) || (!forceFetchNew && requestedSequenceNumber.isEmpty)
 
   private[services] def getMovementIfChanged(getMovementRequest: GetMovementRequest, repositoryResult: GetMovementMongoResponse)
                                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {
@@ -150,10 +155,11 @@ class GetMovementService @Inject()(
         res <- EitherT.fromEither[Future](response)
         movement <- EitherT.fromEither[Future](handleParseResult(XmlReader.of[GetMovementResponse].read(res)))
         resString = xmlUtils.trimWhitespaceFromXml(res)
-        getMovementMongoResponse = response.map(_ => GetMovementMongoResponse(getMovementRequest.arc, JsString(resString.toString())))
+        getMovementMongoResponse = response.map(_ => GetMovementMongoResponse(getMovementRequest.arc, movement.sequenceNumber, JsString(resString.toString())))
         getMovementMongoResponseRight <- EitherT.fromEither[Future](getMovementMongoResponse)
         _ = cachedMovement match {
-          case Some(Right(cache)) if cache == movement =>
+          case Some(Right(cache)) if cache == movement || cache.sequenceNumber > movement.sequenceNumber =>
+            //If the movement is the same, or the cached movement is newer than the movement retrieved then don't update Mongo.
             Future.successful(getMovementMongoResponseRight)
           case _ =>
             repository.set(getMovementMongoResponseRight)

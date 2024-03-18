@@ -34,10 +34,10 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
 
   "writes" should {
     "write a model to JSON" in {
-      Json.toJson(getMovementResponse()) shouldBe getMovementJson
+      Json.toJson(getMovementResponse()) shouldBe getMovementJson()
     }
     "write a max model to JSON" in {
-      Json.toJson(maxGetMovementResponse) shouldBe maxGetMovementJson
+      Json.toJson(maxGetMovementResponse()) shouldBe maxGetMovementJson()
     }
   }
 
@@ -46,11 +46,11 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
     "successfully read a movement" when {
 
       "all fields are valid" in {
-        GetMovementResponse.xmlReader.read(XML.loadString(getMovementResponseBody)) shouldBe ParseSuccess(getMovementResponse())
+        GetMovementResponse.xmlReader.read(XML.loadString(getMovementResponseBody())) shouldBe ParseSuccess(getMovementResponse())
       }
 
       "maximum fields" in {
-        GetMovementResponse.xmlReader.read(XML.loadString(maxGetMovementResponseBody)) shouldBe ParseSuccess(maxGetMovementResponse)
+        GetMovementResponse.xmlReader.read(XML.loadString(maxGetMovementResponseBody())) shouldBe ParseSuccess(maxGetMovementResponse())
       }
 
       "duplicate CnCodes" in {

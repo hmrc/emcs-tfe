@@ -249,13 +249,13 @@ class LegacyMessagesControllerSpec extends TestBaseSpec with MockLegacyMessagesS
             .withBody(<message></message>)
 
           MockService.performMessageAction(GetMovement, requestWithAction)
-            .returns(EitherT.rightT(getRawMovementResponse))
+            .returns(EitherT.rightT(getRawMovementResponse()))
 
           val result = controller.performMessagesOperation()(requestWithAction)
 
           status(result) shouldBe OK
           contentType(result) shouldBe Some("application/soap+xml")
-          trim(XML.loadString(contentAsString(result))).toString() shouldBe trim(soapEnvelope(schemaResultBody(XML.loadString(getMovementResponseBody)))).toString()
+          trim(XML.loadString(contentAsString(result))).toString() shouldBe trim(soapEnvelope(schemaResultBody(XML.loadString(getMovementResponseBody())))).toString()
 
         }
       }

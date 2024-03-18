@@ -32,7 +32,7 @@ import scala.xml.XML
 
 trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
 
-  lazy val getMovementResponseBody: String =
+  def getMovementResponseBody(sequenceNumber: Int = 1): String =
     s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                                |    <mov:currentMovement>
                                                |      <mov:status>Accepted</mov:status>
@@ -85,7 +85,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |              <body:TimeOfDispatch>10:00:00</body:TimeOfDispatch>
                                                |            </body:EadEsad>
                                                |            <body:HeaderEadEsad>
-                                               |              <body:SequenceNumber>1</body:SequenceNumber>
+                                               |              <body:SequenceNumber>$sequenceNumber</body:SequenceNumber>
                                                |              <body:DateAndTimeOfUpdateValidation>2008-09-04T10:22:50</body:DateAndTimeOfUpdateValidation>
                                                |              <body:DestinationTypeCode>6</body:DestinationTypeCode>
                                                |              <body:JourneyTime>D20</body:JourneyTime>
@@ -462,7 +462,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |    </mov:eventHistory>
                                                |  </mov:movementView>""".stripMargin
 
-  lazy val getMovementSoapWrapper: String = s"""<tns:Envelope
+  def getMovementSoapWrapper(sequenceNumber: Int = 1): String = s"""<tns:Envelope
                                                |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                                |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
                                                |	<tns:Body>
@@ -483,7 +483,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |			<con:OperationResponse>
                                                |				<con:Results>
                                                |					<con:Result Name="">
-                                               |						<![CDATA[$getMovementResponseBody]]>
+                                               |						<![CDATA[${getMovementResponseBody(sequenceNumber)}]]>
                                                |					</con:Result>
                                                |				</con:Results>
                                                |			</con:OperationResponse>
@@ -491,9 +491,9 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |	</tns:Body>
                                                |</tns:Envelope>""".stripMargin
 
-  def getMovementResponse(journeyTimeValue: String = "20 days"): GetMovementResponse = GetMovementResponse(
+  def getMovementResponse(journeyTimeValue: String = "20 days", sequenceNumber: Int = 1): GetMovementResponse = GetMovementResponse(
     arc = "13AB7778889991ABCDEF9",
-    sequenceNumber = 1,
+    sequenceNumber,
     destinationType = Export,
     memberStateCode = Some("GB"),
     serialNumberOfCertificateOfExemption = None,
@@ -698,14 +698,14 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     )
   )
 
-  lazy val getRawMovementResponse: RawGetMovementResponse = RawGetMovementResponse("dateTime", testErn, XML.loadString(getMovementResponseBody))
+  def getRawMovementResponse(sequenceNumber: Int = 1): RawGetMovementResponse = RawGetMovementResponse("dateTime", testErn, XML.loadString(getMovementResponseBody(sequenceNumber)))
 
-  lazy val getRawMovementJson: JsValue        = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> Base64.getEncoder.encodeToString(getMovementResponseBody.getBytes))
-  lazy val getRawMovementInvalidJson: JsValue = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> getMovementResponseBody)
+  def getRawMovementJson(sequenceNumber: Int = 1): JsValue = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> Base64.getEncoder.encodeToString(getMovementResponseBody(sequenceNumber).getBytes))
+  def getRawMovementInvalidJson(sequenceNumber: Int = 1): JsValue = Json.obj("dateTime" -> "dateTime", "exciseRegistrationNumber" -> testErn, "message" -> getMovementResponseBody(sequenceNumber))
 
-  lazy val getMovementJson: JsValue = Json.obj(
+  def getMovementJson(sequenceNumber: Int = 1): JsValue = Json.obj(
     fields = "arc" -> "13AB7778889991ABCDEF9",
-    "sequenceNumber"                                  -> 1,
+    "sequenceNumber"                                  -> sequenceNumber,
     "destinationType"                                 -> "6",
     "memberStateCode"                                 -> "GB",
     "consignorTrader"                                 -> maxTraderModelJson(ConsignorTrader),
@@ -849,7 +849,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     )
   )
 
-  lazy val maxGetMovementResponseBody: String =
+  def maxGetMovementResponseBody(sequenceNumber: Int = 1): String =
     s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
                                          |    <mov:currentMovement>
                                          |      <mov:status>Beans</mov:status>
@@ -958,7 +958,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |              </body:ImportSad>
                                          |            </body:EadEsad>
                                          |            <body:HeaderEadEsad>
-                                         |              <body:SequenceNumber>1</body:SequenceNumber>
+                                         |              <body:SequenceNumber>$sequenceNumber</body:SequenceNumber>
                                          |              <body:DateAndTimeOfUpdateValidation>HeaderEadEsadDateTime</body:DateAndTimeOfUpdateValidation>
                                          |              <body:DestinationTypeCode>10</body:DestinationTypeCode>
                                          |              <body:JourneyTime>H10</body:JourneyTime>
@@ -1160,9 +1160,9 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |    </mov:eventHistory>
                                          |  </mov:movementView>""".stripMargin
 
-  lazy val maxGetMovementResponse: GetMovementResponse = GetMovementResponse(
+  def maxGetMovementResponse(sequenceNumber: Int = 1): GetMovementResponse = GetMovementResponse(
     arc = "ExciseMovementArc",
-    sequenceNumber = 1,
+    sequenceNumber,
     destinationType = DestinationType.TemporaryCertifiedConsignee,
     memberStateCode = Some("CCTMemberStateCode"),
     serialNumberOfCertificateOfExemption = Some("CCTSerialNumber"),
@@ -1490,9 +1490,9 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     )
   )
 
-  lazy val maxGetMovementJson: JsObject = Json.obj(
+  def maxGetMovementJson(sequenceNumber: Int = 1): JsObject = Json.obj(fields =
     "arc"                                  -> "ExciseMovementArc",
-    "sequenceNumber"                       -> 1,
+    "sequenceNumber"                       -> sequenceNumber,
     "destinationType"                      -> "10",
     "memberStateCode"                      -> "CCTMemberStateCode",
     "serialNumberOfCertificateOfExemption" -> "CCTSerialNumber",
@@ -1778,6 +1778,6 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     )
   )
 
-  lazy val getMovementMongoResponse: GetMovementMongoResponse = GetMovementMongoResponse(testArc, JsString(getMovementResponseBody))
+  def getMovementMongoResponse(sequenceNumber: Int = 1): GetMovementMongoResponse = GetMovementMongoResponse(testArc, sequenceNumber, data = JsString(getMovementResponseBody(sequenceNumber)))
 
 }
