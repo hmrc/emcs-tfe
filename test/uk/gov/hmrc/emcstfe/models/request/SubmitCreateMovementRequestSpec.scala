@@ -214,9 +214,20 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
 
         "placeOfDispatch is NOT defined" should {
 
-          s"return country code GB" in {
+          "when consignorERN is defined" should {
 
-            requestWithMovement(movementType, hasPlaceOfDispatch = false).messageSenderCountryCode() shouldBe None
+            s"return country code of consignor" in {
+
+              requestWithMovement(movementType, hasPlaceOfDispatch = false).messageSenderCountryCode() shouldBe Some(consignorTraderCountryCode)
+            }
+          }
+
+          "when consignorERN is NOT defined (should never happen)" should {
+
+            s"return country code as None" in {
+
+              requestWithMovement(movementType, hasPlaceOfDispatch = false, hasConsignorErn = false).messageSenderCountryCode() shouldBe None
+            }
           }
         }
       }
@@ -475,7 +486,8 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
 
   def requestWithMovement(movement: MovementType,
                           destinationType: DestinationType = DestinationType.TaxWarehouse,
-                          hasPlaceOfDispatch: Boolean = true): SubmitCreateMovementRequest = {
+                          hasPlaceOfDispatch: Boolean = true,
+                          hasConsignorErn: Boolean = true): SubmitCreateMovementRequest = {
 
     val request =
       CreateMovementFixtures.createMovementModelMax
@@ -496,7 +508,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
           _.copy(referenceNumber = deliveryPlaceCustomsOfficeCountryCode)
         ))
         .copy(consignorTrader = CreateMovementFixtures.createMovementModelMax.consignorTrader
-          .copy(traderExciseNumber = Some(consignorTraderCountryCode))
+          .copy(traderExciseNumber = Option.when(hasConsignorErn)(consignorTraderCountryCode))
         )
 
     SubmitCreateMovementRequest(
