@@ -78,7 +78,7 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
   private[request] def messageSenderCountryCode(): Option[String] =
     body.movementType match {
       case UKtoUK | UKtoEU | DirectExport | IndirectExport =>
-        body.placeOfDispatchTrader.flatMap(_.countryCode)
+        body.placeOfDispatchTrader.flatMap(_.countryCode).fold(body.consignorTrader.countryCode)(Some(_))
       case _ =>
         body.consignorTrader.countryCode
     }
