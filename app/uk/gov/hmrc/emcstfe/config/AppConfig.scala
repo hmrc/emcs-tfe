@@ -103,6 +103,8 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def eisGetMovementHistoryEventsUrl(): String =
     eisBaseUrl + "/emcs/movements/v1/movement-history"
 
+  def eisPreValidateTraderUrl(): String =
+    eisBaseUrl + "/emcs/pre-validate-trader/v1"
 
   def urlEMCSApplicationService(): String =
     chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
