@@ -26,7 +26,7 @@ class ExciseTraderValidationRequestSpec extends TestBaseSpec with PreValidateFix
     exciseTraderValidationRequest = ExciseTraderValidationRequest(
       exciseTraderRequest = ExciseTraderRequest(
         exciseRegistrationNumber = testErn,
-        entityGroup = "UK Trader",
+        entityGroup = "UK Record",
         validateProductAuthorisationRequest = Seq.empty
       )
     )

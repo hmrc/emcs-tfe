@@ -32,7 +32,7 @@ trait PreValidateFixtures extends BaseFixtures {
     exciseTraderValidationRequest = ExciseTraderValidationRequest(
       exciseTraderRequest = ExciseTraderRequest(
         exciseRegistrationNumber = testErn,
-        entityGroup = "UK Trader",
+        entityGroup = "UK Record",
         validateProductAuthorisationRequest = Seq(
           ValidateProductAuthorisationRequest(
             product = Product(exciseProductCode = "W200")
