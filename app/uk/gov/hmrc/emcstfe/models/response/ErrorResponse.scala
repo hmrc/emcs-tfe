@@ -101,6 +101,4 @@ object ErrorResponse {
   case object NoLegacyActionProvided extends ErrorResponse {
     val message = s"no action found in the request"
   }
-
-  case class PreValidationError(message: String) extends ErrorResponse
 }
