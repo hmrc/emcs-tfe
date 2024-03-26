@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.response.prevalidate
 import play.api.libs.json.{Format, Json}
 
 
-case class ProductErrors(
+case class ProductError(
                           exciseProductCode: String,
                           errorCode: String,
                           errorText: String
@@ -27,7 +27,7 @@ case class ProductErrors(
 
 case class ValidateProductAuthorisationResponse(
                                                  valid: Boolean,
-                                                 productError: Option[Seq[ProductErrors]] = None
+                                                 productError: Option[Seq[ProductError]] = None
                                                )
 
 case class ExciseTraderResponse(
@@ -48,8 +48,8 @@ case class ExciseTraderValidationResponse (
 case class PreValidateTraderApiResponse(exciseTraderValidationResponse: ExciseTraderValidationResponse)
 
 
-object ProductErrors {
-  implicit val format: Format[ProductErrors] = Json.format
+object ProductError {
+  implicit val format: Format[ProductError] = Json.format
 }
 
 object ValidateProductAuthorisationResponse {
