@@ -79,10 +79,19 @@ trait MockHttpClient extends MockFactory {
         })
     }
 
-    def post[I, T](url: String,
-                   body: I): CallHandler[Future[T]] = {
+    def post[I, T](url: String, body: I): CallHandler[Future[T]] = {
       (mockHttpClient
         .POST[I, T](_: String, _: I, _: Seq[(String, String)])(_: Writes[I], _: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
+        .expects(assertArgs { (actualUrl, actualBody: I, _, _, _, _, _) => {
+          actualUrl shouldBe url
+          actualBody shouldBe body
+        }
+        })
+    }
+
+    def put[I, T](url: String, body: I): CallHandler[Future[T]] = {
+      (mockHttpClient
+        .PUT[I, T](_: String, _: I, _: Seq[(String, String)])(_: Writes[I], _: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs { (actualUrl, actualBody: I, _, _, _, _, _) => {
           actualUrl shouldBe url
           actualBody shouldBe body

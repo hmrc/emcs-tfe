@@ -67,6 +67,10 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   def userAllowListBaseUrl(): String = s"$userAllowListService/user-allow-list"
 
+  private def nrsBrokerService: String = servicesConfig.baseUrl("nrs-broker")
+
+  def nrsBrokerBaseUrl(): String = s"$nrsBrokerService/emcs-tfe-nrs-message-broker"
+
   def eisSubmissionsUrl(): String =
     eisBaseUrl + "/emcs/digital-submit-new-message/v1"
 
