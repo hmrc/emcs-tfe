@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.utils
+package uk.gov.hmrc.emcstfe.models.nrs.alertReject
 
-import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.emcstfe.fixtures.NRSBrokerFixtures
+import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
+import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class SHA256HashingSpec extends PlaySpec with NRSBrokerFixtures {
+class AlertRejectNRSSubmissionSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
 
-  ".getHash" should {
+  ".apply" should {
 
-    "parse a value into the correct SHA-256 hash" in {
+    s"generate the correct model from the $SubmitAlertOrRejectionModel" in {
 
-      val expectedValue: String = "80298ad82661b0744d95cd969f782fdde6db73e92d25f52ef0b77b803bfbf4d9"
-
-      SHA256Hashing.getHash(testPlainTextPayload) mustBe expectedValue
+      AlertRejectNRSSubmission.apply(maxSubmitAlertOrRejectionModel) shouldBe nrsSubmission
     }
   }
 }

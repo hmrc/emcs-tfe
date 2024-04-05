@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
-import uk.gov.hmrc.auth.core.retrieve.{AgentInformation, ItmpAddress, ItmpName, LoginTimes}
-import uk.gov.hmrc.auth.core.{ConfidenceLevel, User}
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.CreateMovementNotableEvent
+import uk.gov.hmrc.auth.core.ConfidenceLevel
+import uk.gov.hmrc.auth.core.retrieve._
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.{AlertRejectNotableEvent, CreateMovementNotableEvent}
 import uk.gov.hmrc.emcstfe.models.nrs.{IdentityData, NRSMetadata, NRSPayload, SearchKeys}
 import uk.gov.hmrc.emcstfe.models.response.nrsBroker.NRSBrokerInsertPayloadResponse
 
@@ -29,21 +29,49 @@ import java.time.Instant
 trait NRSBrokerFixtures extends BaseFixtures {
 
   val identityDataModel: IdentityData = IdentityData(
+    internalId = Some(testInternalId),
+    externalId = Some("externalId"),
     confidenceLevel = ConfidenceLevel.L200,
     agentInformation = AgentInformation(Some("agentId"), Some("agentCode"), Some("agentFriendlyName")),
-    itmpName = ItmpName(None, None, None),
-    itmpAddress = ItmpAddress(None, None, None, None, None, None, None, None),
+    itmpName = None,
+    itmpAddress = None,
     loginTimes = LoginTimes(Instant.ofEpochMilli(1L), None),
-    credentialRole = Some(User),
-    affinityGroup = Some(Organisation)
+    credentialRole = None,
+    affinityGroup = Some(Organisation),
+    credentials = Some(Credentials(providerId = testCredId, providerType = "gg"))
   )
 
-  /* Payload:
-    {
-      "testing": "emcs-tfe",
-      "version": "1"
-    }
- */
+  val predicateRetrieval = new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(new ~(
+    Some(Organisation),
+    Some(testInternalId)),
+    Some("externalId")),
+    None),
+    Some(Credentials(providerId = testCredId, providerType = "gg"))),
+    ConfidenceLevel.L200),
+    None),
+    None),
+    None),
+    None),
+    AgentInformation(Some("agentId"), Some("agentCode"), Some("agentFriendlyName"))),
+    None),
+    None),
+    None),
+    None),
+    None),
+    None),
+    LoginTimes(Instant.ofEpochMilli(1L), None)
+  )
+
+  val testJsonPayload: JsObject = Json.obj(
+    "testing" -> "emcs-tfe",
+    "version" -> "1"
+  )
+
+  val testPlainTextPayload: String =
+    """{
+      |    "testing": "emcs-tfe",
+      |    "version": "1"
+      |}""".stripMargin
 
   val nrsMetadataModel: NRSMetadata = NRSMetadata(
     businessId = "emcs",
@@ -77,4 +105,17 @@ trait NRSBrokerFixtures extends BaseFixtures {
   )
 
   val nrsBrokerResponseModel: NRSBrokerInsertPayloadResponse = NRSBrokerInsertPayloadResponse("ref1")
+
+  val nrsBrokerResponseJson: JsValue = Json.obj("reference" -> "ref1")
+
+  // Specific journey payloads
+
+  val alertRejectNRSPayload = nrsPayloadModel.copy(
+    payload = "eyJhcmMiOiIyM0dCMDAwMDAwMDAwMDAzNzY5NjciLCJzZXF1ZW5jZU51bWJlciI6MSwiY29uc2lnbmVlVHJhZGVyIjp7InRyYWRlckV4Y2lzZU51bWJlciI6IkdCMDAwMDAwMDAxMjM0NiIsInRyYWRlck5hbWUiOiJuYW1lIiwiYWRkcmVzcyI6eyJzdHJlZXROdW1iZXIiOiJudW1iZXIiLCJzdHJlZXQiOiJzdHJlZXQiLCJwb3N0Y29kZSI6InBvc3Rjb2RlIiwiY2l0eSI6ImNpdHkifSwiZW9yaU51bWJlciI6ImVvcmkifSwiZXhjaXNlTW92ZW1lbnQiOnsiYXJjIjoiMjNHQjAwMDAwMDAwMDAwMzc2OTY3Iiwic2VxdWVuY2VOdW1iZXIiOjF9LCJkZXN0aW5hdGlvbk9mZmljZSI6IkdCMTIzNCIsImRhdGVPZkFsZXJ0T3JSZWplY3Rpb24iOiIyMDIzLTA3LTI0IiwiaXNSZWplY3RlZCI6dHJ1ZSwiYWxlcnRPclJlamVjdGlvblJlYXNvbnMiOlt7InJlYXNvbiI6IjEiLCJhZGRpdGlvbmFsSW5mb3JtYXRpb24iOiJmb28ifSx7InJlYXNvbiI6IjIifV19",
+    metadata = nrsMetadataModel.copy(
+      payloadSha256Checksum = "194faf8f248499edce72e13cdd8a6f1cd84521ea82dfb998ef34edb6bd4a5f14",
+      notableEvent = AlertRejectNotableEvent,
+      headerData = Json.obj("Host" -> "localhost")
+    )
+  )
 }
