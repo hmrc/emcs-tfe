@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.retrieve._
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.{AlertRejectNotableEvent, CreateMovementNotableEvent}
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.{AlertRejectNotableEvent, CreateMovementNotableEvent, ExplainShortageOrExcessNotableEvent}
 import uk.gov.hmrc.emcstfe.models.nrs.{IdentityData, NRSMetadata, NRSPayload, SearchKeys}
 import uk.gov.hmrc.emcstfe.models.response.nrsBroker.NRSBrokerInsertPayloadResponse
 
@@ -110,11 +110,20 @@ trait NRSBrokerFixtures extends BaseFixtures {
 
   // Specific journey payloads
 
-  val alertRejectNRSPayload = nrsPayloadModel.copy(
+  val alertRejectNRSPayload: NRSPayload = nrsPayloadModel.copy(
     payload = "eyJhcmMiOiIyM0dCMDAwMDAwMDAwMDAzNzY5NjciLCJzZXF1ZW5jZU51bWJlciI6MSwiY29uc2lnbmVlVHJhZGVyIjp7InRyYWRlckV4Y2lzZU51bWJlciI6IkdCMDAwMDAwMDAxMjM0NiIsInRyYWRlck5hbWUiOiJuYW1lIiwiYWRkcmVzcyI6eyJzdHJlZXROdW1iZXIiOiJudW1iZXIiLCJzdHJlZXQiOiJzdHJlZXQiLCJwb3N0Y29kZSI6InBvc3Rjb2RlIiwiY2l0eSI6ImNpdHkifSwiZW9yaU51bWJlciI6ImVvcmkifSwiZXhjaXNlTW92ZW1lbnQiOnsiYXJjIjoiMjNHQjAwMDAwMDAwMDAwMzc2OTY3Iiwic2VxdWVuY2VOdW1iZXIiOjF9LCJkZXN0aW5hdGlvbk9mZmljZSI6IkdCMTIzNCIsImRhdGVPZkFsZXJ0T3JSZWplY3Rpb24iOiIyMDIzLTA3LTI0IiwiaXNSZWplY3RlZCI6dHJ1ZSwiYWxlcnRPclJlamVjdGlvblJlYXNvbnMiOlt7InJlYXNvbiI6IjEiLCJhZGRpdGlvbmFsSW5mb3JtYXRpb24iOiJmb28ifSx7InJlYXNvbiI6IjIifV19",
     metadata = nrsMetadataModel.copy(
       payloadSha256Checksum = "194faf8f248499edce72e13cdd8a6f1cd84521ea82dfb998ef34edb6bd4a5f14",
       notableEvent = AlertRejectNotableEvent,
+      headerData = Json.obj("Host" -> "localhost")
+    )
+  )
+
+  val shortageExcessNRSPayload: NRSPayload = nrsPayloadModel.copy(
+    payload = "eyJlcm4iOiJHQldLMDAwMDAxMjM0IiwiYXJjIjoiMDFERTAwMDAwMTIzNDUiLCJzZXF1ZW5jZU51bWJlciI6MSwic3VibWl0dGVyVHlwZSI6IjEiLCJjb25zaWdub3JUcmFkZXIiOnsidHJhZGVyRXhjaXNlTnVtYmVyIjoiR0IwMDAwMDAwMDEyMzQ2IiwidHJhZGVyTmFtZSI6Im5hbWUiLCJhZGRyZXNzIjp7InN0cmVldE51bWJlciI6Im51bWJlciIsInN0cmVldCI6InN0cmVldCIsInBvc3Rjb2RlIjoicG9zdGNvZGUiLCJjaXR5IjoiY2l0eSJ9fSwiaW5kaXZpZHVhbEl0ZW1zIjpbeyJleGNpc2VQcm9kdWN0Q29kZSI6ImNvZGUiLCJib2R5UmVjb3JkVW5pcXVlUmVmZXJlbmNlIjoxLCJleHBsYW5hdGlvbiI6ImV4cGxhbmF0aW9uIiwiYWN0dWFsUXVhbnRpdHkiOjMuMn0seyJleGNpc2VQcm9kdWN0Q29kZSI6ImNvZGUiLCJib2R5UmVjb3JkVW5pcXVlUmVmZXJlbmNlIjoyLCJleHBsYW5hdGlvbiI6ImV4cGxhbmF0aW9uIn1dLCJkYXRlT2ZBbmFseXNpcyI6ImRhdGUiLCJnbG9iYWxFeHBsYW5hdGlvbiI6ImV4cGxhbmF0aW9uIn0=",
+    metadata = nrsMetadataModel.copy(
+      payloadSha256Checksum = "2769dee412ff9754f2f1150bdfa247a0c10e61861373b2bc71543dba81969f45",
+      notableEvent = ExplainShortageOrExcessNotableEvent,
       headerData = Json.obj("Host" -> "localhost")
     )
   )

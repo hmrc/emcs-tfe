@@ -20,6 +20,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.{Consignee, Consignor}
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, ExciseMovementModel, SubmitterType}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, AttributesModel, BodyAnalysisModel, SubmitExplainShortageExcessModel}
+import uk.gov.hmrc.emcstfe.models.nrs.explainShortageExcess.ExplainShortageExcessNRSSubmission
 
 import scala.xml.Elem
 
@@ -31,7 +32,9 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
     )
 
     def attributesXml(submitterType: SubmitterType): Elem = <urn:Attributes>
-      <urn:SubmitterType>{submitterType}</urn:SubmitterType>
+      <urn:SubmitterType>
+        {submitterType}
+      </urn:SubmitterType>
     </urn:Attributes>
 
     def attributesJson(submitterType: SubmitterType): JsObject = Json.obj(
@@ -116,6 +119,7 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
   }
 
   object SubmitExplainShortageExcessFixtures {
+
     import AnalysisFixtures._
     import AttributesFixtures._
     import BodyAnalysisFixtures._
@@ -152,8 +156,7 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
     }
 
     def submitExplainShortageExcessXmlMin(submitterType: SubmitterType): Elem = <urn:ExplanationOnReasonForShortage>
-      {attributesXml(submitterType)}
-      {exciseMovementXml}
+      {attributesXml(submitterType)}{exciseMovementXml}
     </urn:ExplanationOnReasonForShortage>
 
     def submitExplainShortageExcessJsonMax(submitterType: SubmitterType): JsObject = {
@@ -175,6 +178,21 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
     def submitExplainShortageExcessJsonMin(submitterType: SubmitterType): JsObject = Json.obj(
       "attributes" -> attributesJson(submitterType),
       "exciseMovement" -> exciseMovementJson
+    )
+  }
+
+  def nrsSubmission(submitterType: SubmitterType, ern: String): ExplainShortageExcessNRSSubmission = {
+    val submissionModel = SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(submitterType)
+    ExplainShortageExcessNRSSubmission(
+      ern = ern,
+      arc = submissionModel.exciseMovement.arc,
+      sequenceNumber = submissionModel.exciseMovement.sequenceNumber,
+      submitterType = submitterType,
+      consigneeTrader = submissionModel.consigneeTrader,
+      consignorTrader = submissionModel.consignorTrader,
+      individualItems = submissionModel.bodyAnalysis,
+      dateOfAnalysis = submissionModel.analysis.map(_.dateOfAnalysis),
+      globalExplanation = submissionModel.analysis.map(_.globalExplanation)
     )
   }
 }
