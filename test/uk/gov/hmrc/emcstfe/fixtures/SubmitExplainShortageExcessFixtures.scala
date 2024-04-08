@@ -181,7 +181,7 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
     )
   }
 
-  def nrsSubmission(submitterType: SubmitterType, ern: String): ExplainShortageExcessNRSSubmission = {
+  def explainShortageExcessNRSSubmission(submitterType: SubmitterType, ern: String): ExplainShortageExcessNRSSubmission = {
     val submissionModel = SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(submitterType)
     ExplainShortageExcessNRSSubmission(
       ern = ern,

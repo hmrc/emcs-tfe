@@ -49,7 +49,7 @@ class SubmitExplainShortageExcessControllerSpec extends TestBaseSpec
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 
       if (isNRSEnabled) {
-        MockNRSBrokerService.submitPayload(nrsSubmission(Consignor, testErn), testErn, ExplainShortageOrExcessNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+        MockNRSBrokerService.submitPayload(explainShortageExcessNRSSubmission(Consignor, testErn), testErn, ExplainShortageOrExcessNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
       }
     }
 

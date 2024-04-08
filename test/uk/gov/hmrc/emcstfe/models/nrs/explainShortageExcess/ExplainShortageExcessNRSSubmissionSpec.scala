@@ -28,10 +28,10 @@ class ExplainShortageExcessNRSSubmissionSpec extends TestBaseSpec with SubmitExp
     s"generate the correct model from the $SubmitExplainShortageExcessModel" in {
 
       ExplainShortageExcessNRSSubmission
-        .apply(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignee), testErn) shouldBe nrsSubmission(Consignee, testErn)
+        .apply(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignee), testErn) shouldBe explainShortageExcessNRSSubmission(Consignee, testErn)
 
       ExplainShortageExcessNRSSubmission
-        .apply(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignor), testErn) shouldBe nrsSubmission(Consignor, testErn)
+        .apply(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignor), testErn) shouldBe explainShortageExcessNRSSubmission(Consignor, testErn)
     }
   }
 
