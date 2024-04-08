@@ -44,6 +44,7 @@ trait IntegrationBaseSpec
     "microservice.services.chris.port" -> WireMockHelper.wireMockPort,
     "microservice.services.eis.port" -> WireMockHelper.wireMockPort,
     "microservice.services.user-allow-list.port" -> WireMockHelper.wireMockPort,
+    "microservice.services.nrs-broker.port" -> WireMockHelper.wireMockPort,
     "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort,
     "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
     "createMovementUserAnswers.TTL" -> testTtl,

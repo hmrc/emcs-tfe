@@ -28,23 +28,16 @@ class NRSPayloadSpec extends TestBaseSpec with NRSBrokerFixtures {
 
   ".apply" should {
 
-    val plainPayload: String =
-      """{
-        |    "testing": "emcs-tfe",
-        |    "version": "1"
-        |}""".stripMargin
-
     "generate the correct payload by encoding, hashing the payload and applying the correct attributes" in {
 
-      val result = NRSPayload.apply(plainPayload, CreateMovementNotableEvent, identityDataModel, testErn)(hc.copy(authorization = Some(Authorization("Bearer token"))), implicitly)
+      val result = NRSPayload.apply(testPlainTextPayload, CreateMovementNotableEvent, identityDataModel, testErn, Instant.ofEpochMilli(1L))(hc.copy(authorization = Some(Authorization("Bearer token"))), implicitly)
 
-      //When the model is created, it does Instant.now so copy the model to set the submission timestamp concretely
-      result.copy(metadata = result.metadata.copy(userSubmissionTimestamp = Instant.ofEpochMilli(1L))) shouldBe nrsPayloadModel.copy(metadata = nrsPayloadModel.metadata.copy(headerData = Json.obj("Host" -> "localhost")))
+      result shouldBe nrsPayloadModel.copy(metadata = nrsPayloadModel.metadata.copy(headerData = Json.obj("Host" -> "localhost")))
     }
 
     "throw an exception when an auth token is not in the HeaderCarrier" in {
 
-      intercept[NoSuchElementException](NRSPayload.apply(plainPayload, CreateMovementNotableEvent, identityDataModel, testErn)(hc.copy(authorization = None), implicitly))
+      intercept[NoSuchElementException](NRSPayload.apply(testPlainTextPayload, CreateMovementNotableEvent, identityDataModel, testErn, Instant.ofEpochMilli(1L))(hc.copy(authorization = None), implicitly))
     }
   }
 

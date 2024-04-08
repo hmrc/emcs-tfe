@@ -26,27 +26,42 @@ object AuthStub extends DownstreamStub with BaseFixtures {
 
   val authoriseUri = "/auth/authorise"
 
-  def authorised(exciseNumber: String = testErn): StubMapping =
+  def authorised(exciseNumber: String = testErn, withIdentityData: Boolean = false): StubMapping =
     onSuccess(POST, authoriseUri, OK, Json.obj(
-        "affinityGroup" -> "Organisation",
-        "allEnrolments" -> Json.arr(
-          Json.obj(
-            "key" -> EnrolmentKeys.EMCS_ENROLMENT,
-            "identifiers" -> Json.arr(
-              Json.obj(
-                "key" -> EnrolmentKeys.ERN,
-                "value" -> exciseNumber,
-                "state" -> EnrolmentKeys.ACTIVATED
-              )
+      "affinityGroup" -> "Organisation",
+      "allEnrolments" -> Json.arr(
+        Json.obj(
+          "key" -> EnrolmentKeys.EMCS_ENROLMENT,
+          "identifiers" -> Json.arr(
+            Json.obj(
+              "key" -> EnrolmentKeys.ERN,
+              "value" -> exciseNumber,
+              "state" -> EnrolmentKeys.ACTIVATED
             )
           )
-        ),
-        "internalId" -> testInternalId,
-        "optionalCredentials" -> Json.obj(
-          "providerId" -> testCredId,
-          "providerType" -> "gg"
         )
-      ))
+      ),
+      "internalId" -> testInternalId,
+      "optionalCredentials" -> Json.obj(
+        "providerId" -> testCredId,
+        "providerType" -> "gg"
+      )
+    ).deepMerge(
+      if (withIdentityData) {
+        Json.obj(
+          "externalId" -> "externalId",
+          "confidenceLevel" -> 200,
+          "agentInformation" -> Json.obj(
+            "agentId" -> "agentId",
+            "agentCode" -> "agentCode",
+            "agentFriendlyName" -> "agentFriendlyName"
+          ),
+          "loginTimes" -> Json.obj(
+            "currentLogin" -> "1970-01-01T00:00:00.001Z"
+          )
+        )
+      } else Json.obj()
+    ))
 
   def unauthorised(): StubMapping =
     onError(POST, authoriseUri, UNAUTHORIZED)

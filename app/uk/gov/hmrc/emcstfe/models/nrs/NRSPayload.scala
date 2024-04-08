@@ -31,7 +31,7 @@ object NRSPayload {
 
   implicit val writes: Writes[NRSPayload] = Json.writes[NRSPayload]
 
-  def apply(payload: String, notableEvent: NotableEvent, identityData: IdentityData, ern: String)
+  def apply(payload: String, notableEvent: NotableEvent, identityData: IdentityData, ern: String, timestamp: Instant)
            (implicit hc: HeaderCarrier, userRequest: UserRequest[_]): NRSPayload = {
     NRSPayload(
       payload = Base64.getEncoder.encodeToString(payload.getBytes(StandardCharsets.UTF_8)),
@@ -40,7 +40,7 @@ object NRSPayload {
         notableEvent = notableEvent,
         payloadContentType = "application/json",
         payloadSha256Checksum = SHA256Hashing.getHash(payload),
-        userSubmissionTimestamp = Instant.now,
+        userSubmissionTimestamp = timestamp,
         identityData = identityData,
         userAuthToken = hc.authorization.get.value,
         headerData = JsObject(userRequest.request.headers.toMap.map(kv => kv._1 -> JsString(kv._2 mkString ","))),

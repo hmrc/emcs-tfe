@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-  val switches: Seq[FeatureSwitch] = Seq(UseDownstreamStub, SendToEIS, ValidateUsingFS41Schema, EnablePrivateBeta, EnablePublicBeta, DefaultDraftMovementCorrelationId)
+  val switches: Seq[FeatureSwitch] = Seq(UseDownstreamStub, SendToEIS, ValidateUsingFS41Schema, EnablePrivateBeta, EnablePublicBeta, DefaultDraftMovementCorrelationId, EnableNRS)
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
@@ -62,4 +62,9 @@ case object EnablePublicBeta extends FeatureSwitch {
 case object DefaultDraftMovementCorrelationId extends FeatureSwitch {
   override val configName: String = "features.defaultDraftMovementCorrelationId"
   override val displayName: String = "Defaults the draft movement correlation ID (local/staging only)"
+}
+
+case object EnableNRS extends FeatureSwitch {
+  override val configName: String = "features.enableNRS"
+  override val displayName: String = "Enables sending submissions to NRS"
 }

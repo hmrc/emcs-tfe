@@ -49,6 +49,11 @@ trait DownstreamStub extends WireMockMethods {
       .thenReturn(status = status, body)
   }
 
+  def onSuccessWithRequestBodyAndHeaders(method: HTTPMethod, uri: String, headers: Map[String, String], status: Int, requestBody: Option[String], responseBody: JsValue): StubMapping = {
+    whenWithBody(method = method, uri = uri, headers = headers, body = requestBody)
+      .thenReturn(status = status, responseBody)
+  }
+
   def onError(method: HTTPMethod, uri: String, errorStatus: Int): StubMapping =
     when(method, uri).thenReturn(errorStatus)
 

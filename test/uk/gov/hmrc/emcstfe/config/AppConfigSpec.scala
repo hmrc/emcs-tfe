@@ -72,16 +72,6 @@ class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
       }
     }
 
-    //TODO: TEMPORARY TEST TO INCREASE COVERAGE
-    //TODO: this should be removed once we have made an actual call to the NRS connector in the IT's
-    ".nrsBrokerBaseUrl" should {
-
-      "return the correct URL" in {
-
-        config.nrsBrokerBaseUrl() shouldBe "http://localhost:8315/emcs-tfe-nrs-message-broker"
-      }
-    }
-
     "tokens" should {
       "return the correct value for eis.emcs08.token" in {
         config.eisSubmitBearerToken shouldBe "value-emcs08"
