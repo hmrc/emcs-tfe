@@ -26,7 +26,7 @@ class AlertRejectNRSSubmissionSpec extends TestBaseSpec with SubmitAlertOrReject
 
     s"generate the correct model from the $SubmitAlertOrRejectionModel" in {
 
-      AlertRejectNRSSubmission.apply(maxSubmitAlertOrRejectionModel) shouldBe nrsSubmission
+      AlertRejectNRSSubmission.apply(maxSubmitAlertOrRejectionModel) shouldBe alertRejectNRSSubmission
     }
   }
 }

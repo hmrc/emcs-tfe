@@ -149,7 +149,7 @@ trait SubmitAlertOrRejectionFixtures extends BaseFixtures with TraderModelFixtur
       </urn:AlertOrRejection>
     </urn:AlertOrRejectionOfEADESAD>
 
-  val nrsSubmission: AlertRejectNRSSubmission = AlertRejectNRSSubmission(
+  val alertRejectNRSSubmission: AlertRejectNRSSubmission = AlertRejectNRSSubmission(
     arc = maxSubmitAlertOrRejectionModel.exciseMovement.arc,
     sequenceNumber = maxSubmitAlertOrRejectionModel.exciseMovement.sequenceNumber,
     consigneeTrader = maxSubmitAlertOrRejectionModel.consigneeTrader,

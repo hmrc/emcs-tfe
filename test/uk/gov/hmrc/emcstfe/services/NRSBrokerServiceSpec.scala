@@ -51,7 +51,7 @@ class NRSBrokerServiceSpec extends TestBaseSpec with MockNRSBrokerConnector with
 
         MockAuthConnector.authorise(EmptyPredicate, retrievals).returns(Future.failed(UnsupportedAuthProvider("Game over!")))
 
-        await(service.submitPayload(nrsSubmission, testErn, CreateMovementNotableEvent)) shouldBe Left(IdentityDataException("UnsupportedAuthProvider"))
+        await(service.submitPayload(alertRejectNRSSubmission, testErn, CreateMovementNotableEvent)) shouldBe Left(IdentityDataException("UnsupportedAuthProvider"))
       }
 
       "the broker connector returns a Left" in new Setup {
@@ -60,7 +60,7 @@ class NRSBrokerServiceSpec extends TestBaseSpec with MockNRSBrokerConnector with
 
         MockNRSBrokerConnector.submitPayload(alertRejectNRSPayload, testErn).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-        await(service.submitPayload(nrsSubmission, testErn, AlertRejectNotableEvent)) shouldBe Left(UnexpectedDownstreamResponseError)
+        await(service.submitPayload(alertRejectNRSSubmission, testErn, AlertRejectNotableEvent)) shouldBe Left(UnexpectedDownstreamResponseError)
       }
 
       "the broker connector returns an unhandled future exception" in new Setup {
@@ -69,7 +69,7 @@ class NRSBrokerServiceSpec extends TestBaseSpec with MockNRSBrokerConnector with
 
         MockNRSBrokerConnector.submitPayload(alertRejectNRSPayload, testErn).returns(Future.failed(new Exception("Game over!")))
 
-        await(service.submitPayload(nrsSubmission, testErn, AlertRejectNotableEvent)) shouldBe Left(UnexpectedDownstreamResponseError)
+        await(service.submitPayload(alertRejectNRSSubmission, testErn, AlertRejectNotableEvent)) shouldBe Left(UnexpectedDownstreamResponseError)
       }
     }
 
@@ -81,7 +81,7 @@ class NRSBrokerServiceSpec extends TestBaseSpec with MockNRSBrokerConnector with
 
         MockNRSBrokerConnector.submitPayload(alertRejectNRSPayload, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
 
-        await(service.submitPayload(nrsSubmission, testErn, AlertRejectNotableEvent)) shouldBe Right(nrsBrokerResponseModel)
+        await(service.submitPayload(alertRejectNRSSubmission, testErn, AlertRejectNotableEvent)) shouldBe Right(nrsBrokerResponseModel)
       }
     }
   }

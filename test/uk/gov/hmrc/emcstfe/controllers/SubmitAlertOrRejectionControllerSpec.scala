@@ -47,7 +47,7 @@ class SubmitAlertOrRejectionControllerSpec extends TestBaseSpec
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 
       if (isNRSEnabled) {
-        MockNRSBrokerService.submitPayload(nrsSubmission, testErn, AlertRejectNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+        MockNRSBrokerService.submitPayload(alertRejectNRSSubmission, testErn, AlertRejectNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
       }
     }
 
