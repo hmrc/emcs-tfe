@@ -21,8 +21,11 @@ import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.models.common.Descending
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
+import uk.gov.hmrc.emcstfe.models.request.{GetDraftMovementSearchOptions, LRN, LastUpdatedDate}
+import uk.gov.hmrc.emcstfe.models.response.SearchDraftMovementsResponse
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository._
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
@@ -52,6 +55,8 @@ trait CreateMovementUserAnswersRepository {
   def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]]
 
   def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): Future[Boolean]
+
+  def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions): Future[SearchDraftMovementsResponse]
 }
 
 @Singleton
@@ -159,6 +164,81 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
       )
       .toFuture()
       .map(_ => true)
+
+  def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions): Future[SearchDraftMovementsResponse] = {
+
+    val findFilter = {
+      Filters.and(
+        Seq(
+          //Drafts for this ERN
+          Some(Filters.equal(ernField, ern)),
+
+          //Drafts which match any search text across LRN, Consignee Name, Consignee ERN or Destination Warehouse ERN
+          searchOptions.searchString.map(searchKey =>
+            Filters.or(
+              Filters.regex(lrnField, searchKey),
+              Filters.regex(consigneeNameField, searchKey),
+              Filters.regex(consigneeErnField, searchKey),
+              Filters.regex(destinationWarehouseField, searchKey)
+            )
+          ),
+
+          //Filter by Destination Type(s) (used the underlying associated MovementScenario(s) to match against Drafts)
+          searchOptions.destinationTypes.map(destinationTypes =>
+            Filters.or(
+              destinationTypes.flatMap(_.movementScenarios).map(Filters.equal(destinationTypeField, _)):_*
+            )
+          ),
+
+          //Filter by Dispatch from/to
+          (searchOptions.dateOfDispatchFrom, searchOptions.dateOfDispatchTo) match {
+            case (Some(from), Some(to)) =>
+              Some(Filters.and(
+                Filters.gte(dateOfDispatchDateField, Codecs.toBson(from)),
+                Filters.lte(dateOfDispatchDateField, Codecs.toBson(to))
+              ))
+            case (Some(from), _) =>
+              Some(Filters.gte(dateOfDispatchDateField, Codecs.toBson(from)))
+            case (_, Some(to)) =>
+              Some(Filters.lte(dateOfDispatchDateField, Codecs.toBson(to)))
+            case _ =>
+              None
+          },
+
+          //Filter by EPC, where at least one of the added items in the array matches the selected EPC code
+          searchOptions.exciseProductCode.map { epc =>
+            Filters.equal(itemProductCode, epc)
+          },
+
+          //Filter for drafts which have submission failure body
+          searchOptions.draftHasErrors.flatMap { hasErrors =>
+            Option.when(hasErrors)(Filters.eq(submissionFailuresErrorFixedField, false))
+          }
+        ).flatten:_*
+      )
+    }
+
+    val sortFilter = {
+      val sortField = searchOptions.sortField match {
+        case LRN => lrnField
+        case LastUpdatedDate => lastUpdatedField
+      }
+      if(searchOptions.sortOrder == Descending) Sorts.descending(sortField) else Sorts.ascending(sortField)
+    }
+
+    val countOfMatchedDocuments = collection.countDocuments(findFilter).toFuture()
+    val paginatedResult = collection
+      .find(findFilter)
+      .sort(sortFilter)
+      .skip(searchOptions.startPosition)
+      .limit(searchOptions.maxRows)
+      .toFuture()
+
+    for {
+      count <- countOfMatchedDocuments
+      result <- paginatedResult
+    } yield SearchDraftMovementsResponse(result, count.toInt)
+  }
 }
 
 object CreateMovementUserAnswersRepository {
@@ -170,10 +250,17 @@ object CreateMovementUserAnswersRepository {
   val submittedDraftIdField = "submittedDraftId"
 
   val lrnField = "data.info.localReferenceNumber"
+  val consigneeNameField = "data.consignee.businessName"
+  val consigneeErnField = "data.consignee.exciseRegistrationNumber"
+  val destinationWarehouseField = "data.destination.destinationWarehouseExcise"
+  val destinationTypeField = "data.info.destinationType"
+  val dateOfDispatchDateField = "data.info.dispatchDetails.date"
+  val itemProductCode = "data.items.addedItems.itemExciseProductCode"
 
   val lastUpdatedField = "lastUpdated"
 
   val submissionFailuresField = "submissionFailures"
+  val submissionFailuresErrorFixedField = s"$submissionFailuresField.hasBeenFixed"
 
   val hasBeenSubmittedField = "hasBeenSubmitted"
 

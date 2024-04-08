@@ -18,7 +18,8 @@ package uk.gov.hmrc.emcstfe.services.userAnswers
 
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, SearchDraftMovementsResponse}
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.services.recovery
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -46,4 +47,7 @@ class CreateMovementUserAnswersService @Inject()(repo: CreateMovementUserAnswers
 
   def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure])(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[String]]] =
     repo.setErrorMessagesForDraftMovement(ern, submittedDraftId, errors).map(Right(_)).recover(recovery)
+
+  def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions)(implicit executionContext: ExecutionContext): Future[Either[ErrorResponse, SearchDraftMovementsResponse]] =
+    repo.searchDrafts(ern, searchOptions).map(Right(_)).recover(recovery)
 }

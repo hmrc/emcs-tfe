@@ -21,12 +21,13 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
+import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
 import uk.gov.hmrc.emcstfe.services.userAnswers.CreateMovementUserAnswersService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
@@ -106,5 +107,16 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
                 InternalServerError(Json.toJson(mongoError))
             }
         }
+    }
+
+  def search(ern: String, searchOptions: GetDraftMovementSearchOptions): Action[AnyContent] =
+    authorisedUserRequest(ern) { _ =>
+      createMovementUserAnswersService.searchDrafts(ern, searchOptions) map {
+        case Right(response) => Ok(Json.toJson(response))
+        case Left(mongoError) =>
+          logger.warn(s"[search] An error occurred when searching the draft movements: ${mongoError.message}")
+          InternalServerError(Json.toJson(mongoError))
+      }
+      Future.successful(NotImplemented)
     }
 }

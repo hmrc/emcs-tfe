@@ -16,6 +16,10 @@ lazy val microservice = Project("emcs-tfe", file("."))
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions",
+    routesImport += "uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions",
+    routesImport += "uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSortField",
+    routesImport += "uk.gov.hmrc.emcstfe.models.common.SortOrdering",
+    routesImport += "uk.gov.hmrc.emcstfe.models.common.DestinationType",
     ScoverageKeys.coverageMinimumStmtTotal := 95,
   )
   .configs(ItTest)
