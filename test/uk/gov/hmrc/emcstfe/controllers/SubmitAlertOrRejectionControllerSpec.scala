@@ -43,7 +43,7 @@ class SubmitAlertOrRejectionControllerSpec extends TestBaseSpec
 
   class Fixture(authAction: AuthAction, optIsNRSEnabled: Option[Boolean] = Some(true)) {
 
-    optIsNRSEnabled.map { isNRSEnabled =>
+    optIsNRSEnabled.foreach { isNRSEnabled =>
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 
       if (isNRSEnabled) {
