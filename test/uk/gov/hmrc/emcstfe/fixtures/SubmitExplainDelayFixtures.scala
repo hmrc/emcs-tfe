@@ -99,7 +99,7 @@ trait SubmitExplainDelayFixtures extends BaseFixtures with ChRISResponsesFixture
     </urn:ExplanationOnDelayForDelivery>
 
 
-  val nrsSubmission: ExplainDelayNRSSubmission = ExplainDelayNRSSubmission(
+  val explainDelayNRSSubmission: ExplainDelayNRSSubmission = ExplainDelayNRSSubmission(
     arc = maxSubmitExplainDelayModel.arc,
     sequenceNumber = maxSubmitExplainDelayModel.sequenceNumber,
     submitterType = maxSubmitExplainDelayModel.submitterType,
