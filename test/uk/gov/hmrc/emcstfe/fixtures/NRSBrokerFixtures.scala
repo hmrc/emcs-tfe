@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.retrieve._
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.{AlertRejectNotableEvent, CreateMovementNotableEvent, ExplainShortageOrExcessNotableEvent}
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent._
 import uk.gov.hmrc.emcstfe.models.nrs.{IdentityData, NRSMetadata, NRSPayload, SearchKeys}
 import uk.gov.hmrc.emcstfe.models.response.nrsBroker.NRSBrokerInsertPayloadResponse
 
@@ -124,6 +124,15 @@ trait NRSBrokerFixtures extends BaseFixtures {
     metadata = nrsMetadataModel.copy(
       payloadSha256Checksum = "2769dee412ff9754f2f1150bdfa247a0c10e61861373b2bc71543dba81969f45",
       notableEvent = ExplainShortageOrExcessNotableEvent,
+      headerData = Json.obj("Host" -> "localhost")
+    )
+  )
+
+  val explainDelayNRSPayload: NRSPayload = nrsPayloadModel.copy(
+    payload = "eyJhcmMiOiIyM0dCMDAwMDAwMDAwMDAzNzY5NjciLCJzZXF1ZW5jZU51bWJlciI6MSwic3VibWl0dGVyVHlwZSI6IjIiLCJkZWxheVR5cGUiOiIxIiwiZGVsYXlSZWFzb25UeXBlIjoiNSIsImFkZGl0aW9uYWxJbmZvcm1hdGlvbiI6Im90aGVyIn0=",
+    metadata = nrsMetadataModel.copy(
+      payloadSha256Checksum = "0e97d45bda0498e2f53d6d0f332c5c0fe69f0cf8cc038dcd2d0e7d4bbf1750da",
+      notableEvent = ExplainDelayNotableEvent,
       headerData = Json.obj("Host" -> "localhost")
     )
   )
