@@ -47,8 +47,8 @@ class SubmitExplainShortageExcessController @Inject()(cc: ControllerComponents,
     implicit request =>
       withJsonBody[SubmitExplainShortageExcessModel] {
         submission =>
-          val nrsSubmissionModel = ExplainShortageExcessNRSSubmission.apply(submission, ern)
           if(isEnabled(EnableNRS)) {
+            val nrsSubmissionModel = ExplainShortageExcessNRSSubmission.apply(submission, ern)
             nrsBrokerService.submitPayload(nrsSubmissionModel, ern, ExplainShortageOrExcessNotableEvent).flatMap(_ => handleSubmission(submission))
           } else {
             handleSubmission(submission)
