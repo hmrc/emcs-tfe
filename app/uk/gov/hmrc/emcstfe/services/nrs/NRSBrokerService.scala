@@ -59,7 +59,7 @@ class NRSBrokerService @Inject()(
       case e =>
         //Don't log out the exception message in case of sensitive data
         logger.warn(s"[submitPayload] - An error occurred when retrieving identity data for ERN: $ern. Error: ${e.getClass.getSimpleName}")
-        Left(IdentityDataException(e.getMessage))
+        Left(IdentityDataException(e.getClass.getSimpleName))
     }
   }
 

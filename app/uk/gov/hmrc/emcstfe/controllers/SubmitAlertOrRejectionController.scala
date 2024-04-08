@@ -46,8 +46,8 @@ class SubmitAlertOrRejectionController @Inject()(cc: ControllerComponents,
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitAlertOrRejectionModel] {
       submission =>
-        val nrsSubmissionModel = AlertRejectNRSSubmission.apply(submission)
         if(isEnabled(EnableNRS)) {
+          val nrsSubmissionModel = AlertRejectNRSSubmission.apply(submission)
           nrsBrokerService.submitPayload(nrsSubmissionModel, ern, AlertRejectNotableEvent).flatMap(_ => handleSubmission(submission))
         } else {
           handleSubmission(submission)

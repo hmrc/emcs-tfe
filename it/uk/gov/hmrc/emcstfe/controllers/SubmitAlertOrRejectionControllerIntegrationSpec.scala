@@ -56,7 +56,7 @@ class SubmitAlertOrRejectionControllerIntegrationSpec extends IntegrationBaseSpe
 
   override def beforeEach(): Unit = {
     disable(SendToEIS)
-    sys.props -= EnableNRS.configName
+    disable(EnableNRS)
     super.beforeEach()
   }
 

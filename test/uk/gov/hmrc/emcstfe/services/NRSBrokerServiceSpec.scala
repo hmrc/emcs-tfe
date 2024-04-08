@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import uk.gov.hmrc.auth.core.UnsupportedAuthProvider
 import uk.gov.hmrc.auth.core.authorise.EmptyPredicate
 import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitAlertOrRejectionFixtures}
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockAuthConnector, MockNRSBrokerConnector}
@@ -48,9 +49,9 @@ class NRSBrokerServiceSpec extends TestBaseSpec with MockNRSBrokerConnector with
 
       "retrieving the identity data throws an exception" in new Setup {
 
-        MockAuthConnector.authorise(EmptyPredicate, retrievals).returns(Future.failed(new Exception("Game over!")))
+        MockAuthConnector.authorise(EmptyPredicate, retrievals).returns(Future.failed(UnsupportedAuthProvider("Game over!")))
 
-        await(service.submitPayload(nrsSubmission, testErn, CreateMovementNotableEvent)) shouldBe Left(IdentityDataException("Game over!"))
+        await(service.submitPayload(nrsSubmission, testErn, CreateMovementNotableEvent)) shouldBe Left(IdentityDataException("UnsupportedAuthProvider"))
       }
 
       "the broker connector returns a Left" in new Setup {
