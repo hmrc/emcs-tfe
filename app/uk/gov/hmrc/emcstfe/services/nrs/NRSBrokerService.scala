@@ -52,11 +52,13 @@ class NRSBrokerService @Inject()(
           Right(response)
       }.recover {
         case e =>
+          logger.debug(s"[submitPayload] - Error submitting the NRS payload to the broker with message: ${e.getMessage}")
           logger.warn(s"[submitPayload] - An unexpected error occurred sending payload to NRS broker for ERN: $ern. Error: ${e.getClass.getSimpleName}")
           Left(UnexpectedDownstreamResponseError)
       }
     }.recover {
       case e =>
+        logger.debug(s"[submitPayload] - Error retrieving identity data with message: ${e.getMessage}")
         //Don't log out the exception message in case of sensitive data
         logger.warn(s"[submitPayload] - An error occurred when retrieving identity data for ERN: $ern. Error: ${e.getClass.getSimpleName}")
         Left(IdentityDataException(e.getClass.getSimpleName))
