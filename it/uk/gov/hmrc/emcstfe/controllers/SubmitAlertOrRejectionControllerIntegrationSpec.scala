@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 
+import com.github.tomakehurst.wiremock.client.WireMock.{putRequestedFor, urlEqualTo, verify}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
@@ -197,6 +198,8 @@ class SubmitAlertOrRejectionControllerIntegrationSpec extends IntegrationBaseSpe
         response.status shouldBe Status.OK
         response.header("Content-Type") shouldBe Some("application/json")
         response.json shouldBe eisSuccessJson()
+        verify(1, putRequestedFor(urlEqualTo(s"/emcs-tfe-nrs-message-broker/trader/$testErn/nrs/submission")))
+        wireMockServer.findAllUnmatchedRequests.size() shouldBe 0
       }
     }
   }
