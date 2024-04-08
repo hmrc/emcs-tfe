@@ -26,7 +26,7 @@ class ExplainDelayNRSSubmissionSpec extends TestBaseSpec with SubmitExplainDelay
 
     s"generate the correct model from the $SubmitExplainDelayModel" in {
 
-      ExplainDelayNRSSubmission.apply(maxSubmitExplainDelayModel) shouldBe nrsSubmission
+      ExplainDelayNRSSubmission.apply(maxSubmitExplainDelayModel) shouldBe explainDelayNRSSubmission
     }
   }
 }

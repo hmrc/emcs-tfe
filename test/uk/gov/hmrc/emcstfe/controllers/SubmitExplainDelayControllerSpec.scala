@@ -46,7 +46,7 @@ class SubmitExplainDelayControllerSpec
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 
       if (isNRSEnabled) {
-        MockNRSBrokerService.submitPayload(nrsSubmission, testErn, ExplainDelayNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+        MockNRSBrokerService.submitPayload(explainDelayNRSSubmission, testErn, ExplainDelayNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
       }
     }
 
@@ -124,17 +124,16 @@ class SubmitExplainDelayControllerSpec
               }
             }
           }
-
-          "user is NOT authorised" must {
-            s"return ${Status.FORBIDDEN} (FORBIDDEN)" in new Fixture(FakeFailedAuthAction, optIsNRSEnabled = None) {
-
-              val result = controller.submit(testErn, testArc)(fakeRequest)
-
-              status(result) shouldBe Status.FORBIDDEN
-            }
-          }
         }
+      }
+    }
 
+    "user is NOT authorised" must {
+      s"return ${Status.FORBIDDEN} (FORBIDDEN)" in new Fixture(FakeFailedAuthAction, optIsNRSEnabled = None) {
+
+        val result = controller.submit(testErn, testArc)(fakeRequest)
+
+        status(result) shouldBe Status.FORBIDDEN
       }
     }
 
