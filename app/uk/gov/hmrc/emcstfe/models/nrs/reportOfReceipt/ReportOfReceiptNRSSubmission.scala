@@ -52,8 +52,7 @@ object ReportOfReceiptNRSSubmission {
       dateOfArrival = submission.dateOfArrival,
       acceptMovement = submission.acceptMovement,
       individualItems = submission.individualItems,
-      otherInformation = submission.otherInformation,
-
+      otherInformation = submission.otherInformation
     )
   }
 

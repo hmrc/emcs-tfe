@@ -18,13 +18,14 @@ package uk.gov.hmrc.emcstfe.models.nrs.reportOfReceipt
 
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitExplainShortageExcessFixtures, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
+import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class ReportOfReceiptNRSSubmissionSpec extends TestBaseSpec with SubmitExplainShortageExcessFixtures with SubmitReportOfReceiptFixtures {
 
   ".apply" should {
 
-    s"generate the correct model from the $SubmitExplainShortageExcessModel" in {
+    s"generate the correct model from the $SubmitReportOfReceiptModel" in {
 
       ReportOfReceiptNRSSubmission
         .apply(maxSubmitReportOfReceiptModel, testErn) shouldBe reportOfReceiptNRSSubmission
