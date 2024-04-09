@@ -136,4 +136,13 @@ trait NRSBrokerFixtures extends BaseFixtures {
       headerData = Json.obj("Host" -> "localhost")
     )
   )
+
+  val cancelMovementNRSPayload: NRSPayload = nrsPayloadModel.copy(
+    payload = "eyJlcm4iOiJHQldLMDAwMDAxMjM0IiwiYXJjIjoiMjNHQjAwMDAwMDAwMDAwMzc2OTY3Iiwic2VxdWVuY2VOdW1iZXIiOjEsImNvbnNpZ25lZVRyYWRlciI6eyJ0cmFkZXJFeGNpc2VOdW1iZXIiOiJHQjAwMDAwMDAwMTIzNDYiLCJ0cmFkZXJOYW1lIjoibmFtZSIsImFkZHJlc3MiOnsic3RyZWV0TnVtYmVyIjoibnVtYmVyIiwic3RyZWV0Ijoic3RyZWV0IiwicG9zdGNvZGUiOiJwb3N0Y29kZSIsImNpdHkiOiJjaXR5In0sImVvcmlOdW1iZXIiOiJlb3JpIn0sImRlc3RpbmF0aW9uVHlwZSI6IjYiLCJtZW1iZXJTdGF0ZUNvZGUiOiJHQiIsImNhbmNlbFJlYXNvbiI6IjEiLCJhZGRpdGlvbmFsSW5mb3JtYXRpb24iOiJ0ZXN0IGNhbmNlbGxhdGlvbiByZWFzb24ifQ==",
+    metadata = nrsMetadataModel.copy(
+      payloadSha256Checksum = "8247ca8a5a22248a0e2d3c53366da854b93e4c29b3f343f84b160613e15e224c",
+      notableEvent = CancelMovementNotableEvent,
+      headerData = Json.obj("Host" -> "localhost")
+    )
+  )
 }

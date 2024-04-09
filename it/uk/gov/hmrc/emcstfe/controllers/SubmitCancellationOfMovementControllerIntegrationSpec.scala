@@ -16,14 +16,15 @@
 
 package uk.gov.hmrc.emcstfe.controllers
 
+import com.github.tomakehurst.wiremock.client.WireMock.{putRequestedFor, urlEqualTo, verify}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
-import uk.gov.hmrc.emcstfe.fixtures.SubmitCancellationOfMovementFixtures
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitCancellationOfMovementFixtures}
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
@@ -31,7 +32,10 @@ import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import scala.xml.XML
 
-class SubmitCancellationOfMovementControllerIntegrationSpec extends IntegrationBaseSpec with SubmitCancellationOfMovementFixtures with FeatureSwitching {
+class SubmitCancellationOfMovementControllerIntegrationSpec extends IntegrationBaseSpec
+  with SubmitCancellationOfMovementFixtures
+  with FeatureSwitching
+  with NRSBrokerFixtures {
 
   override val config: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -44,6 +48,8 @@ class SubmitCancellationOfMovementControllerIntegrationSpec extends IntegrationB
 
     def downstreamEisUri: String = s"/emcs/digital-submit-new-message/v1"
 
+    def downstreamNRSBrokerUri: String = s"/emcs-tfe-nrs-message-broker/trader/$testErn/nrs/submission"
+
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri, "Content-Type" -> "application/json")
@@ -52,6 +58,7 @@ class SubmitCancellationOfMovementControllerIntegrationSpec extends IntegrationB
 
   override def beforeEach(): Unit = {
     disable(SendToEIS)
+    disable(EnableNRS)
     super.beforeEach()
   }
 
@@ -165,5 +172,37 @@ class SubmitCancellationOfMovementControllerIntegrationSpec extends IntegrationB
       }
     }
 
+    "when submitting payloads to NRS (downstream submission agnostic)" must {
+
+      "return a success" in new Test {
+
+        /*
+          This uses JsonUnit (a Wiremock-provided library) to ignore some unmatchable body elements.
+          In this case userSubmissionTimestamp is naturally impossible to match accurately.
+          Header data is made up as part of the request processing, so the tests can't accurately replicate this.
+          If userSubmissionTimestamp or headerData was missing in the actual payload then the test would fail.
+         */
+        val nrsRequestBody: JsObject = {
+          Json.toJson(cancelMovementNRSPayload.copy(
+            metadata = cancelMovementNRSPayload.metadata.copy(userAuthToken = "auth1234"))
+          ).as[JsObject].deepMerge(Json.obj("metadata" -> Json.obj("userSubmissionTimestamp" -> f"$${json-unit.any-string}", "headerData" -> f"$${json-unit.ignore}")))
+        }
+
+        override def setupStubs(): StubMapping = {
+          enable(SendToEIS)
+          enable(EnableNRS)
+          AuthStub.authorised(withIdentityData = true)
+          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
+          DownstreamStub.onSuccessWithRequestBodyAndHeaders(DownstreamStub.PUT, downstreamNRSBrokerUri, status = Status.ACCEPTED, requestBody = Some(Json.stringify(nrsRequestBody)), responseBody = nrsBrokerResponseJson, headers = Map("Authorization" -> "auth1234"))
+        }
+
+        val response: WSResponse = await(request().post(maxSubmitCancellationOfMovementModelJson))
+        response.status shouldBe Status.OK
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe eisSuccessJson()
+        verify(1, putRequestedFor(urlEqualTo(s"/emcs-tfe-nrs-message-broker/trader/$testErn/nrs/submission")))
+        wireMockServer.findAllUnmatchedRequests.size() shouldBe 0
+      }
+    }
   }
 }

@@ -21,6 +21,7 @@ import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.CancellationReasonType.
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.{CancellationReasonModel, SubmitCancellationOfMovementModel}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
+import uk.gov.hmrc.emcstfe.models.nrs.cancelMovement.CancelMovementNRSSubmission
 
 import scala.xml.Elem
 
@@ -92,5 +93,16 @@ trait SubmitCancellationOfMovementFixtures extends BaseFixtures with ChRISRespon
         <urn:CancellationReasonCode>{TypingError.toString}</urn:CancellationReasonCode>
       </urn:Cancellation>
     </urn:CancellationOfEAD>
+
+  val cancelMovementNRSSubmission: CancelMovementNRSSubmission = CancelMovementNRSSubmission(
+    ern = testErn,
+    arc = maxSubmitCancellationOfMovementModel.exciseMovement.arc,
+    sequenceNumber = maxSubmitCancellationOfMovementModel.exciseMovement.sequenceNumber,
+    consigneeTrader = maxSubmitCancellationOfMovementModel.consigneeTrader,
+    destinationType = maxSubmitCancellationOfMovementModel.destinationType,
+    memberStateCode = maxSubmitCancellationOfMovementModel.memberStateCode,
+    cancelReason = maxSubmitCancellationOfMovementModel.cancellationReason.reason,
+    additionalInformation = maxSubmitCancellationOfMovementModel.cancellationReason.complementaryInformation
+  )
 
 }
