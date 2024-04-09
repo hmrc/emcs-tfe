@@ -145,4 +145,13 @@ trait NRSBrokerFixtures extends BaseFixtures {
       headerData = Json.obj("Host" -> "localhost")
     )
   )
+
+  val reportOfReceiptNRSPayload: NRSPayload = nrsPayloadModel.copy(
+    payload = "eyJlcm4iOiJHQldLMDAwMDAxMjM0IiwiYXJjIjoiMjNHQjAwMDAwMDAwMDAwMzc2OTY3Iiwic2VxdWVuY2VOdW1iZXIiOjEsImRlc3RpbmF0aW9uVHlwZSI6IjEiLCJkZXN0aW5hdGlvbk9mZmljZSI6IkdCMDAwNDM0IiwiZGF0ZU9mQXJyaXZhbCI6IjIwMjQtMDQtMDkiLCJhY2NlcHRNb3ZlbWVudCI6InNhdGlzZmFjdG9yeSIsImluZGl2aWR1YWxJdGVtcyI6W119",
+    metadata = nrsMetadataModel.copy(
+      payloadSha256Checksum = "4a9683fc7c327123da46a8c72dd3df8d4dbae2f45cee273fd9cafb083174a853",
+      notableEvent = ReportAReceiptNotableEvent,
+      headerData = Json.obj("Host" -> "localhost")
+    )
+  )
 }

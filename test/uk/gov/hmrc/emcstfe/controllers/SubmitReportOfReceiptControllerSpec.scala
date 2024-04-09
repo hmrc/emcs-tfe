@@ -22,83 +22,179 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
-import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, SendToEIS}
+import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitReportOfReceiptService
+import uk.gov.hmrc.emcstfe.mocks.services.{MockNRSBrokerService, MockSubmitReportOfReceiptService}
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ReportAReceiptNotableEvent
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISServiceUnavailableError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitReportOfReceiptControllerSpec extends TestBaseSpec with MockSubmitReportOfReceiptService with SubmitReportOfReceiptFixtures with MockAppConfig
-  with FakeAuthAction {
+class SubmitReportOfReceiptControllerSpec extends TestBaseSpec
+  with MockSubmitReportOfReceiptService
+  with SubmitReportOfReceiptFixtures
+  with MockAppConfig
+  with FakeAuthAction
+  with MockNRSBrokerService
+  with NRSBrokerFixtures {
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/report-of-receipt").withBody(Json.toJson(maxSubmitReportOfReceiptModel))
-    val controller = new SubmitReportOfReceiptController(Helpers.stubControllerComponents(), mockService, mockAppConfig, authAction)
+    val controller = new SubmitReportOfReceiptController(Helpers.stubControllerComponents(), mockService, mockAppConfig, mockNRSBrokerService, authAction)
   }
 
   s"POST ${routes.SubmitReportOfReceiptController.submit(testErn, testArc)}" when {
 
     "user is authorised" must {
 
-      "when calling ChRIS" should {
-        s"return ${Status.OK} (OK)" when {
-          "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
+      "when the NRS feature switch is enabled" should {
 
-            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+        "when calling ChRIS" should {
 
-            MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(chrisSuccessResponse)))
+          s"return ${Status.OK} (OK)" when {
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+            "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-            status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe chrisSuccessJson()
+              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+              MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(true)
+
+              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn, ReportAReceiptNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+              MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(chrisSuccessResponse)))
+
+              val result = controller.submit(testErn, testArc)(fakeRequest)
+
+              status(result) shouldBe Status.OK
+              contentAsJson(result) shouldBe chrisSuccessJson()
+            }
+          }
+
+          s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+
+            "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+
+              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+              MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(true)
+
+              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn, ReportAReceiptNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+              MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+
+              val result = controller.submit(testErn, testArc)(fakeRequest)
+
+              status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+              contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
+            }
           }
         }
 
-        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-          "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+        "when calling EIS" should {
 
-            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+          s"return ${Status.OK} (OK)" when {
 
-            MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+            "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+              MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(true)
 
-            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-            contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
+              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn, ReportAReceiptNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+              MockService.submitViaEIS(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(eisSuccessResponse)))
+
+              val result = controller.submit(testErn, testArc)(fakeRequest)
+
+              status(result) shouldBe Status.OK
+              contentAsJson(result) shouldBe eisSuccessJson()
+            }
+          }
+
+          s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+
+            "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+
+              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+              MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(true)
+
+              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn, ReportAReceiptNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+              MockService.submitViaEIS(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
+
+              val result = controller.submit(testErn, testArc)(fakeRequest)
+
+              status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+              contentAsJson(result) shouldBe Json.obj("message" -> EISServiceUnavailableError("SERVICE_UNAVAILABLE").message)
+            }
           }
         }
       }
 
-      "when calling EIS" should {
-        s"return ${Status.OK} (OK)" when {
-          "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
+      "when the NRS feature switch is disabled" should {
 
-            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+        "when calling ChRIS" should {
 
-            MockService.submitViaEIS(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(eisSuccessResponse)))
+          s"return ${Status.OK} (OK)" when {
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+            "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-            status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe eisSuccessJson()
+              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+              MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(false)
+
+              MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(chrisSuccessResponse)))
+
+              val result = controller.submit(testErn, testArc)(fakeRequest)
+
+              status(result) shouldBe Status.OK
+              contentAsJson(result) shouldBe chrisSuccessJson()
+            }
+          }
+
+          s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+
+            "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+
+              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+              MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(false)
+
+              MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+
+              val result = controller.submit(testErn, testArc)(fakeRequest)
+
+              status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+              contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
+            }
           }
         }
 
-        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-          "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+        "when calling EIS" should {
 
-            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+          s"return ${Status.OK} (OK)" when {
 
-            MockService.submitViaEIS(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
+            "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+              MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(false)
 
-            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-            contentAsJson(result) shouldBe Json.obj("message" -> EISServiceUnavailableError("SERVICE_UNAVAILABLE").message)
+              MockService.submitViaEIS(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(eisSuccessResponse)))
+
+              val result = controller.submit(testErn, testArc)(fakeRequest)
+
+              status(result) shouldBe Status.OK
+              contentAsJson(result) shouldBe eisSuccessJson()
+            }
+          }
+
+          s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+
+            "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+
+              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+              MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(false)
+
+              MockService.submitViaEIS(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
+
+              val result = controller.submit(testErn, testArc)(fakeRequest)
+
+              status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+              contentAsJson(result) shouldBe Json.obj("message" -> EISServiceUnavailableError("SERVICE_UNAVAILABLE").message)
+            }
           }
         }
       }
