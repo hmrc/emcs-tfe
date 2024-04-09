@@ -20,6 +20,7 @@ import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignee
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType.Strikes
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayType.DelayWithReportReceipt
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
+import uk.gov.hmrc.emcstfe.models.nrs.explainDelay.ExplainDelayNRSSubmission
 
 trait SubmitExplainDelayFixtures extends BaseFixtures with ChRISResponsesFixture with EISResponsesFixture {
 
@@ -98,4 +99,12 @@ trait SubmitExplainDelayFixtures extends BaseFixtures with ChRISResponsesFixture
     </urn:ExplanationOnDelayForDelivery>
 
 
+  val explainDelayNRSSubmission: ExplainDelayNRSSubmission = ExplainDelayNRSSubmission(
+    arc = maxSubmitExplainDelayModel.arc,
+    sequenceNumber = maxSubmitExplainDelayModel.sequenceNumber,
+    submitterType = maxSubmitExplainDelayModel.submitterType,
+    delayType = maxSubmitExplainDelayModel.delayType,
+    delayReasonType = maxSubmitExplainDelayModel.delayReasonType,
+    additionalInformation = maxSubmitExplainDelayModel.additionalInformation
+  )
 }

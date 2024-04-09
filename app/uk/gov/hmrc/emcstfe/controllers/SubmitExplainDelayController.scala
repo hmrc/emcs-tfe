@@ -20,19 +20,25 @@ import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainDelayNotableEvent
+import uk.gov.hmrc.emcstfe.models.nrs.explainDelay.ExplainDelayNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.SubmitExplainDelayService
+import uk.gov.hmrc.emcstfe.services.nrs.NRSBrokerService
 import uk.gov.hmrc.emcstfe.utils.Logging
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SubmitExplainDelayController @Inject()(cc: ControllerComponents,
                                              service: SubmitExplainDelayService,
+                                             nrsBrokerService: NRSBrokerService,
                                              override val auth: AuthAction,
                                              val config: AppConfig
                                             )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging with FeatureSwitching {
@@ -41,12 +47,21 @@ class SubmitExplainDelayController @Inject()(cc: ControllerComponents,
     implicit request =>
       withJsonBody[SubmitExplainDelayModel] {
         submission =>
-          if (isEnabled(SendToEIS)) {
-            service.submitViaEIS(submission).map(handleResponse(_))
+          if (isEnabled(EnableNRS)) {
+            val nrsSubmissionModel = ExplainDelayNRSSubmission.apply(submission)
+            nrsBrokerService.submitPayload(nrsSubmissionModel, ern, ExplainDelayNotableEvent).flatMap(_ => handleSubmission(submission))
           } else {
-            service.submit(submission).map(handleResponse(_))
+            handleSubmission(submission)
           }
       }
+  }
+
+  private def handleSubmission(submission: SubmitExplainDelayModel)(implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Result] = {
+    if (isEnabled(SendToEIS)) {
+      service.submitViaEIS(submission).map(handleResponse(_))
+    } else {
+      service.submit(submission).map(handleResponse(_))
+    }
   }
 
   def handleResponse[A](response: Either[ErrorResponse, A])(implicit writes: Writes[A]): Result =
