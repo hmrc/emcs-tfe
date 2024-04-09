@@ -20,6 +20,7 @@ import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{PartiallyRefused, Satis
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.TaxWarehouse
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.Excess
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, DeliveryPlaceTrader}
+import uk.gov.hmrc.emcstfe.models.nrs.reportOfReceipt.ReportOfReceiptNRSSubmission
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 
 import java.time.LocalDate
@@ -151,4 +152,23 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
       </urn:ReportOfReceiptExport>
     </urn:AcceptedOrRejectedReportOfReceiptExport>
 
+  val reportOfReceiptNRSSubmission: ReportOfReceiptNRSSubmission = {
+    ReportOfReceiptNRSSubmission(
+      ern = testErn,
+      arc = testArc,
+      destinationType = Some(TaxWarehouse),
+      dateAndTimeOfValidationOfReportOfReceiptExport = None,
+      sequenceNumber = 1,
+      consigneeTrader = Some(maxTraderModel(ConsigneeTrader)),
+      deliveryPlaceTrader = Some(maxTraderModel(DeliveryPlaceTrader)),
+      destinationOffice = destinationOfficeId,
+      dateOfArrival = arrivalDate,
+      acceptMovement = PartiallyRefused,
+      individualItems = Seq(
+        excessReceiptedItemsModel,
+        excessReceiptedItemsModel.copy(eadBodyUniqueReference = 2)
+      ),
+      otherInformation = Some("other")
+    )
+  }
 }
