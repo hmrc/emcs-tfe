@@ -20,6 +20,8 @@ import org.scalamock.handlers.{CallHandler1, CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
+import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
+import uk.gov.hmrc.emcstfe.models.response.SearchDraftMovementsResponse
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 
 import scala.concurrent.Future
@@ -49,6 +51,9 @@ trait MockCreateMovementUserAnswersRepository extends MockFactory {
     def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): CallHandler3[String, String, String, Future[Boolean]] =
       (mockCreateMovementUserAnswersRepository.setSubmittedDraftId(_: String, _: String, _: String))
         .expects(ern, draftId, submittedDraftId)
+
+    def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions): CallHandler2[String, GetDraftMovementSearchOptions, Future[SearchDraftMovementsResponse]] =
+      (mockCreateMovementUserAnswersRepository.searchDrafts(_: String, _: GetDraftMovementSearchOptions)).expects(ern, searchOptions)
   }
 }
 

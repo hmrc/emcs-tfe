@@ -117,6 +117,5 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
           logger.warn(s"[search] An error occurred when searching the draft movements: ${mongoError.message}")
           InternalServerError(Json.toJson(mongoError))
       }
-      Future.successful(NotImplemented)
     }
 }
