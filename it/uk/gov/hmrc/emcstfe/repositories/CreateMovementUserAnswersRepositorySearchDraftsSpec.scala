@@ -162,7 +162,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe additionalDraftsCount + draftData.size
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .sortBy(_.lastUpdated)
@@ -177,7 +177,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe additionalDraftsCount + draftData.size
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .sortBy(_.lastUpdated)
@@ -191,7 +191,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe additionalDraftsCount + draftData.size
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .sortBy(_.data.lrn)
@@ -206,7 +206,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe additionalDraftsCount + draftData.size
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .sortBy(_.data.lrn)
@@ -221,8 +221,8 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe additionalDraftsCount + draftData.size
-        result.foundDrafts.size shouldBe GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS
-        result.foundDrafts shouldBe
+        result.paginatedDrafts.size shouldBe GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .sortBy(_.lastUpdated)
@@ -238,8 +238,8 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe additionalDraftsCount + draftData.size
-        result.foundDrafts.size shouldBe 3
-        result.foundDrafts shouldBe
+        result.paginatedDrafts.size shouldBe 3
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .sortBy(_.lastUpdated)
@@ -255,8 +255,8 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe additionalDraftsCount + draftData.size
-        result.foundDrafts.size shouldBe 0
-        result.foundDrafts shouldBe
+        result.paginatedDrafts.size shouldBe 0
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .sortBy(_.lastUpdated)
@@ -278,7 +278,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 1
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(_.data.lrn.exists(_.contains(searchString)))
@@ -302,7 +302,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 1
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(_.data.lrn.exists(_.contains(searchString)))
@@ -322,7 +322,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 2
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
@@ -349,7 +349,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 2
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
@@ -372,7 +372,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 3
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
@@ -400,7 +400,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 3
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
@@ -424,7 +424,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 4
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
@@ -453,7 +453,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 4
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
@@ -481,7 +481,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 1
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(_.submissionFailures.exists(_.hasBeenFixed == false))
@@ -504,7 +504,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 2
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .filter(draft =>
@@ -525,7 +525,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 2
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .filter(draft =>
@@ -546,7 +546,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 2
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .filter(draft =>
@@ -567,7 +567,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 2
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .filter(draft =>
@@ -590,7 +590,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 1
-        result.foundDrafts shouldBe
+        result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
             .filter(draft =>
@@ -614,7 +614,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 2
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(_.data.itemEpcs.exists(_.exists(_ == "B100")))
@@ -631,7 +631,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 0
-        result.foundDrafts shouldBe Seq()
+        result.paginatedDrafts shouldBe Seq()
       }
     }
 
@@ -647,7 +647,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 3
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(_.data.destinationType.exists(destinationTypes.flatMap(_.movementScenarios).contains))
@@ -664,7 +664,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 1
-          result.foundDrafts shouldBe
+          result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(_.data.destinationType.exists(destinationTypes.flatMap(_.movementScenarios).contains))
@@ -682,7 +682,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 0
-        result.foundDrafts shouldBe Seq()
+        result.paginatedDrafts shouldBe Seq()
       }
     }
   }

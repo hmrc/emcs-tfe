@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.repositories
 
 import com.google.inject.ImplementedBy
 import org.mongodb.scala.bson.conversions.Bson
+import org.mongodb.scala.bson.{BsonArray, BsonDocument}
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
@@ -69,7 +70,8 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
     mongoComponent = mongoComponent,
     domainFormat = CreateMovementUserAnswers.format,
     indexes = mongoIndexes(appConfig.createMovementUserAnswersTTL()),
-    replaceIndexes = appConfig.createMovementUserAnswersReplaceIndexes()
+    replaceIndexes = appConfig.createMovementUserAnswersReplaceIndexes(),
+    extraCodecs = Seq(Codecs.playFormatCodec(SearchDraftMovementsResponse.format))
   ) with CreateMovementUserAnswersRepository {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
@@ -186,7 +188,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
           //Filter by Destination Type(s) (used the underlying associated MovementScenario(s) to match against Drafts)
           searchOptions.destinationTypes.map(destinationTypes =>
             Filters.or(
-              destinationTypes.flatMap(_.movementScenarios).map(Filters.equal(destinationTypeField, _)):_*
+              destinationTypes.flatMap(_.movementScenarios).map(Filters.equal(destinationTypeField, _)): _*
             )
           ),
 
@@ -214,7 +216,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
           searchOptions.draftHasErrors.flatMap { hasErrors =>
             Option.when(hasErrors)(Filters.eq(submissionFailuresErrorFixedField, false))
           }
-        ).flatten:_*
+        ).flatten: _*
       )
     }
 
@@ -223,21 +225,32 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
         case LRN => lrnField
         case LastUpdatedDate => lastUpdatedField
       }
-      if(searchOptions.sortOrder == Descending) Sorts.descending(sortField) else Sorts.ascending(sortField)
+      if (searchOptions.sortOrder == Descending) Sorts.descending(sortField) else Sorts.ascending(sortField)
     }
 
-    val countOfMatchedDocuments = collection.countDocuments(findFilter).toFuture()
-    val paginatedResult = collection
-      .find(findFilter)
-      .sort(sortFilter)
-      .skip(searchOptions.startPosition)
-      .limit(searchOptions.maxRows)
-      .toFuture()
+    val aggregatePipeline = {
+      Seq(
+        Aggregates.filter(findFilter),
+        Aggregates.sort(sortFilter),
+        Aggregates.facet(
+          Facet("metadata", Aggregates.count("count")),
+          Facet("paginatedDrafts",
+            Aggregates.skip(searchOptions.startPosition),
+            Aggregates.limit(searchOptions.maxRows)
+          )
+        ),
+        //This step takes the count from the metadata facet array, the ifNull is required in case no documents were found, in which case return 0
+        Aggregates.addFields(
+          Field("count", BsonDocument(
+            "$ifNull" -> BsonArray(BsonDocument("$arrayElemAt" -> BsonArray("$metadata.count", 0)), 0)
+          ))
+        )
+      )
+    }
 
-    for {
-      count <- countOfMatchedDocuments
-      result <- paginatedResult
-    } yield SearchDraftMovementsResponse(result, count.toInt)
+    collection
+      .aggregate[SearchDraftMovementsResponse](aggregatePipeline)
+      .head()
   }
 }
 

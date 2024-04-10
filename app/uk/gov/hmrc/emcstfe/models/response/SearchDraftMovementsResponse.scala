@@ -19,10 +19,8 @@ package uk.gov.hmrc.emcstfe.models.response
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 
-case class SearchDraftMovementsResponse(
-    foundDrafts: Seq[CreateMovementUserAnswers],
-    count: Int
-)
+case class SearchDraftMovementsResponse(count: Int,
+                                        paginatedDrafts: Seq[CreateMovementUserAnswers])
 
 object SearchDraftMovementsResponse {
   implicit val format: Format[SearchDraftMovementsResponse] = Json.format
