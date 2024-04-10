@@ -78,8 +78,8 @@ object GetDraftMovementSearchOptions {
       override def unbind(key: String, searchOptions: GetDraftMovementSearchOptions): String =
         Seq(
           Some(sortFieldBinder.unbind(key + ".sortField", searchOptions.sortField)),
-          Some(intBinder.unbind(key + ".startPosition", searchOptions.startPosition)),
           Some(sortOrderBinder.unbind(key + ".sortOrder", searchOptions.sortOrder)),
+          Some(intBinder.unbind(key + ".startPosition", searchOptions.startPosition)),
           Some(intBinder.unbind(key + ".maxRows", searchOptions.maxRows)),
           searchOptions.searchString.map(stringBinder.unbind(key + ".searchString", _)),
           searchOptions.draftHasErrors.map(booleanBinder.unbind(key + ".draftHasErrors", _)),

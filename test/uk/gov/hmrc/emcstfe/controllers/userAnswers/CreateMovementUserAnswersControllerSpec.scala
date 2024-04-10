@@ -298,7 +298,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
     }
   }
 
-  "GET /user-answers/create-movement/search/:ern?search." should {
+  "GET /user-answers/create-movement/search/:ern" should {
     s"return $OK (OK)" when {
 
       "service returns a Right(response)" in {

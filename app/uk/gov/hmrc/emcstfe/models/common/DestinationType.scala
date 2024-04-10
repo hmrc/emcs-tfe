@@ -18,6 +18,8 @@ package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.mvc.QueryStringBindable
 
+import scala.util.Try
+
 sealed trait DestinationType {
   val movementScenarios: Seq[String]
 }
@@ -88,12 +90,18 @@ object DestinationType extends Enumerable.Implicits {
 
   implicit def queryStringBinder(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[Seq[DestinationType]] =
     new QueryStringBindable[Seq[DestinationType]] {
-      override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, Seq[DestinationType]]] =
-        stringBinder.bind(key, params).map(_.map(destinationTypes =>
-          destinationTypes.split(";").toSeq.map(destinationType)
-        ))
+      override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, Seq[DestinationType]]] = {
+        params.get(key).map { destinationTypeCodes =>
+          Try(destinationTypeCodes.map(destinationType)).fold[Either[String, Seq[DestinationType]]](
+            e => Left(e.getMessage),
+            Right(_)
+          )
+        }
+      }
 
       override def unbind(key: String, destinations: Seq[DestinationType]): String =
-        stringBinder.unbind(key, destinations.map(_.toString).mkString(";"))
+        destinations.map(destinationType =>
+          stringBinder.unbind(key, destinationType.toString)
+        ).mkString("&")
     }
 }

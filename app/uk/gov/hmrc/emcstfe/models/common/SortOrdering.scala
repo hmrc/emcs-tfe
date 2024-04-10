@@ -18,6 +18,8 @@ package uk.gov.hmrc.emcstfe.models.common
 
 import play.api.mvc.QueryStringBindable
 
+import scala.util.Try
+
 sealed trait SortOrdering
 case object Ascending extends SortOrdering {
   override def toString: String = "A"
@@ -37,7 +39,9 @@ object SortOrdering {
   implicit def queryStringBinder(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[SortOrdering] =
     new QueryStringBindable[SortOrdering] {
       override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, SortOrdering]] =
-        stringBinder.bind(key, params).map(_.map(SortOrdering.apply))
+        Try(stringBinder.bind(key, params).map(_.map(SortOrdering.apply))).fold[Option[Either[String, SortOrdering]]](
+          e => Some(Left(e.getMessage)), identity
+        )
 
       override def unbind(key: String, sortOrdering: SortOrdering): String =
         stringBinder.unbind(key, sortOrdering.toString)

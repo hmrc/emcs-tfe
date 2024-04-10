@@ -18,6 +18,8 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import play.api.mvc.QueryStringBindable
 
+import scala.util.Try
+
 sealed trait GetDraftMovementSortField
 case object LRN extends GetDraftMovementSortField {
   override def toString: String = "lrn"
@@ -37,7 +39,9 @@ object GetDraftMovementSortField {
   implicit def queryStringBinder(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[GetDraftMovementSortField] =
     new QueryStringBindable[GetDraftMovementSortField] {
       override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, GetDraftMovementSortField]] =
-        stringBinder.bind(key, params).map(_.map(GetDraftMovementSortField.apply))
+        Try(stringBinder.bind(key, params).map(_.map(GetDraftMovementSortField.apply))).fold[Option[Either[String, GetDraftMovementSortField]]](
+          e => Some(Left(e.getMessage)), identity
+        )
 
       override def unbind(key: String, sortField: GetDraftMovementSortField): String =
         stringBinder.unbind(key, sortField.toString)
