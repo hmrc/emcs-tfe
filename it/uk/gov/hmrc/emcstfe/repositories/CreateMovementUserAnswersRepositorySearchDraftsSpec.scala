@@ -133,6 +133,29 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
       ),
       timestamp = Instant.ofEpochSecond(6000),
       submissionFailures = Seq(movementSubmissionFailureModel)
+    ),
+    userAnswers(
+      draftId = UUID.randomUUID().toString,
+      data = Json.obj(
+        "info" -> Json.obj(
+          "localReferenceNumber" -> "123456ABC",
+          "dispatchDetails" -> Json.obj(
+            "date" -> LocalDate.of(2024, 5, 1)
+          ),
+          "destinationType" -> "directDelivery"
+        ),
+        "consignee" -> Json.obj(
+          "businessName" -> "Foo-123456ABC",
+          "exciseRegistrationNumber" -> "ERN123456ABC"
+        ),
+        "dispatch" -> Json.obj(
+          "dispatchWarehouseExcise" -> "ABCDEFGH012345600ERN"
+        ),
+        "destination" -> Json.obj(
+          "destinationWarehouseExcise" -> "WarehouseERN"
+        )
+      ),
+      timestamp = Instant.ofEpochSecond(8000)
     )
   )
   val additionalDraftsCount = 50
@@ -267,11 +290,26 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
     "searching by ERN and a search term" when {
 
+      "search term doesn't match anything" must {
+
+        val searchString = "FOO"
+
+        "return empty and count 0" in {
+
+          val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
+
+          lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
+
+          result.count shouldBe 0
+          result.paginatedDrafts shouldBe Seq()
+        }
+      }
+
       "only LRN is matched" must {
 
         val searchString = "ABCDEFGHIJKL"
 
-        "return paginated drafts related to that ERN where the search term also matches against LRN" in {
+        "return paginated drafts related to that ERN where the search term also matches" in {
 
           val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
 
@@ -285,29 +323,6 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
               .sortBy(_.lastUpdated)
               .reverse
               .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
-        }
-
-        "return paginated drafts related to that ERN where the search term also matches against LRN (sorted asecnding and different start position)" in {
-
-          val startPosition = 2
-          val maxRows = 10
-          val searchOptions = GetDraftMovementSearchOptions(
-            searchString = Some(searchString),
-            sortField = LRN,
-            sortOrder = Ascending,
-            startPosition = startPosition,
-            maxRows = maxRows
-          )
-
-          lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
-
-          result.count shouldBe 1
-          result.paginatedDrafts shouldBe
-            insertedDrafts
-              .filter(_.ern == testErn)
-              .filter(_.data.lrn.exists(_.contains(searchString)))
-              .sortBy(_.data.lrn)
-              .slice(startPosition, maxRows + startPosition)
         }
       }
 
@@ -315,7 +330,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         val searchString = "ABCDEFGHIJK"
 
-        "return paginated drafts related to that ERN where the search term also matches against LRN and Business Name" in {
+        "return paginated drafts related to that ERN where the search term also matches" in {
 
           val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
 
@@ -333,39 +348,13 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
               .reverse
               .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
         }
-
-        "return paginated drafts related to that ERN where the search term also matches against LRN (sorted asecnding and different start position)" in {
-
-          val startPosition = 2
-          val maxRows = 10
-          val searchOptions = GetDraftMovementSearchOptions(
-            searchString = Some(searchString),
-            sortField = LRN,
-            sortOrder = Ascending,
-            startPosition = startPosition,
-            maxRows = maxRows
-          )
-
-          lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
-
-          result.count shouldBe 2
-          result.paginatedDrafts shouldBe
-            insertedDrafts
-              .filter(_.ern == testErn)
-              .filter(draft =>
-                draft.data.lrn.exists(_.contains(searchString)) ||
-                  draft.data.consigneeBusinessName.exists(_.contains(searchString))
-              )
-              .sortBy(_.data.lrn)
-              .slice(startPosition, maxRows + startPosition)
-        }
       }
 
-      "LRN, BusinessName and exciseRegistrationNumber matched" must {
+      "LRN, BusinessName and consigneeErn matched" must {
 
         val searchString = "ABCDEFGHIJ"
 
-        "return paginated drafts related to that ERN where the search term also matches against LRN and Business Name" in {
+        "return paginated drafts related to that ERN where the search term also matches" in {
 
           val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
 
@@ -383,41 +372,14 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
               .sortBy(_.lastUpdated)
               .reverse
               .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
-        }
-
-        "return paginated drafts related to that ERN where the search term also matches against LRN (sorted asecnding and different start position)" in {
-
-          val startPosition = 2
-          val maxRows = 10
-          val searchOptions = GetDraftMovementSearchOptions(
-            searchString = Some(searchString),
-            sortField = LRN,
-            sortOrder = Ascending,
-            startPosition = startPosition,
-            maxRows = maxRows
-          )
-
-          lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
-
-          result.count shouldBe 3
-          result.paginatedDrafts shouldBe
-            insertedDrafts
-              .filter(_.ern == testErn)
-              .filter(draft =>
-                draft.data.lrn.exists(_.contains(searchString)) ||
-                  draft.data.consigneeBusinessName.exists(_.contains(searchString)) ||
-                  draft.data.consigneeERN.exists(_.contains(searchString))
-              )
-              .sortBy(_.data.lrn)
-              .slice(startPosition, maxRows + startPosition)
         }
       }
 
-      "LRN, BusinessName, exciseRegistrationNumber and WarehouseERN matched" must {
+      "LRN, BusinessName, consigneeErn and DestinationErn matched" must {
 
         val searchString = "ABCDEFGHI"
 
-        "return paginated drafts related to that ERN where the search term also matches against LRN and Business Name" in {
+        "return paginated drafts related to that ERN where the search term also matches" in {
 
           val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
 
@@ -437,22 +399,19 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
               .reverse
               .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
         }
+      }
 
-        "return paginated drafts related to that ERN where the search term also matches against LRN (sorted asecnding and different start position)" in {
+      "LRN, BusinessName, consigneeErn, DestinationErn and DispatchErn matched" must {
 
-          val startPosition = 2
-          val maxRows = 10
-          val searchOptions = GetDraftMovementSearchOptions(
-            searchString = Some(searchString),
-            sortField = LRN,
-            sortOrder = Ascending,
-            startPosition = startPosition,
-            maxRows = maxRows
-          )
+        val searchString = "ABCDEFGH"
+
+        "return paginated drafts related to that ERN where the search term also matches" in {
+
+          val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
 
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-          result.count shouldBe 4
+          result.count shouldBe 5
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
@@ -460,10 +419,12 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
                 draft.data.lrn.exists(_.contains(searchString)) ||
                   draft.data.consigneeBusinessName.exists(_.contains(searchString)) ||
                   draft.data.consigneeERN.exists(_.contains(searchString)) ||
-                  draft.data.destinationWarehouseERN.exists(_.contains(searchString))
+                  draft.data.destinationWarehouseERN.exists(_.contains(searchString)) ||
+                  draft.data.dispatchWarehouseERN.exists(_.contains(searchString))
               )
-              .sortBy(_.data.lrn)
-              .slice(startPosition, maxRows + startPosition)
+              .sortBy(_.lastUpdated)
+              .reverse
+              .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
         }
       }
     }
@@ -503,7 +464,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe 2
+        result.count shouldBe 3
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
@@ -524,7 +485,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe 2
+        result.count shouldBe 3
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
@@ -545,7 +506,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe 2
+        result.count shouldBe 3
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
@@ -566,7 +527,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe 2
+        result.count shouldBe 3
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
@@ -696,6 +657,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
     implicit def consigneeBusinessName: Option[String] = read(__ \ "consignee" \ "businessName")
     implicit def consigneeERN: Option[String] = read(__ \ "consignee" \ "exciseRegistrationNumber")
     implicit def destinationWarehouseERN: Option[String] = read(__ \ "destination" \ "destinationWarehouseExcise")
+    implicit def dispatchWarehouseERN: Option[String] = read(__ \ "dispatch" \ "dispatchWarehouseExcise")
     implicit def dispatchDate: Option[LocalDate] = read(__ \ "info" \ "dispatchDetails" \ "date").map(LocalDate.parse)
     implicit def itemEpcs: Option[Seq[String]] = {
       val reads = (__ \ "items" \ "addedItems").readNullable[Seq[String]](Reads.seq((__ \ "itemExciseProductCode").read[String]))

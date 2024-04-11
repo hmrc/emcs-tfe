@@ -176,14 +176,13 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
           Some(Filters.equal(ernField, ern)),
 
           //Drafts which match any search text across LRN, Consignee Name, Consignee ERN or Destination Warehouse ERN
-          searchOptions.searchString.map(searchKey =>
+          searchOptions.searchString.map { searchKey =>
             Filters.or(
-              Filters.regex(lrnField, searchKey),
-              Filters.regex(consigneeNameField, searchKey),
-              Filters.regex(consigneeErnField, searchKey),
-              Filters.regex(destinationWarehouseField, searchKey)
+              Seq(lrnField, consigneeNameField, consigneeErnField, destinationErnField, dispatchErnField).map(field =>
+                Filters.regex(field, searchKey)
+              ):_*
             )
-          ),
+          },
 
           //Filter by Destination Type(s) (used the underlying associated MovementScenario(s) to match against Drafts)
           searchOptions.destinationTypes.map(destinationTypes =>
@@ -265,7 +264,8 @@ object CreateMovementUserAnswersRepository {
   val lrnField = "data.info.localReferenceNumber"
   val consigneeNameField = "data.consignee.businessName"
   val consigneeErnField = "data.consignee.exciseRegistrationNumber"
-  val destinationWarehouseField = "data.destination.destinationWarehouseExcise"
+  val destinationErnField = "data.destination.destinationWarehouseExcise"
+  val dispatchErnField = "data.dispatch.dispatchWarehouseExcise"
   val destinationTypeField = "data.info.destinationType"
   val dateOfDispatchDateField = "data.info.dispatchDetails.date"
   val itemProductCode = "data.items.addedItems.itemExciseProductCode"
