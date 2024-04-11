@@ -57,7 +57,7 @@ class GetDraftMovementSearchOptionsSpec extends TestBaseSpec {
           "search.maxRows" -> Seq("99"),
           "search.searchString" -> Seq("FooBar"),
           "search.draftHasErrors" -> Seq("true"),
-          "search.destinationTypes" -> Seq("1", "3", "6"),
+          "search.destinationType" -> Seq("1", "3", "6"),
           "search.dateOfDispatchFrom" -> Seq("2020-07-06"),
           "search.dateOfDispatchTo" -> Seq("2020-07-07"),
           "search.exciseProductCode" -> Seq("6000")
@@ -107,9 +107,9 @@ class GetDraftMovementSearchOptionsSpec extends TestBaseSpec {
           "&search.maxRows=99" +
           "&search.searchString=FooBar" +
           "&search.draftHasErrors=true" +
-          "&search.destinationTypes=1" +
-          "&search.destinationTypes=3" +
-          "&search.destinationTypes=6" +
+          "&search.destinationType=1" +
+          "&search.destinationType=3" +
+          "&search.destinationType=6" +
           "&search.dateOfDispatchFrom=2020-07-06" +
           "&search.dateOfDispatchTo=2020-07-07" +
           "&search.exciseProductCode=6000"

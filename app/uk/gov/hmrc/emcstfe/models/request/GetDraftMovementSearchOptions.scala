@@ -55,7 +55,7 @@ object GetDraftMovementSearchOptions {
           maxRows <- intBinder.bind(key + ".maxRows", params).getOrElse(Right(DEFAULT_MAX_ROWS))
           searchString <- stringBinder.bind(key + ".searchString", params).map(_.map(Some(_))).getOrElse(Right(None))
           draftHasErrors <- booleanBinder.bind(key + ".draftHasErrors", params).map(_.map(Some(_))).getOrElse(Right(None))
-          destinationTypes <- destinationTypeBinder.bind(key + ".destinationTypes", params).map(_.map(Some(_))).getOrElse(Right(None))
+          destinationTypes <- destinationTypeBinder.bind(key + ".destinationType", params).map(_.map(Some(_))).getOrElse(Right(None))
           dateOfDispatchFrom <- stringBinder.bind(key + ".dateOfDispatchFrom", params).map(_.map(date => Some(LocalDate.parse(date)))).getOrElse(Right(None))
           dateOfDispatchTo <- stringBinder.bind(key + ".dateOfDispatchTo", params).map(_.map(date => Some(LocalDate.parse(date)))).getOrElse(Right(None))
           exciseProductCode <- stringBinder.bind(key + ".exciseProductCode", params).map(_.map(Some(_))).getOrElse(Right(None))
@@ -83,7 +83,7 @@ object GetDraftMovementSearchOptions {
           Some(intBinder.unbind(key + ".maxRows", searchOptions.maxRows)),
           searchOptions.searchString.map(stringBinder.unbind(key + ".searchString", _)),
           searchOptions.draftHasErrors.map(booleanBinder.unbind(key + ".draftHasErrors", _)),
-          searchOptions.destinationTypes.map(destinationTypeBinder.unbind(key + ".destinationTypes", _)),
+          searchOptions.destinationTypes.map(destinationTypeBinder.unbind(key + ".destinationType", _)),
           searchOptions.dateOfDispatchFrom.map(date => stringBinder.unbind(key + ".dateOfDispatchFrom", date.toString)),
           searchOptions.dateOfDispatchTo.map(date => stringBinder.unbind(key + ".dateOfDispatchTo", date.toString)),
           searchOptions.exciseProductCode.map(stringBinder.unbind(key + ".exciseProductCode", _)),
