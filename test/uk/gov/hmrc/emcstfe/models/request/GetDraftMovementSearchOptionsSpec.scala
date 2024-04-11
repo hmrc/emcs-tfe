@@ -33,7 +33,7 @@ class GetDraftMovementSearchOptionsSpec extends TestBaseSpec {
         sortOrder = Descending,
         startPosition = 0,
         maxRows = 10,
-        searchString = None,
+        searchTerm = None,
         draftHasErrors = None,
         destinationTypes = None,
         dateOfDispatchFrom = None,
@@ -55,7 +55,7 @@ class GetDraftMovementSearchOptionsSpec extends TestBaseSpec {
           "search.sortOrder" -> Seq("A"),
           "search.startPosition" -> Seq("10"),
           "search.maxRows" -> Seq("99"),
-          "search.searchString" -> Seq("FooBar"),
+          "search.searchTerm" -> Seq("FooBar"),
           "search.draftHasErrors" -> Seq("true"),
           "search.destinationType" -> Seq("1", "3", "6"),
           "search.dateOfDispatchFrom" -> Seq("2020-07-06"),
@@ -67,7 +67,7 @@ class GetDraftMovementSearchOptionsSpec extends TestBaseSpec {
             sortOrder = Ascending,
             startPosition = 10,
             maxRows = 99,
-            searchString = Some("FooBar"),
+            searchTerm = Some("FooBar"),
             draftHasErrors = Some(true),
             destinationTypes = Some(Seq(TaxWarehouse, TemporaryRegisteredConsignee, Export)),
             dateOfDispatchFrom = Some(LocalDate.of(2020,7,6)),
@@ -94,7 +94,7 @@ class GetDraftMovementSearchOptionsSpec extends TestBaseSpec {
         sortOrder = Ascending,
         startPosition = 10,
         maxRows = 99,
-        searchString = Some("FooBar"),
+        searchTerm = Some("FooBar"),
         draftHasErrors = Some(true),
         destinationTypes = Some(Seq(TaxWarehouse, TemporaryRegisteredConsignee, Export)),
         dateOfDispatchFrom = Some(LocalDate.of(2020, 7, 6)),
@@ -105,7 +105,7 @@ class GetDraftMovementSearchOptionsSpec extends TestBaseSpec {
           "&search.sortOrder=A" +
           "&search.startPosition=10" +
           "&search.maxRows=99" +
-          "&search.searchString=FooBar" +
+          "&search.searchTerm=FooBar" +
           "&search.draftHasErrors=true" +
           "&search.destinationType=1" +
           "&search.destinationType=3" +

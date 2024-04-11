@@ -176,7 +176,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
           Some(Filters.equal(ernField, ern)),
 
           //Drafts which match any search text across LRN, Consignee Name, Consignee ERN or Destination Warehouse ERN
-          searchOptions.searchString.map { searchKey =>
+          searchOptions.searchTerm.map { searchKey =>
             Filters.or(
               Seq(lrnField, consigneeNameField, consigneeErnField, destinationErnField, dispatchErnField).map(field =>
                 Filters.regex(field, searchKey)

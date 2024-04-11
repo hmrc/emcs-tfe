@@ -16,21 +16,19 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
-import play.api.libs.json._
-import uk.gov.hmrc.emcstfe.fixtures.MovementSubmissionFailureFixtures
+import uk.gov.hmrc.emcstfe.fixtures.{CreateMovementSearchFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.models.common.Ascending
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, RegisteredConsignee, TaxWarehouse}
-import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.request.{GetDraftMovementSearchOptions, LRN}
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
-import java.util.UUID
-import scala.util.Random
 
-class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBaseSpec[CreateMovementUserAnswers] with MovementSubmissionFailureFixtures {
+class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBaseSpec[CreateMovementUserAnswers]
+  with CreateMovementSearchFixture
+  with MovementSubmissionFailureFixtures {
 
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
@@ -41,138 +39,21 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
     time = timeMachine
   )
 
-  val draftData = Seq(
-    userAnswers(
-      draftId = UUID.randomUUID().toString,
-      data = Json.obj(
-        "info" -> Json.obj(
-          "localReferenceNumber" -> "LRN-ABCD-12456465"
-        ),
-        "consignee" -> Json.obj(
-          "businessName" -> "Foo-ABCD-123456",
-          "exciseRegistrationNumber" -> "ERNABCDEFGHIJ123456"
-        ),
-        "destination" -> Json.obj(
-          "destinationWarehouseExcise" -> "WarehouseABERN"
-        ),
-        "items" -> Json.obj(
-          "addedItems" -> Json.arr(
-            Json.obj("itemExciseProductCode" -> "T200"),
-            Json.obj("itemExciseProductCode" -> "B100")
-          )
-        )
-      ),
-      timestamp = Instant.ofEpochSecond(600)
-    ),
-    userAnswers(
-      draftId = UUID.randomUUID().toString,
-      data = Json.obj(
-        "info" -> Json.obj(
-          "localReferenceNumber" -> "ABCDEFGHIJKL123456",
-          "destinationType" -> "gbTaxWarehouse"
-        ),
-        "consignee" -> Json.obj(
-          "businessName" -> "ABCDFoo-123456",
-          "exciseRegistrationNumber" -> "ABCERN123456"
-        ),
-        "destination" -> Json.obj(
-          "destinationWarehouseExcise" -> "ABWarehouseERN"
-        ),
-        "items" -> Json.obj(
-          "addedItems" -> Json.arr(
-            Json.obj("itemExciseProductCode" -> "T200")
-          )
-        )
-      ),
-      timestamp = Instant.ofEpochSecond(3000),
-      submissionFailures = Seq(movementSubmissionFailureModel.copy(hasBeenFixed = false))
-    ),
-    userAnswers(
-      draftId = UUID.randomUUID().toString,
-      data = Json.obj(
-        "info" -> Json.obj(
-          "localReferenceNumber" -> "123456ABC",
-          "dispatchDetails" -> Json.obj(
-            "date" -> LocalDate.of(2024, 4, 6)
-          ),
-          "destinationType" -> "euTaxWarehouse"
-        ),
-        "consignee" -> Json.obj(
-          "businessName" -> "Foo-123456ABCDEFGHIJK",
-          "exciseRegistrationNumber" -> "ERN123456ABC"
-        ),
-        "destination" -> Json.obj(
-          "destinationWarehouseExcise" -> "WarehouseERNAB"
-        ),
-        "items" -> Json.obj(
-          "addedItems" -> Json.arr(
-            Json.obj("itemExciseProductCode" -> "B100"),
-            Json.obj("itemExciseProductCode" -> "E200")
-          )
-        )
-      ),
-      timestamp = Instant.ofEpochSecond(4500)
-    ),
-    userAnswers(
-      draftId = UUID.randomUUID().toString,
-      data = Json.obj(
-        "info" -> Json.obj(
-          "localReferenceNumber" -> "123456ABC",
-          "dispatchDetails" -> Json.obj(
-            "date" -> LocalDate.of(2024, 5, 1)
-          ),
-          "destinationType" -> "exportWithCustomsDeclarationLodgedInTheUk"
-        ),
-        "consignee" -> Json.obj(
-          "businessName" -> "Foo-123456ABC",
-          "exciseRegistrationNumber" -> "ERN123456ABC"
-        ),
-        "destination" -> Json.obj(
-          "destinationWarehouseExcise" -> "WarehouseERNABCDEFGHI"
-        )
-      ),
-      timestamp = Instant.ofEpochSecond(6000),
-      submissionFailures = Seq(movementSubmissionFailureModel)
-    ),
-    userAnswers(
-      draftId = UUID.randomUUID().toString,
-      data = Json.obj(
-        "info" -> Json.obj(
-          "localReferenceNumber" -> "123456ABC",
-          "dispatchDetails" -> Json.obj(
-            "date" -> LocalDate.of(2024, 5, 1)
-          ),
-          "destinationType" -> "directDelivery"
-        ),
-        "consignee" -> Json.obj(
-          "businessName" -> "Foo-123456ABC",
-          "exciseRegistrationNumber" -> "ERN123456ABC"
-        ),
-        "dispatch" -> Json.obj(
-          "dispatchWarehouseExcise" -> "ABCDEFGH012345600ERN"
-        ),
-        "destination" -> Json.obj(
-          "destinationWarehouseExcise" -> "WarehouseERN"
-        )
-      ),
-      timestamp = Instant.ofEpochSecond(8000)
-    )
-  )
   val additionalDraftsCount = 50
   val additionalDraftData = generateNDrafts(n = additionalDraftsCount)
-  val insertedDrafts = draftData ++ additionalDraftData
+  val insertedDrafts = searchableDrafts ++ additionalDraftData
 
   override protected def beforeAll(): Unit = {
     //Ensures the notablescan value is set to true. See beforeALl on the IndexedMongoQueriesSupport trait.
     super.beforeAll()
     //Ensures that DB is empty and indexes are set.
     prepareDatabase()
-    insertedDrafts.foreach(draft => await(insert(draft)))
+    await(repository.collection.insertMany(insertedDrafts).head())
   }
 
   //IMPORTANT: This Intentionally overrides beforeEach to an empty Unit so as to NOT drop Mongo before every test.
   //In this spec, we want to specifically keep all data for performance reasons as we're repeatedly querying the same data set
-  override protected def beforeEach(): Unit = { () }
+  override protected def beforeEach(): Unit = ()
 
   ".search" when {
 
@@ -184,7 +65,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + draftData.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.size
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
@@ -199,7 +80,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + draftData.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.size
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
@@ -213,7 +94,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + draftData.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.size
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
@@ -228,7 +109,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + draftData.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.size
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
@@ -243,7 +124,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + draftData.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.size
         result.paginatedDrafts.size shouldBe GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS
         result.paginatedDrafts shouldBe
           insertedDrafts
@@ -253,14 +134,14 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
             .slice(startPosition, GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS + startPosition)
       }
 
-      s"return paginated drafts, from ${(additionalDraftsCount + draftData.size) - 3} to MAX related to that ERN (should return 3)" in {
+      s"return paginated drafts, from ${(additionalDraftsCount + searchableDrafts.size) - 3} to MAX related to that ERN (should return 3)" in {
 
-        val startPosition = (additionalDraftsCount + draftData.size) - 3
+        val startPosition = (additionalDraftsCount + searchableDrafts.size) - 3
         val searchOptions = GetDraftMovementSearchOptions(startPosition = startPosition)
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + draftData.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.size
         result.paginatedDrafts.size shouldBe 3
         result.paginatedDrafts shouldBe
           insertedDrafts
@@ -270,14 +151,14 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
             .slice(startPosition, GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS + startPosition)
       }
 
-      s"return paginated drafts, from ${additionalDraftsCount + draftData.size} to MAX related to that ERN (should return 0)" in {
+      s"return paginated drafts, from ${additionalDraftsCount + searchableDrafts.size} to MAX related to that ERN (should return 0)" in {
 
-        val startPosition = additionalDraftsCount + draftData.size
+        val startPosition = additionalDraftsCount + searchableDrafts.size
         val searchOptions = GetDraftMovementSearchOptions(startPosition = startPosition)
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + draftData.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.size
         result.paginatedDrafts.size shouldBe 0
         result.paginatedDrafts shouldBe
           insertedDrafts
@@ -292,11 +173,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
       "search term doesn't match anything" must {
 
-        val searchString = "FOO"
+        val searchTerm = "FOO"
 
         "return empty and count 0" in {
 
-          val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
+          val searchOptions = GetDraftMovementSearchOptions(searchTerm = Some(searchTerm))
 
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
@@ -307,11 +188,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
       "only LRN is matched" must {
 
-        val searchString = "ABCDEFGHIJKL"
+        val searchTerm = "ABCDEFGHIJKL"
 
         "return paginated drafts related to that ERN where the search term also matches" in {
 
-          val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
+          val searchOptions = GetDraftMovementSearchOptions(searchTerm = Some(searchTerm))
 
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
@@ -319,7 +200,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
-              .filter(_.data.lrn.exists(_.contains(searchString)))
+              .filter(_.data.lrn.exists(_.contains(searchTerm)))
               .sortBy(_.lastUpdated)
               .reverse
               .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
@@ -328,11 +209,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
       "LRN and BusinessName matched" must {
 
-        val searchString = "ABCDEFGHIJK"
+        val searchTerm = "ABCDEFGHIJK"
 
         "return paginated drafts related to that ERN where the search term also matches" in {
 
-          val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
+          val searchOptions = GetDraftMovementSearchOptions(searchTerm = Some(searchTerm))
 
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
@@ -341,8 +222,8 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
-                draft.data.lrn.exists(_.contains(searchString)) ||
-                  draft.data.consigneeBusinessName.exists(_.contains(searchString))
+                draft.data.lrn.exists(_.contains(searchTerm)) ||
+                  draft.data.consigneeBusinessName.exists(_.contains(searchTerm))
               )
               .sortBy(_.lastUpdated)
               .reverse
@@ -352,11 +233,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
       "LRN, BusinessName and consigneeErn matched" must {
 
-        val searchString = "ABCDEFGHIJ"
+        val searchTerm = "ABCDEFGHIJ"
 
         "return paginated drafts related to that ERN where the search term also matches" in {
 
-          val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
+          val searchOptions = GetDraftMovementSearchOptions(searchTerm = Some(searchTerm))
 
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
@@ -365,9 +246,9 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
-                draft.data.lrn.exists(_.contains(searchString)) ||
-                  draft.data.consigneeBusinessName.exists(_.contains(searchString)) ||
-                  draft.data.consigneeERN.exists(_.contains(searchString))
+                draft.data.lrn.exists(_.contains(searchTerm)) ||
+                  draft.data.consigneeBusinessName.exists(_.contains(searchTerm)) ||
+                  draft.data.consigneeERN.exists(_.contains(searchTerm))
               )
               .sortBy(_.lastUpdated)
               .reverse
@@ -377,11 +258,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
       "LRN, BusinessName, consigneeErn and DestinationErn matched" must {
 
-        val searchString = "ABCDEFGHI"
+        val searchTerm = "ABCDEFGHI"
 
         "return paginated drafts related to that ERN where the search term also matches" in {
 
-          val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
+          val searchOptions = GetDraftMovementSearchOptions(searchTerm = Some(searchTerm))
 
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
@@ -390,10 +271,10 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
-                draft.data.lrn.exists(_.contains(searchString)) ||
-                  draft.data.consigneeBusinessName.exists(_.contains(searchString)) ||
-                  draft.data.consigneeERN.exists(_.contains(searchString)) ||
-                  draft.data.destinationWarehouseERN.exists(_.contains(searchString))
+                draft.data.lrn.exists(_.contains(searchTerm)) ||
+                  draft.data.consigneeBusinessName.exists(_.contains(searchTerm)) ||
+                  draft.data.consigneeERN.exists(_.contains(searchTerm)) ||
+                  draft.data.destinationWarehouseERN.exists(_.contains(searchTerm))
               )
               .sortBy(_.lastUpdated)
               .reverse
@@ -403,11 +284,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
       "LRN, BusinessName, consigneeErn, DestinationErn and DispatchErn matched" must {
 
-        val searchString = "ABCDEFGH"
+        val searchTerm = "ABCDEFGH"
 
         "return paginated drafts related to that ERN where the search term also matches" in {
 
-          val searchOptions = GetDraftMovementSearchOptions(searchString = Some(searchString))
+          val searchOptions = GetDraftMovementSearchOptions(searchTerm = Some(searchTerm))
 
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
@@ -416,11 +297,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
             insertedDrafts
               .filter(_.ern == testErn)
               .filter(draft =>
-                draft.data.lrn.exists(_.contains(searchString)) ||
-                  draft.data.consigneeBusinessName.exists(_.contains(searchString)) ||
-                  draft.data.consigneeERN.exists(_.contains(searchString)) ||
-                  draft.data.destinationWarehouseERN.exists(_.contains(searchString)) ||
-                  draft.data.dispatchWarehouseERN.exists(_.contains(searchString))
+                draft.data.lrn.exists(_.contains(searchTerm)) ||
+                  draft.data.consigneeBusinessName.exists(_.contains(searchTerm)) ||
+                  draft.data.consigneeERN.exists(_.contains(searchTerm)) ||
+                  draft.data.destinationWarehouseERN.exists(_.contains(searchTerm)) ||
+                  draft.data.dispatchWarehouseERN.exists(_.contains(searchTerm))
               )
               .sortBy(_.lastUpdated)
               .reverse
@@ -647,60 +528,4 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
       }
     }
   }
-
-  private implicit class JsObjectExtension(json: JsObject) {
-
-    implicit def read(path: JsPath)(implicit reads: Reads[String]): Option[String] = path.readNullable[String].reads(json).get
-
-    implicit def lrn: Option[String] = read(__ \ "info" \ "localReferenceNumber")
-    implicit def destinationType: Option[String] = read(__ \ "info" \ "destinationType")
-    implicit def consigneeBusinessName: Option[String] = read(__ \ "consignee" \ "businessName")
-    implicit def consigneeERN: Option[String] = read(__ \ "consignee" \ "exciseRegistrationNumber")
-    implicit def destinationWarehouseERN: Option[String] = read(__ \ "destination" \ "destinationWarehouseExcise")
-    implicit def dispatchWarehouseERN: Option[String] = read(__ \ "dispatch" \ "dispatchWarehouseExcise")
-    implicit def dispatchDate: Option[LocalDate] = read(__ \ "info" \ "dispatchDetails" \ "date").map(LocalDate.parse)
-    implicit def itemEpcs: Option[Seq[String]] = {
-      val reads = (__ \ "items" \ "addedItems").readNullable[Seq[String]](Reads.seq((__ \ "itemExciseProductCode").read[String]))
-      json.as[Option[Seq[String]]](reads)
-    }
-  }
-
-  def userAnswers(ern: String = testErn,
-                  draftId: String = testDraftId,
-                  data: JsObject = Json.obj("foo" -> "bar"),
-                  submissionFailures: Seq[MovementSubmissionFailure] = Seq(),
-                  timestamp: Instant = Instant.ofEpochSecond(1)): CreateMovementUserAnswers =
-    CreateMovementUserAnswers(
-      ern = ern,
-      draftId = draftId,
-      data = data,
-      submissionFailures = submissionFailures,
-      lastUpdated = timestamp,
-      hasBeenSubmitted = true,
-      submittedDraftId = Some(testDraftId)
-    )
-
-  private def generateNDrafts(n: Int = 1): Seq[CreateMovementUserAnswers] = (1 to n).flatMap { i =>
-    val draft = userAnswers(
-      draftId = s"draft$i",
-      data = Json.obj("info" -> Json.obj(
-        "localReferenceNumber" -> s"LRN${Random.nextInt(i * 1000)}"
-      )),
-      timestamp = Instant.ofEpochSecond(i * 5)
-    )
-    Seq(draft, generateRandomDraft(i))
-  }
-
-  private def generateRandomDraft(i: Int): CreateMovementUserAnswers =
-    CreateMovementUserAnswers(
-      ern = s"GB${Random.nextInt(i * 1000)}",
-      draftId = UUID.randomUUID().toString,
-      data = Json.obj("info" -> Json.obj(
-        "localReferenceNumber" -> s"LRN${Random.nextInt(i * 1000)}"
-      )),
-      submissionFailures = Seq(),
-      lastUpdated = Instant.ofEpochSecond(i * 2),
-      hasBeenSubmitted = false,
-      submittedDraftId = None
-    )
 }

@@ -26,7 +26,7 @@ case class GetDraftMovementSearchOptions(sortField: GetDraftMovementSortField = 
                                          sortOrder: SortOrdering = GetDraftMovementSearchOptions.DEFAULT_SORT_ORDER,
                                          startPosition: Int = DEFAULT_START_POSITION,
                                          maxRows: Int = GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS,
-                                         searchString: Option[String] = None,
+                                         searchTerm: Option[String] = None,
                                          draftHasErrors: Option[Boolean] = None,
                                          destinationTypes: Option[Seq[DestinationType]] = None,
                                          dateOfDispatchFrom: Option[LocalDate] = None,
@@ -53,7 +53,7 @@ object GetDraftMovementSearchOptions {
           sortOrder <- sortOrderBinder.bind(key + ".sortOrder", params).getOrElse(Right(DEFAULT_SORT_ORDER))
           startPosition <- intBinder.bind(key + ".startPosition", params).getOrElse(Right(DEFAULT_START_POSITION))
           maxRows <- intBinder.bind(key + ".maxRows", params).getOrElse(Right(DEFAULT_MAX_ROWS))
-          searchString <- stringBinder.bind(key + ".searchString", params).map(_.map(Some(_))).getOrElse(Right(None))
+          searchTerm <- stringBinder.bind(key + ".searchTerm", params).map(_.map(Some(_))).getOrElse(Right(None))
           draftHasErrors <- booleanBinder.bind(key + ".draftHasErrors", params).map(_.map(Some(_))).getOrElse(Right(None))
           destinationTypes <- destinationTypeBinder.bind(key + ".destinationType", params).map(_.map(Some(_))).getOrElse(Right(None))
           dateOfDispatchFrom <- stringBinder.bind(key + ".dateOfDispatchFrom", params).map(_.map(date => Some(LocalDate.parse(date)))).getOrElse(Right(None))
@@ -65,7 +65,7 @@ object GetDraftMovementSearchOptions {
             sortOrder = sortOrder,
             startPosition = startPosition,
             maxRows = maxRows,
-            searchString = searchString,
+            searchTerm = searchTerm,
             draftHasErrors = draftHasErrors,
             destinationTypes = destinationTypes,
             dateOfDispatchFrom = dateOfDispatchFrom,
@@ -81,7 +81,7 @@ object GetDraftMovementSearchOptions {
           Some(sortOrderBinder.unbind(key + ".sortOrder", searchOptions.sortOrder)),
           Some(intBinder.unbind(key + ".startPosition", searchOptions.startPosition)),
           Some(intBinder.unbind(key + ".maxRows", searchOptions.maxRows)),
-          searchOptions.searchString.map(stringBinder.unbind(key + ".searchString", _)),
+          searchOptions.searchTerm.map(stringBinder.unbind(key + ".searchTerm", _)),
           searchOptions.draftHasErrors.map(booleanBinder.unbind(key + ".draftHasErrors", _)),
           searchOptions.destinationTypes.map(destinationTypeBinder.unbind(key + ".destinationType", _)),
           searchOptions.dateOfDispatchFrom.map(date => stringBinder.unbind(key + ".dateOfDispatchFrom", date.toString)),
