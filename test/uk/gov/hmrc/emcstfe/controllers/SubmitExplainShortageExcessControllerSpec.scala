@@ -27,7 +27,6 @@ import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitExplainShortageExc
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.{MockNRSBrokerService, MockSubmitExplainShortageExcessService}
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainShortageOrExcessNotableEvent
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -49,7 +48,7 @@ class SubmitExplainShortageExcessControllerSpec extends TestBaseSpec
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 
       if (isNRSEnabled) {
-        MockNRSBrokerService.submitPayload(explainShortageExcessNRSSubmission(Consignor, testErn), testErn, ExplainShortageOrExcessNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+        MockNRSBrokerService.submitPayload(explainShortageExcessNRSSubmission(Consignor, testErn), testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
       }
     }
 

@@ -23,7 +23,6 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.CancelMovementNotableEvent
 import uk.gov.hmrc.emcstfe.models.nrs.cancelMovement.CancelMovementNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.SubmitCancellationOfMovementService
@@ -48,8 +47,7 @@ class SubmitCancellationOfMovementController @Inject()(cc: ControllerComponents,
         withJsonBody[SubmitCancellationOfMovementModel] {
           submission =>
             if(isEnabled(EnableNRS)) {
-              val nrsSubmissionModel = CancelMovementNRSSubmission.apply(submission, ern)
-              nrsBrokerService.submitPayload(nrsSubmissionModel, ern, CancelMovementNotableEvent).flatMap(_ => handleSubmission(submission))
+              nrsBrokerService.submitPayload(CancelMovementNRSSubmission(submission, ern), ern).flatMap(_ => handleSubmission(submission))
             } else {
               handleSubmission(submission)
             }

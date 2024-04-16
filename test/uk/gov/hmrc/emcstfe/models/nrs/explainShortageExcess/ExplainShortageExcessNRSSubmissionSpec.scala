@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.models.nrs.explainShortageExcess
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.{Consignee, Consignor}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainShortageOrExcessNotableEvent
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class ExplainShortageExcessNRSSubmissionSpec extends TestBaseSpec with SubmitExplainShortageExcessFixtures {
@@ -27,12 +28,16 @@ class ExplainShortageExcessNRSSubmissionSpec extends TestBaseSpec with SubmitExp
 
     s"generate the correct model from the $SubmitExplainShortageExcessModel" in {
 
-      ExplainShortageExcessNRSSubmission
-        .apply(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignee), testErn) shouldBe explainShortageExcessNRSSubmission(Consignee, testErn)
+      ExplainShortageExcessNRSSubmission(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignee), testErn) shouldBe
+        explainShortageExcessNRSSubmission(Consignee, testErn)
 
-      ExplainShortageExcessNRSSubmission
-        .apply(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignor), testErn) shouldBe explainShortageExcessNRSSubmission(Consignor, testErn)
+      ExplainShortageExcessNRSSubmission(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignor), testErn) shouldBe
+        explainShortageExcessNRSSubmission(Consignor, testErn)
+    }
+
+    "have the correct notableEvent" in {
+      ExplainShortageExcessNRSSubmission(SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(Consignor), testErn).notableEvent shouldBe
+        ExplainShortageOrExcessNotableEvent
     }
   }
-
 }

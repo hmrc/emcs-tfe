@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.nrs.alertReject
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.AlertRejectNotableEvent
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class AlertRejectNRSSubmissionSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
@@ -25,8 +26,11 @@ class AlertRejectNRSSubmissionSpec extends TestBaseSpec with SubmitAlertOrReject
   ".apply" should {
 
     s"generate the correct model from the $SubmitAlertOrRejectionModel" in {
+      AlertRejectNRSSubmission(maxSubmitAlertOrRejectionModel) shouldBe alertRejectNRSSubmission
+    }
 
-      AlertRejectNRSSubmission.apply(maxSubmitAlertOrRejectionModel) shouldBe alertRejectNRSSubmission
+    "have the correct notableEvent" in {
+      AlertRejectNRSSubmission(maxSubmitAlertOrRejectionModel).notableEvent shouldBe AlertRejectNotableEvent
     }
   }
 }

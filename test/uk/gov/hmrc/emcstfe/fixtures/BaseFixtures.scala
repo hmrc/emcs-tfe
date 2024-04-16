@@ -21,6 +21,7 @@ import scala.xml.{Node, NodeSeq, PCData}
 
 trait BaseFixtures {
 
+  val testAuthToken = "Bearer token"
   val testErn = "GBWK000001234"
   val testArc: String = "23GB00000000000376967"
   val testLrn: String = "LRN"

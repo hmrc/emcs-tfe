@@ -19,13 +19,17 @@ package uk.gov.hmrc.emcstfe.models.nrs.explainDelay
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainDelay.{DelayReasonType, DelayType, SubmitExplainDelayModel}
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainDelayNotableEvent
+import uk.gov.hmrc.emcstfe.models.nrs.{NRSSubmission, NotableEvent}
 
 case class ExplainDelayNRSSubmission(arc: String,
                                      sequenceNumber: Int,
                                      submitterType: SubmitterType,
                                      delayType: DelayType,
                                      delayReasonType: DelayReasonType,
-                                     additionalInformation: Option[String])
+                                     additionalInformation: Option[String]) extends NRSSubmission {
+  override val notableEvent: NotableEvent = ExplainDelayNotableEvent
+}
 
 object ExplainDelayNRSSubmission {
   def apply(submission: SubmitExplainDelayModel): ExplainDelayNRSSubmission = ExplainDelayNRSSubmission(

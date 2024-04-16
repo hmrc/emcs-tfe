@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.nrs.explainDelay
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainDelayNotableEvent
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class ExplainDelayNRSSubmissionSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
@@ -25,8 +26,11 @@ class ExplainDelayNRSSubmissionSpec extends TestBaseSpec with SubmitExplainDelay
   ".apply" should {
 
     s"generate the correct model from the $SubmitExplainDelayModel" in {
+      ExplainDelayNRSSubmission(maxSubmitExplainDelayModel) shouldBe explainDelayNRSSubmission
+    }
 
-      ExplainDelayNRSSubmission.apply(maxSubmitExplainDelayModel) shouldBe explainDelayNRSSubmission
+    "have the correct notableEvent" in {
+      ExplainDelayNRSSubmission(maxSubmitExplainDelayModel).notableEvent shouldBe ExplainDelayNotableEvent
     }
   }
 }

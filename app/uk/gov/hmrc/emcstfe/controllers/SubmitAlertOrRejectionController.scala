@@ -23,7 +23,6 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.AlertRejectNotableEvent
 import uk.gov.hmrc.emcstfe.models.nrs.alertReject.AlertRejectNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.SubmitAlertOrRejectionService
@@ -47,8 +46,7 @@ class SubmitAlertOrRejectionController @Inject()(cc: ControllerComponents,
     withJsonBody[SubmitAlertOrRejectionModel] {
       submission =>
         if(isEnabled(EnableNRS)) {
-          val nrsSubmissionModel = AlertRejectNRSSubmission.apply(submission)
-          nrsBrokerService.submitPayload(nrsSubmissionModel, ern, AlertRejectNotableEvent).flatMap(_ => handleSubmission(submission))
+          nrsBrokerService.submitPayload(AlertRejectNRSSubmission(submission), ern).flatMap(_ => handleSubmission(submission))
         } else {
           handleSubmission(submission)
         }

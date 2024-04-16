@@ -26,7 +26,6 @@ import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitCancellationOfMovementFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.{MockNRSBrokerService, MockSubmitCancellationOfMovementService}
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.CancelMovementNotableEvent
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -46,7 +45,7 @@ class SubmitCancellationOfMovementControllerSpec extends TestBaseSpec
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 
       if (isNRSEnabled) {
-        MockNRSBrokerService.submitPayload(cancelMovementNRSSubmission, testErn, CancelMovementNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+        MockNRSBrokerService.submitPayload(cancelMovementNRSSubmission, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
       }
     }
 

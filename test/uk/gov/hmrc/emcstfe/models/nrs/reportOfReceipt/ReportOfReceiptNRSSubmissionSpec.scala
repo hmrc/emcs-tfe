@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.nrs.reportOfReceipt
 
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitExplainShortageExcessFixtures, SubmitReportOfReceiptFixtures}
-import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ReportAReceiptNotableEvent
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -26,9 +26,11 @@ class ReportOfReceiptNRSSubmissionSpec extends TestBaseSpec with SubmitExplainSh
   ".apply" should {
 
     s"generate the correct model from the $SubmitReportOfReceiptModel" in {
+      ReportOfReceiptNRSSubmission(maxSubmitReportOfReceiptModel, testErn) shouldBe reportOfReceiptNRSSubmission
+    }
 
-      ReportOfReceiptNRSSubmission
-        .apply(maxSubmitReportOfReceiptModel, testErn) shouldBe reportOfReceiptNRSSubmission
+    "have the correct notableEvent" in {
+      ReportOfReceiptNRSSubmission(maxSubmitReportOfReceiptModel, testErn).notableEvent shouldBe ReportAReceiptNotableEvent
     }
   }
 }

@@ -22,7 +22,7 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.emcstfe.connectors.NRSBrokerConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.nrs.{IdentityData, NRSPayload, NotableEvent}
+import uk.gov.hmrc.emcstfe.models.nrs.{IdentityData, NRSPayload, NRSSubmission}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{IdentityDataException, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.models.response.nrsBroker.NRSBrokerInsertPayloadResponse
@@ -40,11 +40,11 @@ class NRSBrokerService @Inject()(
                                   timeMachine: TimeMachine
                                 ) extends Logging with AuthorisedFunctions {
 
-  def submitPayload[A](submission: A, ern: String, notableEvent: NotableEvent)
-                      (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_], writes: Writes[A]): Future[Either[ErrorResponse, NRSBrokerInsertPayloadResponse]] = {
+  def submitPayload[A <: NRSSubmission](submission: A, ern: String)
+                                       (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_], writes: Writes[A]): Future[Either[ErrorResponse, NRSBrokerInsertPayloadResponse]] = {
     val submissionAsString = Json.stringify(Json.toJson(submission)(writes))
     getIdentityData().flatMap { identityData =>
-      val payload = NRSPayload(submissionAsString, notableEvent, identityData, ern, timeMachine.instant())
+      val payload = NRSPayload(submissionAsString, submission.notableEvent, identityData, ern, timeMachine.instant())
       brokerConnector.submitPayload(payload, ern).map {
         case Left(value) => Left(value)
         case Right(response) =>

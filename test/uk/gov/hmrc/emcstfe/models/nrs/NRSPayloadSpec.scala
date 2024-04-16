@@ -30,7 +30,7 @@ class NRSPayloadSpec extends TestBaseSpec with NRSBrokerFixtures {
 
     "generate the correct payload by encoding, hashing the payload and applying the correct attributes" in {
 
-      val result = NRSPayload.apply(testPlainTextPayload, CreateMovementNotableEvent, identityDataModel, testErn, Instant.ofEpochMilli(1L))(hc.copy(authorization = Some(Authorization("Bearer token"))), implicitly)
+      val result = NRSPayload.apply(testPlainTextPayload, CreateMovementNotableEvent, identityDataModel, testErn, Instant.ofEpochMilli(1L))(hc.copy(authorization = Some(Authorization(testAuthToken))), implicitly)
 
       result shouldBe nrsPayloadModel.copy(metadata = nrsPayloadModel.metadata.copy(headerData = Json.obj("Host" -> "localhost")))
     }
