@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + searchableDrafts.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .sortBy(_.lastUpdated)
             .reverse
             .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
@@ -80,10 +81,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + searchableDrafts.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .sortBy(_.lastUpdated)
             .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
       }
@@ -94,10 +96,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + searchableDrafts.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .sortBy(_.data.lrn)
             .reverse
             .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
@@ -109,10 +112,11 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + searchableDrafts.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .sortBy(_.data.lrn)
             .take(GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS)
       }
@@ -124,45 +128,48 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + searchableDrafts.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)
         result.paginatedDrafts.size shouldBe GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .sortBy(_.lastUpdated)
             .reverse
             .slice(startPosition, GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS + startPosition)
       }
 
-      s"return paginated drafts, from ${(additionalDraftsCount + searchableDrafts.size) - 3} to MAX related to that ERN (should return 3)" in {
+      s"return paginated drafts, from ${(additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)) - 3} to MAX related to that ERN (should return 3)" in {
 
-        val startPosition = (additionalDraftsCount + searchableDrafts.size) - 3
+        val startPosition = (additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)) - 3
         val searchOptions = GetDraftMovementSearchOptions(startPosition = startPosition)
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + searchableDrafts.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)
         result.paginatedDrafts.size shouldBe 3
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .sortBy(_.lastUpdated)
             .reverse
             .slice(startPosition, GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS + startPosition)
       }
 
-      s"return paginated drafts, from ${additionalDraftsCount + searchableDrafts.size} to MAX related to that ERN (should return 0)" in {
+      s"return paginated drafts, from ${additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)} to MAX related to that ERN (should return 0)" in {
 
-        val startPosition = additionalDraftsCount + searchableDrafts.size
+        val startPosition = additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)
         val searchOptions = GetDraftMovementSearchOptions(startPosition = startPosition)
 
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
-        result.count shouldBe additionalDraftsCount + searchableDrafts.size
+        result.count shouldBe additionalDraftsCount + searchableDrafts.count(_.hasBeenSubmitted == false)
         result.paginatedDrafts.size shouldBe 0
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .sortBy(_.lastUpdated)
             .reverse
             .slice(startPosition, GetDraftMovementSearchOptions.DEFAULT_MAX_ROWS + startPosition)
@@ -200,6 +207,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(_.data.lrn.exists(_.contains(searchTerm)))
               .sortBy(_.lastUpdated)
               .reverse
@@ -221,6 +229,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(draft =>
                 draft.data.lrn.exists(_.contains(searchTerm)) ||
                   draft.data.consigneeBusinessName.exists(_.contains(searchTerm))
@@ -245,6 +254,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(draft =>
                 draft.data.lrn.exists(_.contains(searchTerm)) ||
                   draft.data.consigneeBusinessName.exists(_.contains(searchTerm)) ||
@@ -270,6 +280,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(draft =>
                 draft.data.lrn.exists(_.contains(searchTerm)) ||
                   draft.data.consigneeBusinessName.exists(_.contains(searchTerm)) ||
@@ -296,6 +307,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(draft =>
                 draft.data.lrn.exists(_.contains(searchTerm)) ||
                   draft.data.consigneeBusinessName.exists(_.contains(searchTerm)) ||
@@ -326,6 +338,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(_.submissionFailures.exists(_.hasBeenFixed == false))
               .sortBy(_.lastUpdated)
               .reverse
@@ -349,6 +362,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .filter(draft =>
               draft.data.dispatchDate.exists(date => !date.isBefore(fromDate))
             )
@@ -370,6 +384,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .filter(draft =>
               draft.data.dispatchDate.exists(date => !date.isBefore(fromDate))
             )
@@ -391,6 +406,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .filter(draft =>
               draft.data.dispatchDate.exists(date => !date.isAfter(toDate))
             )
@@ -412,6 +428,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .filter(draft =>
               draft.data.dispatchDate.exists(date => !date.isAfter(toDate))
             )
@@ -435,6 +452,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         result.paginatedDrafts shouldBe
           insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .filter(draft =>
               draft.data.dispatchDate.exists(date => !date.isAfter(toDate)) &&
                 draft.data.dispatchDate.exists(date => !date.isBefore(fromDate))
@@ -459,6 +477,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(_.data.itemEpcs.exists(_.exists(_ == "B100")))
               .sortBy(_.lastUpdated)
               .reverse
@@ -492,6 +511,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(_.data.destinationType.exists(destinationTypes.flatMap(_.movementScenarios).contains))
               .sortBy(_.lastUpdated)
               .reverse
@@ -509,6 +529,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           result.paginatedDrafts shouldBe
             insertedDrafts
               .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
               .filter(_.data.destinationType.exists(destinationTypes.flatMap(_.movementScenarios).contains))
               .sortBy(_.lastUpdated)
               .reverse

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
                   draftId: String = testDraftId,
                   data: JsObject = Json.obj("foo" -> "bar"),
                   submissionFailures: Seq[MovementSubmissionFailure] = Seq(),
+                  hasBeenSubmitted: Boolean = false,
                   timestamp: Instant = Instant.ofEpochSecond(1)): CreateMovementUserAnswers =
     CreateMovementUserAnswers(
       ern = ern,
@@ -37,7 +38,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
       data = data,
       submissionFailures = submissionFailures,
       lastUpdated = timestamp,
-      hasBeenSubmitted = true,
+      hasBeenSubmitted = hasBeenSubmitted,
       submittedDraftId = Some(testDraftId)
     )
 
@@ -156,6 +157,30 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
         )
       ),
       timestamp = Instant.ofEpochSecond(8000)
+    ),
+    userAnswers(
+      draftId = UUID.randomUUID().toString,
+      data = Json.obj(
+        "info" -> Json.obj(
+          "localReferenceNumber" -> "123456ABC",
+          "dispatchDetails" -> Json.obj(
+            "date" -> LocalDate.of(2024, 5, 1)
+          ),
+          "destinationType" -> "directDelivery"
+        ),
+        "consignee" -> Json.obj(
+          "businessName" -> "Foo-123456ABC",
+          "exciseRegistrationNumber" -> "ERN123456ABC"
+        ),
+        "dispatch" -> Json.obj(
+          "dispatchWarehouseExcise" -> "ABCDEFGH012345600ERN"
+        ),
+        "destination" -> Json.obj(
+          "destinationWarehouseExcise" -> "WarehouseERN"
+        )
+      ),
+      timestamp = Instant.ofEpochSecond(9000),
+      hasBeenSubmitted = true
     )
   )
 

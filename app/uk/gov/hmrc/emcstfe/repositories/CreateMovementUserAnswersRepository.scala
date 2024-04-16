@@ -172,10 +172,11 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
     val findFilter = {
       Filters.and(
         Seq(
-          //Drafts for this ERN
+          //Drafts for this ERN that are not submitted
           Some(Filters.equal(ernField, ern)),
+          Some(Filters.equal(hasBeenSubmittedField, false)),
 
-          //Drafts which match any search text across LRN, Consignee Name, Consignee ERN or Destination Warehouse ERN
+          //Drafts which contain search text across LRN, Consignee Name, Consignee ERN or Destination Warehouse ERN
           searchOptions.searchTerm.map { searchKey =>
             Filters.or(
               Seq(lrnField, consigneeNameField, consigneeErnField, destinationErnField, dispatchErnField).map(field =>

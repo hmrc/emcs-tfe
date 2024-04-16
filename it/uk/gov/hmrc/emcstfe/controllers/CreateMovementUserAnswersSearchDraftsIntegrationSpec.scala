@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import org.mongodb.scala.bson.BsonDocument
 import play.api.http.Status
-import play.api.http.Status.OK
+import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementSearchFixture
@@ -103,6 +103,7 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
 
           val expectedReturnedDrafts = insertedDrafts
             .filter(_.ern == testErn)
+            .filter(_.hasBeenSubmitted == false)
             .filter(draft =>
               draft.data.lrn.exists(_.contains(searchTerm)) ||
                 draft.data.consigneeBusinessName.exists(_.contains(searchTerm)) ||
@@ -134,7 +135,9 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
 
             val response: WSResponse = await(searchRequest.get())
 
-            val foundDrafts = insertedDrafts.filter(_.ern == testErn)
+            val foundDrafts = insertedDrafts
+              .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
 
             val expectedReturnedDrafts = foundDrafts
               .sortBy(_.lastUpdated)
@@ -160,7 +163,9 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
 
             val response: WSResponse = await(searchRequest.get())
 
-            val foundDrafts = insertedDrafts.filter(_.ern == testErn)
+            val foundDrafts = insertedDrafts
+              .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
 
             val expectedReturnedDrafts = foundDrafts
               .sortBy(_.lastUpdated)
@@ -186,7 +191,9 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
 
             val response: WSResponse = await(searchRequest.get())
 
-            val foundDrafts = insertedDrafts.filter(_.ern == testErn)
+            val foundDrafts = insertedDrafts
+              .filter(_.ern == testErn)
+              .filter(_.hasBeenSubmitted == false)
 
             val expectedReturnedDrafts = foundDrafts
               .sortBy(_.lastUpdated)
@@ -196,6 +203,38 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
             expectedReturnedDrafts.size shouldBe Math.min(max, foundDrafts.size)
             response.status shouldBe OK
             response.json shouldBe Json.toJson(SearchDraftMovementsResponse(count = foundDrafts.size, paginatedDrafts = expectedReturnedDrafts))
+          }
+
+          "return 400 BadRequest if the startPosition is negative" in {
+
+            AuthStub.authorised()
+
+            val start = -1
+
+            val searchRequest = buildRequest(uri).withQueryStringParameters(
+              "search.startPosition" -> start.toString
+            )
+
+            val response: WSResponse = await(searchRequest.get())
+
+            response.status shouldBe BAD_REQUEST
+            response.body shouldBe "startPosition must be positive"
+          }
+
+          "return 400 BadRequest if the maxRows is negative" in {
+
+            AuthStub.authorised()
+
+            val maxRows = -1
+
+            val searchRequest = buildRequest(uri).withQueryStringParameters(
+              "search.maxRows" -> maxRows.toString
+            )
+
+            val response: WSResponse = await(searchRequest.get())
+
+            response.status shouldBe BAD_REQUEST
+            response.body shouldBe "maxRows must be positive"
           }
         }
       }

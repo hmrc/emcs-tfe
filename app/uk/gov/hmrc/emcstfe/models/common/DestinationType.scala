@@ -83,10 +83,8 @@ object DestinationType extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[DestinationType] =
     Enumerable(values.map(v => v.toString -> v): _*)
 
-  def destinationType(code: String): DestinationType = values.find(_.toString == code) match {
-    case Some(value) => value
-    case None => throw new IllegalArgumentException(s"Destination code of '$code' could not be mapped to a valid Destination Type")
-  }
+  def destinationType(code: String): DestinationType =
+    values.find(_.toString == code).getOrElse(throw new IllegalArgumentException(s"Destination code of '$code' could not be mapped to a valid Destination Type"))
 
   implicit def queryStringBinder(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[Seq[DestinationType]] =
     new QueryStringBindable[Seq[DestinationType]] {

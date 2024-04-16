@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.controllers.userAnswers
 
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
@@ -27,7 +27,7 @@ import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
@@ -111,11 +111,22 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
 
   def search(ern: String, searchOptions: GetDraftMovementSearchOptions): Action[AnyContent] =
     authorisedUserRequest(ern) { _ =>
-      createMovementUserAnswersService.searchDrafts(ern, searchOptions) map {
-        case Right(response) => Ok(Json.toJson(response))
-        case Left(mongoError) =>
-          logger.warn(s"[search] An error occurred when searching the draft movements: ${mongoError.message}")
-          InternalServerError(Json.toJson(mongoError))
+      validate(searchOptions) {
+        createMovementUserAnswersService.searchDrafts(ern, searchOptions) map {
+          case Right(response) => Ok(Json.toJson(response))
+          case Left(mongoError) =>
+            logger.warn(s"[search] An error occurred when searching the draft movements: ${mongoError.message}")
+            InternalServerError(Json.toJson(mongoError))
+        }
       }
+    }
+
+  private def validate(searchOptions: GetDraftMovementSearchOptions)(f: => Future[Result]): Future[Result] =
+    (for {
+      _ <- if(searchOptions.startPosition < 0) Left("startPosition must be positive") else Right(searchOptions.startPosition)
+      _ <- if(searchOptions.maxRows < 0) Left("maxRows must be positive") else Right(searchOptions.maxRows)
+    } yield searchOptions) match {
+      case Left(err) => Future.successful(BadRequest(err))
+      case Right(_) => f
     }
 }
