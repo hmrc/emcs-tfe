@@ -20,6 +20,7 @@ import play.api.libs.json.{JsObject, JsPath, Json, Reads, __}
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 
+import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import java.util.UUID
 import scala.util.Random
@@ -31,7 +32,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
                   data: JsObject = Json.obj("foo" -> "bar"),
                   submissionFailures: Seq[MovementSubmissionFailure] = Seq(),
                   hasBeenSubmitted: Boolean = false,
-                  timestamp: Instant = Instant.ofEpochSecond(1)): CreateMovementUserAnswers =
+                  timestamp: Instant = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(1, ChronoUnit.SECONDS)): CreateMovementUserAnswers =
     CreateMovementUserAnswers(
       ern = ern,
       draftId = draftId,
@@ -63,7 +64,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
           )
         )
       ),
-      timestamp = Instant.ofEpochSecond(600)
+      timestamp = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(600, ChronoUnit.SECONDS)
     ),
     userAnswers(
       draftId = UUID.randomUUID().toString,
@@ -85,7 +86,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
           )
         )
       ),
-      timestamp = Instant.ofEpochSecond(3000),
+      timestamp = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(3000, ChronoUnit.SECONDS),
       submissionFailures = Seq(movementSubmissionFailureModel.copy(hasBeenFixed = false))
     ),
     userAnswers(
@@ -112,7 +113,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
           )
         )
       ),
-      timestamp = Instant.ofEpochSecond(4500)
+      timestamp = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(4500, ChronoUnit.SECONDS)
     ),
     userAnswers(
       draftId = UUID.randomUUID().toString,
@@ -132,7 +133,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
           "destinationWarehouseExcise" -> "WarehouseERNABCDEFGHI"
         )
       ),
-      timestamp = Instant.ofEpochSecond(6000),
+      timestamp = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(6000, ChronoUnit.SECONDS),
       submissionFailures = Seq(movementSubmissionFailureModel)
     ),
     userAnswers(
@@ -156,7 +157,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
           "destinationWarehouseExcise" -> "WarehouseERN"
         )
       ),
-      timestamp = Instant.ofEpochSecond(8000)
+      timestamp = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(8000, ChronoUnit.SECONDS)
     ),
     userAnswers(
       draftId = UUID.randomUUID().toString,
@@ -179,7 +180,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
           "destinationWarehouseExcise" -> "WarehouseERN"
         )
       ),
-      timestamp = Instant.ofEpochSecond(9000),
+      timestamp = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(9000, ChronoUnit.SECONDS),
       hasBeenSubmitted = true
     )
   )
@@ -214,7 +215,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
       data = Json.obj("info" -> Json.obj(
         "localReferenceNumber" -> s"LRN${Random.nextInt(i * 1000)}"
       )),
-      timestamp = Instant.ofEpochSecond(i * 5)
+      timestamp = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(i * 5, ChronoUnit.SECONDS)
     )
     Seq(draft, generateRandomDraft(i))
   }
@@ -227,7 +228,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
         "localReferenceNumber" -> s"LRN${Random.nextInt(i * 1000)}"
       )),
       submissionFailures = Seq(),
-      lastUpdated = Instant.ofEpochSecond(i * 2),
+      lastUpdated = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(i * 2, ChronoUnit.SECONDS),
       hasBeenSubmitted = false,
       submittedDraftId = None
     )
