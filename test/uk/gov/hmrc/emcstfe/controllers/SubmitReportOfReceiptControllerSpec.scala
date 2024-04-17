@@ -26,7 +26,6 @@ import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitReportOfReceiptFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.{MockNRSBrokerService, MockSubmitReportOfReceiptService}
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ReportAReceiptNotableEvent
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISServiceUnavailableError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -60,7 +59,7 @@ class SubmitReportOfReceiptControllerSpec extends TestBaseSpec
               MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
               MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(true)
 
-              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn, ReportAReceiptNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
               MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(chrisSuccessResponse)))
 
               val result = controller.submit(testErn, testArc)(fakeRequest)
@@ -77,7 +76,7 @@ class SubmitReportOfReceiptControllerSpec extends TestBaseSpec
               MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
               MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(true)
 
-              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn, ReportAReceiptNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
               MockService.submit(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
               val result = controller.submit(testErn, testArc)(fakeRequest)
@@ -97,7 +96,7 @@ class SubmitReportOfReceiptControllerSpec extends TestBaseSpec
               MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
               MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(true)
 
-              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn, ReportAReceiptNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
               MockService.submitViaEIS(maxSubmitReportOfReceiptModel).returns(Future.successful(Right(eisSuccessResponse)))
 
               val result = controller.submit(testErn, testArc)(fakeRequest)
@@ -114,7 +113,7 @@ class SubmitReportOfReceiptControllerSpec extends TestBaseSpec
               MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
               MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(true)
 
-              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn, ReportAReceiptNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+              MockNRSBrokerService.submitPayload(reportOfReceiptNRSSubmission, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
               MockService.submitViaEIS(maxSubmitReportOfReceiptModel).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
 
               val result = controller.submit(testErn, testArc)(fakeRequest)

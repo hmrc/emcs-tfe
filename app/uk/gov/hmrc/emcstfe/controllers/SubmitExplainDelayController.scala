@@ -23,7 +23,6 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainDelayNotableEvent
 import uk.gov.hmrc.emcstfe.models.nrs.explainDelay.ExplainDelayNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.SubmitExplainDelayService
@@ -48,8 +47,7 @@ class SubmitExplainDelayController @Inject()(cc: ControllerComponents,
       withJsonBody[SubmitExplainDelayModel] {
         submission =>
           if (isEnabled(EnableNRS)) {
-            val nrsSubmissionModel = ExplainDelayNRSSubmission.apply(submission)
-            nrsBrokerService.submitPayload(nrsSubmissionModel, ern, ExplainDelayNotableEvent).flatMap(_ => handleSubmission(submission))
+            nrsBrokerService.submitPayload(ExplainDelayNRSSubmission(submission), ern).flatMap(_ => handleSubmission(submission))
           } else {
             handleSubmission(submission)
           }

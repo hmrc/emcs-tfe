@@ -23,7 +23,6 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainShortageOrExcessNotableEvent
 import uk.gov.hmrc.emcstfe.models.nrs.explainShortageExcess.ExplainShortageExcessNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.SubmitExplainShortageExcessService
@@ -48,8 +47,7 @@ class SubmitExplainShortageExcessController @Inject()(cc: ControllerComponents,
       withJsonBody[SubmitExplainShortageExcessModel] {
         submission =>
           if(isEnabled(EnableNRS)) {
-            val nrsSubmissionModel = ExplainShortageExcessNRSSubmission.apply(submission, ern)
-            nrsBrokerService.submitPayload(nrsSubmissionModel, ern, ExplainShortageOrExcessNotableEvent).flatMap(_ => handleSubmission(submission))
+            nrsBrokerService.submitPayload(ExplainShortageExcessNRSSubmission(submission, ern), ern).flatMap(_ => handleSubmission(submission))
           } else {
             handleSubmission(submission)
           }

@@ -19,6 +19,8 @@ package uk.gov.hmrc.emcstfe.models.nrs.explainShortageExcess
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.emcstfe.models.common.{SubmitterType, TraderModel}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{BodyAnalysisModel, SubmitExplainShortageExcessModel}
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainShortageOrExcessNotableEvent
+import uk.gov.hmrc.emcstfe.models.nrs.{NRSSubmission, NotableEvent}
 
 case class ExplainShortageExcessNRSSubmission(
                                                ern: String,
@@ -30,7 +32,9 @@ case class ExplainShortageExcessNRSSubmission(
                                                individualItems: Option[Seq[BodyAnalysisModel]],
                                                dateOfAnalysis: Option[String],
                                                globalExplanation: Option[String]
-                                             )
+                                             ) extends NRSSubmission {
+  override val notableEvent: NotableEvent = ExplainShortageOrExcessNotableEvent
+}
 
 object ExplainShortageExcessNRSSubmission {
 

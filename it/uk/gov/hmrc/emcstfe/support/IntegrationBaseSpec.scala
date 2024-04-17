@@ -77,7 +77,7 @@ trait IntegrationBaseSpec
 
   def buildRequest(path: String, extraHeaders: (String, String)*): WSRequest = client
     .url(s"http://localhost:$port/emcs-tfe$path")
-    .withHttpHeaders(Seq(HeaderNames.AUTHORIZATION -> "auth1234") ++ extraHeaders: _*)
+    .withHttpHeaders(Seq(HeaderNames.AUTHORIZATION -> testAuthToken) ++ extraHeaders: _*)
     .withFollowRedirects(false)
 
   def document(response: WSResponse): JsValue = Json.parse(response.body)

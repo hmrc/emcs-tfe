@@ -19,6 +19,8 @@ package uk.gov.hmrc.emcstfe.models.nrs.alertReject
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.{AlertOrRejectionReasonModel, SubmitAlertOrRejectionModel}
 import uk.gov.hmrc.emcstfe.models.common.{ExciseMovementModel, TraderModel}
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.AlertRejectNotableEvent
+import uk.gov.hmrc.emcstfe.models.nrs.{NRSSubmission, NotableEvent}
 
 import java.time.LocalDate
 
@@ -32,7 +34,9 @@ case class AlertRejectNRSSubmission(
                                   dateOfAlertOrRejection: LocalDate,
                                   isRejected: Boolean,
                                   alertOrRejectionReasons: Option[Seq[AlertOrRejectionReasonModel]]
-                                )
+                                ) extends NRSSubmission {
+  override val notableEvent: NotableEvent = AlertRejectNotableEvent
+}
 
 object AlertRejectNRSSubmission {
 

@@ -18,6 +18,8 @@ package uk.gov.hmrc.emcstfe.models.nrs.reportOfReceipt
 
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.emcstfe.models.common.{AcceptMovement, DestinationType, TraderModel}
+import uk.gov.hmrc.emcstfe.models.nrs.NRSSubmission
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ReportAReceiptNotableEvent
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel}
 
 import java.time.LocalDate
@@ -35,7 +37,9 @@ case class ReportOfReceiptNRSSubmission(
                                          acceptMovement: AcceptMovement,
                                          individualItems: Seq[ReceiptedItemsModel],
                                          otherInformation: Option[String]
-                                       )
+                                       ) extends NRSSubmission {
+  override val notableEvent = ReportAReceiptNotableEvent
+}
 
 object ReportOfReceiptNRSSubmission {
 

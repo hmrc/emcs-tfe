@@ -26,7 +26,6 @@ import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitExplainDelayFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.{MockNRSBrokerService, MockSubmitExplainDelayService}
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ExplainDelayNotableEvent
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -46,7 +45,7 @@ class SubmitExplainDelayControllerSpec
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 
       if (isNRSEnabled) {
-        MockNRSBrokerService.submitPayload(explainDelayNRSSubmission, testErn, ExplainDelayNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+        MockNRSBrokerService.submitPayload(explainDelayNRSSubmission, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
       }
     }
 

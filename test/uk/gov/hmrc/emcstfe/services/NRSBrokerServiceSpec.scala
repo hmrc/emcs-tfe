@@ -20,7 +20,7 @@ import uk.gov.hmrc.auth.core.UnsupportedAuthProvider
 import uk.gov.hmrc.auth.core.authorise.EmptyPredicate
 import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitAlertOrRejectionFixtures}
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockAuthConnector, MockNRSBrokerConnector}
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.{AlertRejectNotableEvent, CreateMovementNotableEvent}
+import uk.gov.hmrc.emcstfe.models.nrs.alertReject.AlertRejectNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{IdentityDataException, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.services.nrs.NRSBrokerService
 import uk.gov.hmrc.emcstfe.services.nrs.NRSBrokerService.retrievals
@@ -36,7 +36,7 @@ class NRSBrokerServiceSpec extends TestBaseSpec with MockNRSBrokerConnector with
   val instantNow: Instant = Instant.now()
   private val timeMachine: TimeMachine = () => Instant.ofEpochMilli(1L)
 
-  implicit lazy val headerCarrierWithAuthToken: HeaderCarrier = hc.copy(authorization = Some(Authorization("Bearer token")))
+  implicit lazy val headerCarrierWithAuthToken: HeaderCarrier = hc.copy(authorization = Some(Authorization(testAuthToken)))
 
   class Setup {
 
@@ -51,25 +51,25 @@ class NRSBrokerServiceSpec extends TestBaseSpec with MockNRSBrokerConnector with
 
         MockAuthConnector.authorise(EmptyPredicate, retrievals).returns(Future.failed(UnsupportedAuthProvider("Game over!")))
 
-        await(service.submitPayload(alertRejectNRSSubmission, testErn, CreateMovementNotableEvent)) shouldBe Left(IdentityDataException("UnsupportedAuthProvider"))
+        await(service.submitPayload(alertRejectNRSSubmission, testErn)) shouldBe Left(IdentityDataException("UnsupportedAuthProvider"))
       }
 
       "the broker connector returns a Left" in new Setup {
 
         MockAuthConnector.authorise(EmptyPredicate, retrievals).returns(Future.successful(predicateRetrieval))
 
-        MockNRSBrokerConnector.submitPayload(alertRejectNRSPayload, testErn).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+        MockNRSBrokerConnector.submitPayload(createNRSPayload(AlertRejectNRSSubmission(maxSubmitAlertOrRejectionModel)), testErn).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-        await(service.submitPayload(alertRejectNRSSubmission, testErn, AlertRejectNotableEvent)) shouldBe Left(UnexpectedDownstreamResponseError)
+        await(service.submitPayload(alertRejectNRSSubmission, testErn)) shouldBe Left(UnexpectedDownstreamResponseError)
       }
 
       "the broker connector returns an unhandled future exception" in new Setup {
 
         MockAuthConnector.authorise(EmptyPredicate, retrievals).returns(Future.successful(predicateRetrieval))
 
-        MockNRSBrokerConnector.submitPayload(alertRejectNRSPayload, testErn).returns(Future.failed(new Exception("Game over!")))
+        MockNRSBrokerConnector.submitPayload(createNRSPayload(AlertRejectNRSSubmission(maxSubmitAlertOrRejectionModel)), testErn).returns(Future.failed(new Exception("Game over!")))
 
-        await(service.submitPayload(alertRejectNRSSubmission, testErn, AlertRejectNotableEvent)) shouldBe Left(UnexpectedDownstreamResponseError)
+        await(service.submitPayload(alertRejectNRSSubmission, testErn)) shouldBe Left(UnexpectedDownstreamResponseError)
       }
     }
 
@@ -79,9 +79,9 @@ class NRSBrokerServiceSpec extends TestBaseSpec with MockNRSBrokerConnector with
 
         MockAuthConnector.authorise(EmptyPredicate, retrievals).returns(Future.successful(predicateRetrieval))
 
-        MockNRSBrokerConnector.submitPayload(alertRejectNRSPayload, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
+        MockNRSBrokerConnector.submitPayload(createNRSPayload(AlertRejectNRSSubmission(maxSubmitAlertOrRejectionModel)), testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
 
-        await(service.submitPayload(alertRejectNRSSubmission, testErn, AlertRejectNotableEvent)) shouldBe Right(nrsBrokerResponseModel)
+        await(service.submitPayload(alertRejectNRSSubmission, testErn)) shouldBe Right(nrsBrokerResponseModel)
       }
     }
   }

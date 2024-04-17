@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import org.scalamock.handlers.CallHandler7
+import org.scalamock.handlers.CallHandler6
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Writes
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent
+import uk.gov.hmrc.emcstfe.models.nrs.NRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.nrsBroker.NRSBrokerInsertPayloadResponse
 import uk.gov.hmrc.emcstfe.services.nrs.NRSBrokerService
@@ -34,9 +34,9 @@ trait MockNRSBrokerService extends MockFactory {
 
   object MockNRSBrokerService {
 
-    def submitPayload[A](submission: A, ern: String, notableEvent: NotableEvent): CallHandler7[A, String, NotableEvent, HeaderCarrier, ExecutionContext, UserRequest[_], Writes[A], Future[Either[ErrorResponse, NRSBrokerInsertPayloadResponse]]] = {
-      (mockNRSBrokerService.submitPayload(_: A, _: String, _: NotableEvent)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: Writes[A]))
-        .expects(submission, ern, notableEvent, *, *, *, *)
+    def submitPayload[A <: NRSSubmission](submission: A, ern: String): CallHandler6[A, String, HeaderCarrier, ExecutionContext, UserRequest[_], Writes[A], Future[Either[ErrorResponse, NRSBrokerInsertPayloadResponse]]] = {
+      (mockNRSBrokerService.submitPayload(_: A, _: String)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_], _: Writes[A]))
+        .expects(submission, ern, *, *, *, *)
     }
   }
 

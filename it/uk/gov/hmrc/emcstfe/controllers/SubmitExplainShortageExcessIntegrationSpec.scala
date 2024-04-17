@@ -26,6 +26,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitExplainShortageExcessFixtures}
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
+import uk.gov.hmrc.emcstfe.models.nrs.explainShortageExcess.ExplainShortageExcessNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
@@ -185,9 +186,9 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec
           If userSubmissionTimestamp or headerData was missing in the actual payload then the test would fail.
          */
         val nrsRequestBody: JsObject = {
-          Json.toJson(shortageExcessNRSPayload.copy(
-            metadata = shortageExcessNRSPayload.metadata.copy(userAuthToken = "auth1234"))
-          ).as[JsObject].deepMerge(Json.obj("metadata" -> Json.obj("userSubmissionTimestamp" -> f"$${json-unit.any-string}", "headerData" -> f"$${json-unit.ignore}")))
+          Json.toJson(createNRSPayload(ExplainShortageExcessNRSSubmission(submitExplainShortageExcessModelMax(Consignor), testErn)))
+            .as[JsObject]
+            .deepMerge(Json.obj("metadata" -> Json.obj("userSubmissionTimestamp" -> f"$${json-unit.any-string}", "headerData" -> f"$${json-unit.ignore}")))
         }
 
         override def setupStubs(): StubMapping = {
@@ -195,7 +196,7 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec
           enable(EnableNRS)
           AuthStub.authorised(withIdentityData = true)
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
-          DownstreamStub.onSuccessWithRequestBodyAndHeaders(DownstreamStub.PUT, downstreamNRSBrokerUri, status = Status.ACCEPTED, requestBody = Some(Json.stringify(nrsRequestBody)), responseBody = nrsBrokerResponseJson, headers = Map("Authorization" -> "auth1234"))
+          DownstreamStub.onSuccessWithRequestBodyAndHeaders(DownstreamStub.PUT, downstreamNRSBrokerUri, status = Status.ACCEPTED, requestBody = Some(Json.stringify(nrsRequestBody)), responseBody = nrsBrokerResponseJson, headers = Map("Authorization" -> testAuthToken))
         }
 
         val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax(Consignor)))

@@ -22,7 +22,6 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.ReportAReceiptNotableEvent
 import uk.gov.hmrc.emcstfe.models.nrs.reportOfReceipt.ReportOfReceiptNRSSubmission
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
@@ -46,8 +45,7 @@ class SubmitReportOfReceiptController @Inject()(cc: ControllerComponents,
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitReportOfReceiptModel] { submission =>
       if (isEnabled(EnableNRS)) {
-        val nrsSubmissionModel = ReportOfReceiptNRSSubmission.apply(submission, ern)
-        nrsBrokerService.submitPayload(nrsSubmissionModel, ern, ReportAReceiptNotableEvent).flatMap(_ => handleSubmission(submission))
+        nrsBrokerService.submitPayload(ReportOfReceiptNRSSubmission(submission, ern), ern).flatMap(_ => handleSubmission(submission))
       } else {
         handleSubmission(submission)
       }

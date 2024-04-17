@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.nrs.cancelMovement
 
 import uk.gov.hmrc.emcstfe.fixtures.SubmitCancellationOfMovementFixtures
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.CancelMovementNotableEvent
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class CancelMovementNRSSubmissionSpec extends TestBaseSpec with SubmitCancellationOfMovementFixtures {
@@ -25,9 +26,11 @@ class CancelMovementNRSSubmissionSpec extends TestBaseSpec with SubmitCancellati
   ".apply" should {
 
     s"generate the correct model from the $SubmitCancellationOfMovementModel" in {
+      CancelMovementNRSSubmission(maxSubmitCancellationOfMovementModel, testErn) shouldBe cancelMovementNRSSubmission
+    }
 
-      CancelMovementNRSSubmission.apply(maxSubmitCancellationOfMovementModel, testErn) shouldBe cancelMovementNRSSubmission
+    "have the correct notableEvent" in {
+      CancelMovementNRSSubmission(maxSubmitCancellationOfMovementModel, testErn).notableEvent shouldBe CancelMovementNotableEvent
     }
   }
-
 }

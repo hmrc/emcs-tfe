@@ -27,7 +27,6 @@ import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitAlertOrRejectionFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.{MockNRSBrokerService, MockSubmitAlertOrRejectionService}
-import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.AlertRejectNotableEvent
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -47,7 +46,7 @@ class SubmitAlertOrRejectionControllerSpec extends TestBaseSpec
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 
       if (isNRSEnabled) {
-        MockNRSBrokerService.submitPayload(alertRejectNRSSubmission, testErn, AlertRejectNotableEvent).returns(Future.successful(Right(nrsBrokerResponseModel)))
+        MockNRSBrokerService.submitPayload(alertRejectNRSSubmission, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
       }
     }
 

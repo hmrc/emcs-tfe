@@ -19,6 +19,8 @@ package uk.gov.hmrc.emcstfe.models.nrs.cancelMovement
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.{CancellationReasonType, SubmitCancellationOfMovementModel}
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, TraderModel}
+import uk.gov.hmrc.emcstfe.models.nrs.NotableEvent.CancelMovementNotableEvent
+import uk.gov.hmrc.emcstfe.models.nrs.{NRSSubmission, NotableEvent}
 
 //Based from the FE audit model
 case class CancelMovementNRSSubmission(
@@ -30,7 +32,9 @@ case class CancelMovementNRSSubmission(
                                         memberStateCode: Option[String],
                                         cancelReason: CancellationReasonType,
                                         additionalInformation: Option[String]
-                                      )
+                                      ) extends NRSSubmission {
+  override val notableEvent: NotableEvent = CancelMovementNotableEvent
+}
 
 object CancelMovementNRSSubmission {
 
