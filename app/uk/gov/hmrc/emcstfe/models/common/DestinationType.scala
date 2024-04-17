@@ -16,20 +16,56 @@
 
 package uk.gov.hmrc.emcstfe.models.common
 
-sealed trait DestinationType
+import play.api.mvc.QueryStringBindable
+
+import scala.util.Try
+
+sealed trait DestinationType {
+  val movementScenarios: Seq[String]
+}
 
 object DestinationType extends Enumerable.Implicits {
 
-  case object TaxWarehouse extends WithName("1") with DestinationType
-  case object RegisteredConsignee extends WithName("2") with DestinationType
-  case object TemporaryRegisteredConsignee extends WithName("3") with DestinationType
-  case object DirectDelivery extends WithName("4") with DestinationType
-  case object ExemptedOrganisations extends WithName("5") with DestinationType
-  case object Export extends WithName("6") with DestinationType
-  case object UnknownDestination extends WithName("8") with DestinationType
-  case object CertifiedConsignee extends WithName("9") with DestinationType
-  case object TemporaryCertifiedConsignee extends WithName("10") with DestinationType
-  case object ReturnToThePlaceOfDispatchOfTheConsignor extends WithName("11") with DestinationType
+  case object TaxWarehouse extends WithName("1") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("euTaxWarehouse", "gbTaxWarehouse")
+  }
+
+  case object RegisteredConsignee extends WithName("2") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("registeredConsignee")
+  }
+
+  case object TemporaryRegisteredConsignee extends WithName("3") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("temporaryRegisteredConsignee")
+  }
+
+  case object DirectDelivery extends WithName("4") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("directDelivery")
+  }
+
+  case object ExemptedOrganisations extends WithName("5") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("exemptedOrganisation")
+  }
+
+  case object Export extends WithName("6") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("exportWithCustomsDeclarationLodgedInTheUk", "exportWithCustomsDeclarationLodgedInTheEu")
+  }
+
+  case object UnknownDestination extends WithName("8") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("unknownDestination")
+  }
+
+  case object CertifiedConsignee extends WithName("9") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("certifiedConsignee")
+  }
+
+  case object TemporaryCertifiedConsignee extends WithName("10") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq("temporaryCertifiedConsignee")
+  }
+
+  case object ReturnToThePlaceOfDispatchOfTheConsignor extends WithName("11") with DestinationType {
+    override val movementScenarios: Seq[String] = Seq()
+  }
+
 
   val values: Seq[DestinationType] = Seq(
     TaxWarehouse,
@@ -46,4 +82,24 @@ object DestinationType extends Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[DestinationType] =
     Enumerable(values.map(v => v.toString -> v): _*)
+
+  def destinationType(code: String): DestinationType =
+    values.find(_.toString == code).getOrElse(throw new IllegalArgumentException(s"Destination code of '$code' could not be mapped to a valid Destination Type"))
+
+  implicit def queryStringBinder(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[Seq[DestinationType]] =
+    new QueryStringBindable[Seq[DestinationType]] {
+      override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, Seq[DestinationType]]] = {
+        params.get(key).map { destinationTypeCodes =>
+          Try(destinationTypeCodes.map(destinationType)).fold[Either[String, Seq[DestinationType]]](
+            e => Left(e.getMessage),
+            Right(_)
+          )
+        }
+      }
+
+      override def unbind(key: String, destinations: Seq[DestinationType]): String =
+        destinations.map(destinationType =>
+          stringBinder.unbind(key, destinationType.toString)
+        ).mkString("&")
+    }
 }

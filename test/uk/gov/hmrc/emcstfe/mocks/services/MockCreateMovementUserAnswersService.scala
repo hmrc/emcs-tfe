@@ -20,7 +20,8 @@ import org.scalamock.handlers.{CallHandler2, CallHandler3, CallHandler4}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, SearchDraftMovementsResponse}
 import uk.gov.hmrc.emcstfe.services.userAnswers.CreateMovementUserAnswersService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,6 +48,9 @@ trait MockCreateMovementUserAnswersService extends MockFactory  {
 
     def setErrorMessagesForDraftMovement(ern: String, lrn: String, movementSubmissionFailures: Seq[MovementSubmissionFailure]): CallHandler4[String, String, Seq[MovementSubmissionFailure], ExecutionContext, Future[Either[ErrorResponse, Option[String]]]] =
       (mockService.setErrorMessagesForDraftMovement(_: String, _: String, _: Seq[MovementSubmissionFailure])(_: ExecutionContext)).expects(ern, lrn, movementSubmissionFailures, *)
+
+    def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions): CallHandler3[String, GetDraftMovementSearchOptions, ExecutionContext, Future[Either[ErrorResponse, SearchDraftMovementsResponse]]] =
+      (mockService.searchDrafts(_: String, _: GetDraftMovementSearchOptions)(_: ExecutionContext)).expects(ern, searchOptions, *)
   }
 }
 

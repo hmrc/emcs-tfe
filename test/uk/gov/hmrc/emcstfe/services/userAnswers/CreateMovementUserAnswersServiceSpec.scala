@@ -21,7 +21,9 @@ import uk.gov.hmrc.emcstfe.fixtures.{GetMovementListFixture, MovementSubmissionF
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
+import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
+import uk.gov.hmrc.emcstfe.models.response.SearchDraftMovementsResponse
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.Instant
@@ -166,6 +168,45 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
 
         MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.failed(new Exception("bang")))
         await(service.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures)) shouldBe Left(MongoError("bang"))
+      }
+    }
+  }
+
+  ".search" should {
+    "return a Right(SearchDraftMovementsResponse)" when {
+      "UserAnswers are successfully found matching the search in Mongo" in new Test {
+
+        val searchOptions = GetDraftMovementSearchOptions()
+        val response = SearchDraftMovementsResponse(1, Seq(userAnswers))
+
+        MockCreateMovementUserAnswersRepository.searchDrafts(testErn, searchOptions)
+          .returns(Future.successful(response))
+
+        await(service.searchDrafts(testErn, searchOptions)) shouldBe Right(response)
+      }
+    }
+
+    "return a Right(SearchDraftMovementsResponse)" when {
+      "UserAnswers are not found matching the search in Mongo" in new Test {
+
+        val searchOptions = GetDraftMovementSearchOptions()
+        val response = SearchDraftMovementsResponse(0, Seq())
+
+        MockCreateMovementUserAnswersRepository.searchDrafts(testErn, searchOptions)
+          .returns(Future.successful(response))
+
+        await(service.searchDrafts(testErn, searchOptions)) shouldBe Right(response)
+      }
+    }
+
+    "return a Left" when {
+      "mongo error is returned" in new Test {
+
+        val searchOptions = GetDraftMovementSearchOptions()
+
+        MockCreateMovementUserAnswersRepository.searchDrafts(testErn, searchOptions)
+          .returns(Future.failed(new Exception("bang")))
+        await(service.searchDrafts(testErn, searchOptions)) shouldBe Left(MongoError("bang"))
       }
     }
   }

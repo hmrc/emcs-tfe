@@ -10,6 +10,7 @@ PUT           /create-movement/:ern/:draftId/mark-as-draft                     u
 PUT           /create-movement/:ern/:submittedDraftId/error-messages           uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.setErrorMessages(ern, submittedDraftId)
 DELETE        /create-movement/:ern/:draftId                                   uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.clear(ern, draftId)
 GET           /create-movement/trader/:ern/lrn/:lrn                            uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.checkForExistingLrn(ern, lrn)
+GET           /create-movement/drafts/search/:ern                              uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.search(ern, search: GetDraftMovementSearchOptions)
 GET           /create-movement/draft/:ern/:messageId                           uk.gov.hmrc.emcstfe.controllers.userAnswers.CreateMovementUserAnswersController.checkForExistingDraft(ern, messageId)
 
 DELETE        /explain-delay/:ern/:arc                                         uk.gov.hmrc.emcstfe.controllers.userAnswers.ExplainDelayUserAnswersController.clear(ern, arc)

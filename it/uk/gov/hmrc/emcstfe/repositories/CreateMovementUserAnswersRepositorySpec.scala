@@ -31,7 +31,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  private val userAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("foo" -> "bar"), submissionFailures = Seq.empty, Instant.ofEpochSecond(1), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+  val userAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("foo" -> "bar"), submissionFailures = Seq.empty, Instant.ofEpochSecond(1), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   protected override val repository = new CreateMovementUserAnswersRepositoryImpl(
     mongoComponent = mongoComponent,
@@ -39,7 +39,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
     time = timeMachine
   )
 
-  override protected def afterEach(): Unit = {
+  override protected def beforeEach(): Unit = {
     super.afterEach()
     repository.collection.deleteMany(Document()).toFuture().futureValue
   }
@@ -53,8 +53,8 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       val setResult = repository.set(userAnswers).futureValue
       val updatedRecord = find(
         Filters.and(
-          Filters.equal("ern", userAnswers.ern),
-          Filters.equal("draftId", userAnswers.draftId)
+          Filters.equal("ern", testErn),
+          Filters.equal("draftId", testDraftId)
         )
       ).futureValue.headOption.value
 
@@ -71,7 +71,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         insert(userAnswers).futureValue
 
-        val result = repository.get(userAnswers.ern, userAnswers.draftId).futureValue
+        val result = repository.get(testErn, testDraftId).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instantNow)
 
         result.value shouldBe expectedResult
@@ -84,8 +84,8 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         insert(userAnswers.copy(draftId = "foo", submittedDraftId = Some(testDraftId))).futureValue
 
-        val result = repository.get(userAnswers.ern, testDraftId).futureValue
-        val expectedResult = userAnswers.copy(lastUpdated = instantNow, draftId = "foo", submittedDraftId = Some(testDraftId))
+        val result = repository.get(testErn, testDraftId).futureValue
+        val expectedResult = userAnswers.copy(draftId = "foo", lastUpdated = instantNow, submittedDraftId = Some(testDraftId))
 
         result.value shouldBe expectedResult
       }
@@ -95,7 +95,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
       "return None" in {
 
-        repository.get(userAnswers.ern, "wrongLrn").futureValue shouldBe None
+        repository.get(testErn, "wrongLrn").futureValue shouldBe None
       }
     }
   }
@@ -106,14 +106,14 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
       insert(userAnswers).futureValue
 
-      val result = repository.clear(userAnswers.ern, userAnswers.draftId).futureValue
+      val result = repository.clear(testErn, testDraftId).futureValue
 
       result shouldBe true
-      repository.get(userAnswers.ern, userAnswers.draftId).futureValue shouldBe None
+      repository.get(testErn, testDraftId).futureValue shouldBe None
     }
 
     "return true when there is no record to remove" in {
-      val result = repository.clear(userAnswers.ern, userAnswers.draftId).futureValue
+      val result = repository.clear(testErn, testDraftId).futureValue
 
       result shouldBe true
     }
@@ -127,15 +127,15 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         insert(userAnswers).futureValue
 
-        val result = repository.keepAlive(userAnswers.ern, userAnswers.draftId).futureValue
+        val result = repository.keepAlive(testErn, testDraftId).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instantNow)
 
         result shouldBe true
         val updatedAnswers = find(
           Filters.and(
-            Filters.equal("ern", userAnswers.ern),
-            Filters.equal("draftId", userAnswers.draftId)
+            Filters.equal("ern", testErn),
+            Filters.equal("draftId", testDraftId)
           )
         ).futureValue.headOption.value
         updatedAnswers shouldBe expectedUpdatedAnswers
@@ -146,7 +146,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
       "return true" in {
 
-        repository.keepAlive(userAnswers.ern, "wrongLrn").futureValue shouldBe true
+        repository.keepAlive(testErn, "wrongLrn").futureValue shouldBe true
       }
     }
   }
@@ -156,13 +156,13 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
     "there is a record with this ern and lrn" in {
       val lrnEntry = userAnswers.copy(data = Json.obj("info" -> Json.obj("localReferenceNumber" -> "LRN1234")))
       insert(lrnEntry).futureValue
-      repository.checkForExistingLrn(userAnswers.ern, "LRN1234").futureValue shouldBe true
+      repository.checkForExistingLrn(testErn, "LRN1234").futureValue shouldBe true
     }
 
     "there is no record with this ern and lrn" in {
       val lrnEntry = userAnswers.copy(data = Json.obj("info" -> Json.obj("localReferenceNumber" -> "LRN1234")))
       insert(lrnEntry).futureValue
-      repository.checkForExistingLrn(userAnswers.ern, "ABC1234").futureValue shouldBe false
+      repository.checkForExistingLrn(testErn, "ABC1234").futureValue shouldBe false
     }
 
   }
@@ -175,13 +175,13 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         insert(userAnswers.copy(hasBeenSubmitted = true)).futureValue
 
-        val result = repository.markDraftAsUnsubmitted(userAnswers.ern, userAnswers.draftId).futureValue
+        val result = repository.markDraftAsUnsubmitted(testErn, testDraftId).futureValue
 
         result shouldBe true
         val updatedAnswers = find(
           Filters.and(
-            Filters.equal("ern", userAnswers.ern),
-            Filters.equal("draftId", userAnswers.draftId)
+            Filters.equal("ern", testErn),
+            Filters.equal("draftId", testDraftId)
           )
         ).futureValue.headOption.value
         updatedAnswers.lastUpdated.isAfter(userAnswers.lastUpdated) shouldBe true
@@ -193,7 +193,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
       "there are no records in Mongo" in {
 
-        val result = repository.markDraftAsUnsubmitted(userAnswers.ern, userAnswers.draftId).futureValue
+        val result = repository.markDraftAsUnsubmitted(testErn, testDraftId).futureValue
 
         result shouldBe false
       }
@@ -202,7 +202,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         insert(userAnswers.copy(hasBeenSubmitted = true)).futureValue
 
-        val result = repository.markDraftAsUnsubmitted(userAnswers.ern, "blah").futureValue
+        val result = repository.markDraftAsUnsubmitted(testErn, "blah").futureValue
 
         result shouldBe false
       }
@@ -211,7 +211,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
         insert(userAnswers.copy(hasBeenSubmitted = true)).futureValue
 
-        val result = repository.markDraftAsUnsubmitted("blah", userAnswers.draftId).futureValue
+        val result = repository.markDraftAsUnsubmitted("blah", testDraftId).futureValue
 
         result shouldBe false
       }
@@ -225,7 +225,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       "there is a record with this ern and lrn" in {
         val mongoEntry = userAnswers.copy(submittedDraftId = Some(testDraftId))
         insert(mongoEntry).futureValue
-        repository.setErrorMessagesForDraftMovement(userAnswers.ern, testDraftId, Seq(movementSubmissionFailureModel)).futureValue shouldBe Some(testDraftId)
+        repository.setErrorMessagesForDraftMovement(testErn, testDraftId, Seq(movementSubmissionFailureModel)).futureValue shouldBe Some(testDraftId)
       }
     }
 
@@ -235,7 +235,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       "there is no record with this ern and lrn" in {
         val mongoEntry = userAnswers.copy(submittedDraftId = Some(testDraftId))
         insert(mongoEntry).futureValue
-        repository.setErrorMessagesForDraftMovement(userAnswers.ern, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
+        repository.setErrorMessagesForDraftMovement(testErn, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
       }
     }
   }
@@ -244,15 +244,16 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
     "update the record when the there is one" in {
       insert(userAnswers).futureValue
-      repository.setSubmittedDraftId(userAnswers.ern, userAnswers.draftId, s"PORTAL$testDraftId").futureValue shouldBe true
-      repository.get(userAnswers.ern, userAnswers.draftId).futureValue.get.submittedDraftId.get shouldBe s"PORTAL$testDraftId"
+      repository.setSubmittedDraftId(testErn, testDraftId, s"PORTAL$testDraftId").futureValue shouldBe true
+      repository.get(testErn, testDraftId).futureValue.get.submittedDraftId.get shouldBe s"PORTAL$testDraftId"
     }
 
 
     "not update any records when the search criteria doesn't match any" in {
 
       insert(userAnswers).futureValue
-      repository.setErrorMessagesForDraftMovement(userAnswers.ern, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
+      repository.setErrorMessagesForDraftMovement(testErn, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
     }
   }
+
 }

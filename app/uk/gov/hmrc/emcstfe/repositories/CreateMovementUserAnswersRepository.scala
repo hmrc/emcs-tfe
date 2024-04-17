@@ -18,11 +18,15 @@ package uk.gov.hmrc.emcstfe.repositories
 
 import com.google.inject.ImplementedBy
 import org.mongodb.scala.bson.conversions.Bson
+import org.mongodb.scala.bson.{BsonArray, BsonDocument}
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.models.common.Descending
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
+import uk.gov.hmrc.emcstfe.models.request.{GetDraftMovementSearchOptions, LRN, LastUpdatedDate}
+import uk.gov.hmrc.emcstfe.models.response.SearchDraftMovementsResponse
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository._
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
@@ -52,6 +56,8 @@ trait CreateMovementUserAnswersRepository {
   def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]]
 
   def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): Future[Boolean]
+
+  def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions): Future[SearchDraftMovementsResponse]
 }
 
 @Singleton
@@ -64,7 +70,8 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
     mongoComponent = mongoComponent,
     domainFormat = CreateMovementUserAnswers.format,
     indexes = mongoIndexes(appConfig.createMovementUserAnswersTTL()),
-    replaceIndexes = appConfig.createMovementUserAnswersReplaceIndexes()
+    replaceIndexes = appConfig.createMovementUserAnswersReplaceIndexes(),
+    extraCodecs = Seq(Codecs.playFormatCodec(SearchDraftMovementsResponse.format))
   ) with CreateMovementUserAnswersRepository {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
@@ -159,6 +166,92 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
       )
       .toFuture()
       .map(_ => true)
+
+  def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions): Future[SearchDraftMovementsResponse] = {
+
+    val findFilter = {
+      Filters.and(
+        Seq(
+          //Drafts for this ERN that are not submitted
+          Some(Filters.equal(ernField, ern)),
+          Some(Filters.equal(hasBeenSubmittedField, false)),
+
+          //Drafts which contain search text across LRN, Consignee Name, Consignee ERN or Destination Warehouse ERN
+          searchOptions.searchTerm.map { searchKey =>
+            Filters.or(
+              Seq(lrnField, consigneeNameField, consigneeErnField, destinationErnField, dispatchErnField).map(field =>
+                Filters.regex(field, searchKey)
+              ):_*
+            )
+          },
+
+          //Filter by Destination Type(s) (used the underlying associated MovementScenario(s) to match against Drafts)
+          searchOptions.destinationTypes.map(destinationTypes =>
+            Filters.or(
+              destinationTypes.flatMap(_.movementScenarios).map(Filters.equal(destinationTypeField, _)): _*
+            )
+          ),
+
+          //Filter by Dispatch from/to
+          (searchOptions.dateOfDispatchFrom, searchOptions.dateOfDispatchTo) match {
+            case (Some(from), Some(to)) =>
+              Some(Filters.and(
+                Filters.gte(dateOfDispatchDateField, Codecs.toBson(from)),
+                Filters.lte(dateOfDispatchDateField, Codecs.toBson(to))
+              ))
+            case (Some(from), _) =>
+              Some(Filters.gte(dateOfDispatchDateField, Codecs.toBson(from)))
+            case (_, Some(to)) =>
+              Some(Filters.lte(dateOfDispatchDateField, Codecs.toBson(to)))
+            case _ =>
+              None
+          },
+
+          //Filter by EPC, where at least one of the added items in the array matches the selected EPC code
+          searchOptions.exciseProductCode.map { epc =>
+            Filters.equal(itemProductCode, epc)
+          },
+
+          //Filter for drafts which have submission failure body
+          searchOptions.draftHasErrors.flatMap { hasErrors =>
+            Option.when(hasErrors)(Filters.eq(submissionFailuresErrorFixedField, false))
+          }
+        ).flatten: _*
+      )
+    }
+
+    val sortFilter = {
+      val sortField = searchOptions.sortField match {
+        case LRN => lrnField
+        case LastUpdatedDate => lastUpdatedField
+      }
+      if (searchOptions.sortOrder == Descending) Sorts.descending(sortField) else Sorts.ascending(sortField)
+    }
+
+    val aggregatePipeline = {
+      Seq(
+        Aggregates.filter(findFilter),
+        Aggregates.sort(sortFilter),
+        Aggregates.facet(
+          Facet("metadata", Aggregates.count("count")),
+          Facet("paginatedDrafts",
+            Aggregates.skip(searchOptions.startPosition),
+            Aggregates.limit(searchOptions.maxRows)
+          )
+        ),
+        //This step takes the count from the metadata facet array, the ifNull is required in case no documents were found, in which case return 0
+        Aggregates.addFields(
+          Field("count", BsonDocument(
+            "$ifNull" -> BsonArray(BsonDocument("$arrayElemAt" -> BsonArray("$metadata.count", 0)), 0)
+          ))
+        )
+      )
+    }
+
+    collection
+      .aggregate[SearchDraftMovementsResponse](aggregatePipeline)
+      .head()
+  }
 }
 
 object CreateMovementUserAnswersRepository {
@@ -170,10 +263,18 @@ object CreateMovementUserAnswersRepository {
   val submittedDraftIdField = "submittedDraftId"
 
   val lrnField = "data.info.localReferenceNumber"
+  val consigneeNameField = "data.consignee.businessName"
+  val consigneeErnField = "data.consignee.exciseRegistrationNumber"
+  val destinationErnField = "data.destination.destinationWarehouseExcise"
+  val dispatchErnField = "data.dispatch.dispatchWarehouseExcise"
+  val destinationTypeField = "data.info.destinationType"
+  val dateOfDispatchDateField = "data.info.dispatchDetails.date"
+  val itemProductCode = "data.items.addedItems.itemExciseProductCode"
 
   val lastUpdatedField = "lastUpdated"
 
   val submissionFailuresField = "submissionFailures"
+  val submissionFailuresErrorFixedField = s"$submissionFailuresField.hasBeenFixed"
 
   val hasBeenSubmittedField = "hasBeenSubmitted"
 

@@ -25,7 +25,9 @@ import uk.gov.hmrc.emcstfe.fixtures.MovementSubmissionFailureFixtures
 import uk.gov.hmrc.emcstfe.mocks.services.MockCreateMovementUserAnswersService
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
+import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
+import uk.gov.hmrc.emcstfe.models.response.SearchDraftMovementsResponse
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.Instant
@@ -289,6 +291,38 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
         MockCreateMovementUserAnswersService.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.successful(Left(MongoError("errMsg"))))
 
         val result = controller.setErrorMessages(testErn, testLrn)(fakeRequest.withBody(Json.toJson(movementSubmissionFailures)))
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))
+      }
+    }
+  }
+
+  "GET /user-answers/create-movement/search/:ern" should {
+    s"return $OK (OK)" when {
+
+      "service returns a Right(response)" in {
+
+        val searchOptions = GetDraftMovementSearchOptions()
+        val response = SearchDraftMovementsResponse(0, Seq())
+
+        MockCreateMovementUserAnswersService.searchDrafts(testErn, searchOptions).returns(Future.successful(Right(response)))
+
+        val result = controller.search(testErn, searchOptions)(fakeRequest)
+
+        status(result) shouldBe Status.OK
+        contentAsJson(result) shouldBe Json.toJson(response)
+      }
+    }
+
+    s"return $INTERNAL_SERVER_ERROR (ISE)" when {
+      "service returns a Left" in {
+
+        val searchOptions = GetDraftMovementSearchOptions()
+
+        MockCreateMovementUserAnswersService.searchDrafts(testErn, searchOptions).returns(Future.successful(Left(MongoError("errMsg"))))
+
+        val result = controller.search(testErn, searchOptions)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))

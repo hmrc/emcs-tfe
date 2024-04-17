@@ -30,6 +30,53 @@ class DestinationTypeSpec extends TestBaseSpec {
       DirectDelivery.toString shouldBe "4"
       ExemptedOrganisations.toString shouldBe "5"
       Export.toString shouldBe "6"
+      UnknownDestination.toString shouldBe "8"
+      CertifiedConsignee.toString shouldBe "9"
+      TemporaryCertifiedConsignee.toString shouldBe "10"
+      ReturnToThePlaceOfDispatchOfTheConsignor.toString shouldBe "11"
+    }
+
+    "have the correct MovementScenarios" in {
+      TaxWarehouse.movementScenarios shouldBe Seq("euTaxWarehouse", "gbTaxWarehouse")
+      RegisteredConsignee.movementScenarios shouldBe Seq("registeredConsignee")
+      TemporaryRegisteredConsignee.movementScenarios shouldBe Seq("temporaryRegisteredConsignee")
+      DirectDelivery.movementScenarios shouldBe Seq("directDelivery")
+      ExemptedOrganisations.movementScenarios shouldBe Seq("exemptedOrganisation")
+      Export.movementScenarios shouldBe Seq("exportWithCustomsDeclarationLodgedInTheUk", "exportWithCustomsDeclarationLodgedInTheEu")
+      UnknownDestination.movementScenarios shouldBe Seq("unknownDestination")
+      CertifiedConsignee.movementScenarios shouldBe Seq("certifiedConsignee")
+      TemporaryCertifiedConsignee.movementScenarios shouldBe Seq("temporaryCertifiedConsignee")
+      ReturnToThePlaceOfDispatchOfTheConsignor.movementScenarios shouldBe Seq()
+    }
+
+    "be able to be constructed by a QueryStringBinder" when {
+
+      "no query param is supplied" in {
+        DestinationType.queryStringBinder.bind("destinationType", Map()) shouldBe None
+      }
+
+      "valid query param is supplied (single value)" in {
+        DestinationType.queryStringBinder.bind("destinationType", Map(
+          "destinationType" -> Seq("1")
+        )) shouldBe Some(Right(Seq(TaxWarehouse)))
+      }
+
+      "fail if binding an invalid query param" in {
+        DestinationType.queryStringBinder.bind("destinationType", Map(
+          "destinationType" -> Seq("99")
+        )) shouldBe Some(Left("Destination code of '99' could not be mapped to a valid Destination Type"))
+      }
+
+      "valid query param is supplied (all values)" in {
+        DestinationType.queryStringBinder.bind("destinationType", Map(
+          "destinationType" -> DestinationType.values.map(_.toString)
+        )) shouldBe Some(Right(DestinationType.values))
+      }
+    }
+
+    "unbind QueryString to URL format" in {
+      DestinationType.queryStringBinder.unbind("destinationType", DestinationType.values) shouldBe
+        DestinationType.values.map("destinationType=" + _.toString).mkString("&")
     }
   }
 }
