@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 
@@ -23,5 +24,16 @@ case class SearchDraftMovementsResponse(count: Int,
                                         paginatedDrafts: Seq[CreateMovementUserAnswers])
 
 object SearchDraftMovementsResponse {
-  implicit val format: Format[SearchDraftMovementsResponse] = Json.format
+
+  implicit val reads: Reads[SearchDraftMovementsResponse] = (
+    (__ \ "count").read[Int] and
+      (__ \ "paginatedDrafts").read[Seq[CreateMovementUserAnswers]](Reads.seq(CreateMovementUserAnswers.mongoReads))
+  )(SearchDraftMovementsResponse.apply _)
+
+  implicit val writes: Writes[SearchDraftMovementsResponse] = (
+    (__ \ "count").write[Int] and
+      (__ \ "paginatedDrafts").write[Seq[CreateMovementUserAnswers]](Writes.seq(CreateMovementUserAnswers.responseWrites))
+    )(unlift(SearchDraftMovementsResponse.unapply))
+
+  implicit val format: Format[SearchDraftMovementsResponse] = Format(reads, writes)
 }

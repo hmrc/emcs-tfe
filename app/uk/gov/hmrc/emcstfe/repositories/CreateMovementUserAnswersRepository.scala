@@ -68,7 +68,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
   extends PlayMongoRepository[CreateMovementUserAnswers](
     collectionName = "create-movement-user-answers",
     mongoComponent = mongoComponent,
-    domainFormat = CreateMovementUserAnswers.format,
+    domainFormat = CreateMovementUserAnswers.mongoFormat,
     indexes = mongoIndexes(appConfig.createMovementUserAnswersTTL()),
     replaceIndexes = appConfig.createMovementUserAnswersReplaceIndexes(),
     extraCodecs = Seq(Codecs.playFormatCodec(SearchDraftMovementsResponse.format))

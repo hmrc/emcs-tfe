@@ -33,7 +33,7 @@ final case class CreateMovementUserAnswers(ern: String,
 
 object CreateMovementUserAnswers {
 
-  val reads: Reads[CreateMovementUserAnswers] = (
+  val mongoReads: Reads[CreateMovementUserAnswers] = (
     (__ \ "ern").read[String] and
       (__ \ "draftId").read[String] and
       (__ \ "data").read[JsObject] and
@@ -43,7 +43,7 @@ object CreateMovementUserAnswers {
       (__ \ "submittedDraftId").readNullable[String]
     )(CreateMovementUserAnswers.apply _)
 
-  val writes: OWrites[CreateMovementUserAnswers] = (
+  val mongoWrites: OWrites[CreateMovementUserAnswers] = (
     (__ \ "ern").write[String] and
       (__ \ "draftId").write[String] and
       (__ \ "data").write[JsObject] and
@@ -53,5 +53,7 @@ object CreateMovementUserAnswers {
       (__ \ "submittedDraftId").writeNullable[String]
     )(unlift(CreateMovementUserAnswers.unapply))
 
-  implicit val format: OFormat[CreateMovementUserAnswers] = OFormat(reads, writes)
+  implicit val mongoFormat: OFormat[CreateMovementUserAnswers] = OFormat(mongoReads, mongoWrites)
+
+  val responseWrites: OWrites[CreateMovementUserAnswers] = Json.writes[CreateMovementUserAnswers]
 }
