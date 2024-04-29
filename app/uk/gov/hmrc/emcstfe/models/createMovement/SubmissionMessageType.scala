@@ -23,12 +23,10 @@ sealed trait SubmissionMessageType
 object SubmissionMessageType extends Enumerable.Implicits {
   case object Standard extends WithName("1") with SubmissionMessageType
 
-  case object Export extends WithName("2") with SubmissionMessageType
-
   case object DutyPaidB2B extends WithName("3") with SubmissionMessageType
 
   val values: Seq[SubmissionMessageType] = Seq(
-    Standard, Export, DutyPaidB2B
+    Standard, DutyPaidB2B
   )
 
   implicit val enumerable: Enumerable[SubmissionMessageType] =
