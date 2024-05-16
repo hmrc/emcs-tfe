@@ -37,7 +37,7 @@ class DestinationTypeSpec extends TestBaseSpec {
     }
 
     "have the correct MovementScenarios" in {
-      TaxWarehouse.movementScenarios shouldBe Seq("euTaxWarehouse", "gbTaxWarehouse")
+      TaxWarehouse.movementScenarios shouldBe Seq("euTaxWarehouse", "gbTaxWarehouse", "niTaxWarehouse")
       RegisteredConsignee.movementScenarios shouldBe Seq("registeredConsignee")
       TemporaryRegisteredConsignee.movementScenarios shouldBe Seq("temporaryRegisteredConsignee")
       DirectDelivery.movementScenarios shouldBe Seq("directDelivery")
