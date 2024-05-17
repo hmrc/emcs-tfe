@@ -27,7 +27,7 @@ sealed trait DestinationType {
 object DestinationType extends Enumerable.Implicits {
 
   case object TaxWarehouse extends WithName("1") with DestinationType {
-    override val movementScenarios: Seq[String] = Seq("euTaxWarehouse", "gbTaxWarehouse")
+    override val movementScenarios: Seq[String] = Seq("euTaxWarehouse", "gbTaxWarehouse", "niTaxWarehouse")
   }
 
   case object RegisteredConsignee extends WithName("2") with DestinationType {
