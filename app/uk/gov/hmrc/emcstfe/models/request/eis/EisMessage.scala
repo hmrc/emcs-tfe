@@ -58,7 +58,7 @@ trait EisMessage extends XmlWriterUtils {
       <con:OperationRequest>
         <con:Parameters>
           <con:Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</con:Parameter>
-          <con:Parameter Name="message">{PCData(xml.toString())}</con:Parameter>
+          <con:Parameter Name="message">{PCData(trimWhitespaceFromXml(xml).toString())}</con:Parameter>
         </con:Parameters>
         <con:ReturnData/>
       </con:OperationRequest>
