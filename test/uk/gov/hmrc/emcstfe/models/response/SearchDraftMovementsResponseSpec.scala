@@ -33,7 +33,8 @@ class SearchDraftMovementsResponseSpec extends TestBaseSpec with GetMovementList
       ern = testErn,
       draftId = testDraftId,
       data = Json.obj(),
-      submissionFailures = Seq(),
+      submissionFailures = Seq.empty,
+      validationErrors = Seq.empty,
       lastUpdated = lastUpdated,
       hasBeenSubmitted = true,
       submittedDraftId = Some("submission1234")
@@ -76,6 +77,7 @@ class SearchDraftMovementsResponseSpec extends TestBaseSpec with GetMovementList
             "draftId" -> testDraftId,
             "data" -> Json.obj(),
             "submissionFailures" -> Json.arr(),
+            "validationErrors" -> Json.arr(),
             "lastUpdated" -> "1970-01-01T00:00:00.001Z",
             "hasBeenSubmitted" -> true,
             "submittedDraftId" -> "submission1234"

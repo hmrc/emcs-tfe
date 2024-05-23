@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.connectors.httpParsers
 
-import play.api.http.Status
-import play.api.http.Status.OK
+import play.api.LoggerLike
+import play.api.http.Status._
 import play.api.libs.json.JsonValidationError
 import uk.gov.hmrc.emcstfe.fixtures.EISResponsesFixture
 import uk.gov.hmrc.emcstfe.models.response.EISSubmissionSuccessResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISInternalServerError, EISJsonParsingError, EISJsonSchemaMismatchError, EISResourceNotFoundError, EISServiceUnavailableError, EISUnknownError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISInternalServerError, EISJsonParsingError, EISJsonSchemaMismatchError, EISRIMValidationError, EISResourceNotFoundError, EISServiceUnavailableError, EISUnknownError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HttpResponse
@@ -29,7 +29,11 @@ import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
 
 class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with LogCapturing with Logging {
 
-  object TestParser extends EisJsonHttpParser
+  val _logger: LoggerLike = logger
+
+  object TestParser extends EisJsonHttpParser {
+    override val logger: LoggerLike = _logger
+  }
 
   ".modelFromJsonHttpReads" when {
 
@@ -61,11 +65,10 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
 
         }
 
-        Seq(Status.BAD_REQUEST -> EISJsonSchemaMismatchError("an error"),
-          Status.NOT_FOUND -> EISResourceNotFoundError("an error"),
-          Status.UNPROCESSABLE_ENTITY -> EISBusinessError("an error"),
-          Status.INTERNAL_SERVER_ERROR -> EISInternalServerError("an error"),
-          Status.SERVICE_UNAVAILABLE -> EISServiceUnavailableError("an error")).foreach { statusAndErrorModel =>
+        Seq(BAD_REQUEST -> EISJsonSchemaMismatchError("an error"),
+          NOT_FOUND -> EISResourceNotFoundError("an error"),
+          INTERNAL_SERVER_ERROR -> EISInternalServerError("an error"),
+          SERVICE_UNAVAILABLE -> EISServiceUnavailableError("an error")).foreach { statusAndErrorModel =>
 
           s"a ${statusAndErrorModel._1} response is returned" in {
 
@@ -78,9 +81,42 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
           }
         }
 
+        s"a status code of UNPROCESSABLE_ENTITY $UNPROCESSABLE_ENTITY is returned" in {
+
+          val response = HttpResponse(UNPROCESSABLE_ENTITY, body = eisRimValidationJsonResponse.toString(), headers = Map.empty)
+
+          val result = TestParser.modelFromJsonHttpReads[EISSubmissionSuccessResponse].read("POST", "/eis/foo/bar", response)
+
+          result shouldBe Left(EISRIMValidationError(eisRimValidationResponse))
+
+        }
+
+
+        s"a status code of UNPROCESSABLE_ENTITY $UNPROCESSABLE_ENTITY is returned but the body is not valid for a RIM validation error response - return response body" in {
+
+          val responseBody = "{\"message\": \"No data found\"}"
+
+          val response = HttpResponse(UNPROCESSABLE_ENTITY, body = responseBody, headers = Map.empty)
+
+          val result = TestParser.modelFromJsonHttpReads[EISSubmissionSuccessResponse].read("POST", "/eis/foo/bar", response)
+
+          result shouldBe Left(EISBusinessError(responseBody))
+
+        }
+
+        s"a status code of UNPROCESSABLE_ENTITY $UNPROCESSABLE_ENTITY is returned but the body is not valid JSON" in {
+
+          val response = HttpResponse(UNPROCESSABLE_ENTITY, body = "foo bar", headers = Map.empty)
+
+          val result = TestParser.modelFromJsonHttpReads[EISSubmissionSuccessResponse].read("POST", "/eis/foo/bar", response)
+
+          result shouldBe Left(EISJsonParsingError(List(JsonValidationError(List("Unrecognized token 'foo': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n at [Source: (String)\"foo bar\"; line: 1, column: 4]")))))
+
+        }
+
         "an unknown response is returned" in {
 
-          val response = HttpResponse(Status.CONFLICT, body = "an error", headers = Map.empty)
+          val response = HttpResponse(CONFLICT, body = "an error", headers = Map.empty)
 
           withCaptureOfLoggingFrom(logger) {
             logs =>
@@ -89,7 +125,7 @@ class EisJsonHttpParserSpec extends TestBaseSpec with EISResponsesFixture with L
 
               result shouldBe Left(EISUnknownError("an error"))
 
-              logs.exists(_.getMessage == "[TestParser][modelFromJsonHttpReads] Received unexpected status: 409") shouldBe true
+              logs.exists(_.getMessage == "[EisJsonHttpParserSpec][modelFromJsonHttpReads] Received unexpected status: 409") shouldBe true
 
           }
 

@@ -420,7 +420,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
                 destinationOffice = "XI004098",
                 dateOfArrival = LocalDate.parse("2021-09-08"),
                 otherInformation = None,
-                individualItems = Seq(),
+                individualItems = Seq.empty,
                 destinationType = None,
                 acceptMovement = Satisfactory
               ))

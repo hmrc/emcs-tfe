@@ -163,7 +163,7 @@ class AuthActionSpec extends TestBaseSpec with BaseFixtures {
                     override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
                       Enrolment(
                         key = EnrolmentKeys.EMCS_ENROLMENT,
-                        identifiers = Seq(),
+                        identifiers = Seq.empty,
                         state = EnrolmentKeys.ACTIVATED
                       )
                     ))))

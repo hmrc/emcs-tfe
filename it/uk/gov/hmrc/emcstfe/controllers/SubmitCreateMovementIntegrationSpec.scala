@@ -170,6 +170,36 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec
           )
         }
 
+        "downstream call returns a 422 (not RIM validation errors)" in new Test {
+          override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.UNPROCESSABLE_ENTITY, Json.obj("foo" -> "bar").toString())
+          }
+
+          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Request not processed returned by EIS, error response: {\"foo\":\"bar\"}"
+          )
+        }
+
+        "downstream call returns RIM validation errors" in new Test {
+          override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.UNPROCESSABLE_ENTITY, eisRimValidationJsonResponse.toString())
+          }
+
+          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
+          response.status shouldBe Status.UNPROCESSABLE_ENTITY
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Request not processed returned by EIS, correlation ID: 7be1db16-e8fb-4e81-97e5-3d3e2d21f6c4"
+          )
+        }
+
         "downstream call returns a non-200 HTTP response" in new Test {
 
           override def setupStubs(): StubMapping = {

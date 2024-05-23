@@ -16,18 +16,19 @@
 
 package uk.gov.hmrc.emcstfe.connectors.httpParsers
 
+import play.api.LoggerLike
 import play.api.http.Status._
 import play.api.libs.json.{JsonValidationError, Reads}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
-import uk.gov.hmrc.emcstfe.utils.Logging
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationErrorResponse
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
-import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 
-@Singleton
-class EisJsonHttpParser @Inject()() extends Logging {
+trait EisJsonHttpParser {
+
+  val logger: LoggerLike
 
   def modelFromJsonHttpReads[A](implicit jsonReads: Reads[A]): HttpReads[Either[ErrorResponse, A]] = (_: String, _: String, response: HttpResponse) => {
     response.status match {
@@ -46,14 +47,21 @@ class EisJsonHttpParser @Inject()() extends Logging {
       case NOT_FOUND => Left(EISResourceNotFoundError(response.body))
       case UNPROCESSABLE_ENTITY =>
         logger.debug(s"[modelFromJsonHttpReads] Business/RIM validation error (422) from EIS: ${response.body}")
-        Left(EISBusinessError(response.body))
+        Try {
+          RIMValidationErrorResponse.format.reads(response.json).fold(_ => None, Some(_))
+        } match {
+          case Failure(exception) =>
+            logger.error(exception.getMessage, exception)
+            Left(EISJsonParsingError(Seq(JsonValidationError(exception.getMessage))))
+          case Success(Some(rimErrorResponse)) => Left(EISRIMValidationError(rimErrorResponse))
+          case Success(_) => Left(EISBusinessError(response.body))
+        }
       case INTERNAL_SERVER_ERROR => Left(EISInternalServerError(response.body))
       case SERVICE_UNAVAILABLE => Left(EISServiceUnavailableError(response.body))
-      case _ => {
+      case _ =>
         logger.warn(s"[modelFromJsonHttpReads] Received unexpected status: ${response.status}")
         logger.debug(s"[modelFromJsonHttpReads] Error response body: ${response.body}")
         Left(EISUnknownError(response.body))
-      }
     }
   }
 

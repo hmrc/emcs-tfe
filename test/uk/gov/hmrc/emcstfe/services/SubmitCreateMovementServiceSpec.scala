@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISUnknownError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -39,12 +39,14 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
         "when calling submit" must {
 
           "return a Right" when {
-            "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
+            "connector call is successful and XML is the correct format (clearing RIM validation errors)" in new Test(useFS41SchemaVersion) {
 
               MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
                 Future.successful(Right(chrisSuccessResponse))
               )
 
+              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, Seq.empty)
+                .returns(Future.successful(true))
 
               await(service.submit(submitCreateMovementRequest)) shouldBe Right(chrisSuccessResponse)
             }
@@ -70,11 +72,36 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
                 Future.successful(Right(eisSuccessResponse))
               )
 
+              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, Seq.empty)
+                .returns(Future.successful(true))
+
               await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Right(eisSuccessResponse)
             }
           }
 
           "return a Left" when {
+
+            "EIS returns a 422 error with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
+
+              MockEisConnector.submit(submitCreateMovementRequest).returns(
+                Future.successful(Left(EISRIMValidationError(eisRimValidationResponse)))
+              )
+
+              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, eisRimValidationResponse.validatorResults.get)
+                .returns(Future.successful(true))
+
+              await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISRIMValidationError(eisRimValidationResponse))
+            }
+
+            "EIS returns a 422 error without RIM validation errors" in new Test(useFS41SchemaVersion) {
+
+              MockEisConnector.submit(submitCreateMovementRequest).returns(
+                Future.successful(Left(EISBusinessError("wrong")))
+              )
+
+              await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISBusinessError("wrong"))
+            }
+
             "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
 
               MockEisConnector.submit(submitCreateMovementRequest).returns(

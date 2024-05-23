@@ -35,7 +35,7 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
 
   val testSubmittedDraftId = "12345-12346-12347"
 
-  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("info" -> Json.obj("localReferenceNumber" -> testLrn)), submissionFailures = Seq.empty, Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testSubmittedDraftId))
+  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("info" -> Json.obj("localReferenceNumber" -> testLrn)), submissionFailures = Seq.empty, validationErrors = Seq.empty, Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testSubmittedDraftId))
 
   def uri: String = s"/user-answers/create-movement/$testErn/$testDraftId"
 

@@ -35,5 +35,5 @@ case class MarkMessageAsReadRequest(exciseRegistrationNumber: String, messageId:
 
   override def metricName: String = "markMessageAsRead"
 
-  override val queryParams: Seq[(String, String)] = Seq()
+  override val queryParams: Seq[(String, String)] = Seq.empty
 }

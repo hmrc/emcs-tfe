@@ -46,7 +46,7 @@ class DestinationTypeSpec extends TestBaseSpec {
       UnknownDestination.movementScenarios shouldBe Seq("unknownDestination")
       CertifiedConsignee.movementScenarios shouldBe Seq("certifiedConsignee")
       TemporaryCertifiedConsignee.movementScenarios shouldBe Seq("temporaryCertifiedConsignee")
-      ReturnToThePlaceOfDispatchOfTheConsignor.movementScenarios shouldBe Seq()
+      ReturnToThePlaceOfDispatchOfTheConsignor.movementScenarios shouldBe Seq.empty
     }
 
     "be able to be constructed by a QueryStringBinder" when {

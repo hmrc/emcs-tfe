@@ -22,6 +22,7 @@ import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubm
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
 import uk.gov.hmrc.emcstfe.models.response.SearchDraftMovementsResponse
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 
 import scala.concurrent.Future
@@ -46,7 +47,10 @@ trait MockCreateMovementUserAnswersRepository extends MockFactory {
       (mockCreateMovementUserAnswersRepository.markDraftAsUnsubmitted(_: String, _: String)).expects(ern, draftId)
 
     def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, movementSubmissionFailures: Seq[MovementSubmissionFailure]): CallHandler3[String, String, Seq[MovementSubmissionFailure], Future[Option[String]]] =
-      (mockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(_: String, _: String, _: Seq[MovementSubmissionFailure])).expects(ern, submittedDraftId, movementSubmissionFailures)
+      (mockCreateMovementUserAnswersRepository.setSubmissionErrorMessagesForDraftMovement(_: String, _: String, _: Seq[MovementSubmissionFailure])).expects(ern, submittedDraftId, movementSubmissionFailures)
+
+    def setValidationErrorMessagesForDraftMovement(ern: String, draftId: String, validationErrors: Seq[RIMValidationError]): CallHandler3[String, String, Seq[RIMValidationError], Future[Boolean]] =
+      (mockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(_: String, _: String, _: Seq[RIMValidationError])).expects(ern, draftId, validationErrors)
 
     def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): CallHandler3[String, String, String, Future[Boolean]] =
       (mockCreateMovementUserAnswersRepository.setSubmittedDraftId(_: String, _: String, _: String))

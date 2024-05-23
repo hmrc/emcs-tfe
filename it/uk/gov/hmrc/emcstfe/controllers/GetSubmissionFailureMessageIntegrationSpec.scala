@@ -43,7 +43,7 @@ class GetSubmissionFailureMessageIntegrationSpec extends IntegrationBaseSpec wit
   import GetSubmissionFailureMessageResponseFixtures._
 
   private abstract class Test(sendToEIS: Boolean = true) {
-    val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("foo" -> "bar"), submissionFailures = Seq.empty, Instant.ofEpochSecond(1), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+    val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("foo" -> "bar"), submissionFailures = Seq.empty, validationErrors = Seq.empty, Instant.ofEpochSecond(1), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
     def setupStubs(): StubMapping
 

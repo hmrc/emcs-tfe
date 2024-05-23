@@ -23,12 +23,12 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{DefaultDraftMovementCorrelationId, EnableNRS, SendToEIS, ValidateUsingFS41Schema}
-import uk.gov.hmrc.emcstfe.fixtures.{CreateMovementFixtures, NRSBrokerFixtures}
+import uk.gov.hmrc.emcstfe.fixtures.{CreateMovementFixtures, EISResponsesFixture, NRSBrokerFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.{MockNRSBrokerService, MockSubmitCreateMovementService}
 import uk.gov.hmrc.emcstfe.models.nrs.createMovement.CreateMovementNRSSubmission
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISServiceUnavailableError, UnexpectedDownstreamResponseError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISServiceUnavailableError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -39,7 +39,8 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec
   with MockAppConfig
   with MockNRSBrokerService
   with NRSBrokerFixtures
-  with FakeAuthAction {
+  with FakeAuthAction
+  with EISResponsesFixture {
 
   class Fixture(authAction: AuthAction, optIsNRSEnabled: Option[Boolean] = Some(true)) {
     optIsNRSEnabled.foreach { isNRSEnabled =>
@@ -126,6 +127,40 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec
 
                 status(result) shouldBe Status.OK
                 contentAsJson(result) shouldBe eisSuccessJson(withSubmittedDraftId = true)
+              }
+            }
+
+            s"return ${Status.UNPROCESSABLE_ENTITY} (UNPROCESSABLE_ENTITY)" when {
+              "service returns a Left(EISRIMValidationError) - when it is a RIM Validation error" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
+
+                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+                MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
+
+                MockService.submitViaEIS(requestModel).returns(Future.successful(Left(EISRIMValidationError(eisRimValidationResponse))))
+
+                val result = controller.submit(testErn, testDraftId)(fakeRequest)
+
+                status(result) shouldBe Status.UNPROCESSABLE_ENTITY
+                contentAsJson(result) shouldBe Json.obj("message" -> EISRIMValidationError(eisRimValidationResponse).message)
+              }
+
+              "service returns a Left(EISBusinessError) - when it is not a RIM Validation error" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
+
+                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+                MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
+
+                MockService.submitViaEIS(requestModel).returns(Future.successful(Left(EISBusinessError("foobar"))))
+
+                val result = controller.submit(testErn, testDraftId)(fakeRequest)
+
+                status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+                contentAsJson(result) shouldBe Json.obj("message" -> EISBusinessError("foobar").message)
               }
             }
 

@@ -46,7 +46,7 @@ class CreateMovementUserAnswersService @Inject()(repo: CreateMovementUserAnswers
     repo.markDraftAsUnsubmitted(ern, draftId).map(Right(_)).recover(recovery)
 
   def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure])(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[String]]] =
-    repo.setErrorMessagesForDraftMovement(ern, submittedDraftId, errors).map(Right(_)).recover(recovery)
+    repo.setSubmissionErrorMessagesForDraftMovement(ern, submittedDraftId, errors).map(Right(_)).recover(recovery)
 
   def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions)(implicit executionContext: ExecutionContext): Future[Either[ErrorResponse, SearchDraftMovementsResponse]] =
     repo.searchDrafts(ern, searchOptions).map(Right(_)).recover(recovery)
