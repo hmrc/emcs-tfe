@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.rimValidation
 
-import play.api.libs.json.{Json, Reads, Writes}
-import uk.gov.hmrc.emcstfe.utils.JsonUtils
+import play.api.libs.json.{Format, Json}
 
 case class RIMValidationError(
                                errorCategory: Option[String],
@@ -26,22 +25,7 @@ case class RIMValidationError(
                                errorLocation: Option[String]
                              )
 
-object RIMValidationError extends JsonUtils {
+object RIMValidationError {
 
-  implicit val jsonReads: Reads[RIMValidationError] = Json.reads[RIMValidationError]
-
-  implicit val jsonWrites: Writes[RIMValidationError] = (error: RIMValidationError) => {
-    //Multiple errors exist under code 12 and 13, so if the error code is 12 or 13 then return the message
-    //with 'amend entry and resubmit' removed, otherwise return None
-    val transformedErrorReason = error.errorType match {
-      case Some(12) | Some(13) => error.errorReason
-      case _ => None
-    }
-    Json.obj(
-      "errorCategory" -> error.errorCategory,
-      "errorType" -> error.errorType,
-      "errorReason" -> transformedErrorReason,
-      "errorLocation" -> error.errorLocation
-    ).removeNullValues()
-  }
+  implicit val format: Format[RIMValidationError] = Json.format[RIMValidationError]
 }
