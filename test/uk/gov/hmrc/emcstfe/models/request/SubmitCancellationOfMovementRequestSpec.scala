@@ -248,8 +248,7 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
         val requestXml = XML.loadString(request.eisXMLBody())
         val expectedXml = trim(expectedRequest)
 
-        requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
-        requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
+        requestXml shouldBe expectedXml
       }
     }
 
@@ -288,8 +287,7 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
         val requestXml = XML.loadString(request.eisXMLBody())
         val expectedXml = trim(expectedRequest)
 
-        requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
-        requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
+        requestXml shouldBe expectedXml
       }
     }
   }

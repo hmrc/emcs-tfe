@@ -213,8 +213,7 @@ class SubmitExplainDelayRequestSpec extends TestBaseSpec with SubmitExplainDelay
         val requestXml = XML.loadString(request.eisXMLBody())
         val expectedXml = trim(expectedRequest)
 
-        requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
-        requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
+        requestXml shouldBe expectedXml
       }
     }
 
@@ -251,8 +250,7 @@ class SubmitExplainDelayRequestSpec extends TestBaseSpec with SubmitExplainDelay
         val requestXml = XML.loadString(request.eisXMLBody())
         val expectedXml = trim(expectedRequest)
 
-        requestXml.getControlDocWithoutMessage.toString() shouldEqual expectedXml.getControlDocWithoutMessage.toString()
-        requestXml.getMessageBody.toString() shouldEqual expectedXml.getMessageBody.toString()
+        requestXml shouldBe expectedXml
       }
     }
   }

@@ -20,25 +20,9 @@ import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
 
 import scala.xml.Utility.trim
-import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Elem, Node, NodeSeq, XML}
+import scala.xml.{Node, XML}
 
 trait TestBaseSpec extends UnitSpec with MockFactory {
-  implicit class TestXMLClassOps(n: NodeSeq) {
-    def getMessageBody: NodeSeq = trim(XML.loadString((n \\ "Parameter" filter {
-      _ \ "@Name" exists (_.text == "message")
-    }).text))
-
-    def getControlDocWithoutMessage: NodeSeq = {
-      val removeMessageFromControl: RewriteRule = new RewriteRule {
-        override def transform(n: Node): NodeSeq = n match {
-          case e: Elem if (e \ "@Name").text == "message" & e.label == "Parameter" => NodeSeq.Empty
-          case n => n
-        }
-      }
-      new RuleTransformer(removeMessageFromControl).transform(n)
-    }
-  }
 
   def wrapInControlDoc(xml: Node)(implicit request: EisSubmissionRequest): Node =
     <con:Control xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
@@ -56,7 +40,7 @@ trait TestBaseSpec extends UnitSpec with MockFactory {
           <con:Parameter Name="ExciseRegistrationNumber">{request.exciseRegistrationNumber}</con:Parameter>
           {XML.loadString(s"""
                              |<con:Parameter Name="message">
-                             |<![CDATA[$xml]]>
+                             |<![CDATA[${trim(xml)}]]>
                              |</con:Parameter>
                              """.stripMargin)}
           </con:Parameters>
