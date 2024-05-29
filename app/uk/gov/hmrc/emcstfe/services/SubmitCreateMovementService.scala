@@ -20,6 +20,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.FeatureSwitching
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISRIMValidationError
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -35,14 +36,38 @@ class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
                                             val config: AppConfig) extends Logging with FeatureSwitching {
   def submit(requestModel: SubmitCreateMovementRequest)
             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    chrisConnector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](requestModel)
+    chrisConnector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](requestModel).flatMap(handleResponse(requestModel, _))
 
   def submitViaEIS(requestModel: SubmitCreateMovementRequest)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submit[EISSubmissionSuccessResponse](requestModel, "submitCreateMovementEISRequest")
+    eisConnector.submit[EISSubmissionSuccessResponse](requestModel, "submitCreateMovementEISRequest").flatMap(handleResponse(requestModel, _))
 
   def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): Future[Boolean] =
     createMovementUserAnswersRepository.setSubmittedDraftId(ern, draftId, submittedDraftId)
 
+  private def handleResponse[A](requestModel: SubmitCreateMovementRequest, response: Either[ErrorResponse, A])
+                               (implicit ec: ExecutionContext): Future[Either[ErrorResponse, A]] =
+    response match {
+    //If the submission fails due to RIM validation errors, store the errors in Mongo for persistence
+    case Left(rimError: EISRIMValidationError) =>
+      logger.warn(s"[handleResponse] - RIM validation error codes for correlation ID - ${rimError.errorResponse.emcsCorrelationId}: ${rimError.errorResponse.validatorResults.map(_.flatMap(_.errorType))}")
+      createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
+        requestModel.exciseRegistrationNumber,
+        requestModel.draftId,
+        rimError.errorResponse.validatorResults.getOrElse(Seq.empty)
+      ).map {
+        _ => Left(rimError)
+      }
+    //Clear any existing RIM validation errors when the movement is submitted successfully
+    case Right(value) =>
+      createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
+        requestModel.exciseRegistrationNumber,
+        requestModel.draftId,
+        Seq.empty
+      ).map {
+        _ => Right(value)
+      }
+    case response => Future.successful(response)
+  }
 
 }

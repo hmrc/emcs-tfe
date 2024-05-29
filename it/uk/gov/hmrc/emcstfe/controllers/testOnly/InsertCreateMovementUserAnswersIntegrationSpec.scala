@@ -32,7 +32,7 @@ import java.time.temporal.ChronoUnit
 
 class InsertCreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
-  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(ern = testErn, draftId = testDraftId, data = Json.obj(), submissionFailures = Seq.empty, lastUpdated = Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+  val userAnswers: CreateMovementUserAnswers = CreateMovementUserAnswers(ern = testErn, draftId = testDraftId, data = Json.obj(), submissionFailures = Seq.empty, validationErrors = Seq.empty, lastUpdated = Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   def uri: String = s"/test-only/user-answers/create-movement/$testErn/$testDraftId"
 

@@ -41,7 +41,7 @@ class InsertCreateMovementUserAnswersControllerSpec extends TestBaseSpec with Mo
   )
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(ern = testErn, draftId = testDraftId, data = Json.obj(), submissionFailures = Seq.empty, lastUpdated = Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+    CreateMovementUserAnswers(ern = testErn, draftId = testDraftId, data = Json.obj(), submissionFailures = Seq.empty, validationErrors = Seq.empty, lastUpdated = Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   "PUT /test-only/user-answers/create-movement/:ern/:draftId" should {
     s"return $OK (OK)" when {

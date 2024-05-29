@@ -52,7 +52,7 @@ trait MockHttpClient extends MockFactory {
 
     def postString[T](url: String,
                       body: String,
-                      headers: Seq[(String, String)] = Seq()): CallHandler[Future[T]] = {
+                      headers: Seq[(String, String)] = Seq.empty): CallHandler[Future[T]] = {
       (mockHttpClient
         .POSTString[T](_: String, _: String, _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs { (actualUrl, actualBody, actualHeaders, _, _, _) => {
@@ -65,7 +65,7 @@ trait MockHttpClient extends MockFactory {
     def postJson[I, T](url: String,
                        bearerToken: String,
                        body: I,
-                       headers: Seq[(String, String)] = Seq()): CallHandler[Future[T]] = {
+                       headers: Seq[(String, String)] = Seq.empty): CallHandler[Future[T]] = {
       (mockHttpClient
         .POST[I, T](_: String, _: I, _: Seq[(String, String)])(_: Writes[I], _: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
         .expects(assertArgs { (actualUrl, actualBody, actualHeaders, _, _, hc, _) => {

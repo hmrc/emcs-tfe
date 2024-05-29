@@ -123,7 +123,7 @@ trait SubmitReportOfReceiptFixtures extends BaseFixtures
     destinationOffice = destinationOfficeId,
     dateOfArrival = arrivalDate,
     acceptMovement = Satisfactory,
-    individualItems = Seq(),
+    individualItems = Seq.empty,
     otherInformation = None,
     dateAndTimeOfValidationOfReportOfReceiptExport = None
   )

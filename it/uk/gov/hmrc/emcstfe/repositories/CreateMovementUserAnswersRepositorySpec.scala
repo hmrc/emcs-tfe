@@ -19,19 +19,19 @@ package uk.gov.hmrc.emcstfe.repositories
 import org.mongodb.scala.Document
 import org.mongodb.scala.model.Filters
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.fixtures.MovementSubmissionFailureFixtures
+import uk.gov.hmrc.emcstfe.fixtures.{EISResponsesFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateMovementUserAnswers] with MovementSubmissionFailureFixtures {
+class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateMovementUserAnswers] with MovementSubmissionFailureFixtures with EISResponsesFixture {
 
   private val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val timeMachine: TimeMachine = () => instantNow
 
-  val userAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("foo" -> "bar"), submissionFailures = Seq.empty, Instant.ofEpochSecond(1), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+  val userAnswers = CreateMovementUserAnswers(testErn, testDraftId, Json.obj("foo" -> "bar"), submissionFailures = Seq.empty, validationErrors = Seq.empty, Instant.ofEpochSecond(1), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   protected override val repository = new CreateMovementUserAnswersRepositoryImpl(
     mongoComponent = mongoComponent,
@@ -225,7 +225,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       "there is a record with this ern and lrn" in {
         val mongoEntry = userAnswers.copy(submittedDraftId = Some(testDraftId))
         insert(mongoEntry).futureValue
-        repository.setErrorMessagesForDraftMovement(testErn, testDraftId, Seq(movementSubmissionFailureModel)).futureValue shouldBe Some(testDraftId)
+        repository.setSubmissionErrorMessagesForDraftMovement(testErn, testDraftId, Seq(movementSubmissionFailureModel)).futureValue shouldBe Some(testDraftId)
       }
     }
 
@@ -235,7 +235,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       "there is no record with this ern and lrn" in {
         val mongoEntry = userAnswers.copy(submittedDraftId = Some(testDraftId))
         insert(mongoEntry).futureValue
-        repository.setErrorMessagesForDraftMovement(testErn, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
+        repository.setSubmissionErrorMessagesForDraftMovement(testErn, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
       }
     }
   }
@@ -251,9 +251,24 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
 
     "not update any records when the search criteria doesn't match any" in {
 
-      insert(userAnswers).futureValue
-      repository.setErrorMessagesForDraftMovement(testErn, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
+      repository.setSubmittedDraftId(testErn, "ABC1234", s"PORTAL$testDraftId").futureValue shouldBe true
+      repository.get(testErn, "ABC1234").futureValue shouldBe None
     }
   }
 
+  ".setValidationErrorMessagesForDraftMovement" must {
+
+    "update the record when the there is one" in {
+      insert(userAnswers).futureValue
+      repository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, eisRimValidationResults).futureValue shouldBe true
+      repository.get(testErn, testDraftId).futureValue.get.validationErrors shouldBe eisRimValidationResults
+    }
+
+
+    "not update any records when the search criteria doesn't match any" in {
+
+      repository.setValidationErrorMessagesForDraftMovement(testErn, "ABC1234", eisRimValidationResults).futureValue shouldBe true
+      repository.get(testErn, "ABC1234").futureValue shouldBe None
+    }
+  }
 }

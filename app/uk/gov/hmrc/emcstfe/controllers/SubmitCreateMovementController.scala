@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.controllers
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.config.Constants.DEFAULT_CORRELATION_ID
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config._
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
@@ -26,6 +27,7 @@ import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
 import uk.gov.hmrc.emcstfe.models.nrs.createMovement.CreateMovementNRSSubmission
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISRIMValidationError
 import uk.gov.hmrc.emcstfe.services.SubmitCreateMovementService
 import uk.gov.hmrc.emcstfe.services.nrs.NRSBrokerService
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -46,9 +48,7 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
   def submit(ern: String, draftId: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitCreateMovementModel] { submission =>
       if (isEnabled(EnableNRS)) {
-        nrsBrokerService.submitPayload(CreateMovementNRSSubmission(ern, submission), ern).flatMap(_ =>
-          handleSubmission(ern, draftId, submission)
-        )
+        nrsBrokerService.submitPayload(CreateMovementNRSSubmission(ern, submission), ern).flatMap(_ => handleSubmission(ern, draftId, submission))
       } else {
         handleSubmission(ern, draftId, submission)
       }
@@ -74,6 +74,7 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
 
   def handleResponse[A](response: Either[ErrorResponse, A], ern: String, draftId: String, correlationId: String)(implicit writes: Writes[A]): Future[Result] =
     response match {
+      case Left(value: EISRIMValidationError) => Future(UnprocessableEntity(Json.toJson(value)))
       case Left(value) => Future(InternalServerError(Json.toJson(value)))
       case Right(value) =>
         service.setSubmittedDraftId(ern, draftId, correlationId).map {
@@ -85,7 +86,7 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
                                isDefaultDraftMovementCorrelationIdEnabled: Boolean,
                                requestModel: SubmitCreateMovementRequest): String = {
     (isDefaultDraftMovementCorrelationIdEnabled, isEISFeatureEnabled) match {
-      case (true, _) => "PORTAL123"
+      case (true, _) => DEFAULT_CORRELATION_ID
       case (_, true) => requestModel.correlationUUID
       case (_, false) => requestModel.legacyCorrelationUUID
     }

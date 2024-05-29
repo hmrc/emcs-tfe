@@ -20,7 +20,6 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.libs.json.JsonValidationError
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDownstreamStub}
 import uk.gov.hmrc.emcstfe.fixtures._
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
@@ -66,15 +65,13 @@ class EisConnectorSpec
     super.afterEach()
   }
 
-  val jsonParser: EisJsonHttpParser = new EisJsonHttpParser
-
   lazy val config: AppConfig = app.injector.instanceOf[AppConfig]
 
   trait Test {
     implicit val hc: HeaderCarrier    = HeaderCarrier()
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-    val connector = new EisConnector(mockHttpClient, config, mockMetricsService, jsonParser)
+    val connector = new EisConnector(mockHttpClient, config, mockMetricsService)
 
     val baseUrl: String = "http://localhost:8308"
   }
@@ -222,6 +219,34 @@ class EisConnectorSpec
 
           await(connector.submit[EISSubmissionSuccessResponse](submitReportOfReceiptRequest, "submitReportOfReceiptEISRequest")) shouldBe response
         }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response (RIM Validation errors)" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISRIMValidationError(eisRimValidationResponse))
+
+          MockMetricsService.requestTimer(submitReportOfReceiptRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/digital-submit-new-message/v1",
+              body = submitReportOfReceiptRequest.toJson,
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-emcs08"
+              ),
+              bearerToken = "Bearer value-emcs08"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.submit[EISSubmissionSuccessResponse](submitReportOfReceiptRequest, "submitReportOfReceiptEISRequest")) shouldBe response
+        }
+
 
         "downstream call fails due to a 500 (ISE) response" in new Test {
 

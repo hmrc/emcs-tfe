@@ -29,6 +29,7 @@ import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementH
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.{GetSubmissionFailureMessageResponse, RawGetSubmissionFailureMessageResponse}
 import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderApiResponse
 import uk.gov.hmrc.emcstfe.services.MetricsService
+import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
@@ -36,33 +37,32 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EisConnector @Inject()(val http: HttpClient,
                              appConfig: AppConfig,
-                             override val metricsService: MetricsService,
-                             httpParser: EisJsonHttpParser
-                            ) extends BaseEisConnector {
+                             override val metricsService: MetricsService
+                            ) extends BaseEisConnector with EisJsonHttpParser with Logging {
 
   private def prepareJsonAndSubmit[A](url: String, request: EisSubmissionRequest, callingMethod: String, bearerToken: String = appConfig.eisSubmitBearerToken)
                                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
     logger.debug(s"[$callingMethod] Sending body: ${request.toJson}")
-    postJson(http, url, request.toJson, request, bearerToken)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
+    postJson(http, url, request.toJson, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
   }
 
   private def prepareGetRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String, bearerToken: String)
                                            (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
-    get(http, url, request, bearerToken)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
+    get(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
   }
 
   private def prepareEmptyPutRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String, bearerToken: String)
                                                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
-    putEmpty(http, url, request, bearerToken)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
+    putEmpty(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
   }
 
   private def prepareDeleteRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String, bearerToken: String)
                                               (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
-    delete(http, url, request, bearerToken)(ec, headerCarrier, httpParser.modelFromJsonHttpReads, appConfig)
+    delete(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
   }
 
   def submit[A](request: EisSubmissionRequest, callingMethod: String)

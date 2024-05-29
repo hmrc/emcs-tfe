@@ -53,7 +53,7 @@ class GetSubmissionFailureMessageControllerSpec extends TestBaseSpec
       "service returns a Right (calling repository when correlation ID exists within drafts hence draftMovementExists = true)" in {
 
         val userAnswers: CreateMovementUserAnswers =
-          CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+          CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), validationErrors = Seq.empty, Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
         MockService.getSubmissionFailureMessage(getSubmissionFailureMessageRequest).returns(Future.successful(Right(getSubmissionFailureMessageResponseModel)))
 

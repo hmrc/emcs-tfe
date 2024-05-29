@@ -35,7 +35,7 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
   }
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), Instant.now(), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+    CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), validationErrors = Seq.empty, Instant.now(), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   ".get" should {
     "return a Right(Some(answers))" when {
@@ -190,7 +190,7 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
       "UserAnswers are not found matching the search in Mongo" in new Test {
 
         val searchOptions = GetDraftMovementSearchOptions()
-        val response = SearchDraftMovementsResponse(0, Seq())
+        val response = SearchDraftMovementsResponse(0, Seq.empty)
 
         MockCreateMovementUserAnswersRepository.searchDrafts(testErn, searchOptions)
           .returns(Future.successful(response))

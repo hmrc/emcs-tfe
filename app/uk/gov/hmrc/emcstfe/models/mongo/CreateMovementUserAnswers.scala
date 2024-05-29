@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.models.mongo
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -27,6 +28,7 @@ final case class CreateMovementUserAnswers(ern: String,
                                            draftId: String,
                                            data: JsObject,
                                            submissionFailures: Seq[MovementSubmissionFailure],
+                                           validationErrors: Seq[RIMValidationError],
                                            lastUpdated: Instant,
                                            hasBeenSubmitted: Boolean,
                                            submittedDraftId: Option[String])
@@ -38,6 +40,7 @@ object CreateMovementUserAnswers {
       (__ \ "draftId").read[String] and
       (__ \ "data").read[JsObject] and
       (__ \ "submissionFailures").readNullable[Seq[MovementSubmissionFailure]].map(_.getOrElse(Seq.empty)) and
+      (__ \ "validationErrors").readNullable[Seq[RIMValidationError]].map(_.getOrElse(Seq.empty)) and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat) and
       (__ \ "hasBeenSubmitted").read[Boolean] and
       (__ \ "submittedDraftId").readNullable[String]
@@ -48,6 +51,7 @@ object CreateMovementUserAnswers {
       (__ \ "draftId").write[String] and
       (__ \ "data").write[JsObject] and
       (__ \ "submissionFailures").write[Seq[MovementSubmissionFailure]] and
+      (__ \ "validationErrors").write[Seq[RIMValidationError]] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat) and
       (__ \ "hasBeenSubmitted").write[Boolean] and
       (__ \ "submittedDraftId").writeNullable[String]

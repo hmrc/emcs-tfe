@@ -63,7 +63,7 @@ object DestinationType extends Enumerable.Implicits {
   }
 
   case object ReturnToThePlaceOfDispatchOfTheConsignor extends WithName("11") with DestinationType {
-    override val movementScenarios: Seq[String] = Seq()
+    override val movementScenarios: Seq[String] = Seq.empty
   }
 
 

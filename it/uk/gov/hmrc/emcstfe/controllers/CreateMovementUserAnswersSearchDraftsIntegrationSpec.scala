@@ -82,7 +82,7 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
           val response: WSResponse = await(searchRequest.get())
 
           response.status shouldBe OK
-          response.json shouldBe Json.toJson(SearchDraftMovementsResponse(count = 0, paginatedDrafts = Seq()))
+          response.json shouldBe Json.toJson(SearchDraftMovementsResponse(count = 0, paginatedDrafts = Seq.empty))
         }
 
         "multiple search criteria match" in {

@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import com.lucidchart.open.xtract.ParseError
 import play.api.libs.json._
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationErrorResponse
 
 sealed trait ErrorResponse {
   val message: String
@@ -74,6 +75,10 @@ object ErrorResponse {
 
   case class EISBusinessError(errorResponse: String) extends ErrorResponse {
     val message = s"Request not processed returned by EIS, error response: $errorResponse"
+  }
+
+  case class EISRIMValidationError(errorResponse: RIMValidationErrorResponse) extends ErrorResponse {
+    val message = s"Request not processed returned by EIS, correlation ID: ${errorResponse.emcsCorrelationId}"
   }
 
   case class EISInternalServerError(errorResponse: String) extends ErrorResponse {

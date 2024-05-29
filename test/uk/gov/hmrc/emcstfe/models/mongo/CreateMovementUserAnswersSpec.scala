@@ -17,14 +17,14 @@
 package uk.gov.hmrc.emcstfe.models.mongo
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.emcstfe.fixtures.{BaseFixtures, MovementSubmissionFailureFixtures}
+import uk.gov.hmrc.emcstfe.fixtures.{BaseFixtures, EISResponsesFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures with MovementSubmissionFailureFixtures {
+class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures with MovementSubmissionFailureFixtures with EISResponsesFixture {
 
   val instant: Instant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
@@ -35,6 +35,7 @@ class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures with 
       "foo" -> "bar"
     ),
     submissionFailures = Seq(movementSubmissionFailureModel),
+    validationErrors = eisRimValidationResults,
     lastUpdated = instant,
     hasBeenSubmitted = true,
     submittedDraftId = Some(testDraftId)
@@ -47,6 +48,7 @@ class CreateMovementUserAnswersSpec extends TestBaseSpec with BaseFixtures with 
       "foo" -> "bar"
     ),
     "submissionFailures" -> Json.arr(movementSubmissionFailureJson),
+    "validationErrors" -> Json.arr(eisRimValidationResultsJson),
     "lastUpdated" -> Json.toJson(instant)(MongoJavatimeFormats.instantWrites),
     "hasBeenSubmitted" -> true,
     "submittedDraftId" -> testDraftId

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.config
+package uk.gov.hmrc.emcstfe.models.response.rimValidation
 
-object Constants {
+import play.api.libs.json.{Format, Json}
 
-  val NDEA = "NDEA."
-  val GB = "GB"
-  val DEFAULT_CORRELATION_ID = "PORTAL123"
+case class RIMValidationErrorResponse(emcsCorrelationId: String, validatorResults: Option[Seq[RIMValidationError]])
 
+object RIMValidationErrorResponse {
+
+  implicit val format: Format[RIMValidationErrorResponse] = Json.format[RIMValidationErrorResponse]
 }

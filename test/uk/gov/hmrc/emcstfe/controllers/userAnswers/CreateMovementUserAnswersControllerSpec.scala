@@ -44,7 +44,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
   )
 
   val userAnswers: CreateMovementUserAnswers =
-    CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
+    CreateMovementUserAnswers(testErn, testDraftId, data = Json.obj(), submissionFailures = Seq(movementSubmissionFailureModel), validationErrors = Seq.empty, Instant.now().truncatedTo(ChronoUnit.MILLIS), hasBeenSubmitted = true, submittedDraftId = Some(testDraftId))
 
   "GET /user-answers/create-movement/:ern/:lrn" should {
     s"return $OK (OK)" when {
@@ -304,7 +304,7 @@ class CreateMovementUserAnswersControllerSpec extends TestBaseSpec with MockCrea
       "service returns a Right(response)" in {
 
         val searchOptions = GetDraftMovementSearchOptions()
-        val response = SearchDraftMovementsResponse(0, Seq())
+        val response = SearchDraftMovementsResponse(0, Seq.empty)
 
         MockCreateMovementUserAnswersService.searchDrafts(testErn, searchOptions).returns(Future.successful(Right(response)))
 

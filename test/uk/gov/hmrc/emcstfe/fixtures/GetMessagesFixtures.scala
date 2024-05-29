@@ -743,12 +743,12 @@ trait GetMessagesFixtures extends BaseFixtures {
     )
 
     val getMessagesResponseMinimumModel: GetMessagesResponse = GetMessagesResponse(
-      messages = Seq(),
+      messages = Seq.empty,
       totalNumberOfMessagesAvailable = 0
     )
 
     val getMessagesResponseMinimumJson: JsValue = Json.obj(
-      "messages" -> JsArray(Seq()),
+      "messages" -> JsArray(Seq.empty),
       "totalNumberOfMessagesAvailable" -> 0
     )
   }

@@ -189,7 +189,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
           lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
           result.count shouldBe 0
-          result.paginatedDrafts shouldBe Seq()
+          result.paginatedDrafts shouldBe Seq.empty
         }
       }
 
@@ -492,7 +492,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 0
-        result.paginatedDrafts shouldBe Seq()
+        result.paginatedDrafts shouldBe Seq.empty
       }
     }
 
@@ -545,7 +545,7 @@ class CreateMovementUserAnswersRepositorySearchDraftsSpec extends RepositoryBase
         lazy val result = repository.searchDrafts(testErn, searchOptions).futureValue
 
         result.count shouldBe 0
-        result.paginatedDrafts shouldBe Seq()
+        result.paginatedDrafts shouldBe Seq.empty
       }
     }
   }

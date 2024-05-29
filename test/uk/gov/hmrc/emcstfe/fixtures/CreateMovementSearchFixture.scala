@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 import play.api.libs.json.{JsObject, JsPath, Json, Reads, __}
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
@@ -30,7 +31,8 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
   def userAnswers(ern: String = testErn,
                   draftId: String = testDraftId,
                   data: JsObject = Json.obj("foo" -> "bar"),
-                  submissionFailures: Seq[MovementSubmissionFailure] = Seq(),
+                  submissionFailures: Seq[MovementSubmissionFailure] = Seq.empty,
+                  validationErrors: Seq[RIMValidationError] = Seq.empty,
                   hasBeenSubmitted: Boolean = false,
                   timestamp: Instant = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(1, ChronoUnit.SECONDS)): CreateMovementUserAnswers =
     CreateMovementUserAnswers(
@@ -38,6 +40,7 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
       draftId = draftId,
       data = data,
       submissionFailures = submissionFailures,
+      validationErrors = validationErrors,
       lastUpdated = timestamp,
       hasBeenSubmitted = hasBeenSubmitted,
       submittedDraftId = Some(testDraftId)
@@ -227,7 +230,8 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
       data = Json.obj("info" -> Json.obj(
         "localReferenceNumber" -> s"LRN${Random.nextInt(i * 1000)}"
       )),
-      submissionFailures = Seq(),
+      submissionFailures = Seq.empty,
+      validationErrors = Seq.empty,
       lastUpdated = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(i * 2, ChronoUnit.SECONDS),
       hasBeenSubmitted = false,
       submittedDraftId = None

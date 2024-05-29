@@ -27,6 +27,7 @@ import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubm
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.request.{GetDraftMovementSearchOptions, LRN, LastUpdatedDate}
 import uk.gov.hmrc.emcstfe.models.response.SearchDraftMovementsResponse
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository._
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
@@ -53,7 +54,9 @@ trait CreateMovementUserAnswersRepository {
 
   def markDraftAsUnsubmitted(ern: String, draftId: String): Future[Boolean]
 
-  def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]]
+  def setSubmissionErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]]
+
+  def setValidationErrorMessagesForDraftMovement(ern: String, draftId: String, errors: Seq[RIMValidationError]): Future[Boolean]
 
   def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): Future[Boolean]
 
@@ -149,7 +152,7 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
           .map(_.exists(_.getModifiedCount == 1L))
     }
 
-  def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]] =
+  def setSubmissionErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]] =
     collection
       .findOneAndUpdate(
         filter = bySubmittedDraftId(ern, submittedDraftId),
@@ -157,6 +160,15 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
       )
       .headOption()
       .map(_.map(_.draftId))
+
+  def setValidationErrorMessagesForDraftMovement(ern: String, draftId: String, errors: Seq[RIMValidationError]): Future[Boolean] =
+    collection
+      .findOneAndUpdate(
+        filter = byDraftId(ern, draftId),
+        update = Updates.set(validationErrorsField, Codecs.toBson(errors))
+      )
+      .toFuture()
+      .map(_ => true)
 
   def setSubmittedDraftId(ern: String, draftId: String, submittedDraftId: String): Future[Boolean] =
     collection
@@ -277,6 +289,8 @@ object CreateMovementUserAnswersRepository {
   val submissionFailuresErrorFixedField = s"$submissionFailuresField.hasBeenFixed"
 
   val hasBeenSubmittedField = "hasBeenSubmitted"
+
+  val validationErrorsField = "validationErrors"
 
   def mongoIndexes(timeToLive: Duration): Seq[IndexModel] = Seq(
     IndexModel(

@@ -43,7 +43,7 @@ class GetMovementListSpec extends TestBaseSpec with GetMovementListFixture {
 
       "there are no Movements returned" in {
 
-        GetMovementList.xmlReader.read(noMovements) shouldBe ParseSuccess(GetMovementList(movements = Seq(), count = 0))
+        GetMovementList.xmlReader.read(noMovements) shouldBe ParseSuccess(GetMovementList(movements = Seq.empty, count = 0))
       }
     }
 

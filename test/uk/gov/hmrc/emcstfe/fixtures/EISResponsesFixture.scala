@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.EISSubmissionSuccessResponse
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.{RIMValidationError, RIMValidationErrorResponse}
 
 trait EISResponsesFixture {
 
@@ -26,6 +27,36 @@ trait EISResponsesFixture {
     message = "Great success",
     emcsCorrelationId = "3e8dae97-b586-4cef-8511-68ac12da9028"
   )
+
+  lazy val eisRimValidationResponse: RIMValidationErrorResponse = RIMValidationErrorResponse(
+    emcsCorrelationId = "7be1db16-e8fb-4e81-97e5-3d3e2d21f6c4",
+    validatorResults = Some(eisRimValidationResults)
+  )
+
+  lazy val eisRimValidationResults: Seq[RIMValidationError] = Seq(RIMValidationError(errorCategory = Some("business"), errorType = Some(12), errorReason = Some("some error"), errorLocation = Some("some location")))
+
+  lazy val eisRimValidationResultsJson: JsValue = Json.parse(
+    """
+      |{
+      |    "errorType": 12,
+      |    "errorCategory": "business",
+      |    "errorLocation": "some location",
+      |    "errorReason": "some error"
+      |}
+      |""".stripMargin
+  )
+
+  val eisRimValidationJsonResponse: JsValue = Json.parse(
+    s"""
+      |{
+      |    "emcsCorrelationId": "7be1db16-e8fb-4e81-97e5-3d3e2d21f6c4",
+      |    "message": [
+      |        "Rim Validation Failures"
+      |    ],
+      |    "validatorResults": [
+      |        $eisRimValidationResultsJson
+      |    ]
+      |}""".stripMargin)
 
   def eisSuccessJson(withSubmittedDraftId: Boolean = false, submittedDraftId: Option[String] = None): JsValue = Json.parse(
     s"""{
