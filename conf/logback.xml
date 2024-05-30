@@ -14,12 +14,6 @@
         </encoder>
     </appender>
 
-    <appender name="STDOUT_IGNORE_NETTY" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%highlight(%.-4level)] %date{ISO8601} %replace(%message){'(.*) (\d{3}) (\d*ms)','$2 $1 $3'} %replace(exception=[%xException]){'^exception=\[\]$',''} %n</pattern>
-        </encoder>
-    </appender>
-
     <appender name="ACCESS_LOG_FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/access.log</file>
         <encoder>
@@ -44,7 +38,7 @@
     </logger>
 
     <logger name="com.ning.http.client.providers.netty" additivity="false">
-        <appender-ref ref="STDOUT_IGNORE_NETTY" />
+        <appender-ref ref="STDOUT" />
     </logger>
 
     <logger name="com.google.inject" level="INFO"/>
