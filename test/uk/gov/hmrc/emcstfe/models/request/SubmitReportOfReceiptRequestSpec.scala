@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
-import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, Export, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.util.Base64
@@ -146,107 +146,36 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
       }
     }
 
-    "for the MessageSender and MessageRecipient headers" when {
+    "MessageSender" should {
+       "be NDEA.GB" when {
+          "the logged in consignee has a country code of GB" in {
+            val loggedInERN = "GBWK000001234"
+            val userRequest: UserRequest[_] = UserRequest(FakeRequest(), loggedInERN, testInternalId, testCredId, Set(loggedInERN))
+            val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)(userRequest)
 
-      val model =
-        maxSubmitReportOfReceiptModel
-          .copy(arc = "01DE0000012345")
-          .copy(consigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("FR0000123456"))))
-          .copy(deliveryPlaceTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("IT0000123456"))))
-
-      "have the correct MessageRecipient" when {
-
-        "destination type is DirectDelivery" should {
-
-          "use the Consignee Trader ID for the Country Code" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(DirectDelivery)), useFS41SchemaVersion = true)
-            request.messageRecipient shouldBe "NDEA.FR"
-          }
-
-          "use GB as default if the Consignee Trader ID does not exist" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(DirectDelivery), consigneeTrader = None), useFS41SchemaVersion = true)
-            request.messageRecipient shouldBe "NDEA.GB"
-          }
-        }
-
-        "destination type is anything other than DirectDelivery" should {
-
-          "use the ARC for the Country Code" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TaxWarehouse)), useFS41SchemaVersion = true)
-            request.messageRecipient shouldBe "NDEA.DE"
-          }
-        }
-      }
-
-      "have the correct MessageSender" when {
-
-        "destination type is TaxWarehouse" should {
-
-          "use the Delivery Place Trader ID for the Country Code" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TaxWarehouse)), useFS41SchemaVersion = true)
-            request.messageSender shouldBe "NDEA.IT"
-          }
-
-          "use GB as default when Delivery Place Trader ID does NOT exist" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TaxWarehouse), deliveryPlaceTrader = None), useFS41SchemaVersion = true)
             request.messageSender shouldBe "NDEA.GB"
           }
         }
 
-        "destination type is TemporaryRegisteredConsignee" should {
-
-          "use the Consignee Trader Id for the Country Code when it exists" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TemporaryRegisteredConsignee)), useFS41SchemaVersion = true)
-            request.messageSender shouldBe "NDEA.FR"
-          }
-
-          "use GB as default when consignee trader ID does NOT exist" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(TemporaryRegisteredConsignee), consigneeTrader = None), useFS41SchemaVersion = true)
-            request.messageSender shouldBe "NDEA.GB"
-          }
-        }
-
-        "destination type is RegisteredConsignee" should {
-
-          "use the Consignee Trader Id for the Country Code when it exists" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(RegisteredConsignee)), useFS41SchemaVersion = true)
-            request.messageSender shouldBe "NDEA.FR"
-          }
-
-          "use GB as default when consignee trader ID does NOT exist" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(RegisteredConsignee), consigneeTrader = None), useFS41SchemaVersion = true)
-            request.messageSender shouldBe "NDEA.GB"
-          }
-        }
-
-        "destination type is DirectDelivery" should {
-
-          "use the ARC for the Country Code" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(DirectDelivery)), useFS41SchemaVersion = true)
-            request.messageSender shouldBe "NDEA.DE"
-          }
-        }
-
-        "destination type is anything else" should {
-
-          "use GB" in {
-
-            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(Export)), useFS41SchemaVersion = true)
-            request.messageSender shouldBe "NDEA.GB"
-          }
+      "be NDEA.XI" when {
+        "the logged in consignee has a country code of XI" in {
+          val loggedInERN = "XIWK000001234"
+          val userRequest: UserRequest[_] = UserRequest(FakeRequest(), loggedInERN, testInternalId, testCredId, Set(loggedInERN))
+          val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)(userRequest)
+          request.messageSender shouldBe "NDEA.XI"
         }
       }
     }
+
+    "MessageRecipient" should {
+      "have the correct value taken from the ARC" in {
+        val arcFromFrance = "01FR0000012345"
+        val model = maxSubmitReportOfReceiptModel.copy(arc = arcFromFrance)
+        val request = SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = true)
+        request.messageRecipient shouldBe "NDEA.FR"
+      }
+    }
+
   }
 
   ".action" should {

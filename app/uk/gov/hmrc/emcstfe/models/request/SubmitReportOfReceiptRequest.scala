@@ -19,8 +19,6 @@ package uk.gov.hmrc.emcstfe.models.request
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{DirectDelivery, RegisteredConsignee, TaxWarehouse, TemporaryRegisteredConsignee}
-import uk.gov.hmrc.emcstfe.models.common.TraderModel
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
@@ -31,23 +29,11 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel, useFS4
                                        (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
 
   private val arcCountryCode = body.arc.substring(2, 4)
-  private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(Constants.GB)
+  private val ernCountryCode = exciseRegistrationNumber.substring(0, 2)
   private val messageNumber = 818
 
-  val messageRecipient =
-    Constants.NDEA ++ (if (body.destinationType.contains(DirectDelivery)) {
-      traderModelCountryCode(body.consigneeTrader)
-    } else {
-      arcCountryCode
-    })
-
-  val messageSender =
-    Constants.NDEA ++ (body.destinationType match {
-      case Some(TaxWarehouse) => traderModelCountryCode(body.deliveryPlaceTrader)
-      case Some(TemporaryRegisteredConsignee) | Some(RegisteredConsignee) => traderModelCountryCode(body.consigneeTrader)
-      case Some(DirectDelivery) => arcCountryCode
-      case _ => Constants.GB
-    })
+  val messageRecipient = Constants.NDEA ++ arcCountryCode
+  val messageSender: String = Constants.NDEA ++ ernCountryCode
 
   override def exciseRegistrationNumber: String = request.ern
 
