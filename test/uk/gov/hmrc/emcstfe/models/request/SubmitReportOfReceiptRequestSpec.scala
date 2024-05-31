@@ -20,6 +20,8 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.util.Base64
@@ -34,7 +36,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
     "useFS41SchemaVersion is enabled" should {
 
-      implicit val request = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)
+      implicit val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)
 
       "generate the correct request XML" in {
 
@@ -146,36 +148,56 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
       }
     }
 
-    "MessageSender" should {
-       "be NDEA.GB" when {
-          "the logged in consignee has a country code of GB" in {
-            val loggedInERN = "GBWK000001234"
-            val userRequest: UserRequest[_] = UserRequest(FakeRequest(), loggedInERN, testInternalId, testCredId, Set(loggedInERN))
-            val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)(userRequest)
+    "for the MessageSender and MessageRecipient headers" when {
 
+      "MessageRecipient" should {
+        "have the correct value taken from the ARC" in {
+          val arcFromFrance = "01FR0000012345"
+          val model = maxSubmitReportOfReceiptModel.copy(arc = arcFromFrance)
+          val request = SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = true)
+          request.messageRecipient shouldBe "NDEA.FR"
+        }
+      }
+
+      "MessageSender" when {
+
+        val model =
+          maxSubmitReportOfReceiptModel
+            .copy(arc = "01GB0000012345")
+            .copy(consigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("GB0000123456"))))
+            .copy(deliveryPlaceTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("XI0000123456"))))
+
+        "the destinationType is a TaxWarehouse" should {
+
+          "use the deliveryPlaceTrader for the Country Code" in {
+            val userRequest: UserRequest[_] = UserRequest(FakeRequest(), "GBWK000001234", testInternalId, testCredId, Set("GBWK000001234"))
+            val request = SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = true)(userRequest)
+            request.messageSender shouldBe "NDEA.XI"
+          }
+
+          "use the logged in users ERN for the country code when deliveryPlaceTrader does NOT exist" in {
+            val userRequest: UserRequest[_] = UserRequest(FakeRequest(), "GBWK000001234", testInternalId, testCredId, Set("GBWK000001234"))
+            val request = SubmitReportOfReceiptRequest(model.copy(deliveryPlaceTrader = None), useFS41SchemaVersion = true)(userRequest)
             request.messageSender shouldBe "NDEA.GB"
           }
+
         }
 
-      "be NDEA.XI" when {
-        "the logged in consignee has a country code of XI" in {
-          val loggedInERN = "XIWK000001234"
-          val userRequest: UserRequest[_] = UserRequest(FakeRequest(), loggedInERN, testInternalId, testCredId, Set(loggedInERN))
-          val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)(userRequest)
-          request.messageSender shouldBe "NDEA.XI"
+        "the destinationType is NOT a TaxWarehouse" should {
+
+          "use the consigneeTrader for the Country Code" in {
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(Export)), useFS41SchemaVersion = true)
+            request.messageSender shouldBe "NDEA.GB"
+          }
+          "use the logged in users ERN for the country code when consigneeTrader does NOT exist" in {
+            val userRequest: UserRequest[_] = UserRequest(FakeRequest(), "GBWK000001234", testInternalId, testCredId, Set("GBWK000001234"))
+            val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(Export), consigneeTrader = None), useFS41SchemaVersion = true)(userRequest)
+            request.messageSender shouldBe "NDEA.GB"
+          }
+
         }
       }
     }
-
-    "MessageRecipient" should {
-      "have the correct value taken from the ARC" in {
-        val arcFromFrance = "01FR0000012345"
-        val model = maxSubmitReportOfReceiptModel.copy(arc = arcFromFrance)
-        val request = SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = true)
-        request.messageRecipient shouldBe "NDEA.FR"
-      }
-    }
-
   }
 
   ".action" should {
@@ -202,7 +224,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
       "generate the correct XML body" in {
 
-        implicit val request = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)
+        implicit val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)
 
         val expectedRequest = {
           wrapInControlDoc(
