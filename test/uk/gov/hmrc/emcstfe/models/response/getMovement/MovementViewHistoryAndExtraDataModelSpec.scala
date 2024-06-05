@@ -22,9 +22,10 @@ import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.ChangeOfDestination
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import scala.xml.XML
 
 class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMovementFixture {
@@ -90,6 +91,11 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
               UnsatisfactoryModel(Shortage, None),
             )
           ))
+        )),
+        notificationOfDivertedMovement = Some(NotificationOfDivertedMovementModel(
+          notificationType = ChangeOfDestination,
+          notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
+          downstreamArcs = Seq(testArc, testArc + "1")
         )))
       )
 
