@@ -25,7 +25,7 @@ import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.response.Packaging
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse.EADESADContainer
-import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.ChangeOfDestination
+import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.{LocalDate, LocalDateTime}
@@ -346,7 +346,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |      <urn:Body>
             |        <urn:NotificationOfDivertedEADESAD>
             |          <urn:ExciseNotification>
-            |            <urn:NotificationType>1</urn:NotificationType>
+            |            <urn:NotificationType>2</urn:NotificationType>
             |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
             |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
             |            <urn:SequenceNumber>1</urn:SequenceNumber>
@@ -355,7 +355,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
             |          </urn:DownstreamArc>
             |          <urn:DownstreamArc>
-            |            <urn:AdministrativeReferenceCode>${testArc}1</urn:AdministrativeReferenceCode>
+            |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
             |          </urn:DownstreamArc>
             |        </urn:NotificationOfDivertedEADESAD>
             |      </urn:Body>
@@ -451,9 +451,9 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
                 acceptMovement = Satisfactory
               )),
               notificationOfDivertedMovement = Some(NotificationOfDivertedMovementModel(
-                notificationType = ChangeOfDestination,
+                notificationType = SplitMovement,
                 notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
-                downstreamArcs = Seq(testArc, testArc + "1")
+                downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
               )
             ))))
       }
@@ -674,7 +674,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |      <urn:Body>
             |        <urn:NotificationOfDivertedEADESAD>
             |          <urn:ExciseNotification>
-            |            <urn:NotificationType>1</urn:NotificationType>
+            |            <urn:NotificationType>2</urn:NotificationType>
             |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
             |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
             |            <urn:SequenceNumber>1</urn:SequenceNumber>
@@ -683,7 +683,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
             |          </urn:DownstreamArc>
             |          <urn:DownstreamArc>
-            |            <urn:AdministrativeReferenceCode>${testArc}1</urn:AdministrativeReferenceCode>
+            |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
             |          </urn:DownstreamArc>
             |        </urn:NotificationOfDivertedEADESAD>
             |      </urn:Body>
@@ -908,7 +908,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |      <urn:Body>
             |        <urn:NotificationOfDivertedEADESAD>
             |          <urn:ExciseNotification>
-            |            <urn:NotificationType>1</urn:NotificationType>
+            |            <urn:NotificationType>2</urn:NotificationType>
             |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
             |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
             |            <urn:SequenceNumber>1</urn:SequenceNumber>
@@ -917,7 +917,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
             |          </urn:DownstreamArc>
             |          <urn:DownstreamArc>
-            |            <urn:AdministrativeReferenceCode>${testArc}1</urn:AdministrativeReferenceCode>
+            |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
             |          </urn:DownstreamArc>
             |        </urn:NotificationOfDivertedEADESAD>
             |      </urn:Body>

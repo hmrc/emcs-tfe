@@ -23,7 +23,7 @@ import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
-import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.ChangeOfDestination
+import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.models.response.getMovement._
 import uk.gov.hmrc.emcstfe.models.response.{Packaging, RawGetMovementResponse, WineProduct}
 
@@ -381,7 +381,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |        <urn:Body>
                                                |          <urn:NotificationOfDivertedEADESAD>
                                                |            <urn:ExciseNotification>
-                                               |              <urn:NotificationType>1</urn:NotificationType>
+                                               |              <urn:NotificationType>2</urn:NotificationType>
                                                |              <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
                                                |              <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
                                                |              <urn:SequenceNumber>1</urn:SequenceNumber>
@@ -390,7 +390,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |              <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
                                                |            </urn:DownstreamArc>
                                                |            <urn:DownstreamArc>
-                                               |              <urn:AdministrativeReferenceCode>${testArc}1</urn:AdministrativeReferenceCode>
+                                               |              <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
                                                |            </urn:DownstreamArc>
                                                |          </urn:NotificationOfDivertedEADESAD>
                                                |        </urn:Body>
@@ -702,9 +702,9 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         acceptMovement = Satisfactory
       )),
       notificationOfDivertedMovement = Some(NotificationOfDivertedMovementModel(
-        notificationType = ChangeOfDestination,
+        notificationType = SplitMovement,
         notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
-        downstreamArcs = Seq(testArc, testArc + "1")
+        downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
       ))
     )
   )
@@ -859,10 +859,10 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       "individualItems" -> Json.arr()
     ),
     "notificationOfDivertedMovement" -> Json.obj(
-      "notificationType" -> "1",
+      "notificationType" -> "2",
       "notificationDateAndTime" -> "2024-06-05T00:00:01",
       "downstreamArcs" -> Json.arr(
-        testArc, s"${testArc}1"
+        testArc, s"${testArc.dropRight(1)}1"
       )
     )
   )
@@ -1186,7 +1186,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |      <urn:Body>
                                          |        <urn:NotificationOfDivertedEADESAD>
                                          |          <urn:ExciseNotification>
-                                         |            <urn:NotificationType>1</urn:NotificationType>
+                                         |            <urn:NotificationType>2</urn:NotificationType>
                                          |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
                                          |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
                                          |            <urn:SequenceNumber>1</urn:SequenceNumber>
@@ -1195,7 +1195,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
                                          |          </urn:DownstreamArc>
                                          |          <urn:DownstreamArc>
-                                         |            <urn:AdministrativeReferenceCode>${testArc}1</urn:AdministrativeReferenceCode>
+                                         |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
                                          |          </urn:DownstreamArc>
                                          |        </urn:NotificationOfDivertedEADESAD>
                                          |      </urn:Body>
@@ -1532,9 +1532,9 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         ))
       )),
       notificationOfDivertedMovement = Some(NotificationOfDivertedMovementModel(
-        notificationType = ChangeOfDestination,
+        notificationType = SplitMovement,
         notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
-        downstreamArcs = Seq(testArc, s"${testArc}1")
+        downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
       ))
     )
   )
@@ -1826,10 +1826,10 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       "otherInformation" -> "some great reason"
     ),
     "notificationOfDivertedMovement" -> Json.obj(
-      "notificationType" -> "1",
+      "notificationType" -> "2",
       "notificationDateAndTime" -> "2024-06-05T00:00:01",
       "downstreamArcs" -> Json.arr(
-        testArc, s"${testArc}1"
+        testArc, s"${testArc.dropRight(1)}1"
       )
     )
   )

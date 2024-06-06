@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.response.getMovement
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.common.Enumerable.EnumerableXmlParseFailure
-import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.ChangeOfDestination
+import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.time.LocalDateTime
@@ -31,9 +31,9 @@ class NotificationOfDivertedMovementModelSpec extends TestBaseSpec with GetMovem
 
     "successfully read a subset of the IE803" in {
       NotificationOfDivertedMovementModel.xmlReads.read(XML.loadString(maxGetMovementResponseBody())) shouldBe ParseSuccess(NotificationOfDivertedMovementModel(
-        notificationType = ChangeOfDestination,
+        notificationType = SplitMovement,
         notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
-        downstreamArcs = Seq(testArc, testArc + "1")
+        downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
       ))
     }
 
@@ -60,7 +60,7 @@ class NotificationOfDivertedMovementModelSpec extends TestBaseSpec with GetMovem
            |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
            |          </urn:DownstreamArc>
            |          <urn:DownstreamArc>
-           |            <urn:AdministrativeReferenceCode>${testArc}1</urn:AdministrativeReferenceCode>
+           |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
            |          </urn:DownstreamArc>
            |        </urn:NotificationOfDivertedEADESAD>
            |      </urn:Body>
