@@ -67,7 +67,7 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
 
     }
 
-    "return NOT_FOUND" when {
+    "return NO_CONTENT" when {
 
       "the ERN is not in the private beta list (only private beta feature enabled)" in new Test("navHub", ern = testErn, isPrivateBetaEnabled = true, isPublicBetaEnabled = false) {
         override def setupStubs(): StubMapping = {
@@ -76,7 +76,7 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
         }
 
         val response: WSResponse = await(request().get())
-        response.status shouldBe Status.NOT_FOUND
+        response.status shouldBe Status.NO_CONTENT
       }
 
     }
@@ -121,7 +121,7 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
 
     }
 
-    "return NOT_FOUND" when {
+    "return NO_CONTENT" when {
 
       "the ERN is not in the traffic percentage nor was in private beta" in new Test("createMovement", ern = "GBRC123458889", isPrivateBetaEnabled = false, isPublicBetaEnabled = true) {
         override def setupStubs(): StubMapping = {
@@ -130,7 +130,7 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
         }
 
         val response: WSResponse = await(request().get())
-        response.status shouldBe Status.NOT_FOUND
+        response.status shouldBe Status.NO_CONTENT
       }
     }
 

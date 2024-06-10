@@ -38,9 +38,11 @@ class UserAllowListController @Inject()(cc: ControllerComponents,
         InternalServerError(error.message)
       },
       if(_) {
+        logger.debug(s"[checkEligibility] User $ern is eligible for private/public beta")
         Ok("User is eligible for private/public beta")
       } else {
-        NotFound("User is not eligible for private/public beta")
+        logger.debug(s"[checkEligibility] User $ern is not eligible for private/public beta")
+        NoContent
       }
     ))
   }

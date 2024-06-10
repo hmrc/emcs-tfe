@@ -43,13 +43,13 @@ class UserAllowListControllerSpec extends TestBaseSpec with FakeAuthAction {
       }
     }
 
-    "return NOT_FOUND" when {
+    "return NO_CONTENT" when {
 
       "the ERN is NOT in a beta phase" in new Test {
 
         MockedUserAllowListService.isEligible(testErn, "service").returns(Future.successful(Right(false)))
         val result = controller.checkEligibility(testErn, "service")(FakeRequest())
-        status(result) shouldBe NOT_FOUND
+        status(result) shouldBe NO_CONTENT
       }
     }
 
