@@ -623,7 +623,8 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
       eadStatus = "Beans",
       dateAndTimeOfValidationOfEadEsad = "2008-09-04T10:22:50",
       numberOfItems = 2,
-      reportOfReceipt = None
+      reportOfReceipt = None,
+      notificationOfDivertedMovement = None
     )
   )
 

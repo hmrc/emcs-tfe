@@ -25,9 +25,10 @@ import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.response.Packaging
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse.EADESADContainer
+import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import scala.xml.XML
 
 class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
@@ -334,6 +335,31 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |        </urn:AcceptedOrRejectedReportOfReceiptExport>
             |      </urn:Body>
             |    </urn:IE818>
+            |    <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
+            |      <urn:Header>
+            |        <urn:MessageSender>NDEA.GB</urn:MessageSender>
+            |        <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+            |        <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
+            |        <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
+            |        <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
+            |      </urn:Header>
+            |      <urn:Body>
+            |        <urn:NotificationOfDivertedEADESAD>
+            |          <urn:ExciseNotification>
+            |            <urn:NotificationType>2</urn:NotificationType>
+            |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
+            |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
+            |            <urn:SequenceNumber>1</urn:SequenceNumber>
+            |          </urn:ExciseNotification>
+            |          <urn:DownstreamArc>
+            |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
+            |          </urn:DownstreamArc>
+            |          <urn:DownstreamArc>
+            |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
+            |          </urn:DownstreamArc>
+            |        </urn:NotificationOfDivertedEADESAD>
+            |      </urn:Body>
+            |    </urn:IE803>
             |    </mov:eventHistory>
             |</mov:movementView>""".stripMargin)) shouldBe
           ParseSuccess(getMovementResponse().copy(
@@ -423,8 +449,13 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
                 individualItems = Seq.empty,
                 destinationType = None,
                 acceptMovement = Satisfactory
-              ))
-            )))
+              )),
+              notificationOfDivertedMovement = Some(NotificationOfDivertedMovementModel(
+                notificationType = SplitMovement,
+                notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
+                downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
+              )
+            ))))
       }
 
       "handle hours and days" in {
@@ -632,6 +663,31 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |        </urn:AcceptedOrRejectedReportOfReceiptExport>
             |      </urn:Body>
             |    </urn:IE818>
+            |    <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
+            |      <urn:Header>
+            |        <urn:MessageSender>NDEA.GB</urn:MessageSender>
+            |        <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+            |        <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
+            |        <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
+            |        <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
+            |      </urn:Header>
+            |      <urn:Body>
+            |        <urn:NotificationOfDivertedEADESAD>
+            |          <urn:ExciseNotification>
+            |            <urn:NotificationType>2</urn:NotificationType>
+            |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
+            |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
+            |            <urn:SequenceNumber>1</urn:SequenceNumber>
+            |          </urn:ExciseNotification>
+            |          <urn:DownstreamArc>
+            |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
+            |          </urn:DownstreamArc>
+            |          <urn:DownstreamArc>
+            |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
+            |          </urn:DownstreamArc>
+            |        </urn:NotificationOfDivertedEADESAD>
+            |      </urn:Body>
+            |    </urn:IE803>
             |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 
@@ -841,6 +897,31 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |        </urn:AcceptedOrRejectedReportOfReceiptExport>
             |      </urn:Body>
             |    </urn:IE818>
+            |    <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
+            |      <urn:Header>
+            |        <urn:MessageSender>NDEA.GB</urn:MessageSender>
+            |        <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+            |        <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
+            |        <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
+            |        <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
+            |      </urn:Header>
+            |      <urn:Body>
+            |        <urn:NotificationOfDivertedEADESAD>
+            |          <urn:ExciseNotification>
+            |            <urn:NotificationType>2</urn:NotificationType>
+            |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
+            |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
+            |            <urn:SequenceNumber>1</urn:SequenceNumber>
+            |          </urn:ExciseNotification>
+            |          <urn:DownstreamArc>
+            |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
+            |          </urn:DownstreamArc>
+            |          <urn:DownstreamArc>
+            |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
+            |          </urn:DownstreamArc>
+            |        </urn:NotificationOfDivertedEADESAD>
+            |      </urn:Body>
+            |    </urn:IE803>
             |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 

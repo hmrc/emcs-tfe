@@ -4,20 +4,13 @@
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/emcs-tfe.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%highlight(%.-4level)] %date{ISO8601} %replace(%message){'(.*) (\d{3}) (\d*ms)','$2 $1 $3'} %replace(exception=[%xException]){'^exception=\[\]$',''} %n</pattern>
+            <pattern>%date{ISO8601} level=[%level] logger=[%logger] thread=[%thread] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
         </encoder>
     </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>[%highlight(%.-4level)] %date{ISO8601} sessionid=[%X{X-Session-ID}] %replace(%message){'(.*) (\d{3}) (\d*ms)','$2 $1 $3'} %replace(exception=[%xException]){'^exception=\[\]$',''} %n</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="ACCESS_LOG_FILE" class="ch.qos.logback.core.FileAppender">
-        <file>logs/access.log</file>
-        <encoder>
-            <pattern>%message%n</pattern>
         </encoder>
     </appender>
 
@@ -28,17 +21,12 @@
         </encoder>
     </appender>
 
-
     <logger name="accesslog" level="INFO" additivity="false">
         <appender-ref ref="ACCESS_LOG_FILE" />
     </logger>
 
     <logger name="connectorlog" level="OFF" additivity="false">
         <appender-ref ref="CONNECTOR_LOG_FILE" />
-    </logger>
-
-    <logger name="com.ning.http.client.providers.netty" additivity="false">
-        <appender-ref ref="STDOUT" />
     </logger>
 
     <logger name="com.google.inject" level="INFO"/>

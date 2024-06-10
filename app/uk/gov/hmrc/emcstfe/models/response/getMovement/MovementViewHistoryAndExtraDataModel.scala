@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple9Semigroupal
+import cats.implicits.catsSyntaxTuple10Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -33,12 +33,16 @@ case class MovementViewHistoryAndExtraDataModel(
                                      eadStatus: String,
                                      dateAndTimeOfValidationOfEadEsad: String,
                                      numberOfItems: Int,
-                                     reportOfReceipt: Option[SubmitReportOfReceiptModel]
+                                     reportOfReceipt: Option[SubmitReportOfReceiptModel],
+                                     notificationOfDivertedMovement: Option[NotificationOfDivertedMovementModel]
                                    )
 
 object MovementViewHistoryAndExtraDataModel {
 
   private[getMovement] lazy val reportOfReceipt = __ \\ "eventHistory" \ "IE818" \ "Body" \ "AcceptedOrRejectedReportOfReceiptExport"
+
+  private[getMovement] lazy val notificationOfDivertedMovement = __ \\ "eventHistory" \ "IE803"
+
   implicit lazy val xmlReader: XmlReader[MovementViewHistoryAndExtraDataModel] = (
     arc.read[String],
     serialNumberOfCertificateOfExemption.read[Option[String]],
@@ -48,7 +52,8 @@ object MovementViewHistoryAndExtraDataModel {
     eadStatus.read[String],
     dateAndTimeOfValidationOfEadEsad.read[String],
     numberOfItems.read[Seq[String]](strictReadSeq).map(_.length),
-    reportOfReceipt.read[SubmitReportOfReceiptModel](SubmitReportOfReceiptModel.xmlReads).optional
+    reportOfReceipt.read[SubmitReportOfReceiptModel](SubmitReportOfReceiptModel.xmlReads).optional,
+    notificationOfDivertedMovement.read[NotificationOfDivertedMovementModel](NotificationOfDivertedMovementModel.xmlReads).optional
   ).mapN(MovementViewHistoryAndExtraDataModel.apply)
 
   implicit val fmt: OFormat[MovementViewHistoryAndExtraDataModel] = Json.format

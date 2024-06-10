@@ -23,10 +23,11 @@ import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.models.response.getMovement._
 import uk.gov.hmrc.emcstfe.models.response.{Packaging, RawGetMovementResponse, WineProduct}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import java.util.Base64
 import scala.xml.XML
 
@@ -369,26 +370,31 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |          </body:ReminderMessageForExciseMovement>
                                                |        </body:Body>
                                                |      </body:IE802>
-                                               |      <body:IE803 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE803:V2.02">
-                                               |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
-                                               |          <head:MessageSender>token</head:MessageSender>
-                                               |          <head:MessageRecipient>token</head:MessageRecipient>
-                                               |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
-                                               |          <head:MessageIdentifier>token</head:MessageIdentifier>
-                                               |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
-                                               |        </body:Header>
-                                               |        <body:Body>
-                                               |          <body:NotificationOfDivertedEADESAD>
-                                               |            <body:ExciseNotification>
-                                               |              <body:NotificationType>1</body:NotificationType>
-                                               |              <body:NotificationDateAndTime>2001-12-17T09:30:47.0Z</body:NotificationDateAndTime>
-                                               |              <body:AdministrativeReferenceCode>13AB1234567891ABCDEF9</body:AdministrativeReferenceCode>
-                                               |              <body:SequenceNumber>1</body:SequenceNumber>
-                                               |            </body:ExciseNotification>
-                                               |          </body:NotificationOfDivertedEADESAD>
-                                               |        </body:Body>
-                                               |      </body:IE803>
+                                               |      <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
+                                               |        <urn:Header>
+                                               |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+                                               |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+                                               |          <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
+                                               |          <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
+                                               |          <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
+                                               |        </urn:Header>
+                                               |        <urn:Body>
+                                               |          <urn:NotificationOfDivertedEADESAD>
+                                               |            <urn:ExciseNotification>
+                                               |              <urn:NotificationType>2</urn:NotificationType>
+                                               |              <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
+                                               |              <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
+                                               |              <urn:SequenceNumber>1</urn:SequenceNumber>
+                                               |            </urn:ExciseNotification>
+                                               |            <urn:DownstreamArc>
+                                               |              <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
+                                               |            </urn:DownstreamArc>
+                                               |            <urn:DownstreamArc>
+                                               |              <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
+                                               |            </urn:DownstreamArc>
+                                               |          </urn:NotificationOfDivertedEADESAD>
+                                               |        </urn:Body>
+                                               |      </urn:IE803>
                                                |      <body:IE837 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE837:V2.02">
                                                |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
                                                |          <head:MessageSender>token</head:MessageSender>
@@ -694,6 +700,11 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         individualItems = Seq.empty,
         destinationType = None,
         acceptMovement = Satisfactory
+      )),
+      notificationOfDivertedMovement = Some(NotificationOfDivertedMovementModel(
+        notificationType = SplitMovement,
+        notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
+        downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
       ))
     )
   )
@@ -846,6 +857,13 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       "dateOfArrival" -> "2021-09-08",
       "acceptMovement" -> "satisfactory",
       "individualItems" -> Json.arr()
+    ),
+    "notificationOfDivertedMovement" -> Json.obj(
+      "notificationType" -> "2",
+      "notificationDateAndTime" -> "2024-06-05T00:00:01",
+      "downstreamArcs" -> Json.arr(
+        testArc, s"${testArc.dropRight(1)}1"
+      )
     )
   )
 
@@ -1157,8 +1175,34 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |        </urn:AcceptedOrRejectedReportOfReceiptExport>
                                          |      </urn:Body>
                                          |    </urn:IE818>
+                                         |    <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
+                                         |      <urn:Header>
+                                         |        <urn:MessageSender>NDEA.GB</urn:MessageSender>
+                                         |        <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+                                         |        <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
+                                         |        <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
+                                         |        <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
+                                         |      </urn:Header>
+                                         |      <urn:Body>
+                                         |        <urn:NotificationOfDivertedEADESAD>
+                                         |          <urn:ExciseNotification>
+                                         |            <urn:NotificationType>2</urn:NotificationType>
+                                         |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
+                                         |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
+                                         |            <urn:SequenceNumber>1</urn:SequenceNumber>
+                                         |          </urn:ExciseNotification>
+                                         |          <urn:DownstreamArc>
+                                         |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
+                                         |          </urn:DownstreamArc>
+                                         |          <urn:DownstreamArc>
+                                         |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
+                                         |          </urn:DownstreamArc>
+                                         |        </urn:NotificationOfDivertedEADESAD>
+                                         |      </urn:Body>
+                                         |    </urn:IE803>
                                          |    </mov:eventHistory>
                                          |  </mov:movementView>""".stripMargin
+
 
   def maxGetMovementResponse(sequenceNumber: Int = 1): GetMovementResponse = GetMovementResponse(
     arc = "ExciseMovementArc",
@@ -1486,6 +1530,11 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             UnsatisfactoryModel(Shortage, None),
           )
         ))
+      )),
+      notificationOfDivertedMovement = Some(NotificationOfDivertedMovementModel(
+        notificationType = SplitMovement,
+        notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
+        downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
       ))
     )
   )
@@ -1775,6 +1824,13 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         )
       ),
       "otherInformation" -> "some great reason"
+    ),
+    "notificationOfDivertedMovement" -> Json.obj(
+      "notificationType" -> "2",
+      "notificationDateAndTime" -> "2024-06-05T00:00:01",
+      "downstreamArcs" -> Json.arr(
+        testArc, s"${testArc.dropRight(1)}1"
+      )
     )
   )
 
