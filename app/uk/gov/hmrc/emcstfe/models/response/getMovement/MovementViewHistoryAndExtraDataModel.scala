@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple10Semigroupal
+import cats.implicits.catsSyntaxTuple11Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -34,7 +34,8 @@ case class MovementViewHistoryAndExtraDataModel(
                                      dateAndTimeOfValidationOfEadEsad: String,
                                      numberOfItems: Int,
                                      reportOfReceipt: Option[SubmitReportOfReceiptModel],
-                                     notificationOfDivertedMovement: Option[NotificationOfDivertedMovementModel]
+                                     notificationOfDivertedMovement: Option[NotificationOfDivertedMovementModel],
+                                     notificationOfAlertOrRejection: Seq[NotificationOfAlertOrRejectionModel]
                                    )
 
 object MovementViewHistoryAndExtraDataModel {
@@ -42,6 +43,8 @@ object MovementViewHistoryAndExtraDataModel {
   private[getMovement] lazy val reportOfReceipt = __ \\ "eventHistory" \ "IE818" \ "Body" \ "AcceptedOrRejectedReportOfReceiptExport"
 
   private[getMovement] lazy val notificationOfDivertedMovement = __ \\ "eventHistory" \ "IE803"
+
+  private[getMovement] lazy val notificationOfAlertOrRejection = __ \\ "eventHistory" \ "IE819"
 
   implicit lazy val xmlReader: XmlReader[MovementViewHistoryAndExtraDataModel] = (
     arc.read[String],
@@ -53,7 +56,8 @@ object MovementViewHistoryAndExtraDataModel {
     dateAndTimeOfValidationOfEadEsad.read[String],
     numberOfItems.read[Seq[String]](strictReadSeq).map(_.length),
     reportOfReceipt.read[SubmitReportOfReceiptModel](SubmitReportOfReceiptModel.xmlReads).optional,
-    notificationOfDivertedMovement.read[NotificationOfDivertedMovementModel](NotificationOfDivertedMovementModel.xmlReads).optional
+    notificationOfDivertedMovement.read[NotificationOfDivertedMovementModel](NotificationOfDivertedMovementModel.xmlReads).optional,
+    notificationOfAlertOrRejection.read[Seq[NotificationOfAlertOrRejectionModel]](strictReadSeq(NotificationOfAlertOrRejectionModel.xmlReads))
   ).mapN(MovementViewHistoryAndExtraDataModel.apply)
 
   implicit val fmt: OFormat[MovementViewHistoryAndExtraDataModel] = Json.format

@@ -17,6 +17,8 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json._
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType.{EADNotConcernRecipient, ProductDoesNotMatchOrder, QuantityDoesNotMatchOrder}
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType.{Alert, Rejection}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.DestinationType._
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
@@ -465,6 +467,125 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |        </urn:AcceptedOrRejectedReportOfReceiptExport>
                                                |      </urn:Body>
                                                |    </urn:IE818>
+                                               |    <!-- Alert Event -->
+                                               |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+                                               |        <ie819:Header>
+                                               |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+                                               |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+                                               |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
+                                               |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+                                               |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+                                               |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+                                               |        </ie819:Header>
+                                               |        <ie819:Body>
+                                               |          <ie819:AlertOrRejectionOfEADESAD>
+                                               |            <ie819:Attributes>
+                                               |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+                                               |            </ie819:Attributes>
+                                               |            <ie819:ConsigneeTrader language="en">
+                                               |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+                                               |              <ie819:TraderName>Bizz</ie819:TraderName>
+                                               |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+                                               |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+                                               |              <ie819:City>Shropshire</ie819:City>
+                                               |            </ie819:ConsigneeTrader>
+                                               |            <ie819:ExciseMovement>
+                                               |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+                                               |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+                                               |            </ie819:ExciseMovement>
+                                               |            <ie819:DestinationOffice>
+                                               |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+                                               |            </ie819:DestinationOffice>
+                                               |            <ie819:AlertOrRejection>
+                                               |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+                                               |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
+                                               |            </ie819:AlertOrRejection>
+                                               |            <ie819:AlertOrRejectionOfEadEsadReason>
+                                               |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
+                                               |            </ie819:AlertOrRejectionOfEadEsadReason>
+                                               |          </ie819:AlertOrRejectionOfEADESAD>
+                                               |        </ie819:Body>
+                                               |      </ie819:IE819>
+                                               |
+                                               |      <!-- 2nd Alert Event -->
+                                               |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+                                               |        <ie819:Header>
+                                               |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+                                               |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+                                               |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
+                                               |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
+                                               |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+                                               |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+                                               |        </ie819:Header>
+                                               |        <ie819:Body>
+                                               |          <ie819:AlertOrRejectionOfEADESAD>
+                                               |            <ie819:Attributes>
+                                               |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+                                               |            </ie819:Attributes>
+                                               |            <ie819:ConsigneeTrader language="en">
+                                               |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+                                               |              <ie819:TraderName>Bizz</ie819:TraderName>
+                                               |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+                                               |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+                                               |              <ie819:City>Shropshire</ie819:City>
+                                               |            </ie819:ConsigneeTrader>
+                                               |            <ie819:ExciseMovement>
+                                               |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+                                               |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+                                               |            </ie819:ExciseMovement>
+                                               |            <ie819:DestinationOffice>
+                                               |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+                                               |            </ie819:DestinationOffice>
+                                               |            <ie819:AlertOrRejection>
+                                               |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+                                               |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
+                                               |            </ie819:AlertOrRejection>
+                                               |            <ie819:AlertOrRejectionOfEadEsadReason>
+                                               |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
+                                               |            </ie819:AlertOrRejectionOfEadEsadReason>
+                                               |          </ie819:AlertOrRejectionOfEADESAD>
+                                               |        </ie819:Body>
+                                               |      </ie819:IE819>
+                                               |
+                                               |      <!-- Rejection Event -->
+                                               |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+                                               |        <ie819:Header>
+                                               |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+                                               |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+                                               |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
+                                               |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+                                               |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+                                               |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+                                               |        </ie819:Header>
+                                               |        <ie819:Body>
+                                               |          <ie819:AlertOrRejectionOfEADESAD>
+                                               |            <ie819:Attributes>
+                                               |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+                                               |            </ie819:Attributes>
+                                               |            <ie819:ConsigneeTrader language="en">
+                                               |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+                                               |              <ie819:TraderName>Bizz</ie819:TraderName>
+                                               |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+                                               |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+                                               |              <ie819:City>Shropshire</ie819:City>
+                                               |            </ie819:ConsigneeTrader>
+                                               |            <ie819:ExciseMovement>
+                                               |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+                                               |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+                                               |            </ie819:ExciseMovement>
+                                               |            <ie819:DestinationOffice>
+                                               |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+                                               |            </ie819:DestinationOffice>
+                                               |            <ie819:AlertOrRejection>
+                                               |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+                                               |              <ie819:EadEsadRejectedFlag>1</ie819:EadEsadRejectedFlag>
+                                               |            </ie819:AlertOrRejection>
+                                               |            <ie819:AlertOrRejectionOfEadEsadReason>
+                                               |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
+                                               |            </ie819:AlertOrRejectionOfEadEsadReason>
+                                               |          </ie819:AlertOrRejectionOfEADESAD>
+                                               |        </ie819:Body>
+                                               |      </ie819:IE819>
                                                |    </mov:eventHistory>
                                                |  </mov:movementView>""".stripMargin
 
@@ -705,7 +826,24 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         notificationType = SplitMovement,
         notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
         downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
-      ))
+      )),
+      notificationOfAlertOrRejection = Seq(
+        NotificationOfAlertOrRejectionModel(
+          notificationType = Alert,
+          notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
+          alertRejectReason = ProductDoesNotMatchOrder
+        ),
+        NotificationOfAlertOrRejectionModel(
+          notificationType = Alert,
+          notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
+          alertRejectReason = EADNotConcernRecipient
+        ),
+        NotificationOfAlertOrRejectionModel(
+          notificationType = Rejection,
+          notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
+          alertRejectReason = QuantityDoesNotMatchOrder
+        )
+      )
     )
   )
 
@@ -863,6 +1001,23 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       "notificationDateAndTime" -> "2024-06-05T00:00:01",
       "downstreamArcs" -> Json.arr(
         testArc, s"${testArc.dropRight(1)}1"
+      )
+    ),
+    "notificationOfAlertOrRejection" -> Json.arr(
+      Json.obj(
+        "notificationType" -> "0",
+        "notificationDateAndTime" -> "2023-12-18T09:00:00",
+        "alertRejectReason" -> "2"
+      ),
+      Json.obj(
+        "notificationType" -> "0",
+        "notificationDateAndTime" -> "2023-12-18T10:00:00",
+        "alertRejectReason" -> "1"
+      ),
+      Json.obj(
+        "notificationType" -> "1",
+        "notificationDateAndTime" -> "2023-12-19T09:00:00",
+        "alertRejectReason" -> "3"
       )
     )
   )
@@ -1200,6 +1355,126 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |        </urn:NotificationOfDivertedEADESAD>
                                          |      </urn:Body>
                                          |    </urn:IE803>
+                                         |
+                                         |    <!-- Alert Event -->
+                                         |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+                                         |        <ie819:Header>
+                                         |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+                                         |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+                                         |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
+                                         |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+                                         |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+                                         |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+                                         |        </ie819:Header>
+                                         |        <ie819:Body>
+                                         |          <ie819:AlertOrRejectionOfEADESAD>
+                                         |            <ie819:Attributes>
+                                         |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+                                         |            </ie819:Attributes>
+                                         |            <ie819:ConsigneeTrader language="en">
+                                         |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+                                         |              <ie819:TraderName>Bizz</ie819:TraderName>
+                                         |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+                                         |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+                                         |              <ie819:City>Shropshire</ie819:City>
+                                         |            </ie819:ConsigneeTrader>
+                                         |            <ie819:ExciseMovement>
+                                         |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+                                         |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+                                         |            </ie819:ExciseMovement>
+                                         |            <ie819:DestinationOffice>
+                                         |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+                                         |            </ie819:DestinationOffice>
+                                         |            <ie819:AlertOrRejection>
+                                         |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+                                         |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
+                                         |            </ie819:AlertOrRejection>
+                                         |            <ie819:AlertOrRejectionOfEadEsadReason>
+                                         |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
+                                         |            </ie819:AlertOrRejectionOfEadEsadReason>
+                                         |          </ie819:AlertOrRejectionOfEADESAD>
+                                         |        </ie819:Body>
+                                         |      </ie819:IE819>
+                                         |
+                                         |      <!-- 2nd Alert Event -->
+                                         |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+                                         |        <ie819:Header>
+                                         |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+                                         |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+                                         |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
+                                         |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
+                                         |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+                                         |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+                                         |        </ie819:Header>
+                                         |        <ie819:Body>
+                                         |          <ie819:AlertOrRejectionOfEADESAD>
+                                         |            <ie819:Attributes>
+                                         |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+                                         |            </ie819:Attributes>
+                                         |            <ie819:ConsigneeTrader language="en">
+                                         |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+                                         |              <ie819:TraderName>Bizz</ie819:TraderName>
+                                         |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+                                         |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+                                         |              <ie819:City>Shropshire</ie819:City>
+                                         |            </ie819:ConsigneeTrader>
+                                         |            <ie819:ExciseMovement>
+                                         |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+                                         |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+                                         |            </ie819:ExciseMovement>
+                                         |            <ie819:DestinationOffice>
+                                         |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+                                         |            </ie819:DestinationOffice>
+                                         |            <ie819:AlertOrRejection>
+                                         |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+                                         |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
+                                         |            </ie819:AlertOrRejection>
+                                         |            <ie819:AlertOrRejectionOfEadEsadReason>
+                                         |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
+                                         |            </ie819:AlertOrRejectionOfEadEsadReason>
+                                         |          </ie819:AlertOrRejectionOfEADESAD>
+                                         |        </ie819:Body>
+                                         |      </ie819:IE819>
+                                         |
+                                         |      <!-- Rejection Event -->
+                                         |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+                                         |        <ie819:Header>
+                                         |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+                                         |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+                                         |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
+                                         |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+                                         |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+                                         |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+                                         |        </ie819:Header>
+                                         |        <ie819:Body>
+                                         |          <ie819:AlertOrRejectionOfEADESAD>
+                                         |            <ie819:Attributes>
+                                         |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+                                         |            </ie819:Attributes>
+                                         |            <ie819:ConsigneeTrader language="en">
+                                         |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+                                         |              <ie819:TraderName>Bizz</ie819:TraderName>
+                                         |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+                                         |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+                                         |              <ie819:City>Shropshire</ie819:City>
+                                         |            </ie819:ConsigneeTrader>
+                                         |            <ie819:ExciseMovement>
+                                         |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+                                         |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+                                         |            </ie819:ExciseMovement>
+                                         |            <ie819:DestinationOffice>
+                                         |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+                                         |            </ie819:DestinationOffice>
+                                         |            <ie819:AlertOrRejection>
+                                         |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+                                         |              <ie819:EadEsadRejectedFlag>1</ie819:EadEsadRejectedFlag>
+                                         |            </ie819:AlertOrRejection>
+                                         |            <ie819:AlertOrRejectionOfEadEsadReason>
+                                         |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
+                                         |            </ie819:AlertOrRejectionOfEadEsadReason>
+                                         |          </ie819:AlertOrRejectionOfEADESAD>
+                                         |        </ie819:Body>
+                                         |      </ie819:IE819>
                                          |    </mov:eventHistory>
                                          |  </mov:movementView>""".stripMargin
 
@@ -1535,7 +1810,24 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         notificationType = SplitMovement,
         notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
         downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
-      ))
+      )),
+      notificationOfAlertOrRejection = Seq(
+        NotificationOfAlertOrRejectionModel(
+          notificationType = Alert,
+          notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
+          alertRejectReason = ProductDoesNotMatchOrder
+        ),
+        NotificationOfAlertOrRejectionModel(
+          notificationType = Alert,
+          notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
+          alertRejectReason = EADNotConcernRecipient
+        ),
+        NotificationOfAlertOrRejectionModel(
+          notificationType = Rejection,
+          notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
+          alertRejectReason = QuantityDoesNotMatchOrder
+        )
+      )
     )
   )
 
@@ -1830,6 +2122,23 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       "notificationDateAndTime" -> "2024-06-05T00:00:01",
       "downstreamArcs" -> Json.arr(
         testArc, s"${testArc.dropRight(1)}1"
+      )
+    ),
+    "notificationOfAlertOrRejection" -> Json.arr(
+      Json.obj(
+        "notificationType" -> "0",
+        "notificationDateAndTime" -> "2023-12-18T09:00:00",
+        "alertRejectReason" -> "2"
+      ),
+      Json.obj(
+        "notificationType" -> "0",
+        "notificationDateAndTime" -> "2023-12-18T10:00:00",
+        "alertRejectReason" -> "1"
+      ),
+      Json.obj(
+        "notificationType" -> "1",
+        "notificationDateAndTime" -> "2023-12-19T09:00:00",
+        "alertRejectReason" -> "3"
       )
     )
   )
