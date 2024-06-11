@@ -25,10 +25,6 @@
         <appender-ref ref="CONNECTOR_LOG_FILE" />
     </logger>
 
-    <logger name="accesslog" level="OFF" additivity="false">
-        <appender-ref ref="ACCESS_LOG_FILE" />
-    </logger>
-
     <logger name="com.google.inject" level="OFF"/>
 
     <logger name="org.asynchttpclient.netty" level="OFF"/>
