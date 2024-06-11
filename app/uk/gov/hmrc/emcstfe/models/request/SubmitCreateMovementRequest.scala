@@ -68,6 +68,8 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
         body.consigneeTrader.flatMap(_.countryCode)
       case (UKtoEU, UnknownDestination) =>
         body.placeOfDispatchTrader.flatMap(_.countryCode)
+      case (UKtoEU, CertifiedConsignee | TemporaryCertifiedConsignee) =>
+        body.consigneeTrader.flatMap(_.countryCode)
       case (DirectExport | IndirectExport | ImportDirectExport | ImportIndirectExport, _) =>
         body.deliveryPlaceCustomsOffice.map(_.referenceNumber.substring(0,2).toUpperCase)
       case _ =>
