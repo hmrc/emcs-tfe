@@ -20,7 +20,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.FeatureSwitching
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISRIMValidationError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -55,6 +55,15 @@ class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
         requestModel.exciseRegistrationNumber,
         requestModel.draftId,
         rimError.errorResponse.validatorResults.getOrElse(Seq.empty)
+      ).map {
+        _ => Left(rimError)
+      }
+    case Left(rimError: ChRISRIMValidationError) =>
+      logger.warn(s"[handleResponse] - RIM validation error codes for correlation ID - ${requestModel.correlationUUID}: ${rimError.errorResponse.rimValidationErrors.map(_.errorType)}")
+      createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
+        requestModel.exciseRegistrationNumber,
+        requestModel.draftId,
+        rimError.errorResponse.rimValidationErrors
       ).map {
         _ => Left(rimError)
       }

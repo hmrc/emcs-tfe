@@ -37,7 +37,7 @@ object GetMovementListResponse {
       message =>
         Try {
           val decodedMessage: String = new String(Base64.getDecoder.decode(message), StandardCharsets.UTF_8)
-          XmlResultParser.handleParseResult(XmlReader.of[GetMovementList].read(XML.loadString(decodedMessage))) match {
+          XmlResultParser.parseResult(XmlReader.of[GetMovementList].read(XML.loadString(decodedMessage))) match {
             case Left(value) => throw JsResult.Exception(JsError(value.message))
             case Right(value) => value
           }

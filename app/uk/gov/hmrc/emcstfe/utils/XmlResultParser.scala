@@ -16,12 +16,16 @@
 
 package uk.gov.hmrc.emcstfe.utils
 
-import com.lucidchart.open.xtract.{ParseFailure, ParseResult, ParseSuccess, PartialParseSuccess}
+import com.lucidchart.open.xtract.{ParseFailure, ParseResult, ParseSuccess, PartialParseSuccess, XmlReader}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlParseError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, XmlParseError}
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.ChRISRIMValidationErrorResponse
+
+import scala.xml.NodeSeq
 
 object XmlResultParser extends Logging {
-   def handleParseResult[A]: ParseResult[A] => Either[ErrorResponse, A] = {
+
+  def parseResult[A]: ParseResult[A] => Either[ErrorResponse, A] = {
     case ParseSuccess(model) => Right(model)
     case ParseFailure(errors) =>
       logger.warn(s"[handleParseResult] XML Response from ChRIS could not be parsed to model. Errors: \n\n - ${errors.mkString("\n - ")}")
@@ -30,4 +34,12 @@ object XmlResultParser extends Logging {
       logger.warn(s"[handleParseResult] PartialParseSuccess - XML Response from ChRIS could not be fully parsed to model. Errors: \n\n - ${errors.mkString("\n - ")}")
       Left(XmlParseError(errors))
   }
+
+  def parseErrorResponse(xml: NodeSeq): ErrorResponse =
+    XmlReader.of[ChRISRIMValidationErrorResponse].read(xml) match {
+      case ParseSuccess(rimFailures) => ChRISRIMValidationError(rimFailures)
+      case parseError =>
+        logger.warn(s"[parseErrorResponse] XML Response from ChRIS could not be parsed to ChRISRIMValidationErrorResponse model. Errors: \n\n - ${parseError.errors.mkString("\n - ")}")
+        XmlParseError(parseError.errors)
+    }
 }

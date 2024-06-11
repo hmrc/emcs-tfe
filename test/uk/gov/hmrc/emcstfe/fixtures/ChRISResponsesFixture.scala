@@ -18,6 +18,9 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.{ChRISRIMValidationErrorResponse, RIMValidationError}
+
+import scala.xml.Elem
 
 trait ChRISResponsesFixture {
 
@@ -43,6 +46,84 @@ trait ChRISResponsesFixture {
       |  </soap:Body>
       |</soap:Envelope>""".stripMargin
 
+  val chrisRimValidationErrorXml: Elem =
+    <Error>
+      <RaisedBy>ChRIS</RaisedBy>
+      <Number>8712</Number>
+      <Type>business</Type>
+      <Text>The submission type must be one of:  - Standard submission  - Submission for export (local clearance)  Please amend your entry and resubmit.</Text>
+      <Location>/tns:Envelope[1]/tns:Body[1]/ie:IE815[1]/ie:Body[1]/ie:SubmittedDraftOfEADESAD[1]/ie:Attributes[1]/ie:SubmissionMessageType[1]</Location>
+      <ErrorData>3</ErrorData>
+    </Error>
+
+  val chrisRimValidationError: RIMValidationError = RIMValidationError(
+    errorCategory = Some("business"),
+    errorType = Some(8712),
+    errorReason = Some("The submission type must be one of:  - Standard submission  - Submission for export (local clearance)  Please amend your entry and resubmit."),
+    errorLocation = Some("/tns:Envelope[1]/tns:Body[1]/ie:IE815[1]/ie:Body[1]/ie:SubmittedDraftOfEADESAD[1]/ie:Attributes[1]/ie:SubmissionMessageType[1]")
+  )
+
+  val chrisRimValidationResponseBody: String =
+    """<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope">
+      |	<Header/>
+      |	<Body>
+      |		<HMRCSOAPResponse xmlns="http://www.inlandrevenue.gov.uk/SOAP/Response/2">
+      |			<ErrorResponse SchemaVersion="2.0" xmlns="http://www.govtalk.gov.uk/CM/errorresponse">
+      |				<Application>
+      |					<MessageCount>7</MessageCount>
+      |				</Application>
+      |				<Error>
+      |					<RaisedBy>ChRIS</RaisedBy>
+      |					<Number>8712</Number>
+      |					<Type>business</Type>
+      |					<Text>The submission type must be one of:  - Standard submission  - Submission for export (local clearance)  Please amend your entry and resubmit.</Text>
+      |					<Location>/tns:Envelope[1]/tns:Body[1]/ie:IE815[1]/ie:Body[1]/ie:SubmittedDraftOfEADESAD[1]/ie:Attributes[1]/ie:SubmissionMessageType[1]</Location>
+      |					<ErrorData>3</ErrorData>
+      |				</Error>
+      |				<Error>
+      |					<RaisedBy>ChRIS</RaisedBy>
+      |					<Number>8044</Number>
+      |					<Type>business</Type>
+      |					<Text>The submission message type must start at 1. Please contact your software supplier for further advice.</Text>
+      |					<Location>/tns:Envelope[1]/tns:Body[1]/ie:IE815[1]/ie:Body[1]/ie:SubmittedDraftOfEADESAD[1]/ie:Attributes[1]/ie:SubmissionMessageType[1]</Location>
+      |					<ErrorData>3</ErrorData>
+      |				</Error>
+      |				<Error>
+      |					<RaisedBy>ChRIS</RaisedBy>
+      |					<Number>8713</Number>
+      |					<Type>business</Type>
+      |					<Text>The origin type must be one of:- Tax warehouse- Import Please amend your entry and resubmit.</Text>
+      |					<Location>/tns:Envelope[1]/tns:Body[1]/ie:IE815[1]/ie:Body[1]/ie:SubmittedDraftOfEADESAD[1]/ie:EadEsadDraft[1]/ie:OriginTypeCode[1]</Location>
+      |					<ErrorData>3</ErrorData>
+      |				</Error>
+      |    </ErrorResponse>
+      |		</HMRCSOAPResponse>
+      |	</Body>
+      |</Envelope>""".stripMargin
+
+  val chrisRIMValidationErrorResponse: ChRISRIMValidationErrorResponse = ChRISRIMValidationErrorResponse(
+    rimValidationErrors = Seq(
+      RIMValidationError(
+        errorCategory = Some("business"),
+        errorType = Some(8712),
+        errorReason = Some("The submission type must be one of:  - Standard submission  - Submission for export (local clearance)  Please amend your entry and resubmit."),
+        errorLocation = Some("/tns:Envelope[1]/tns:Body[1]/ie:IE815[1]/ie:Body[1]/ie:SubmittedDraftOfEADESAD[1]/ie:Attributes[1]/ie:SubmissionMessageType[1]")
+      ),
+      RIMValidationError(
+        errorCategory = Some("business"),
+        errorType = Some(8044),
+        errorReason = Some("The submission message type must start at 1. Please contact your software supplier for further advice."),
+        errorLocation = Some("/tns:Envelope[1]/tns:Body[1]/ie:IE815[1]/ie:Body[1]/ie:SubmittedDraftOfEADESAD[1]/ie:Attributes[1]/ie:SubmissionMessageType[1]")
+      ),
+      RIMValidationError(
+        errorCategory = Some("business"),
+        errorType = Some(8713),
+        errorReason = Some("The origin type must be one of:- Tax warehouse- Import Please amend your entry and resubmit."),
+        errorLocation = Some("/tns:Envelope[1]/tns:Body[1]/ie:IE815[1]/ie:Body[1]/ie:SubmittedDraftOfEADESAD[1]/ie:EadEsadDraft[1]/ie:OriginTypeCode[1]")
+      )
+    )
+  )
+
   lazy val chrisSuccessResponse: ChRISSuccessResponse = ChRISSuccessResponse(
     receipt = "FFVOUNLYECYCCDEBWOV56CFIZ4T6W5KN",
     receiptDate = "2009-01-01T10:10:10.000",
@@ -64,4 +145,12 @@ trait ChRISResponsesFixture {
       |    ${if(withSubmittedDraftId) ",\"submittedDraftId\": \"PORTAL123\"" else ""}
       |}""".stripMargin)
 
+  val invalidRimXmlBody: String = """<Body>
+                         |  <ErrorResponse SchemaVersion="2.0" xmlns="http://www.govtalk.gov.uk/CM/errorresponse">
+                         |    <Error>
+                         |		  <Number>invalid</Number>
+                         |	  </Error>
+                         |  </ErrorResponse>
+                         |</Body>
+                         |""".stripMargin
 }
