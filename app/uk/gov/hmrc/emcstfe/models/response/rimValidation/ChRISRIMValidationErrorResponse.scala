@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.response.rimValidation
 
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
-import com.lucidchart.open.xtract.{XmlReader, __}
+import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Format, Json}
 
 case class ChRISRIMValidationErrorResponse(rimValidationErrors: Seq[RIMValidationError])
@@ -26,7 +26,7 @@ object ChRISRIMValidationErrorResponse {
 
   implicit val format: Format[ChRISRIMValidationErrorResponse] = Json.format[ChRISRIMValidationErrorResponse]
 
-  private val errorResponseContainer = __ \\ "ErrorResponse"
+  val errorResponseContainer: XPath = __ \\ "ErrorResponse"
 
   private val error = errorResponseContainer \ "Error"
 
