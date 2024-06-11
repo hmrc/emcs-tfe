@@ -20,7 +20,7 @@ import com.lucidchart.open.xtract._
 import play.api.http.Status.OK
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{UnexpectedDownstreamResponseError, XmlValidationError}
-import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
+import uk.gov.hmrc.emcstfe.utils.XmlResultParser.{parseErrorResponse, parseResult}
 import uk.gov.hmrc.emcstfe.utils.{Logging, XmlUtils}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
@@ -33,8 +33,7 @@ class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
 
   def modelFromXmlHttpReads[A](shouldExtractFromSoap: Boolean)(implicit xmlReads: XmlReader[A]): HttpReads[Either[ErrorResponse, A]] =
     rawXMLHttpReads(shouldExtractFromSoap).map  {
-      case Right(value) =>
-        handleParseResult(XmlReader.of[A].read(value))
+      case Right(value) => parseResult(XmlReader.of[A].read(value))
       case Left(error) => Left(error)
     }
 
@@ -46,6 +45,9 @@ class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
           case Failure(exception) =>
             logger.warn("[rawXMLHttpReads] Unable to read response body as XML", exception)
             Left(XmlValidationError)
+          //The missing closing tag is intentional as ErrorResponse contains namespace parameters
+          case Success(xml) if xml.toString().contains("<ErrorResponse") =>
+            Left(parseErrorResponse(xml))
           case Success(xml) =>
             if(shouldExtractFromSoap) {
               soapUtils.extractFromSoap(xml)

@@ -17,10 +17,13 @@
 package uk.gov.hmrc.emcstfe.utils
 
 import com.lucidchart.open.xtract._
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.XmlParseError
+import uk.gov.hmrc.emcstfe.fixtures.ChRISResponsesFixture
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, XmlParseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class XmlResultParserSpec extends TestBaseSpec {
+import scala.xml.XML
+
+class XmlResultParserSpec extends TestBaseSpec with ChRISResponsesFixture {
 
   ".handleParseResult" must {
 
@@ -28,7 +31,7 @@ class XmlResultParserSpec extends TestBaseSpec {
 
       "XML parsing is successful" in {
 
-        XmlResultParser.handleParseResult(ParseSuccess("Success")) shouldBe Right("Success")
+        XmlResultParser.parseResult(ParseSuccess("Success")) shouldBe Right("Success")
       }
     }
 
@@ -36,12 +39,34 @@ class XmlResultParserSpec extends TestBaseSpec {
 
       "XML parsing fails" in {
         val error = EmptyError(__ \ "tagName")
-        XmlResultParser.handleParseResult(ParseFailure(error)) shouldBe Left(XmlParseError(Seq(error)))
+        XmlResultParser.parseResult(ParseFailure(error)) shouldBe Left(XmlParseError(Seq(error)))
       }
 
       "XML parsing partially fails" in {
         val error = EmptyError(__ \ "tagName")
-        XmlResultParser.handleParseResult(PartialParseSuccess("PartialData", Seq(error))) shouldBe Left(XmlParseError(Seq(error)))
+        XmlResultParser.parseResult(PartialParseSuccess("PartialData", Seq(error))) shouldBe Left(XmlParseError(Seq(error)))
+      }
+    }
+  }
+
+  ".parseErrorResponse" must {
+
+    "return ChRISRIMValidationError" when {
+
+      "XML parsing is successful" in {
+
+        XmlResultParser.parseErrorResponse(XML.loadString(chrisRimValidationResponseBody)) shouldBe ChRISRIMValidationError(chrisRIMValidationErrorResponse)
+      }
+    }
+
+    "return XmlParseError" when {
+
+      "XML parsing fails" in {
+
+        XmlResultParser.parseErrorResponse(XML.loadString(invalidRimXmlBody)) match {
+          case XmlParseError(errors) => errors.nonEmpty shouldBe true
+          case _ => fail("Result was not of type 'XmlParseError'")
+        }
       }
     }
   }

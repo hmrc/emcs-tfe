@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfe.models.response.rimValidation
 
 import play.api.libs.json.{Format, Json}
 
-case class RIMValidationErrorResponse(emcsCorrelationId: String, validatorResults: Option[Seq[RIMValidationError]])
+case class EISRIMValidationErrorResponse(emcsCorrelationId: String, validatorResults: Option[Seq[RIMValidationError]])
 
-object RIMValidationErrorResponse {
+object EISRIMValidationErrorResponse {
 
-  implicit val format: Format[RIMValidationErrorResponse] = Json.format[RIMValidationErrorResponse]
+  implicit val format: Format[EISRIMValidationErrorResponse] = Json.format[EISRIMValidationErrorResponse]
 }

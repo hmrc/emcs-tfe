@@ -18,91 +18,124 @@ package uk.gov.hmrc.emcstfe.connectors.httpParsers
 
 import com.lucidchart.open.xtract._
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
-import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
+import uk.gov.hmrc.emcstfe.fixtures.{ChRISResponsesFixture, GetMovementFixture}
 import uk.gov.hmrc.emcstfe.mocks.utils.MockXmlUtils
 import uk.gov.hmrc.emcstfe.models.common.Enumerable.EnumerableXmlParseFailure
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, SoapExtractionError, UnexpectedDownstreamResponseError, XmlParseError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse.EADESADContainer
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.emcstfe.models.common.JourneyTime.JourneyTimeParseFailure
-import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse.EADESADContainer
 
 import scala.xml.XML
 
-class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMovementFixture {
+class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMovementFixture with ChRISResponsesFixture {
 
   object TestParser extends ChrisXMLHttpParser(mockXmlUtils)
 
   ".modelFromXmlHttpReads" when {
 
-    s"an OK ($OK) response is received" must {
+    s"an OK ($OK) response is received" when {
 
-      "return a Right" when {
+      "The response is a SuccessResponse from ChRIS (does not include `ErrorResponse` tag in the XML)" must {
 
-        "it contains valid XML" in {
+        "return a Right" when {
 
-          MockXmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper()))
-            .returns(Right(XML.loadString(getMovementResponseBody())))
+          "it contains valid XML" in {
 
-          val response = HttpResponse(OK, body = getMovementSoapWrapper(), headers = Map.empty)
+            MockXmlUtils.extractFromSoap(XML.loadString(getMovementSoapWrapper()))
+              .returns(Right(XML.loadString(getMovementResponseBody())))
 
-          val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+            val response = HttpResponse(OK, body = getMovementSoapWrapper(), headers = Map.empty)
 
-          result shouldBe Right(getMovementResponse())
+            val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+            result shouldBe Right(getMovementResponse())
+          }
+        }
+
+        "return a Left" when {
+          val notXmlBody = "notValidXML"
+          val invalidXmlBody = "<Message></Message>"
+
+          "body is not XML" in {
+
+            val response = HttpResponse(OK, body = notXmlBody, headers = Map.empty)
+
+            val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+            result shouldBe Left(XmlValidationError)
+          }
+
+          "extractFromSoap returns a Left" in {
+
+            MockXmlUtils.extractFromSoap(XML.loadString(invalidXmlBody))
+              .returns(Left(SoapExtractionError))
+
+            val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
+
+            val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+            result shouldBe Left(SoapExtractionError)
+          }
+
+          "extractFromSoap returns a Right but the result can't be parsed to the Model expected" in {
+
+            MockXmlUtils.extractFromSoap(XML.loadString(invalidXmlBody))
+              .returns(Right(XML.loadString(invalidXmlBody)))
+
+            val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
+
+            val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+            result shouldBe Left(XmlParseError(Seq(
+              EmptyError(EADESADContainer \ "EadEsad" \\ "LocalReferenceNumber"),
+              EmptyError(EADESADContainer \ "EadEsad" \\ "InvoiceNumber"),
+              EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'EadEsad/OriginTypeCode'"),
+              EmptyError(EADESADContainer \ "EadEsad" \\ "DateOfDispatch"),
+              EmptyError(EADESADContainer \ "HeaderEadEsad" \\ "SequenceNumber"),
+              EmptyError(EADESADContainer \ "HeaderEadEsad" \\ "DateAndTimeOfUpdateValidation"),
+              EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'HeaderEadEsad/DestinationTypeCode'"),
+              JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''"),
+              EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'HeaderEadEsad/TransportArrangement'"),
+              EmptyError(EADESADContainer \ "TransportMode" \\ "TransportModeCode"),
+              EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'MovementGuarantee/GuarantorTypeCode'"),
+              EmptyError(GetMovementResponse.arc),
+              EmptyError(GetMovementResponse.eadStatus),
+              EmptyError(EADESADContainer \ "ExciseMovement" \ "DateAndTimeOfValidationOfEadEsad")
+            )))
+          }
         }
       }
 
-      "return a Left" when {
-        val notXmlBody = "notValidXML"
-        val invalidXmlBody = "<Message></Message>"
+      "The response is an ErrorResponse from ChRIS (includes `ErrorResponse` tag in the XML)" must {
 
-        "body is not XML" in {
+        "return a Left(ChRISRIMValidationErrorResponse)" when {
 
-          val response = HttpResponse(OK, body = notXmlBody, headers = Map.empty)
+          "it contains valid XML of RIM failures" in {
 
-          val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+            val response = HttpResponse(OK, body = chrisRimValidationResponseBody, headers = Map.empty)
 
-          result shouldBe Left(XmlValidationError)
+            val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+
+            result shouldBe Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse))
+          }
         }
 
-        "extractFromSoap returns a Left" in {
+        "return a Left(ErrorResponse)" when {
 
-          MockXmlUtils.extractFromSoap(XML.loadString(invalidXmlBody))
-            .returns(Left(SoapExtractionError))
+          "body contains ErrorResponse XML tag but can't be read to the RIM Validation model" in {
 
-          val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
+            val response = HttpResponse(OK, body = invalidRimXmlBody, headers = Map.empty)
 
-          val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
+            val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
 
-          result shouldBe Left(SoapExtractionError)
-        }
-
-        "extractFromSoap returns a Right but the result can't be parsed to the Model expected" in {
-
-          MockXmlUtils.extractFromSoap(XML.loadString(invalidXmlBody))
-            .returns(Right(XML.loadString(invalidXmlBody)))
-
-          val response = HttpResponse(OK, body = invalidXmlBody, headers = Map.empty)
-
-          val result = TestParser.modelFromXmlHttpReads[GetMovementResponse](shouldExtractFromSoap = true).read("POST", "/chris/foo/bar", response)
-
-          result shouldBe Left(XmlParseError(Seq(
-            EmptyError(EADESADContainer \ "EadEsad" \\ "LocalReferenceNumber"),
-            EmptyError(EADESADContainer \ "EadEsad" \\ "InvoiceNumber"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'EadEsad/OriginTypeCode'"),
-            EmptyError(EADESADContainer \ "EadEsad" \\ "DateOfDispatch"),
-            EmptyError(EADESADContainer \ "HeaderEadEsad" \\ "SequenceNumber"),
-            EmptyError(EADESADContainer \ "HeaderEadEsad" \\ "DateAndTimeOfUpdateValidation"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'HeaderEadEsad/DestinationTypeCode'"),
-            JourneyTimeParseFailure("Could not parse JourneyTime from XML, received: ''"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'HeaderEadEsad/TransportArrangement'"),
-            EmptyError(EADESADContainer \ "TransportMode" \\ "TransportModeCode"),
-            EnumerableXmlParseFailure(s"Invalid enumerable value of '' for field 'MovementGuarantee/GuarantorTypeCode'"),
-            EmptyError(GetMovementResponse.arc),
-            EmptyError(GetMovementResponse.eadStatus),
-            EmptyError(EADESADContainer \ "ExciseMovement" \ "DateAndTimeOfValidationOfEadEsad")
-          )))
+            result match {
+              case Left(XmlParseError(errors)) => errors.nonEmpty shouldBe true
+              case Right(_) => fail("Result was of type 'Right' when expecting 'Left'")
+            }
+          }
         }
       }
     }

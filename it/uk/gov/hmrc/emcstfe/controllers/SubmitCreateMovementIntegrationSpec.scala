@@ -111,6 +111,21 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec
           response.header("Content-Type") shouldBe Some("application/json")
           response.json shouldBe Json.toJson(XmlValidationError)
         }
+
+        "downstream call returns RIM validation errors" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(chrisRimValidationResponseBody))
+          }
+
+          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
+          response.status shouldBe Status.UNPROCESSABLE_ENTITY
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Request not processed returned by ChRIS"
+          )
+        }
+
         "downstream call returns a non-200 HTTP response" in new Test {
           val referenceDataResponseBody: JsValue = Json.parse(
             s"""

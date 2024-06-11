@@ -29,7 +29,7 @@ import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{GenericParseError, Xml
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementIfChangedResponse}
 import uk.gov.hmrc.emcstfe.repositories.GetMovementRepository
-import uk.gov.hmrc.emcstfe.utils.XmlResultParser.handleParseResult
+import uk.gov.hmrc.emcstfe.utils.XmlResultParser.parseResult
 import uk.gov.hmrc.emcstfe.utils.{Logging, XmlUtils}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -94,7 +94,7 @@ class GetMovementService @Inject()(
     val chrisResponseFutureModel: Future[Either[ErrorResponse, GetMovementIfChangedResponse]] =
       chrisResponseFutureRaw.map {
         case Left(value) => Left(value)
-        case Right(value) => handleParseResult(XmlReader.of[GetMovementIfChangedResponse].read(value))
+        case Right(value) => parseResult(XmlReader.of[GetMovementIfChangedResponse].read(value))
       }
 
     chrisResponseFutureModel.flatMap {
@@ -132,7 +132,7 @@ class GetMovementService @Inject()(
     case Failure(e) =>
       Left(XmlParseError(Seq(GenericParseError(e.getMessage))))
     case Success(value) =>
-      handleParseResult(XmlReader.of[GetMovementResponse].read(value))
+      parseResult(XmlReader.of[GetMovementResponse].read(value))
   }
 
   private[services] def getNewMovement(getMovementRequest: GetMovementRequest, cachedMovement: Option[Either[ErrorResponse, GetMovementResponse]])
@@ -153,7 +153,7 @@ class GetMovementService @Inject()(
     {
       for {
         res <- EitherT.fromEither[Future](response)
-        movement <- EitherT.fromEither[Future](handleParseResult(XmlReader.of[GetMovementResponse].read(res)))
+        movement <- EitherT.fromEither[Future](parseResult(XmlReader.of[GetMovementResponse].read(res)))
         resString = xmlUtils.trimWhitespaceFromXml(res)
         getMovementMongoResponse = response.map(_ => GetMovementMongoResponse(getMovementRequest.arc, movement.sequenceNumber, JsString(resString.toString())))
         getMovementMongoResponseRight <- EitherT.fromEither[Future](getMovementMongoResponse)

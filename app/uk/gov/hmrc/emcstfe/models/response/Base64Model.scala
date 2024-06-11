@@ -31,7 +31,7 @@ object Base64Model {
   implicit def modelReads[T](implicit xmlReader: XmlReader[T]): Reads[Base64Model[T]] = (__.read[String].map{
     message => Try {
       val decodedMessage: String = new String(Base64.getDecoder.decode(message), StandardCharsets.UTF_8)
-      XmlResultParser.handleParseResult(xmlReader.read(XML.loadString(decodedMessage))) match {
+      XmlResultParser.parseResult(xmlReader.read(XML.loadString(decodedMessage))) match {
         case Left(value) => throw JsResult.Exception(JsError(value.message))
         case Right(value) => Base64Model(value)
       }

@@ -27,7 +27,7 @@ import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
 import uk.gov.hmrc.emcstfe.models.nrs.createMovement.CreateMovementNRSSubmission
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISRIMValidationError
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
 import uk.gov.hmrc.emcstfe.services.SubmitCreateMovementService
 import uk.gov.hmrc.emcstfe.services.nrs.NRSBrokerService
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -75,6 +75,7 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
   def handleResponse[A](response: Either[ErrorResponse, A], ern: String, draftId: String, correlationId: String)(implicit writes: Writes[A]): Future[Result] =
     response match {
       case Left(value: EISRIMValidationError) => Future(UnprocessableEntity(Json.toJson(value)))
+      case Left(value: ChRISRIMValidationError) => Future(UnprocessableEntity(Json.toJson(value)))
       case Left(value) => Future(InternalServerError(Json.toJson(value)))
       case Right(value) =>
         service.setSubmittedDraftId(ern, draftId, correlationId).map {

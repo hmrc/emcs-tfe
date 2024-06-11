@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISBusinessError, EISRIMValidationError, EISUnknownError, XmlValidationError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -52,6 +52,20 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
             }
           }
           "return a Left" when {
+
+            "ChRIS returns a 200 response but with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
+
+              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
+                Future.successful(Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse)))
+              )
+
+              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, chrisRIMValidationErrorResponse.rimValidationErrors)
+                .returns(Future.successful(true))
+
+              await(service.submit(submitCreateMovementRequest)) shouldBe Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse))
+            }
+
+
             "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
 
               MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(

@@ -21,7 +21,7 @@ import play.api.http.Status._
 import play.api.libs.json.{JsonValidationError, Reads}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
-import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.EISRIMValidationErrorResponse
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 import scala.util.{Failure, Success, Try}
@@ -48,7 +48,7 @@ trait EisJsonHttpParser {
       case UNPROCESSABLE_ENTITY =>
         logger.debug(s"[modelFromJsonHttpReads] Business/RIM validation error (422) from EIS: ${response.body}")
         Try {
-          RIMValidationErrorResponse.format.reads(response.json).fold(_ => None, Some(_))
+          EISRIMValidationErrorResponse.format.reads(response.json).fold(_ => None, Some(_))
         } match {
           case Failure(exception) =>
             logger.error(exception.getMessage, exception)

@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.EISSubmissionSuccessResponse
-import uk.gov.hmrc.emcstfe.models.response.rimValidation.{RIMValidationError, RIMValidationErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.{RIMValidationError, EISRIMValidationErrorResponse}
 
 trait EISResponsesFixture {
 
@@ -28,7 +28,7 @@ trait EISResponsesFixture {
     emcsCorrelationId = "3e8dae97-b586-4cef-8511-68ac12da9028"
   )
 
-  lazy val eisRimValidationResponse: RIMValidationErrorResponse = RIMValidationErrorResponse(
+  lazy val eisRimValidationResponse: EISRIMValidationErrorResponse = EISRIMValidationErrorResponse(
     emcsCorrelationId = "7be1db16-e8fb-4e81-97e5-3d3e2d21f6c4",
     validatorResults = Some(eisRimValidationResults)
   )

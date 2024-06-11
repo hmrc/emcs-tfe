@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.models.response.rimValidation
 
+import cats.implicits.catsSyntaxTuple4Semigroupal
+import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Format, Json}
 
 case class RIMValidationError(
@@ -28,4 +30,21 @@ case class RIMValidationError(
 object RIMValidationError {
 
   implicit val format: Format[RIMValidationError] = Json.format[RIMValidationError]
+
+  private lazy val errorTypeXmlField = __ \ "Number"
+
+  private lazy val errorCategoryXmlField = __ \ "Type"
+
+  private lazy val errorReasonXmlField = __ \ "Text"
+
+  private lazy val errorLocationXmlField = __ \ "Location"
+
+  val xmlReader: XmlReader[RIMValidationError] = (
+    errorCategoryXmlField.read[String].optional,
+    errorTypeXmlField.read[Int],
+    errorReasonXmlField.read[String].optional,
+    errorLocationXmlField.read[String].optional
+  ).mapN {
+    case (category, errorType, reason, location) => RIMValidationError(category, Some(errorType), reason, location)
+  }
 }
