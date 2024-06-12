@@ -22,7 +22,7 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType
 
 case class AlertOrRejectionReasonModel(reason: AlertOrRejectionReasonType,
-                                               additionalInformation: Option[String])
+                                       additionalInformation: Option[String])
 
 object AlertOrRejectionReasonModel {
 

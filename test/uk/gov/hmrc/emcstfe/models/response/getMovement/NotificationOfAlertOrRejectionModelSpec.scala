@@ -39,7 +39,7 @@ class NotificationOfAlertOrRejectionModelSpec extends TestBaseSpec with GetMovem
 
   "xmlReads" should {
 
-    "successfully read a subset of the IE803" in {
+    "successfully read a subset of the IE819" in {
       TestModel.xmlReads.read(XML.loadString(maxGetMovementResponseBody())) shouldBe ParseSuccess(
         TestModel(Seq(
           NotificationOfAlertOrRejectionModel(
