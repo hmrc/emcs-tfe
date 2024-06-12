@@ -112,6 +112,22 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
           requestWithMovement(MovementType.UKtoEU, DestinationType.UnknownDestination).messageRecipientCountryCode() shouldBe placeOfDispatchTraderCountryCode
         }
       }
+
+      "destinationType is CertifiedConsignee" should {
+
+        s"return country code $consigneeTraderCountryCode from consigneeTrader" in {
+
+          requestWithMovement(MovementType.UKtoEU, DestinationType.CertifiedConsignee).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
+        }
+      }
+
+      "destinationType is TemporaryCertifiedConsignee" should {
+
+        s"return country code $consigneeTraderCountryCode from consigneeTrader" in {
+
+          requestWithMovement(MovementType.UKtoEU, DestinationType.TemporaryCertifiedConsignee).messageRecipientCountryCode() shouldBe consigneeTraderCountryCode
+        }
+      }
     }
 
     "movementType is DirectExport" should {
