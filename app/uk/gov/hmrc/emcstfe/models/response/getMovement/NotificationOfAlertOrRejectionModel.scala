@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple3Semigroupal
+import cats.implicits.catsSyntaxTuple4Semigroupal
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.{AlertOrRejectionReasonType, AlertOrRejectionType}
@@ -26,7 +26,8 @@ import java.time.LocalDateTime
 
 case class NotificationOfAlertOrRejectionModel(notificationType: AlertOrRejectionType,
                                                notificationDateAndTime: LocalDateTime,
-                                               alertRejectReason: AlertOrRejectionReasonType)
+                                               alertRejectReason: AlertOrRejectionReasonType,
+                                               alertRejectReasonInformation: Option[String])
 
 object NotificationOfAlertOrRejectionModel {
 
@@ -38,9 +39,12 @@ object NotificationOfAlertOrRejectionModel {
 
   private lazy val alertRejectReason: XPath = __ \\ "AlertOrRejectionOfMovementReasonCode"
 
+  private lazy val alertRejectReasonInformation: XPath = __ \\ "ComplementaryInformation"
+
   implicit lazy val xmlReads: XmlReader[NotificationOfAlertOrRejectionModel] = (
     notificationType.read[AlertOrRejectionType](AlertOrRejectionType.xmlReads("EadEsadRejectedFlag")(AlertOrRejectionType.enumerable)),
     notificationDateTime.read[LocalDateTime],
-    alertRejectReason.read[AlertOrRejectionReasonType](AlertOrRejectionReasonType.xmlReads("AlertOrRejectionOfMovementReasonCode")(AlertOrRejectionReasonType.enumerable))
+    alertRejectReason.read[AlertOrRejectionReasonType](AlertOrRejectionReasonType.xmlReads("AlertOrRejectionOfMovementReasonCode")(AlertOrRejectionReasonType.enumerable)),
+    alertRejectReasonInformation.read[String].optional
   ).mapN(NotificationOfAlertOrRejectionModel.apply)
 }

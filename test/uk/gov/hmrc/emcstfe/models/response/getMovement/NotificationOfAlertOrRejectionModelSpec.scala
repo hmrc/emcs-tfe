@@ -45,17 +45,20 @@ class NotificationOfAlertOrRejectionModelSpec extends TestBaseSpec with GetMovem
           NotificationOfAlertOrRejectionModel(
             notificationType = Alert,
             notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
-            alertRejectReason = ProductDoesNotMatchOrder
+            alertRejectReason = ProductDoesNotMatchOrder,
+            alertRejectReasonInformation = Some("Info")
           ),
           NotificationOfAlertOrRejectionModel(
             notificationType = Alert,
             notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
-            alertRejectReason = EADNotConcernRecipient
+            alertRejectReason = EADNotConcernRecipient,
+            alertRejectReasonInformation = None
           ),
           NotificationOfAlertOrRejectionModel(
             notificationType = Rejection,
             notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
-            alertRejectReason = QuantityDoesNotMatchOrder
+            alertRejectReason = QuantityDoesNotMatchOrder,
+            alertRejectReasonInformation = None
           )
         )
       ))

@@ -502,6 +502,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                                |            </ie819:AlertOrRejection>
                                                |            <ie819:AlertOrRejectionOfEadEsadReason>
                                                |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
+                                               |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
                                                |            </ie819:AlertOrRejectionOfEadEsadReason>
                                                |          </ie819:AlertOrRejectionOfEADESAD>
                                                |        </ie819:Body>
@@ -831,17 +832,20 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         NotificationOfAlertOrRejectionModel(
           notificationType = Alert,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
-          alertRejectReason = ProductDoesNotMatchOrder
+          alertRejectReason = ProductDoesNotMatchOrder,
+          alertRejectReasonInformation = Some("Info")
         ),
         NotificationOfAlertOrRejectionModel(
           notificationType = Alert,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
-          alertRejectReason = EADNotConcernRecipient
+          alertRejectReason = EADNotConcernRecipient,
+          alertRejectReasonInformation = None
         ),
         NotificationOfAlertOrRejectionModel(
           notificationType = Rejection,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
-          alertRejectReason = QuantityDoesNotMatchOrder
+          alertRejectReason = QuantityDoesNotMatchOrder,
+          alertRejectReasonInformation = None
         )
       )
     )
@@ -1007,7 +1011,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       Json.obj(
         "notificationType" -> "0",
         "notificationDateAndTime" -> "2023-12-18T09:00:00",
-        "alertRejectReason" -> "2"
+        "alertRejectReason" -> "2",
+        "alertRejectReasonInformation" -> "Info"
       ),
       Json.obj(
         "notificationType" -> "0",
@@ -1391,6 +1396,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
                                          |            </ie819:AlertOrRejection>
                                          |            <ie819:AlertOrRejectionOfEadEsadReason>
                                          |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
+                                         |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
                                          |            </ie819:AlertOrRejectionOfEadEsadReason>
                                          |          </ie819:AlertOrRejectionOfEADESAD>
                                          |        </ie819:Body>
@@ -1815,17 +1821,20 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         NotificationOfAlertOrRejectionModel(
           notificationType = Alert,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
-          alertRejectReason = ProductDoesNotMatchOrder
+          alertRejectReason = ProductDoesNotMatchOrder,
+          alertRejectReasonInformation = Some("Info")
         ),
         NotificationOfAlertOrRejectionModel(
           notificationType = Alert,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
-          alertRejectReason = EADNotConcernRecipient
+          alertRejectReason = EADNotConcernRecipient,
+          alertRejectReasonInformation = None
         ),
         NotificationOfAlertOrRejectionModel(
           notificationType = Rejection,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
-          alertRejectReason = QuantityDoesNotMatchOrder
+          alertRejectReason = QuantityDoesNotMatchOrder,
+          alertRejectReasonInformation = None
         )
       )
     )
@@ -2128,7 +2137,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       Json.obj(
         "notificationType" -> "0",
         "notificationDateAndTime" -> "2023-12-18T09:00:00",
-        "alertRejectReason" -> "2"
+        "alertRejectReason" -> "2",
+        "alertRejectReasonInformation" -> "Info"
       ),
       Json.obj(
         "notificationType" -> "0",
