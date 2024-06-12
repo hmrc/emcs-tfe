@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.response.getMovement
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader, __}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
-import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType.{EADNotConcernRecipient, ProductDoesNotMatchOrder, QuantityDoesNotMatchOrder}
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType.{EADNotConcernRecipient, Other, ProductDoesNotMatchOrder, QuantityDoesNotMatchOrder}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType.{Alert, Rejection}
 import uk.gov.hmrc.emcstfe.models.common.Enumerable.EnumerableXmlParseFailure
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -45,23 +45,43 @@ class NotificationOfAlertOrRejectionModelSpec extends TestBaseSpec with GetMovem
           NotificationOfAlertOrRejectionModel(
             notificationType = Alert,
             notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
-            alertRejectReason = ProductDoesNotMatchOrder,
-            alertRejectReasonInformation = Some("Info")
+            alertRejectReason = Seq(
+              AlertOrRejectionReasonModel(
+                reason = ProductDoesNotMatchOrder,
+                additionalInformation = Some("Info")
+              ),
+              AlertOrRejectionReasonModel(
+                reason = EADNotConcernRecipient,
+                additionalInformation = Some("Info")
+              ),
+              AlertOrRejectionReasonModel(
+                reason = Other,
+                additionalInformation = Some("Info")
+              ),
+              AlertOrRejectionReasonModel(
+                reason = QuantityDoesNotMatchOrder,
+                additionalInformation = Some("Info")
+              )
+            )
           ),
           NotificationOfAlertOrRejectionModel(
             notificationType = Alert,
             notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
-            alertRejectReason = EADNotConcernRecipient,
-            alertRejectReasonInformation = None
+            alertRejectReason = Seq(AlertOrRejectionReasonModel(
+              reason = EADNotConcernRecipient,
+              additionalInformation = None
+            ))
           ),
           NotificationOfAlertOrRejectionModel(
             notificationType = Rejection,
             notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
-            alertRejectReason = QuantityDoesNotMatchOrder,
-            alertRejectReasonInformation = None
+            alertRejectReason = Seq(AlertOrRejectionReasonModel(
+              reason = QuantityDoesNotMatchOrder,
+              additionalInformation = None
+            ))
           )
         )
-      ))
+        ))
     }
 
     "fail to read a subset of the movement fields when a field is missing" in {

@@ -726,6 +726,18 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
             |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
             |            </ie819:AlertOrRejectionOfEadEsadReason>
+            |            <ie819:AlertOrRejectionOfEadEsadReason>
+            |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
+            |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+            |            </ie819:AlertOrRejectionOfEadEsadReason>
+            |            <ie819:AlertOrRejectionOfEadEsadReason>
+            |              <ie819:AlertOrRejectionOfMovementReasonCode>0</ie819:AlertOrRejectionOfMovementReasonCode>
+            |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+            |            </ie819:AlertOrRejectionOfEadEsadReason>
+            |            <ie819:AlertOrRejectionOfEadEsadReason>
+            |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
+            |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+            |            </ie819:AlertOrRejectionOfEadEsadReason>
             |          </ie819:AlertOrRejectionOfEADESAD>
             |        </ie819:Body>
             |      </ie819:IE819>
@@ -1078,6 +1090,18 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            </ie819:AlertOrRejection>
             |            <ie819:AlertOrRejectionOfEadEsadReason>
             |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
+            |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+            |            </ie819:AlertOrRejectionOfEadEsadReason>
+            |            <ie819:AlertOrRejectionOfEadEsadReason>
+            |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
+            |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+            |            </ie819:AlertOrRejectionOfEadEsadReason>
+            |            <ie819:AlertOrRejectionOfEadEsadReason>
+            |              <ie819:AlertOrRejectionOfMovementReasonCode>0</ie819:AlertOrRejectionOfMovementReasonCode>
+            |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+            |            </ie819:AlertOrRejectionOfEadEsadReason>
+            |            <ie819:AlertOrRejectionOfEadEsadReason>
+            |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
             |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
             |            </ie819:AlertOrRejectionOfEadEsadReason>
             |          </ie819:AlertOrRejectionOfEADESAD>

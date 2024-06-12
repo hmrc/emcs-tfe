@@ -16,18 +16,18 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple4Semigroupal
+import cats.implicits.catsSyntaxTuple3Semigroupal
+import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.emcstfe.models.alertOrRejection.{AlertOrRejectionReasonType, AlertOrRejectionType}
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader._
 
 import java.time.LocalDateTime
 
 case class NotificationOfAlertOrRejectionModel(notificationType: AlertOrRejectionType,
                                                notificationDateAndTime: LocalDateTime,
-                                               alertRejectReason: AlertOrRejectionReasonType,
-                                               alertRejectReasonInformation: Option[String])
+                                               alertRejectReason: Seq[AlertOrRejectionReasonModel])
 
 object NotificationOfAlertOrRejectionModel {
 
@@ -37,14 +37,11 @@ object NotificationOfAlertOrRejectionModel {
 
   private lazy val notificationDateTime: XPath = __ \\ "DateAndTimeOfValidationOfAlertRejection"
 
-  private lazy val alertRejectReason: XPath = __ \\ "AlertOrRejectionOfMovementReasonCode"
-
-  private lazy val alertRejectReasonInformation: XPath = __ \\ "ComplementaryInformation"
+  private lazy val alertRejectReason: XPath = __ \\ "AlertOrRejectionOfEadEsadReason"
 
   implicit lazy val xmlReads: XmlReader[NotificationOfAlertOrRejectionModel] = (
     notificationType.read[AlertOrRejectionType](AlertOrRejectionType.xmlReads("EadEsadRejectedFlag")(AlertOrRejectionType.enumerable)),
     notificationDateTime.read[LocalDateTime],
-    alertRejectReason.read[AlertOrRejectionReasonType](AlertOrRejectionReasonType.xmlReads("AlertOrRejectionOfMovementReasonCode")(AlertOrRejectionReasonType.enumerable)),
-    alertRejectReasonInformation.read[String].optional
+    alertRejectReason.read[Seq[AlertOrRejectionReasonModel]](strictReadSeq(AlertOrRejectionReasonModel.xmlReads))
   ).mapN(NotificationOfAlertOrRejectionModel.apply)
 }

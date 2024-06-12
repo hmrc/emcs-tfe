@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json._
-import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType.{EADNotConcernRecipient, ProductDoesNotMatchOrder, QuantityDoesNotMatchOrder}
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType.{EADNotConcernRecipient, Other, ProductDoesNotMatchOrder, QuantityDoesNotMatchOrder}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType.{Alert, Rejection}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.DestinationType._
@@ -37,587 +37,599 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
 
   def getMovementResponseBody(sequenceNumber: Int = 1): String =
     s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
-                                               |    <mov:currentMovement>
-                                               |      <mov:status>Accepted</mov:status>
-                                               |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
-                                               |      <body:IE801 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE801:V3.01">
-                                               |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
-                                               |          <head:MessageSender>NDEA.FR</head:MessageSender>
-                                               |          <head:MessageRecipient>NDEA.GB</head:MessageRecipient>
-                                               |          <head:DateOfPreparation>2008-09-04</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>10:22:50</head:TimeOfPreparation>
-                                               |          <head:MessageIdentifier>Message identifier</head:MessageIdentifier>
-                                               |        </body:Header>
-                                               |        <body:Body>
-                                               |          <body:EADESADContainer>
-                                               |            <body:ConsigneeTrader language="en">
-                                               |              ${maxTraderModelXML(ConsigneeTrader)}
-                                               |            </body:ConsigneeTrader>
-                                               |            <body:ComplementConsigneeTrader>
-                                               |              <MemberStateCode>GB</MemberStateCode>
-                                               |            </body:ComplementConsigneeTrader>
-                                               |            <body:ExciseMovement>
-                                               |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
-                                               |              <body:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</body:DateAndTimeOfValidationOfEadEsad>
-                                               |            </body:ExciseMovement>
-                                               |            <body:ConsignorTrader language="en">
-                                               |              ${maxTraderModelXML(ConsignorTrader)}
-                                               |            </body:ConsignorTrader>
-                                               |            <body:PlaceOfDispatchTrader language="en">
-                                               |              ${maxTraderModelXML(PlaceOfDispatchTrader)}
-                                               |            </body:PlaceOfDispatchTrader>
-                                               |            <body:DeliveryPlaceCustomsOffice>
-                                               |              <body:ReferenceNumber>FR000003</body:ReferenceNumber>
-                                               |            </body:DeliveryPlaceCustomsOffice>
-                                               |            <body:CompetentAuthorityDispatchOffice>
-                                               |              <body:ReferenceNumber>GB000002</body:ReferenceNumber>
-                                               |            </body:CompetentAuthorityDispatchOffice>
-                                               |            <body:FirstTransporterTrader language="en">
-                                               |              ${maxTraderModelXML(TransportTrader)}
-                                               |            </body:FirstTransporterTrader>
-                                               |            <body:DocumentCertificate>
-                                               |              <body:DocumentDescription language="en">Test</body:DocumentDescription>
-                                               |              <body:ReferenceOfDocument language="en">AB123</body:ReferenceOfDocument>
-                                               |            </body:DocumentCertificate>
-                                               |            <body:EadEsad>
-                                               |              <body:LocalReferenceNumber>EN</body:LocalReferenceNumber>
-                                               |              <body:InvoiceNumber>IN777888999</body:InvoiceNumber>
-                                               |              <body:InvoiceDate>2008-09-04</body:InvoiceDate>
-                                               |              <body:OriginTypeCode>1</body:OriginTypeCode>
-                                               |              <body:DateOfDispatch>2008-11-20</body:DateOfDispatch>
-                                               |              <body:TimeOfDispatch>10:00:00</body:TimeOfDispatch>
-                                               |            </body:EadEsad>
-                                               |            <body:HeaderEadEsad>
-                                               |              <body:SequenceNumber>$sequenceNumber</body:SequenceNumber>
-                                               |              <body:DateAndTimeOfUpdateValidation>2008-09-04T10:22:50</body:DateAndTimeOfUpdateValidation>
-                                               |              <body:DestinationTypeCode>6</body:DestinationTypeCode>
-                                               |              <body:JourneyTime>D20</body:JourneyTime>
-                                               |              <body:TransportArrangement>1</body:TransportArrangement>
-                                               |            </body:HeaderEadEsad>
-                                               |            <body:TransportMode>
-                                               |              <body:TransportModeCode>1</body:TransportModeCode>
-                                               |            </body:TransportMode>
-                                               |            <body:MovementGuarantee>
-                                               |              <body:GuarantorTypeCode>0</body:GuarantorTypeCode>
-                                               |            </body:MovementGuarantee>
-                                               |            <body:BodyEadEsad>
-                                               |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
-                                               |              <body:ExciseProductCode>W200</body:ExciseProductCode>
-                                               |              <body:CnCode>22041011</body:CnCode>
-                                               |              <body:Quantity>500</body:Quantity>
-                                               |              <body:GrossMass>900</body:GrossMass>
-                                               |              <body:NetMass>375</body:NetMass>
-                                               |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
-                                               |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-                                               |              <body:DegreePlato>1.2</body:DegreePlato>
-                                               |              <body:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</body:MaturationPeriodOrAgeOfProducts>
-                                               |              <body:IndependentSmallProducersDeclaration language="EN">Independent Small Producers Declaration</body:IndependentSmallProducersDeclaration>
-                                               |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-                                               |              <body:SizeOfProducer>20000</body:SizeOfProducer>
-                                               |              <body:Density>880</body:Density>
-                                               |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-                                               |              <body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
-                                               |              <body:Package>
-                                               |                <body:KindOfPackages>BO</body:KindOfPackages>
-                                               |                <body:NumberOfPackages>125</body:NumberOfPackages>
-                                               |                <body:ShippingMarks>MARKS</body:ShippingMarks>
-                                               |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
-                                               |                <body:SealInformation language="en">Red Strip</body:SealInformation>
-                                               |              </body:Package>
-                                               |              <body:WineProduct>
-                                               |                <body:WineProductCategory>4</body:WineProductCategory>
-                                               |                <body:WineGrowingZoneCode>2</body:WineGrowingZoneCode>
-                                               |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
-                                               |                <body:OtherInformation language="en">Not available</body:OtherInformation>
-                                               |                <body:WineOperation>
-                                               |                  <body:WineOperationCode>4</body:WineOperationCode>
-                                               |                </body:WineOperation>
-                                               |                <body:WineOperation>
-                                               |                  <body:WineOperationCode>5</body:WineOperationCode>
-                                               |                </body:WineOperation>
-                                               |              </body:WineProduct>
-                                               |            </body:BodyEadEsad>
-                                               |            <body:BodyEadEsad>
-                                               |              <body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-                                               |              <body:ExciseProductCode>W300</body:ExciseProductCode>
-                                               |              <body:CnCode>27111901</body:CnCode>
-                                               |              <body:Quantity>501</body:Quantity>
-                                               |              <body:GrossMass>901</body:GrossMass>
-                                               |              <body:NetMass>475</body:NetMass>
-                                               |              <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
-                                               |              <body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-                                               |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-                                               |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-                                               |              <body:SizeOfProducer>20000</body:SizeOfProducer>
-                                               |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-                                               |              <body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-                                               |              <body:Package>
-                                               |                <body:KindOfPackages>BO</body:KindOfPackages>
-                                               |                <body:NumberOfPackages>125</body:NumberOfPackages>
-                                               |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
-                                               |                <body:SealInformation language="en">Red Strip</body:SealInformation>
-                                               |              </body:Package>
-                                               |              <body:Package>
-                                               |                <body:KindOfPackages>HG</body:KindOfPackages>
-                                               |                <body:NumberOfPackages>7</body:NumberOfPackages>
-                                               |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
-                                               |                <body:SealInformation language="en">Cork</body:SealInformation>
-                                               |              </body:Package>
-                                               |              <body:WineProduct>
-                                               |                <body:WineProductCategory>3</body:WineProductCategory>
-                                               |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
-                                               |                <body:OtherInformation language="en">Not available</body:OtherInformation>
-                                               |                <body:WineOperation>
-                                               |                  <body:WineOperationCode>0</body:WineOperationCode>
-                                               |                </body:WineOperation>
-                                               |                <body:WineOperation>
-                                               |                  <body:WineOperationCode>1</body:WineOperationCode>
-                                               |                </body:WineOperation>
-                                               |              </body:WineProduct>
-                                               |            </body:BodyEadEsad>
-                                               |            <body:TransportDetails>
-                                               |              <body:TransportUnitCode>1</body:TransportUnitCode>
-                                               |              <body:IdentityOfTransportUnits>Bottles</body:IdentityOfTransportUnits>
-                                               |              <body:CommercialSealIdentification>SID13245678</body:CommercialSealIdentification>
-                                               |              <body:ComplementaryInformation language="en">Bottles of Restina</body:ComplementaryInformation>
-                                               |              <body:SealInformation language="en">Sealed with red strip</body:SealInformation>
-                                               |            </body:TransportDetails>
-                                               |            <body:TransportDetails>
-                                               |              <body:TransportUnitCode>2</body:TransportUnitCode>
-                                               |              <body:IdentityOfTransportUnits>Cans</body:IdentityOfTransportUnits>
-                                               |              <body:CommercialSealIdentification>SID132987</body:CommercialSealIdentification>
-                                               |              <body:ComplementaryInformation language="en">Cans</body:ComplementaryInformation>
-                                               |              <body:SealInformation language="en">Seal</body:SealInformation>
-                                               |            </body:TransportDetails>
-                                               |          </body:EADESADContainer>
-                                               |        </body:Body>
-                                               |      </body:IE801>
-                                               |    </mov:currentMovement>
-                                               |    <mov:eventHistory>
-                                               |      <body:IE801 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE801:V3.01">
-                                               |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
-                                               |          <head:MessageSender>NDEA.FR</head:MessageSender>
-                                               |          <head:MessageRecipient>NDEA.GB</head:MessageRecipient>
-                                               |          <head:DateOfPreparation>2008-09-04</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>10:22:50</head:TimeOfPreparation>
-                                               |          <head:MessageIdentifier>Message identifier</head:MessageIdentifier>
-                                               |        </body:Header>
-                                               |        <body:Body>
-                                               |          <body:EADESADContainer>
-                                               |            <body:ConsigneeTrader language="en">
-                                               |              ${maxTraderModelXML(ConsigneeTrader)}
-                                               |            </body:ConsigneeTrader>
-                                               |            <body:ExciseMovement>
-                                               |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
-                                               |              <body:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</body:DateAndTimeOfValidationOfEadEsad>
-                                               |            </body:ExciseMovement>
-                                               |            <body:ConsignorTrader language="en">
-                                               |              ${maxTraderModelXML(ConsignorTrader)}
-                                               |            </body:ConsignorTrader>
-                                               |            <body:PlaceOfDispatchTrader language="en">
-                                               |              ${maxTraderModelXML(PlaceOfDispatchTrader)}
-                                               |            </body:PlaceOfDispatchTrader>
-                                               |            <body:DeliveryPlaceCustomsOffice>
-                                               |              <body:ReferenceNumber>FR000003</body:ReferenceNumber>
-                                               |            </body:DeliveryPlaceCustomsOffice>
-                                               |            <body:CompetentAuthorityDispatchOffice>
-                                               |              <body:ReferenceNumber>GB000002</body:ReferenceNumber>
-                                               |            </body:CompetentAuthorityDispatchOffice>
-                                               |            <body:FirstTransporterTrader language="en">
-                                               |              ${maxTraderModelXML(TransportTrader)}
-                                               |            </body:FirstTransporterTrader>
-                                               |            <body:DocumentCertificate>
-                                               |              <body:DocumentDescription language="en">Test</body:DocumentDescription>
-                                               |              <body:ReferenceOfDocument language="en">AB123</body:ReferenceOfDocument>
-                                               |            </body:DocumentCertificate>
-                                               |            <body:EadEsad>
-                                               |              <body:LocalReferenceNumber>EN</body:LocalReferenceNumber>
-                                               |              <body:InvoiceNumber>IN777888999</body:InvoiceNumber>
-                                               |              <body:InvoiceDate>2008-09-04</body:InvoiceDate>
-                                               |              <body:OriginTypeCode>1</body:OriginTypeCode>
-                                               |              <body:DateOfDispatch>2008-11-20</body:DateOfDispatch>
-                                               |              <body:TimeOfDispatch>10:00:00</body:TimeOfDispatch>
-                                               |            </body:EadEsad>
-                                               |            <body:HeaderEadEsad>
-                                               |              <body:SequenceNumber>1</body:SequenceNumber>
-                                               |              <body:DateAndTimeOfUpdateValidation>2008-09-04T10:22:50</body:DateAndTimeOfUpdateValidation>
-                                               |              <body:DestinationTypeCode>6</body:DestinationTypeCode>
-                                               |              <body:JourneyTime>D20</body:JourneyTime>
-                                               |              <body:TransportArrangement>1</body:TransportArrangement>
-                                               |            </body:HeaderEadEsad>
-                                               |            <body:TransportMode>
-                                               |              <body:TransportModeCode>1</body:TransportModeCode>
-                                               |            </body:TransportMode>
-                                               |            <body:MovementGuarantee>
-                                               |              <body:GuarantorTypeCode>0</body:GuarantorTypeCode>
-                                               |            </body:MovementGuarantee>
-                                               |            <body:BodyEadEsad>
-                                               |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
-                                               |              <body:ExciseProductCode>W200</body:ExciseProductCode>
-                                               |              <body:CnCode>27111900</body:CnCode>
-                                               |              <body:Quantity>500</body:Quantity>
-                                               |              <body:GrossMass>900</body:GrossMass>
-                                               |              <body:NetMass>375</body:NetMass>
-                                               |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
-                                               |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-                                               |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-                                               |              <body:SizeOfProducer>20000</body:SizeOfProducer>
-                                               |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-                                               |              <body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
-                                               |              <body:Package>
-                                               |                <body:KindOfPackages>GB</body:KindOfPackages>
-                                               |                <body:NumberOfPackages>125</body:NumberOfPackages>
-                                               |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
-                                               |                <body:SealInformation language="en">Red Strip</body:SealInformation>
-                                               |              </body:Package>
-                                               |              <body:WineProduct>
-                                               |                <body:WineProductCategory>4</body:WineProductCategory>
-                                               |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
-                                               |                <body:OtherInformation language="en">Not available</body:OtherInformation>
-                                               |                <body:WineOperation>
-                                               |                  <body:WineOperationCode>4</body:WineOperationCode>
-                                               |                </body:WineOperation>
-                                               |              </body:WineProduct>
-                                               |            </body:BodyEadEsad>
-                                               |            <body:BodyEadEsad>
-                                               |              <body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-                                               |              <body:ExciseProductCode>W300</body:ExciseProductCode>
-                                               |              <body:CnCode>27111901</body:CnCode>
-                                               |              <body:Quantity>501</body:Quantity>
-                                               |              <body:GrossMass>901</body:GrossMass>
-                                               |              <body:NetMass>475</body:NetMass>
-                                               |              <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
-                                               |              <body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
-                                               |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-                                               |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
-                                               |              <body:SizeOfProducer>20000</body:SizeOfProducer>
-                                               |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
-                                               |              <body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
-                                               |              <body:Package>
-                                               |                <body:KindOfPackages>GB</body:KindOfPackages>
-                                               |                <body:NumberOfPackages>125</body:NumberOfPackages>
-                                               |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
-                                               |                <body:SealInformation language="en">Red Strip</body:SealInformation>
-                                               |              </body:Package>
-                                               |              <body:WineProduct>
-                                               |                <body:WineProductCategory>4</body:WineProductCategory>
-                                               |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
-                                               |                <body:OtherInformation language="en">Not available</body:OtherInformation>
-                                               |                <body:WineOperation>
-                                               |                  <body:WineOperationCode>4 5</body:WineOperationCode>
-                                               |                </body:WineOperation>
-                                               |              </body:WineProduct>
-                                               |            </body:BodyEadEsad>
-                                               |            <body:TransportDetails>
-                                               |              <body:TransportUnitCode>1</body:TransportUnitCode>
-                                               |              <body:IdentityOfTransportUnits>Bottles</body:IdentityOfTransportUnits>
-                                               |              <body:CommercialSealIdentification>SID13245678</body:CommercialSealIdentification>
-                                               |              <body:ComplementaryInformation language="en">Bottles of Restina</body:ComplementaryInformation>
-                                               |              <body:SealInformation language="en">Sealed with red strip</body:SealInformation>
-                                               |            </body:TransportDetails>
-                                               |            <body:TransportDetails>
-                                               |              <body:TransportUnitCode>2</body:TransportUnitCode>
-                                               |              <body:IdentityOfTransportUnits>Cans</body:IdentityOfTransportUnits>
-                                               |              <body:CommercialSealIdentification>SID132987</body:CommercialSealIdentification>
-                                               |              <body:ComplementaryInformation language="en">Cans</body:ComplementaryInformation>
-                                               |              <body:SealInformation language="en">Seal info</body:SealInformation>
-                                               |            </body:TransportDetails>
-                                               |          </body:EADESADContainer>
-                                               |        </body:Body>
-                                               |      </body:IE801>
-                                               |      <body:IE810 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE810:V2.02">
-                                               |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
-                                               |          <head:MessageSender>token</head:MessageSender>
-                                               |          <head:MessageRecipient>token</head:MessageRecipient>
-                                               |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
-                                               |          <head:MessageIdentifier>token</head:MessageIdentifier>
-                                               |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
-                                               |        </body:Header>
-                                               |        <body:Body>
-                                               |          <body:CancellationOfEAD>
-                                               |            <body:Attributes>
-                                               |              <body:DateAndTimeOfValidationOfCancellation>2008-09-04T10:22:53</body:DateAndTimeOfValidationOfCancellation>
-                                               |            </body:Attributes>
-                                               |            <body:ExciseMovement>
-                                               |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
-                                               |            </body:ExciseMovement>
-                                               |            <body:Cancellation>
-                                               |              <body:CancellationReasonCode>1</body:CancellationReasonCode>
-                                               |            </body:Cancellation>
-                                               |          </body:CancellationOfEAD>
-                                               |        </body:Body>
-                                               |      </body:IE810>
-                                               |      <body:IE802 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE802:V2.02">
-                                               |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
-                                               |          <head:MessageSender>token</head:MessageSender>
-                                               |          <head:MessageRecipient>token</head:MessageRecipient>
-                                               |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
-                                               |          <head:MessageIdentifier>token</head:MessageIdentifier>
-                                               |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
-                                               |        </body:Header>
-                                               |        <body:Body>
-                                               |          <body:ReminderMessageForExciseMovement>
-                                               |            <body:Attributes>
-                                               |              <body:DateAndTimeOfIssuanceOfReminder>2008-09-04T10:22:53</body:DateAndTimeOfIssuanceOfReminder>
-                                               |              <body:ReminderInformation language="en">To be completed by this date</body:ReminderInformation>
-                                               |              <body:LimitDateAndTime>2008-09-04T10:22:53</body:LimitDateAndTime>
-                                               |              <body:ReminderMessageType>1</body:ReminderMessageType>
-                                               |            </body:Attributes>
-                                               |            <body:ExciseMovement>
-                                               |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
-                                               |              <body:SequenceNumber>1</body:SequenceNumber>
-                                               |            </body:ExciseMovement>
-                                               |          </body:ReminderMessageForExciseMovement>
-                                               |        </body:Body>
-                                               |      </body:IE802>
-                                               |      <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
-                                               |        <urn:Header>
-                                               |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
-                                               |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
-                                               |          <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
-                                               |          <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
-                                               |          <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
-                                               |        </urn:Header>
-                                               |        <urn:Body>
-                                               |          <urn:NotificationOfDivertedEADESAD>
-                                               |            <urn:ExciseNotification>
-                                               |              <urn:NotificationType>2</urn:NotificationType>
-                                               |              <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
-                                               |              <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
-                                               |              <urn:SequenceNumber>1</urn:SequenceNumber>
-                                               |            </urn:ExciseNotification>
-                                               |            <urn:DownstreamArc>
-                                               |              <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
-                                               |            </urn:DownstreamArc>
-                                               |            <urn:DownstreamArc>
-                                               |              <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
-                                               |            </urn:DownstreamArc>
-                                               |          </urn:NotificationOfDivertedEADESAD>
-                                               |        </urn:Body>
-                                               |      </urn:IE803>
-                                               |      <body:IE837 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE837:V2.02">
-                                               |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
-                                               |          <head:MessageSender>token</head:MessageSender>
-                                               |          <head:MessageRecipient>token</head:MessageRecipient>
-                                               |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
-                                               |          <head:MessageIdentifier>token</head:MessageIdentifier>
-                                               |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
-                                               |        </body:Header>
-                                               |        <body:Body>
-                                               |          <body:ExplanationOnDelayForDelivery>
-                                               |            <body:Attributes>
-                                               |              <body:SubmitterIdentification>837Submitter</body:SubmitterIdentification>
-                                               |              <body:SubmitterType>1</body:SubmitterType>
-                                               |              <body:ExplanationCode>1</body:ExplanationCode>
-                                               |              <body:ComplementaryInformation language="to">837 complementory info</body:ComplementaryInformation>
-                                               |              <body:MessageRole>1</body:MessageRole>
-                                               |              <body:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:47.0Z</body:DateAndTimeOfValidationOfExplanationOnDelay>
-                                               |            </body:Attributes>
-                                               |            <body:ExciseMovement>
-                                               |              <body:AdministrativeReferenceCode>13AB1234567891ABCDEF9</body:AdministrativeReferenceCode>
-                                               |              <body:SequenceNumber/>
-                                               |            </body:ExciseMovement>
-                                               |          </body:ExplanationOnDelayForDelivery>
-                                               |        </body:Body>
-                                               |      </body:IE837>
-                                               |      <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
-                                               |      <urn:Header>
-                                               |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
-                                               |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
-                                               |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
-                                               |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
-                                               |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
-                                               |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
-                                               |      </urn:Header>
-                                               |      <urn:Body>
-                                               |        <urn:AcceptedOrRejectedReportOfReceiptExport>
-                                               |          <urn:Attributes>
-                                               |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-                                               |          </urn:Attributes>
-                                               |          <urn:ConsigneeTrader language="en">
-                                               |            <urn:Traderid>XIWK000000206</urn:Traderid>
-                                               |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
-                                               |            <urn:StreetName>Catherdral</urn:StreetName>
-                                               |            <urn:StreetNumber>1</urn:StreetNumber>
-                                               |            <urn:Postcode>BT3 7BF</urn:Postcode>
-                                               |            <urn:City>Salford</urn:City>
-                                               |          </urn:ConsigneeTrader>
-                                               |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
-                                               |            <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
-                                               |            <urn:SequenceNumber>2</urn:SequenceNumber>
-                                               |          </ie:ExciseMovement>
-                                               |          <urn:DeliveryPlaceTrader language="en">
-                                               |            <urn:Traderid>XI00000000207</urn:Traderid>
-                                               |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
-                                               |            <urn:StreetNumber>2</urn:StreetNumber>
-                                               |            <urn:StreetName>Catherdral</urn:StreetName>
-                                               |            <urn:Postcode>BT3 7BF</urn:Postcode>
-                                               |            <urn:City>Salford</urn:City>
-                                               |          </urn:DeliveryPlaceTrader>
-                                               |          <urn:DestinationOffice>
-                                               |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
-                                               |          </urn:DestinationOffice>
-                                               |          <urn:ReportOfReceiptExport>
-                                               |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
-                                               |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
-                                               |          </urn:ReportOfReceiptExport>
-                                               |        </urn:AcceptedOrRejectedReportOfReceiptExport>
-                                               |      </urn:Body>
-                                               |    </urn:IE818>
-                                               |    <!-- Alert Event -->
-                                               |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
-                                               |        <ie819:Header>
-                                               |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
-                                               |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
-                                               |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-                                               |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
-                                               |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
-                                               |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
-                                               |        </ie819:Header>
-                                               |        <ie819:Body>
-                                               |          <ie819:AlertOrRejectionOfEADESAD>
-                                               |            <ie819:Attributes>
-                                               |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
-                                               |            </ie819:Attributes>
-                                               |            <ie819:ConsigneeTrader language="en">
-                                               |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
-                                               |              <ie819:TraderName>Bizz</ie819:TraderName>
-                                               |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
-                                               |              <ie819:Postcode>tf3 4er</ie819:Postcode>
-                                               |              <ie819:City>Shropshire</ie819:City>
-                                               |            </ie819:ConsigneeTrader>
-                                               |            <ie819:ExciseMovement>
-                                               |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
-                                               |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
-                                               |            </ie819:ExciseMovement>
-                                               |            <ie819:DestinationOffice>
-                                               |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
-                                               |            </ie819:DestinationOffice>
-                                               |            <ie819:AlertOrRejection>
-                                               |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
-                                               |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
-                                               |            </ie819:AlertOrRejection>
-                                               |            <ie819:AlertOrRejectionOfEadEsadReason>
-                                               |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
-                                               |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
-                                               |            </ie819:AlertOrRejectionOfEadEsadReason>
-                                               |          </ie819:AlertOrRejectionOfEADESAD>
-                                               |        </ie819:Body>
-                                               |      </ie819:IE819>
-                                               |
-                                               |      <!-- 2nd Alert Event -->
-                                               |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
-                                               |        <ie819:Header>
-                                               |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
-                                               |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
-                                               |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-                                               |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
-                                               |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
-                                               |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
-                                               |        </ie819:Header>
-                                               |        <ie819:Body>
-                                               |          <ie819:AlertOrRejectionOfEADESAD>
-                                               |            <ie819:Attributes>
-                                               |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
-                                               |            </ie819:Attributes>
-                                               |            <ie819:ConsigneeTrader language="en">
-                                               |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
-                                               |              <ie819:TraderName>Bizz</ie819:TraderName>
-                                               |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
-                                               |              <ie819:Postcode>tf3 4er</ie819:Postcode>
-                                               |              <ie819:City>Shropshire</ie819:City>
-                                               |            </ie819:ConsigneeTrader>
-                                               |            <ie819:ExciseMovement>
-                                               |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
-                                               |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
-                                               |            </ie819:ExciseMovement>
-                                               |            <ie819:DestinationOffice>
-                                               |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
-                                               |            </ie819:DestinationOffice>
-                                               |            <ie819:AlertOrRejection>
-                                               |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
-                                               |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
-                                               |            </ie819:AlertOrRejection>
-                                               |            <ie819:AlertOrRejectionOfEadEsadReason>
-                                               |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
-                                               |            </ie819:AlertOrRejectionOfEadEsadReason>
-                                               |          </ie819:AlertOrRejectionOfEADESAD>
-                                               |        </ie819:Body>
-                                               |      </ie819:IE819>
-                                               |
-                                               |      <!-- Rejection Event -->
-                                               |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
-                                               |        <ie819:Header>
-                                               |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
-                                               |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
-                                               |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
-                                               |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
-                                               |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
-                                               |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
-                                               |        </ie819:Header>
-                                               |        <ie819:Body>
-                                               |          <ie819:AlertOrRejectionOfEADESAD>
-                                               |            <ie819:Attributes>
-                                               |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
-                                               |            </ie819:Attributes>
-                                               |            <ie819:ConsigneeTrader language="en">
-                                               |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
-                                               |              <ie819:TraderName>Bizz</ie819:TraderName>
-                                               |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
-                                               |              <ie819:Postcode>tf3 4er</ie819:Postcode>
-                                               |              <ie819:City>Shropshire</ie819:City>
-                                               |            </ie819:ConsigneeTrader>
-                                               |            <ie819:ExciseMovement>
-                                               |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
-                                               |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
-                                               |            </ie819:ExciseMovement>
-                                               |            <ie819:DestinationOffice>
-                                               |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
-                                               |            </ie819:DestinationOffice>
-                                               |            <ie819:AlertOrRejection>
-                                               |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
-                                               |              <ie819:EadEsadRejectedFlag>1</ie819:EadEsadRejectedFlag>
-                                               |            </ie819:AlertOrRejection>
-                                               |            <ie819:AlertOrRejectionOfEadEsadReason>
-                                               |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
-                                               |            </ie819:AlertOrRejectionOfEadEsadReason>
-                                               |          </ie819:AlertOrRejectionOfEADESAD>
-                                               |        </ie819:Body>
-                                               |      </ie819:IE819>
-                                               |    </mov:eventHistory>
-                                               |  </mov:movementView>""".stripMargin
+       |    <mov:currentMovement>
+       |      <mov:status>Accepted</mov:status>
+       |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
+       |      <body:IE801 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE801:V3.01">
+       |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+       |          <head:MessageSender>NDEA.FR</head:MessageSender>
+       |          <head:MessageRecipient>NDEA.GB</head:MessageRecipient>
+       |          <head:DateOfPreparation>2008-09-04</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>10:22:50</head:TimeOfPreparation>
+       |          <head:MessageIdentifier>Message identifier</head:MessageIdentifier>
+       |        </body:Header>
+       |        <body:Body>
+       |          <body:EADESADContainer>
+       |            <body:ConsigneeTrader language="en">
+       |              ${maxTraderModelXML(ConsigneeTrader)}
+       |            </body:ConsigneeTrader>
+       |            <body:ComplementConsigneeTrader>
+       |              <MemberStateCode>GB</MemberStateCode>
+       |            </body:ComplementConsigneeTrader>
+       |            <body:ExciseMovement>
+       |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
+       |              <body:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</body:DateAndTimeOfValidationOfEadEsad>
+       |            </body:ExciseMovement>
+       |            <body:ConsignorTrader language="en">
+       |              ${maxTraderModelXML(ConsignorTrader)}
+       |            </body:ConsignorTrader>
+       |            <body:PlaceOfDispatchTrader language="en">
+       |              ${maxTraderModelXML(PlaceOfDispatchTrader)}
+       |            </body:PlaceOfDispatchTrader>
+       |            <body:DeliveryPlaceCustomsOffice>
+       |              <body:ReferenceNumber>FR000003</body:ReferenceNumber>
+       |            </body:DeliveryPlaceCustomsOffice>
+       |            <body:CompetentAuthorityDispatchOffice>
+       |              <body:ReferenceNumber>GB000002</body:ReferenceNumber>
+       |            </body:CompetentAuthorityDispatchOffice>
+       |            <body:FirstTransporterTrader language="en">
+       |              ${maxTraderModelXML(TransportTrader)}
+       |            </body:FirstTransporterTrader>
+       |            <body:DocumentCertificate>
+       |              <body:DocumentDescription language="en">Test</body:DocumentDescription>
+       |              <body:ReferenceOfDocument language="en">AB123</body:ReferenceOfDocument>
+       |            </body:DocumentCertificate>
+       |            <body:EadEsad>
+       |              <body:LocalReferenceNumber>EN</body:LocalReferenceNumber>
+       |              <body:InvoiceNumber>IN777888999</body:InvoiceNumber>
+       |              <body:InvoiceDate>2008-09-04</body:InvoiceDate>
+       |              <body:OriginTypeCode>1</body:OriginTypeCode>
+       |              <body:DateOfDispatch>2008-11-20</body:DateOfDispatch>
+       |              <body:TimeOfDispatch>10:00:00</body:TimeOfDispatch>
+       |            </body:EadEsad>
+       |            <body:HeaderEadEsad>
+       |              <body:SequenceNumber>$sequenceNumber</body:SequenceNumber>
+       |              <body:DateAndTimeOfUpdateValidation>2008-09-04T10:22:50</body:DateAndTimeOfUpdateValidation>
+       |              <body:DestinationTypeCode>6</body:DestinationTypeCode>
+       |              <body:JourneyTime>D20</body:JourneyTime>
+       |              <body:TransportArrangement>1</body:TransportArrangement>
+       |            </body:HeaderEadEsad>
+       |            <body:TransportMode>
+       |              <body:TransportModeCode>1</body:TransportModeCode>
+       |            </body:TransportMode>
+       |            <body:MovementGuarantee>
+       |              <body:GuarantorTypeCode>0</body:GuarantorTypeCode>
+       |            </body:MovementGuarantee>
+       |            <body:BodyEadEsad>
+       |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
+       |              <body:ExciseProductCode>W200</body:ExciseProductCode>
+       |              <body:CnCode>22041011</body:CnCode>
+       |              <body:Quantity>500</body:Quantity>
+       |              <body:GrossMass>900</body:GrossMass>
+       |              <body:NetMass>375</body:NetMass>
+       |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
+       |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+       |              <body:DegreePlato>1.2</body:DegreePlato>
+       |              <body:MaturationPeriodOrAgeOfProducts language="EN">Maturation Period</body:MaturationPeriodOrAgeOfProducts>
+       |              <body:IndependentSmallProducersDeclaration language="EN">Independent Small Producers Declaration</body:IndependentSmallProducersDeclaration>
+       |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
+       |              <body:SizeOfProducer>20000</body:SizeOfProducer>
+       |              <body:Density>880</body:Density>
+       |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
+       |              <body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+       |              <body:Package>
+       |                <body:KindOfPackages>BO</body:KindOfPackages>
+       |                <body:NumberOfPackages>125</body:NumberOfPackages>
+       |                <body:ShippingMarks>MARKS</body:ShippingMarks>
+       |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+       |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+       |              </body:Package>
+       |              <body:WineProduct>
+       |                <body:WineProductCategory>4</body:WineProductCategory>
+       |                <body:WineGrowingZoneCode>2</body:WineGrowingZoneCode>
+       |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
+       |                <body:OtherInformation language="en">Not available</body:OtherInformation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>4</body:WineOperationCode>
+       |                </body:WineOperation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>5</body:WineOperationCode>
+       |                </body:WineOperation>
+       |              </body:WineProduct>
+       |            </body:BodyEadEsad>
+       |            <body:BodyEadEsad>
+       |              <body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
+       |              <body:ExciseProductCode>W300</body:ExciseProductCode>
+       |              <body:CnCode>27111901</body:CnCode>
+       |              <body:Quantity>501</body:Quantity>
+       |              <body:GrossMass>901</body:GrossMass>
+       |              <body:NetMass>475</body:NetMass>
+       |              <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
+       |              <body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
+       |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+       |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
+       |              <body:SizeOfProducer>20000</body:SizeOfProducer>
+       |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
+       |              <body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+       |              <body:Package>
+       |                <body:KindOfPackages>BO</body:KindOfPackages>
+       |                <body:NumberOfPackages>125</body:NumberOfPackages>
+       |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+       |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+       |              </body:Package>
+       |              <body:Package>
+       |                <body:KindOfPackages>HG</body:KindOfPackages>
+       |                <body:NumberOfPackages>7</body:NumberOfPackages>
+       |                <body:CommercialSealIdentification>SEAL77</body:CommercialSealIdentification>
+       |                <body:SealInformation language="en">Cork</body:SealInformation>
+       |              </body:Package>
+       |              <body:WineProduct>
+       |                <body:WineProductCategory>3</body:WineProductCategory>
+       |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
+       |                <body:OtherInformation language="en">Not available</body:OtherInformation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>0</body:WineOperationCode>
+       |                </body:WineOperation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>1</body:WineOperationCode>
+       |                </body:WineOperation>
+       |              </body:WineProduct>
+       |            </body:BodyEadEsad>
+       |            <body:TransportDetails>
+       |              <body:TransportUnitCode>1</body:TransportUnitCode>
+       |              <body:IdentityOfTransportUnits>Bottles</body:IdentityOfTransportUnits>
+       |              <body:CommercialSealIdentification>SID13245678</body:CommercialSealIdentification>
+       |              <body:ComplementaryInformation language="en">Bottles of Restina</body:ComplementaryInformation>
+       |              <body:SealInformation language="en">Sealed with red strip</body:SealInformation>
+       |            </body:TransportDetails>
+       |            <body:TransportDetails>
+       |              <body:TransportUnitCode>2</body:TransportUnitCode>
+       |              <body:IdentityOfTransportUnits>Cans</body:IdentityOfTransportUnits>
+       |              <body:CommercialSealIdentification>SID132987</body:CommercialSealIdentification>
+       |              <body:ComplementaryInformation language="en">Cans</body:ComplementaryInformation>
+       |              <body:SealInformation language="en">Seal</body:SealInformation>
+       |            </body:TransportDetails>
+       |          </body:EADESADContainer>
+       |        </body:Body>
+       |      </body:IE801>
+       |    </mov:currentMovement>
+       |    <mov:eventHistory>
+       |      <body:IE801 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE801:V3.01">
+       |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+       |          <head:MessageSender>NDEA.FR</head:MessageSender>
+       |          <head:MessageRecipient>NDEA.GB</head:MessageRecipient>
+       |          <head:DateOfPreparation>2008-09-04</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>10:22:50</head:TimeOfPreparation>
+       |          <head:MessageIdentifier>Message identifier</head:MessageIdentifier>
+       |        </body:Header>
+       |        <body:Body>
+       |          <body:EADESADContainer>
+       |            <body:ConsigneeTrader language="en">
+       |              ${maxTraderModelXML(ConsigneeTrader)}
+       |            </body:ConsigneeTrader>
+       |            <body:ExciseMovement>
+       |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
+       |              <body:DateAndTimeOfValidationOfEadEsad>2008-09-04T10:22:50</body:DateAndTimeOfValidationOfEadEsad>
+       |            </body:ExciseMovement>
+       |            <body:ConsignorTrader language="en">
+       |              ${maxTraderModelXML(ConsignorTrader)}
+       |            </body:ConsignorTrader>
+       |            <body:PlaceOfDispatchTrader language="en">
+       |              ${maxTraderModelXML(PlaceOfDispatchTrader)}
+       |            </body:PlaceOfDispatchTrader>
+       |            <body:DeliveryPlaceCustomsOffice>
+       |              <body:ReferenceNumber>FR000003</body:ReferenceNumber>
+       |            </body:DeliveryPlaceCustomsOffice>
+       |            <body:CompetentAuthorityDispatchOffice>
+       |              <body:ReferenceNumber>GB000002</body:ReferenceNumber>
+       |            </body:CompetentAuthorityDispatchOffice>
+       |            <body:FirstTransporterTrader language="en">
+       |              ${maxTraderModelXML(TransportTrader)}
+       |            </body:FirstTransporterTrader>
+       |            <body:DocumentCertificate>
+       |              <body:DocumentDescription language="en">Test</body:DocumentDescription>
+       |              <body:ReferenceOfDocument language="en">AB123</body:ReferenceOfDocument>
+       |            </body:DocumentCertificate>
+       |            <body:EadEsad>
+       |              <body:LocalReferenceNumber>EN</body:LocalReferenceNumber>
+       |              <body:InvoiceNumber>IN777888999</body:InvoiceNumber>
+       |              <body:InvoiceDate>2008-09-04</body:InvoiceDate>
+       |              <body:OriginTypeCode>1</body:OriginTypeCode>
+       |              <body:DateOfDispatch>2008-11-20</body:DateOfDispatch>
+       |              <body:TimeOfDispatch>10:00:00</body:TimeOfDispatch>
+       |            </body:EadEsad>
+       |            <body:HeaderEadEsad>
+       |              <body:SequenceNumber>1</body:SequenceNumber>
+       |              <body:DateAndTimeOfUpdateValidation>2008-09-04T10:22:50</body:DateAndTimeOfUpdateValidation>
+       |              <body:DestinationTypeCode>6</body:DestinationTypeCode>
+       |              <body:JourneyTime>D20</body:JourneyTime>
+       |              <body:TransportArrangement>1</body:TransportArrangement>
+       |            </body:HeaderEadEsad>
+       |            <body:TransportMode>
+       |              <body:TransportModeCode>1</body:TransportModeCode>
+       |            </body:TransportMode>
+       |            <body:MovementGuarantee>
+       |              <body:GuarantorTypeCode>0</body:GuarantorTypeCode>
+       |            </body:MovementGuarantee>
+       |            <body:BodyEadEsad>
+       |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
+       |              <body:ExciseProductCode>W200</body:ExciseProductCode>
+       |              <body:CnCode>27111900</body:CnCode>
+       |              <body:Quantity>500</body:Quantity>
+       |              <body:GrossMass>900</body:GrossMass>
+       |              <body:NetMass>375</body:NetMass>
+       |              <body:FiscalMark language="en">FM564789 Fiscal Mark</body:FiscalMark>
+       |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+       |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
+       |              <body:SizeOfProducer>20000</body:SizeOfProducer>
+       |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
+       |              <body:BrandNameOfProducts language="en">MALAMATINA</body:BrandNameOfProducts>
+       |              <body:Package>
+       |                <body:KindOfPackages>GB</body:KindOfPackages>
+       |                <body:NumberOfPackages>125</body:NumberOfPackages>
+       |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+       |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+       |              </body:Package>
+       |              <body:WineProduct>
+       |                <body:WineProductCategory>4</body:WineProductCategory>
+       |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
+       |                <body:OtherInformation language="en">Not available</body:OtherInformation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>4</body:WineOperationCode>
+       |                </body:WineOperation>
+       |              </body:WineProduct>
+       |            </body:BodyEadEsad>
+       |            <body:BodyEadEsad>
+       |              <body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
+       |              <body:ExciseProductCode>W300</body:ExciseProductCode>
+       |              <body:CnCode>27111901</body:CnCode>
+       |              <body:Quantity>501</body:Quantity>
+       |              <body:GrossMass>901</body:GrossMass>
+       |              <body:NetMass>475</body:NetMass>
+       |              <body:AlcoholicStrengthByVolumeInPercentage>12.7</body:AlcoholicStrengthByVolumeInPercentage>
+       |              <body:FiscalMark language="en">FM564790 Fiscal Mark</body:FiscalMark>
+       |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+       |              <body:DesignationOfOrigin language="en">Designation of Origin</body:DesignationOfOrigin>
+       |              <body:SizeOfProducer>20000</body:SizeOfProducer>
+       |              <body:CommercialDescription language="en">Retsina</body:CommercialDescription>
+       |              <body:BrandNameOfProducts language="en">BrandName</body:BrandNameOfProducts>
+       |              <body:Package>
+       |                <body:KindOfPackages>GB</body:KindOfPackages>
+       |                <body:NumberOfPackages>125</body:NumberOfPackages>
+       |                <body:CommercialSealIdentification>SEAL456789321</body:CommercialSealIdentification>
+       |                <body:SealInformation language="en">Red Strip</body:SealInformation>
+       |              </body:Package>
+       |              <body:WineProduct>
+       |                <body:WineProductCategory>4</body:WineProductCategory>
+       |                <body:ThirdCountryOfOrigin>FJ</body:ThirdCountryOfOrigin>
+       |                <body:OtherInformation language="en">Not available</body:OtherInformation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>4 5</body:WineOperationCode>
+       |                </body:WineOperation>
+       |              </body:WineProduct>
+       |            </body:BodyEadEsad>
+       |            <body:TransportDetails>
+       |              <body:TransportUnitCode>1</body:TransportUnitCode>
+       |              <body:IdentityOfTransportUnits>Bottles</body:IdentityOfTransportUnits>
+       |              <body:CommercialSealIdentification>SID13245678</body:CommercialSealIdentification>
+       |              <body:ComplementaryInformation language="en">Bottles of Restina</body:ComplementaryInformation>
+       |              <body:SealInformation language="en">Sealed with red strip</body:SealInformation>
+       |            </body:TransportDetails>
+       |            <body:TransportDetails>
+       |              <body:TransportUnitCode>2</body:TransportUnitCode>
+       |              <body:IdentityOfTransportUnits>Cans</body:IdentityOfTransportUnits>
+       |              <body:CommercialSealIdentification>SID132987</body:CommercialSealIdentification>
+       |              <body:ComplementaryInformation language="en">Cans</body:ComplementaryInformation>
+       |              <body:SealInformation language="en">Seal info</body:SealInformation>
+       |            </body:TransportDetails>
+       |          </body:EADESADContainer>
+       |        </body:Body>
+       |      </body:IE801>
+       |      <body:IE810 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE810:V2.02">
+       |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+       |          <head:MessageSender>token</head:MessageSender>
+       |          <head:MessageRecipient>token</head:MessageRecipient>
+       |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+       |          <head:MessageIdentifier>token</head:MessageIdentifier>
+       |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+       |        </body:Header>
+       |        <body:Body>
+       |          <body:CancellationOfEAD>
+       |            <body:Attributes>
+       |              <body:DateAndTimeOfValidationOfCancellation>2008-09-04T10:22:53</body:DateAndTimeOfValidationOfCancellation>
+       |            </body:Attributes>
+       |            <body:ExciseMovement>
+       |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
+       |            </body:ExciseMovement>
+       |            <body:Cancellation>
+       |              <body:CancellationReasonCode>1</body:CancellationReasonCode>
+       |            </body:Cancellation>
+       |          </body:CancellationOfEAD>
+       |        </body:Body>
+       |      </body:IE810>
+       |      <body:IE802 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE802:V2.02">
+       |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+       |          <head:MessageSender>token</head:MessageSender>
+       |          <head:MessageRecipient>token</head:MessageRecipient>
+       |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+       |          <head:MessageIdentifier>token</head:MessageIdentifier>
+       |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+       |        </body:Header>
+       |        <body:Body>
+       |          <body:ReminderMessageForExciseMovement>
+       |            <body:Attributes>
+       |              <body:DateAndTimeOfIssuanceOfReminder>2008-09-04T10:22:53</body:DateAndTimeOfIssuanceOfReminder>
+       |              <body:ReminderInformation language="en">To be completed by this date</body:ReminderInformation>
+       |              <body:LimitDateAndTime>2008-09-04T10:22:53</body:LimitDateAndTime>
+       |              <body:ReminderMessageType>1</body:ReminderMessageType>
+       |            </body:Attributes>
+       |            <body:ExciseMovement>
+       |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
+       |              <body:SequenceNumber>1</body:SequenceNumber>
+       |            </body:ExciseMovement>
+       |          </body:ReminderMessageForExciseMovement>
+       |        </body:Body>
+       |      </body:IE802>
+       |      <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
+       |        <urn:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
+       |        </urn:Header>
+       |        <urn:Body>
+       |          <urn:NotificationOfDivertedEADESAD>
+       |            <urn:ExciseNotification>
+       |              <urn:NotificationType>2</urn:NotificationType>
+       |              <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
+       |              <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
+       |              <urn:SequenceNumber>1</urn:SequenceNumber>
+       |            </urn:ExciseNotification>
+       |            <urn:DownstreamArc>
+       |              <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
+       |            </urn:DownstreamArc>
+       |            <urn:DownstreamArc>
+       |              <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
+       |            </urn:DownstreamArc>
+       |          </urn:NotificationOfDivertedEADESAD>
+       |        </urn:Body>
+       |      </urn:IE803>
+       |      <body:IE837 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE837:V2.02">
+       |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+       |          <head:MessageSender>token</head:MessageSender>
+       |          <head:MessageRecipient>token</head:MessageRecipient>
+       |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+       |          <head:MessageIdentifier>token</head:MessageIdentifier>
+       |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+       |        </body:Header>
+       |        <body:Body>
+       |          <body:ExplanationOnDelayForDelivery>
+       |            <body:Attributes>
+       |              <body:SubmitterIdentification>837Submitter</body:SubmitterIdentification>
+       |              <body:SubmitterType>1</body:SubmitterType>
+       |              <body:ExplanationCode>1</body:ExplanationCode>
+       |              <body:ComplementaryInformation language="to">837 complementory info</body:ComplementaryInformation>
+       |              <body:MessageRole>1</body:MessageRole>
+       |              <body:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:47.0Z</body:DateAndTimeOfValidationOfExplanationOnDelay>
+       |            </body:Attributes>
+       |            <body:ExciseMovement>
+       |              <body:AdministrativeReferenceCode>13AB1234567891ABCDEF9</body:AdministrativeReferenceCode>
+       |              <body:SequenceNumber/>
+       |            </body:ExciseMovement>
+       |          </body:ExplanationOnDelayForDelivery>
+       |        </body:Body>
+       |      </body:IE837>
+       |      <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+       |      <urn:Header>
+       |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+       |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+       |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+       |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+       |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+       |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+       |      </urn:Header>
+       |      <urn:Body>
+       |        <urn:AcceptedOrRejectedReportOfReceiptExport>
+       |          <urn:Attributes>
+       |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+       |          </urn:Attributes>
+       |          <urn:ConsigneeTrader language="en">
+       |            <urn:Traderid>XIWK000000206</urn:Traderid>
+       |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
+       |            <urn:StreetName>Catherdral</urn:StreetName>
+       |            <urn:StreetNumber>1</urn:StreetNumber>
+       |            <urn:Postcode>BT3 7BF</urn:Postcode>
+       |            <urn:City>Salford</urn:City>
+       |          </urn:ConsigneeTrader>
+       |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+       |            <urn:AdministrativeReferenceCode>13AB7778889991ABCDEF9</urn:AdministrativeReferenceCode>
+       |            <urn:SequenceNumber>2</urn:SequenceNumber>
+       |          </ie:ExciseMovement>
+       |          <urn:DeliveryPlaceTrader language="en">
+       |            <urn:Traderid>XI00000000207</urn:Traderid>
+       |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
+       |            <urn:StreetNumber>2</urn:StreetNumber>
+       |            <urn:StreetName>Catherdral</urn:StreetName>
+       |            <urn:Postcode>BT3 7BF</urn:Postcode>
+       |            <urn:City>Salford</urn:City>
+       |          </urn:DeliveryPlaceTrader>
+       |          <urn:DestinationOffice>
+       |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
+       |          </urn:DestinationOffice>
+       |          <urn:ReportOfReceiptExport>
+       |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
+       |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
+       |          </urn:ReportOfReceiptExport>
+       |        </urn:AcceptedOrRejectedReportOfReceiptExport>
+       |      </urn:Body>
+       |    </urn:IE818>
+       |    <!-- Alert Event -->
+       |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+       |        <ie819:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+       |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+       |        </ie819:Header>
+       |        <ie819:Body>
+       |          <ie819:AlertOrRejectionOfEADESAD>
+       |            <ie819:Attributes>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |            </ie819:Attributes>
+       |            <ie819:ConsigneeTrader language="en">
+       |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+       |              <ie819:TraderName>Bizz</ie819:TraderName>
+       |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+       |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+       |              <ie819:City>Shropshire</ie819:City>
+       |            </ie819:ConsigneeTrader>
+       |            <ie819:ExciseMovement>
+       |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+       |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+       |            </ie819:ExciseMovement>
+       |            <ie819:DestinationOffice>
+       |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+       |            </ie819:DestinationOffice>
+       |            <ie819:AlertOrRejection>
+       |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+       |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
+       |            </ie819:AlertOrRejection>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
+       |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
+       |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>0</ie819:AlertOrRejectionOfMovementReasonCode>
+       |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
+       |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |          </ie819:AlertOrRejectionOfEADESAD>
+       |        </ie819:Body>
+       |      </ie819:IE819>
+       |
+       |      <!-- 2nd Alert Event -->
+       |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+       |        <ie819:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+       |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+       |        </ie819:Header>
+       |        <ie819:Body>
+       |          <ie819:AlertOrRejectionOfEADESAD>
+       |            <ie819:Attributes>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |            </ie819:Attributes>
+       |            <ie819:ConsigneeTrader language="en">
+       |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+       |              <ie819:TraderName>Bizz</ie819:TraderName>
+       |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+       |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+       |              <ie819:City>Shropshire</ie819:City>
+       |            </ie819:ConsigneeTrader>
+       |            <ie819:ExciseMovement>
+       |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+       |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+       |            </ie819:ExciseMovement>
+       |            <ie819:DestinationOffice>
+       |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+       |            </ie819:DestinationOffice>
+       |            <ie819:AlertOrRejection>
+       |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+       |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
+       |            </ie819:AlertOrRejection>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |          </ie819:AlertOrRejectionOfEADESAD>
+       |        </ie819:Body>
+       |      </ie819:IE819>
+       |
+       |      <!-- Rejection Event -->
+       |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+       |        <ie819:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+       |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+       |        </ie819:Header>
+       |        <ie819:Body>
+       |          <ie819:AlertOrRejectionOfEADESAD>
+       |            <ie819:Attributes>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |            </ie819:Attributes>
+       |            <ie819:ConsigneeTrader language="en">
+       |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+       |              <ie819:TraderName>Bizz</ie819:TraderName>
+       |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+       |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+       |              <ie819:City>Shropshire</ie819:City>
+       |            </ie819:ConsigneeTrader>
+       |            <ie819:ExciseMovement>
+       |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+       |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+       |            </ie819:ExciseMovement>
+       |            <ie819:DestinationOffice>
+       |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+       |            </ie819:DestinationOffice>
+       |            <ie819:AlertOrRejection>
+       |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+       |              <ie819:EadEsadRejectedFlag>1</ie819:EadEsadRejectedFlag>
+       |            </ie819:AlertOrRejection>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |          </ie819:AlertOrRejectionOfEADESAD>
+       |        </ie819:Body>
+       |      </ie819:IE819>
+       |    </mov:eventHistory>
+       |  </mov:movementView>""".stripMargin
 
   def getMovementSoapWrapper(sequenceNumber: Int = 1): String = s"""<tns:Envelope
-                                               |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                               |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
-                                               |	<tns:Body>
-                                               |		<con:Control
-                                               |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
-                                               |			<con:MetaData>
-                                               |				<con:MessageId>String</con:MessageId>
-                                               |				<con:Source>String</con:Source>
-                                               |				<con:Identity>String</con:Identity>
-                                               |				<con:Partner>String</con:Partner>
-                                               |				<con:CorrelationId>String</con:CorrelationId>
-                                               |				<con:BusinessKey>String</con:BusinessKey>
-                                               |				<con:MessageDescriptor>String</con:MessageDescriptor>
-                                               |				<con:QualityOfService>String</con:QualityOfService>
-                                               |				<con:Destination>String</con:Destination>
-                                               |				<con:Priority>0</con:Priority>
-                                               |			</con:MetaData>
-                                               |			<con:OperationResponse>
-                                               |				<con:Results>
-                                               |					<con:Result Name="">
-                                               |						<![CDATA[${getMovementResponseBody(sequenceNumber)}]]>
-                                               |					</con:Result>
-                                               |				</con:Results>
-                                               |			</con:OperationResponse>
-                                               |		</con:Control>
-                                               |	</tns:Body>
-                                               |</tns:Envelope>""".stripMargin
+                                                                   |	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                                   |	xmlns:tns="http://www.w3.org/2003/05/soap-envelope">
+                                                                   |	<tns:Body>
+                                                                   |		<con:Control
+                                                                   |			xmlns:con="http://www.govtalk.gov.uk/taxation/InternationalTrade/Common/ControlDocument">
+                                                                   |			<con:MetaData>
+                                                                   |				<con:MessageId>String</con:MessageId>
+                                                                   |				<con:Source>String</con:Source>
+                                                                   |				<con:Identity>String</con:Identity>
+                                                                   |				<con:Partner>String</con:Partner>
+                                                                   |				<con:CorrelationId>String</con:CorrelationId>
+                                                                   |				<con:BusinessKey>String</con:BusinessKey>
+                                                                   |				<con:MessageDescriptor>String</con:MessageDescriptor>
+                                                                   |				<con:QualityOfService>String</con:QualityOfService>
+                                                                   |				<con:Destination>String</con:Destination>
+                                                                   |				<con:Priority>0</con:Priority>
+                                                                   |			</con:MetaData>
+                                                                   |			<con:OperationResponse>
+                                                                   |				<con:Results>
+                                                                   |					<con:Result Name="">
+                                                                   |						<![CDATA[${getMovementResponseBody(sequenceNumber)}]]>
+                                                                   |					</con:Result>
+                                                                   |				</con:Results>
+                                                                   |			</con:OperationResponse>
+                                                                   |		</con:Control>
+                                                                   |	</tns:Body>
+                                                                   |</tns:Envelope>""".stripMargin
 
   def getMovementResponse(journeyTimeValue: String = "20 days", sequenceNumber: Int = 1): GetMovementResponse = GetMovementResponse(
     arc = "13AB7778889991ABCDEF9",
@@ -832,20 +844,40 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         NotificationOfAlertOrRejectionModel(
           notificationType = Alert,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
-          alertRejectReason = ProductDoesNotMatchOrder,
-          alertRejectReasonInformation = Some("Info")
+          alertRejectReason = Seq(
+            AlertOrRejectionReasonModel(
+              reason = ProductDoesNotMatchOrder,
+              additionalInformation = Some("Info")
+            ),
+            AlertOrRejectionReasonModel(
+              reason = EADNotConcernRecipient,
+              additionalInformation = Some("Info")
+            ),
+            AlertOrRejectionReasonModel(
+              reason = Other,
+              additionalInformation = Some("Info")
+            ),
+            AlertOrRejectionReasonModel(
+              reason = QuantityDoesNotMatchOrder,
+              additionalInformation = Some("Info")
+            )
+          )
         ),
         NotificationOfAlertOrRejectionModel(
           notificationType = Alert,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
-          alertRejectReason = EADNotConcernRecipient,
-          alertRejectReasonInformation = None
+          alertRejectReason = Seq(AlertOrRejectionReasonModel(
+            reason = EADNotConcernRecipient,
+            additionalInformation = None
+          ))
         ),
         NotificationOfAlertOrRejectionModel(
           notificationType = Rejection,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
-          alertRejectReason = QuantityDoesNotMatchOrder,
-          alertRejectReasonInformation = None
+          alertRejectReason = Seq(AlertOrRejectionReasonModel(
+            reason = QuantityDoesNotMatchOrder,
+            additionalInformation = None
+          ))
         )
       )
     )
@@ -1011,478 +1043,514 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       Json.obj(
         "notificationType" -> "0",
         "notificationDateAndTime" -> "2023-12-18T09:00:00",
-        "alertRejectReason" -> "2",
-        "alertRejectReasonInformation" -> "Info"
+        "alertRejectReason" -> Json.arr(
+          Json.obj(
+            "reason" -> "2",
+            "additionalInformation" -> "Info"
+          ),
+          Json.obj(
+            "reason" -> "1",
+            "additionalInformation" -> "Info"
+          ),
+          Json.obj(
+            "reason" -> "0",
+            "additionalInformation" -> "Info"
+          ),
+          Json.obj(
+            "reason" -> "3",
+            "additionalInformation" -> "Info"
+          )
+        )
       ),
       Json.obj(
         "notificationType" -> "0",
         "notificationDateAndTime" -> "2023-12-18T10:00:00",
-        "alertRejectReason" -> "1"
+        "alertRejectReason" -> Json.arr(
+          Json.obj(
+            "reason" -> "1"
+          )
+        )
       ),
       Json.obj(
         "notificationType" -> "1",
         "notificationDateAndTime" -> "2023-12-19T09:00:00",
-        "alertRejectReason" -> "3"
+        "alertRejectReason" -> Json.arr(
+          Json.obj(
+            "reason" -> "3"
+          )
+        )
       )
     )
   )
 
   def maxGetMovementResponseBody(sequenceNumber: Int = 1): String =
     s"""<mov:movementView xsi:schemaLocation="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3 movementView.xsd" xmlns:mov="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementView/3">
-                                         |    <mov:currentMovement>
-                                         |      <mov:status>Beans</mov:status>
-                                         |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
-                                         |      <body:IE801 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE801:V3.01">
-                                         |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
-                                         |          <head:MessageSender>NDEA.FR</head:MessageSender>
-                                         |          <head:MessageRecipient>NDEA.GB</head:MessageRecipient>
-                                         |          <head:DateOfPreparation>2008-09-04</head:DateOfPreparation>
-                                         |          <head:TimeOfPreparation>10:22:50</head:TimeOfPreparation>
-                                         |          <head:MessageIdentifier>Message identifier</head:MessageIdentifier>
-                                         |        </body:Header>
-                                         |        <body:Body>
-                                         |          <body:EADESADContainer>
-                                         |            <body:ConsigneeTrader language="en">
-                                         |              <body:Traderid>ConsigneeTraderId</body:Traderid>
-                                         |              <body:TraderName>ConsigneeTraderName</body:TraderName>
-                                         |              <body:StreetName>ConsigneeTraderStreetName</body:StreetName>
-                                         |              <body:StreetNumber>ConsigneeTraderStreetNumber</body:StreetNumber>
-                                         |              <body:Postcode>ConsigneeTraderPostcode</body:Postcode>
-                                         |              <body:City>ConsigneeTraderCity</body:City>
-                                         |              <body:EoriNumber>ConsigneeTraderEori</body:EoriNumber>
-                                         |            </body:ConsigneeTrader>
-                                         |            <body:ExciseMovement>
-                                         |               <body:AdministrativeReferenceCode>ExciseMovementArc</body:AdministrativeReferenceCode>
-                                         |               <body:DateAndTimeOfValidationOfEadEsad>ExciseMovementDateTime</body:DateAndTimeOfValidationOfEadEsad>
-                                         |            </body:ExciseMovement>
-                                         |            <body:ConsignorTrader language="en">
-                                         |              <body:TraderExciseNumber>ConsignorTraderExciseNumber</body:TraderExciseNumber>
-                                         |              <body:TraderName>ConsignorTraderName</body:TraderName>
-                                         |              <body:StreetName>ConsignorTraderStreetName</body:StreetName>
-                                         |              <body:StreetNumber>ConsignorTraderStreetNumber</body:StreetNumber>
-                                         |              <body:Postcode>ConsignorTraderPostcode</body:Postcode>
-                                         |              <body:City>ConsignorTraderCity</body:City>
-                                         |            </body:ConsignorTrader>
-                                         |            <body:PlaceOfDispatchTrader language="en">
-                                         |              <body:ReferenceOfTaxWarehouse>PlaceOfDispatchTraderReferenceOfTaxWarehouse</body:ReferenceOfTaxWarehouse>
-                                         |              <body:TraderName>PlaceOfDispatchTraderName</body:TraderName>
-                                         |              <body:StreetName>PlaceOfDispatchTraderStreetName</body:StreetName>
-                                         |              <body:StreetNumber>PlaceOfDispatchTraderStreetNumber</body:StreetNumber>
-                                         |              <body:Postcode>PlaceOfDispatchTraderPostcode</body:Postcode>
-                                         |              <body:City>PlaceOfDispatchTraderCity</body:City>
-                                         |            </body:PlaceOfDispatchTrader>
-                                         |            <body:DispatchImportOffice>
-                                         |              <body:ReferenceNumber>DispatchImportOfficeErn</body:ReferenceNumber>
-                                         |            </body:DispatchImportOffice>
-                                         |            <body:ComplementConsigneeTrader>
-                                         |              <body:MemberStateCode>CCTMemberStateCode</body:MemberStateCode>
-                                         |              <body:SerialNumberOfCertificateOfExemption>CCTSerialNumber</body:SerialNumberOfCertificateOfExemption>
-                                         |            </body:ComplementConsigneeTrader>
-                                         |            <body:DeliveryPlaceTrader language="en">
-                                         |              <body:Traderid>DeliveryPlaceTraderId</body:Traderid>
-                                         |              <body:TraderName>DeliveryPlaceTraderName</body:TraderName>
-                                         |              <body:StreetName>DeliveryPlaceTraderStreetName</body:StreetName>
-                                         |              <body:StreetNumber>DeliveryPlaceTraderStreetNumber</body:StreetNumber>
-                                         |              <body:Postcode>DeliveryPlaceTraderPostcode</body:Postcode>
-                                         |              <body:City>DeliveryPlaceTraderCity</body:City>
-                                         |            </body:DeliveryPlaceTrader>
-                                         |            <body:DeliveryPlaceCustomsOffice>
-                                         |              <body:ReferenceNumber>DeliveryPlaceCustomsOfficeErn</body:ReferenceNumber>
-                                         |            </body:DeliveryPlaceCustomsOffice>
-                                         |            <body:CompetentAuthorityDispatchOffice>
-                                         |              <body:ReferenceNumber>CompetentAuthorityDispatchOfficeErn</body:ReferenceNumber>
-                                         |            </body:CompetentAuthorityDispatchOffice>
-                                         |            <body:TransportArrangerTrader language="en">
-                                         |              <body:VatNumber>TransportArrangerTraderVatNumber</body:VatNumber>
-                                         |              <body:TraderName>TransportArrangerTraderName</body:TraderName>
-                                         |              <body:StreetName>TransportArrangerTraderStreetName</body:StreetName>
-                                         |              <body:StreetNumber>TransportArrangerTraderStreetNumber</body:StreetNumber>
-                                         |              <body:Postcode>TransportArrangerTraderPostcode</body:Postcode>
-                                         |              <body:City>TransportArrangerTraderCity</body:City>
-                                         |            </body:TransportArrangerTrader>
-                                         |            <body:FirstTransporterTrader language="en">
-                                         |              <body:VatNumber>FirstTransporterTraderVatNumber</body:VatNumber>
-                                         |              <body:TraderName>FirstTransporterTraderName</body:TraderName>
-                                         |              <body:StreetName>FirstTransporterTraderStreetName</body:StreetName>
-                                         |              <body:StreetNumber>FirstTransporterTraderStreetNumber</body:StreetNumber>
-                                         |              <body:Postcode>FirstTransporterTraderPostcode</body:Postcode>
-                                         |              <body:City>FirstTransporterTraderCity</body:City>
-                                         |            </body:FirstTransporterTrader>
-                                         |            <body:DocumentCertificate>
-                                         |              <body:DocumentType>DocumentCertificateDocumentType1</body:DocumentType>
-                                         |              <body:DocumentReference>DocumentCertificateDocumentReference1</body:DocumentReference>
-                                         |              <body:DocumentDescription>DocumentCertificateDocumentDescription1</body:DocumentDescription>
-                                         |              <body:ReferenceOfDocument>DocumentCertificateReferenceOfDocument1</body:ReferenceOfDocument>
-                                         |            </body:DocumentCertificate>
-                                         |            <body:DocumentCertificate>
-                                         |              <body:DocumentType>DocumentCertificateDocumentType2</body:DocumentType>
-                                         |              <body:DocumentReference>DocumentCertificateDocumentReference2</body:DocumentReference>
-                                         |              <body:DocumentDescription>DocumentCertificateDocumentDescription2</body:DocumentDescription>
-                                         |              <body:ReferenceOfDocument>DocumentCertificateReferenceOfDocument2</body:ReferenceOfDocument>
-                                         |            </body:DocumentCertificate>
-                                         |            <body:EadEsad>
-                                         |              <body:LocalReferenceNumber>EadEsadLocalReferenceNumber</body:LocalReferenceNumber>
-                                         |              <body:InvoiceNumber>EadEsadInvoiceNumber</body:InvoiceNumber>
-                                         |              <body:InvoiceDate>EadEsadInvoiceDate</body:InvoiceDate>
-                                         |              <body:OriginTypeCode>3</body:OriginTypeCode>
-                                         |              <body:DateOfDispatch>EadEsadDateOfDispatch</body:DateOfDispatch>
-                                         |              <body:TimeOfDispatch>EadEsadTimeOfDispatch</body:TimeOfDispatch>
-                                         |              <body:UpstreamArc>EadEsadUpstreamArc</body:UpstreamArc>
-                                         |              <body:ImportSad>
-                                         |                <body:ImportSadNumber>ImportSadNumber1</body:ImportSadNumber>
-                                         |              </body:ImportSad>
-                                         |              <body:ImportSad>
-                                         |                <body:ImportSadNumber>ImportSadNumber2</body:ImportSadNumber>
-                                         |              </body:ImportSad>
-                                         |            </body:EadEsad>
-                                         |            <body:HeaderEadEsad>
-                                         |              <body:SequenceNumber>$sequenceNumber</body:SequenceNumber>
-                                         |              <body:DateAndTimeOfUpdateValidation>HeaderEadEsadDateTime</body:DateAndTimeOfUpdateValidation>
-                                         |              <body:DestinationTypeCode>10</body:DestinationTypeCode>
-                                         |              <body:JourneyTime>H10</body:JourneyTime>
-                                         |              <body:TransportArrangement>2</body:TransportArrangement>
-                                         |            </body:HeaderEadEsad>
-                                         |            <body:TransportMode>
-                                         |              <body:TransportModeCode>TransportModeTransportModeCode</body:TransportModeCode>
-                                         |              <body:ComplementaryInformation>TransportModeComplementaryInformation</body:ComplementaryInformation>
-                                         |            </body:TransportMode>
-                                         |            <body:MovementGuarantee>
-                                         |              <body:GuarantorTypeCode>123</body:GuarantorTypeCode>
-                                         |              <body:GuarantorTrader>
-                                         |                <body:TraderExciseNumber>GuarantorTraderErn1</body:TraderExciseNumber>
-                                         |                <body:TraderName>GuarantorTraderName1</body:TraderName>
-                                         |                <body:StreetName>GuarantorTraderStreetName1</body:StreetName>
-                                         |                <body:StreetNumber>GuarantorTraderStreetNumber1</body:StreetNumber>
-                                         |                <body:Postcode>GuarantorTraderPostcode1</body:Postcode>
-                                         |                <body:City>GuarantorTraderCity1</body:City>
-                                         |                <body:VatNumber>GuarantorTraderVatNumber1</body:VatNumber>
-                                         |              </body:GuarantorTrader>
-                                         |              <body:GuarantorTrader>
-                                         |                <body:TraderExciseNumber>GuarantorTraderErn2</body:TraderExciseNumber>
-                                         |                <body:TraderName>GuarantorTraderName2</body:TraderName>
-                                         |                <body:StreetName>GuarantorTraderStreetName2</body:StreetName>
-                                         |                <body:StreetNumber>GuarantorTraderStreetNumber2</body:StreetNumber>
-                                         |                <body:Postcode>GuarantorTraderPostcode2</body:Postcode>
-                                         |                <body:City>GuarantorTraderCity2</body:City>
-                                         |                <body:VatNumber>GuarantorTraderVatNumber2</body:VatNumber>
-                                         |              </body:GuarantorTrader>
-                                         |            </body:MovementGuarantee>
-                                         |            <body:BodyEadEsad>
-                                         |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
-                                         |              <body:ExciseProductCode>BodyEadEsadExciseProductCode1</body:ExciseProductCode>
-                                         |              <body:CnCode>BodyEadEsadCnCode1</body:CnCode>
-                                         |              <body:Quantity>2</body:Quantity>
-                                         |              <body:GrossMass>3</body:GrossMass>
-                                         |              <body:NetMass>4</body:NetMass>
-                                         |              <body:AlcoholicStrengthByVolumeInPercentage>5</body:AlcoholicStrengthByVolumeInPercentage>
-                                         |              <body:DegreePlato>6</body:DegreePlato>
-                                         |              <body:FiscalMark>BodyEadEsadFiscalMark1</body:FiscalMark>
-                                         |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
-                                         |              <body:DesignationOfOrigin>BodyEadEsadDesignationOfOrigin1</body:DesignationOfOrigin>
-                                         |              <body:SizeOfProducer>BodyEadEsadSizeOfProducer1</body:SizeOfProducer>
-                                         |              <body:Density>7</body:Density>
-                                         |              <body:CommercialDescription>BodyEadEsadCommercialDescription1</body:CommercialDescription>
-                                         |              <body:BrandNameOfProducts>BodyEadEsadBrandNameOfProducts1</body:BrandNameOfProducts>
-                                         |              <body:MaturationPeriodOrAgeOfProducts>BodyEadEsadMaturationPeriodOrAgeOfProducts1</body:MaturationPeriodOrAgeOfProducts>
-                                         |              <body:IndependentSmallProducersDeclaration>BodyEadEsadIndependentSmallProducersDeclaration1</body:IndependentSmallProducersDeclaration>
-                                         |              <body:Package>
-                                         |                <body:KindOfPackages>PackageKindOfPackages11</body:KindOfPackages>
-                                         |                <body:NumberOfPackages>1</body:NumberOfPackages>
-                                         |                <body:ShippingMarks>PackageShippingMarks11</body:ShippingMarks>
-                                         |                <body:CommercialSealIdentification>PackageCommercialSealIdentification11</body:CommercialSealIdentification>
-                                         |                <body:SealInformation>PackageSealInformation11</body:SealInformation>
-                                         |              </body:Package>
-                                         |              <body:Package>
-                                         |                <body:KindOfPackages>PackageKindOfPackages12</body:KindOfPackages>
-                                         |                <body:NumberOfPackages>2</body:NumberOfPackages>
-                                         |                <body:ShippingMarks>PackageShippingMarks12</body:ShippingMarks>
-                                         |                <body:CommercialSealIdentification>PackageCommercialSealIdentification12</body:CommercialSealIdentification>
-                                         |                <body:SealInformation>PackageSealInformation12</body:SealInformation>
-                                         |              </body:Package>
-                                         |              <body:WineProduct>
-                                         |                <body:WineProductCategory>1</body:WineProductCategory>
-                                         |                <body:WineGrowingZoneCode>WineProductWineGrowingZoneCode1</body:WineGrowingZoneCode>
-                                         |                <body:ThirdCountryOfOrigin>WineProductThirdCountryOfOrigin1</body:ThirdCountryOfOrigin>
-                                         |                <body:OtherInformation>WineProductOtherInformation1</body:OtherInformation>
-                                         |                <body:WineOperation>
-                                         |                  <body:WineOperationCode>WineOperationCode11</body:WineOperationCode>
-                                         |                </body:WineOperation>
-                                         |                <body:WineOperation>
-                                         |                  <body:WineOperationCode>WineOperationCode12</body:WineOperationCode>
-                                         |                </body:WineOperation>
-                                         |              </body:WineProduct>
-                                         |            </body:BodyEadEsad>
-                                         |            <body:BodyEadEsad>
-                                         |              <body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
-                                         |              <body:ExciseProductCode>BodyEadEsadExciseProductCode2</body:ExciseProductCode>
-                                         |              <body:CnCode>BodyEadEsadCnCode2</body:CnCode>
-                                         |              <body:Quantity>3</body:Quantity>
-                                         |              <body:GrossMass>4</body:GrossMass>
-                                         |              <body:NetMass>5</body:NetMass>
-                                         |              <body:AlcoholicStrengthByVolumeInPercentage>6</body:AlcoholicStrengthByVolumeInPercentage>
-                                         |              <body:DegreePlato>7</body:DegreePlato>
-                                         |              <body:FiscalMark>BodyEadEsadFiscalMark2</body:FiscalMark>
-                                         |              <body:FiscalMarkUsedFlag>0</body:FiscalMarkUsedFlag>
-                                         |              <body:DesignationOfOrigin>BodyEadEsadDesignationOfOrigin2</body:DesignationOfOrigin>
-                                         |              <body:SizeOfProducer>BodyEadEsadSizeOfProducer2</body:SizeOfProducer>
-                                         |              <body:Density>8</body:Density>
-                                         |              <body:CommercialDescription>BodyEadEsadCommercialDescription2</body:CommercialDescription>
-                                         |              <body:BrandNameOfProducts>BodyEadEsadBrandNameOfProducts2</body:BrandNameOfProducts>
-                                         |              <body:MaturationPeriodOrAgeOfProducts>BodyEadEsadMaturationPeriodOrAgeOfProducts2</body:MaturationPeriodOrAgeOfProducts>
-                                         |              <body:IndependentSmallProducersDeclaration>BodyEadEsadIndependentSmallProducersDeclaration2</body:IndependentSmallProducersDeclaration>
-                                         |              <body:Package>
-                                         |                <body:KindOfPackages>PackageKindOfPackages21</body:KindOfPackages>
-                                         |                <body:NumberOfPackages>3</body:NumberOfPackages>
-                                         |                <body:ShippingMarks>PackageShippingMarks21</body:ShippingMarks>
-                                         |                <body:CommercialSealIdentification>PackageCommercialSealIdentification21</body:CommercialSealIdentification>
-                                         |                <body:SealInformation>PackageSealInformation21</body:SealInformation>
-                                         |              </body:Package>
-                                         |              <body:Package>
-                                         |                <body:KindOfPackages>PackageKindOfPackages22</body:KindOfPackages>
-                                         |                <body:NumberOfPackages>4</body:NumberOfPackages>
-                                         |                <body:ShippingMarks>PackageShippingMarks22</body:ShippingMarks>
-                                         |                <body:CommercialSealIdentification>PackageCommercialSealIdentification22</body:CommercialSealIdentification>
-                                         |                <body:SealInformation>PackageSealInformation22</body:SealInformation>
-                                         |              </body:Package>
-                                         |              <body:WineProduct>
-                                         |                <body:WineProductCategory>2</body:WineProductCategory>
-                                         |                <body:WineGrowingZoneCode>WineProductWineGrowingZoneCode2</body:WineGrowingZoneCode>
-                                         |                <body:ThirdCountryOfOrigin>WineProductThirdCountryOfOrigin2</body:ThirdCountryOfOrigin>
-                                         |                <body:OtherInformation>WineProductOtherInformation2</body:OtherInformation>
-                                         |                <body:WineOperation>
-                                         |                  <body:WineOperationCode>WineOperationCode21</body:WineOperationCode>
-                                         |                </body:WineOperation>
-                                         |                <body:WineOperation>
-                                         |                  <body:WineOperationCode>WineOperationCode22</body:WineOperationCode>
-                                         |                </body:WineOperation>
-                                         |              </body:WineProduct>
-                                         |            </body:BodyEadEsad>
-                                         |            <body:TransportDetails>
-                                         |              <body:TransportUnitCode>TransportDetailsTransportUnitCode1</body:TransportUnitCode>
-                                         |              <body:IdentityOfTransportUnits>TransportDetailsIdentityOfTransportUnits1</body:IdentityOfTransportUnits>
-                                         |              <body:CommercialSealIdentification>TransportDetailsCommercialSealIdentification1</body:CommercialSealIdentification>
-                                         |              <body:ComplementaryInformation>TransportDetailsComplementaryInformation1</body:ComplementaryInformation>
-                                         |              <body:SealInformation>TransportDetailsSealInformation1</body:SealInformation>
-                                         |            </body:TransportDetails>
-                                         |            <body:TransportDetails>
-                                         |              <body:TransportUnitCode>TransportDetailsTransportUnitCode2</body:TransportUnitCode>
-                                         |              <body:IdentityOfTransportUnits>TransportDetailsIdentityOfTransportUnits2</body:IdentityOfTransportUnits>
-                                         |              <body:CommercialSealIdentification>TransportDetailsCommercialSealIdentification2</body:CommercialSealIdentification>
-                                         |              <body:ComplementaryInformation>TransportDetailsComplementaryInformation2</body:ComplementaryInformation>
-                                         |              <body:SealInformation>TransportDetailsSealInformation2</body:SealInformation>
-                                         |            </body:TransportDetails>
-                                         |          </body:EADESADContainer>
-                                         |        </body:Body>
-                                         |      </body:IE801>
-                                         |    </mov:currentMovement>
-                                         |    <mov:eventHistory>
-                                         |          <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
-                                         |      <urn:Header>
-                                         |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
-                                         |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
-                                         |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
-                                         |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
-                                         |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
-                                         |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
-                                         |      </urn:Header>
-                                         |      <urn:Body>
-                                         |        <urn:AcceptedOrRejectedReportOfReceiptExport>
-                                         |          <urn:Attributes>
-                                         |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
-                                         |          </urn:Attributes>
-                                         |          <urn:ConsigneeTrader language="en">
-                                         |            <urn:Traderid>XIWK000000206</urn:Traderid>
-                                         |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
-                                         |            <urn:StreetNumber>1</urn:StreetNumber>
-                                         |            <urn:StreetName>Catherdral</urn:StreetName>
-                                         |            <urn:Postcode>BT3 7BF</urn:Postcode>
-                                         |            <urn:City>Salford</urn:City>
-                                         |          </urn:ConsigneeTrader>
-                                         |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
-                                         |            <urn:AdministrativeReferenceCode>21GB00000000000351266</urn:AdministrativeReferenceCode>
-                                         |            <urn:SequenceNumber>2</urn:SequenceNumber>
-                                         |          </ie:ExciseMovement>
-                                         |          <urn:DeliveryPlaceTrader language="en">
-                                         |            <urn:Traderid>XI00000000207</urn:Traderid>
-                                         |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
-                                         |            <urn:StreetNumber>2</urn:StreetNumber>
-                                         |            <urn:StreetName>Catherdral</urn:StreetName>
-                                         |            <urn:Postcode>BT3 7BF</urn:Postcode>
-                                         |            <urn:City>Salford</urn:City>
-                                         |          </urn:DeliveryPlaceTrader>
-                                         |          <urn:DestinationOffice>
-                                         |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
-                                         |          </urn:DestinationOffice>
-                                         |          <urn:ReportOfReceiptExport>
-                                         |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
-                                         |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
-                                         |            <urn:ComplementaryInformation>some great reason</urn:ComplementaryInformation>
-                                         |          </urn:ReportOfReceiptExport>
-                                         |          <urn:BodyReportOfReceiptExport>
-                                         |            <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
-                                         |            <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
-                                         |            <urn:ObservedShortageOrExcess>21</urn:ObservedShortageOrExcess>
-                                         |            <urn:ExciseProductCode>W300</urn:ExciseProductCode>
-                                         |            <urn:RefusedQuantity>1</urn:RefusedQuantity>
-                                         |            <urn:UnsatisfactoryReason>
-                                         |              <urn:UnsatisfactoryReasonCode>1</urn:UnsatisfactoryReasonCode>
-                                         |              <urn:ComplementaryInformation>some info</urn:ComplementaryInformation>
-                                         |            </urn:UnsatisfactoryReason>
-                                         |            <urn:UnsatisfactoryReason>
-                                         |              <urn:UnsatisfactoryReasonCode>2</urn:UnsatisfactoryReasonCode>
-                                         |            </urn:UnsatisfactoryReason>
-                                         |          </urn:BodyReportOfReceiptExport>
-                                         |        </urn:AcceptedOrRejectedReportOfReceiptExport>
-                                         |      </urn:Body>
-                                         |    </urn:IE818>
-                                         |    <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
-                                         |      <urn:Header>
-                                         |        <urn:MessageSender>NDEA.GB</urn:MessageSender>
-                                         |        <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
-                                         |        <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
-                                         |        <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
-                                         |        <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
-                                         |      </urn:Header>
-                                         |      <urn:Body>
-                                         |        <urn:NotificationOfDivertedEADESAD>
-                                         |          <urn:ExciseNotification>
-                                         |            <urn:NotificationType>2</urn:NotificationType>
-                                         |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
-                                         |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
-                                         |            <urn:SequenceNumber>1</urn:SequenceNumber>
-                                         |          </urn:ExciseNotification>
-                                         |          <urn:DownstreamArc>
-                                         |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
-                                         |          </urn:DownstreamArc>
-                                         |          <urn:DownstreamArc>
-                                         |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
-                                         |          </urn:DownstreamArc>
-                                         |        </urn:NotificationOfDivertedEADESAD>
-                                         |      </urn:Body>
-                                         |    </urn:IE803>
-                                         |
-                                         |    <!-- Alert Event -->
-                                         |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
-                                         |        <ie819:Header>
-                                         |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
-                                         |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
-                                         |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-                                         |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
-                                         |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
-                                         |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
-                                         |        </ie819:Header>
-                                         |        <ie819:Body>
-                                         |          <ie819:AlertOrRejectionOfEADESAD>
-                                         |            <ie819:Attributes>
-                                         |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
-                                         |            </ie819:Attributes>
-                                         |            <ie819:ConsigneeTrader language="en">
-                                         |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
-                                         |              <ie819:TraderName>Bizz</ie819:TraderName>
-                                         |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
-                                         |              <ie819:Postcode>tf3 4er</ie819:Postcode>
-                                         |              <ie819:City>Shropshire</ie819:City>
-                                         |            </ie819:ConsigneeTrader>
-                                         |            <ie819:ExciseMovement>
-                                         |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
-                                         |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
-                                         |            </ie819:ExciseMovement>
-                                         |            <ie819:DestinationOffice>
-                                         |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
-                                         |            </ie819:DestinationOffice>
-                                         |            <ie819:AlertOrRejection>
-                                         |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
-                                         |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
-                                         |            </ie819:AlertOrRejection>
-                                         |            <ie819:AlertOrRejectionOfEadEsadReason>
-                                         |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
-                                         |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
-                                         |            </ie819:AlertOrRejectionOfEadEsadReason>
-                                         |          </ie819:AlertOrRejectionOfEADESAD>
-                                         |        </ie819:Body>
-                                         |      </ie819:IE819>
-                                         |
-                                         |      <!-- 2nd Alert Event -->
-                                         |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
-                                         |        <ie819:Header>
-                                         |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
-                                         |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
-                                         |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-                                         |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
-                                         |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
-                                         |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
-                                         |        </ie819:Header>
-                                         |        <ie819:Body>
-                                         |          <ie819:AlertOrRejectionOfEADESAD>
-                                         |            <ie819:Attributes>
-                                         |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
-                                         |            </ie819:Attributes>
-                                         |            <ie819:ConsigneeTrader language="en">
-                                         |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
-                                         |              <ie819:TraderName>Bizz</ie819:TraderName>
-                                         |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
-                                         |              <ie819:Postcode>tf3 4er</ie819:Postcode>
-                                         |              <ie819:City>Shropshire</ie819:City>
-                                         |            </ie819:ConsigneeTrader>
-                                         |            <ie819:ExciseMovement>
-                                         |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
-                                         |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
-                                         |            </ie819:ExciseMovement>
-                                         |            <ie819:DestinationOffice>
-                                         |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
-                                         |            </ie819:DestinationOffice>
-                                         |            <ie819:AlertOrRejection>
-                                         |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
-                                         |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
-                                         |            </ie819:AlertOrRejection>
-                                         |            <ie819:AlertOrRejectionOfEadEsadReason>
-                                         |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
-                                         |            </ie819:AlertOrRejectionOfEadEsadReason>
-                                         |          </ie819:AlertOrRejectionOfEADESAD>
-                                         |        </ie819:Body>
-                                         |      </ie819:IE819>
-                                         |
-                                         |      <!-- Rejection Event -->
-                                         |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
-                                         |        <ie819:Header>
-                                         |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
-                                         |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
-                                         |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
-                                         |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
-                                         |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
-                                         |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
-                                         |        </ie819:Header>
-                                         |        <ie819:Body>
-                                         |          <ie819:AlertOrRejectionOfEADESAD>
-                                         |            <ie819:Attributes>
-                                         |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
-                                         |            </ie819:Attributes>
-                                         |            <ie819:ConsigneeTrader language="en">
-                                         |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
-                                         |              <ie819:TraderName>Bizz</ie819:TraderName>
-                                         |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
-                                         |              <ie819:Postcode>tf3 4er</ie819:Postcode>
-                                         |              <ie819:City>Shropshire</ie819:City>
-                                         |            </ie819:ConsigneeTrader>
-                                         |            <ie819:ExciseMovement>
-                                         |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
-                                         |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
-                                         |            </ie819:ExciseMovement>
-                                         |            <ie819:DestinationOffice>
-                                         |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
-                                         |            </ie819:DestinationOffice>
-                                         |            <ie819:AlertOrRejection>
-                                         |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
-                                         |              <ie819:EadEsadRejectedFlag>1</ie819:EadEsadRejectedFlag>
-                                         |            </ie819:AlertOrRejection>
-                                         |            <ie819:AlertOrRejectionOfEadEsadReason>
-                                         |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
-                                         |            </ie819:AlertOrRejectionOfEadEsadReason>
-                                         |          </ie819:AlertOrRejectionOfEADESAD>
-                                         |        </ie819:Body>
-                                         |      </ie819:IE819>
-                                         |    </mov:eventHistory>
-                                         |  </mov:movementView>""".stripMargin
+       |    <mov:currentMovement>
+       |      <mov:status>Beans</mov:status>
+       |      <mov:version_transaction_ref>008</mov:version_transaction_ref>
+       |      <body:IE801 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE801:V3.01">
+       |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+       |          <head:MessageSender>NDEA.FR</head:MessageSender>
+       |          <head:MessageRecipient>NDEA.GB</head:MessageRecipient>
+       |          <head:DateOfPreparation>2008-09-04</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>10:22:50</head:TimeOfPreparation>
+       |          <head:MessageIdentifier>Message identifier</head:MessageIdentifier>
+       |        </body:Header>
+       |        <body:Body>
+       |          <body:EADESADContainer>
+       |            <body:ConsigneeTrader language="en">
+       |              <body:Traderid>ConsigneeTraderId</body:Traderid>
+       |              <body:TraderName>ConsigneeTraderName</body:TraderName>
+       |              <body:StreetName>ConsigneeTraderStreetName</body:StreetName>
+       |              <body:StreetNumber>ConsigneeTraderStreetNumber</body:StreetNumber>
+       |              <body:Postcode>ConsigneeTraderPostcode</body:Postcode>
+       |              <body:City>ConsigneeTraderCity</body:City>
+       |              <body:EoriNumber>ConsigneeTraderEori</body:EoriNumber>
+       |            </body:ConsigneeTrader>
+       |            <body:ExciseMovement>
+       |               <body:AdministrativeReferenceCode>ExciseMovementArc</body:AdministrativeReferenceCode>
+       |               <body:DateAndTimeOfValidationOfEadEsad>ExciseMovementDateTime</body:DateAndTimeOfValidationOfEadEsad>
+       |            </body:ExciseMovement>
+       |            <body:ConsignorTrader language="en">
+       |              <body:TraderExciseNumber>ConsignorTraderExciseNumber</body:TraderExciseNumber>
+       |              <body:TraderName>ConsignorTraderName</body:TraderName>
+       |              <body:StreetName>ConsignorTraderStreetName</body:StreetName>
+       |              <body:StreetNumber>ConsignorTraderStreetNumber</body:StreetNumber>
+       |              <body:Postcode>ConsignorTraderPostcode</body:Postcode>
+       |              <body:City>ConsignorTraderCity</body:City>
+       |            </body:ConsignorTrader>
+       |            <body:PlaceOfDispatchTrader language="en">
+       |              <body:ReferenceOfTaxWarehouse>PlaceOfDispatchTraderReferenceOfTaxWarehouse</body:ReferenceOfTaxWarehouse>
+       |              <body:TraderName>PlaceOfDispatchTraderName</body:TraderName>
+       |              <body:StreetName>PlaceOfDispatchTraderStreetName</body:StreetName>
+       |              <body:StreetNumber>PlaceOfDispatchTraderStreetNumber</body:StreetNumber>
+       |              <body:Postcode>PlaceOfDispatchTraderPostcode</body:Postcode>
+       |              <body:City>PlaceOfDispatchTraderCity</body:City>
+       |            </body:PlaceOfDispatchTrader>
+       |            <body:DispatchImportOffice>
+       |              <body:ReferenceNumber>DispatchImportOfficeErn</body:ReferenceNumber>
+       |            </body:DispatchImportOffice>
+       |            <body:ComplementConsigneeTrader>
+       |              <body:MemberStateCode>CCTMemberStateCode</body:MemberStateCode>
+       |              <body:SerialNumberOfCertificateOfExemption>CCTSerialNumber</body:SerialNumberOfCertificateOfExemption>
+       |            </body:ComplementConsigneeTrader>
+       |            <body:DeliveryPlaceTrader language="en">
+       |              <body:Traderid>DeliveryPlaceTraderId</body:Traderid>
+       |              <body:TraderName>DeliveryPlaceTraderName</body:TraderName>
+       |              <body:StreetName>DeliveryPlaceTraderStreetName</body:StreetName>
+       |              <body:StreetNumber>DeliveryPlaceTraderStreetNumber</body:StreetNumber>
+       |              <body:Postcode>DeliveryPlaceTraderPostcode</body:Postcode>
+       |              <body:City>DeliveryPlaceTraderCity</body:City>
+       |            </body:DeliveryPlaceTrader>
+       |            <body:DeliveryPlaceCustomsOffice>
+       |              <body:ReferenceNumber>DeliveryPlaceCustomsOfficeErn</body:ReferenceNumber>
+       |            </body:DeliveryPlaceCustomsOffice>
+       |            <body:CompetentAuthorityDispatchOffice>
+       |              <body:ReferenceNumber>CompetentAuthorityDispatchOfficeErn</body:ReferenceNumber>
+       |            </body:CompetentAuthorityDispatchOffice>
+       |            <body:TransportArrangerTrader language="en">
+       |              <body:VatNumber>TransportArrangerTraderVatNumber</body:VatNumber>
+       |              <body:TraderName>TransportArrangerTraderName</body:TraderName>
+       |              <body:StreetName>TransportArrangerTraderStreetName</body:StreetName>
+       |              <body:StreetNumber>TransportArrangerTraderStreetNumber</body:StreetNumber>
+       |              <body:Postcode>TransportArrangerTraderPostcode</body:Postcode>
+       |              <body:City>TransportArrangerTraderCity</body:City>
+       |            </body:TransportArrangerTrader>
+       |            <body:FirstTransporterTrader language="en">
+       |              <body:VatNumber>FirstTransporterTraderVatNumber</body:VatNumber>
+       |              <body:TraderName>FirstTransporterTraderName</body:TraderName>
+       |              <body:StreetName>FirstTransporterTraderStreetName</body:StreetName>
+       |              <body:StreetNumber>FirstTransporterTraderStreetNumber</body:StreetNumber>
+       |              <body:Postcode>FirstTransporterTraderPostcode</body:Postcode>
+       |              <body:City>FirstTransporterTraderCity</body:City>
+       |            </body:FirstTransporterTrader>
+       |            <body:DocumentCertificate>
+       |              <body:DocumentType>DocumentCertificateDocumentType1</body:DocumentType>
+       |              <body:DocumentReference>DocumentCertificateDocumentReference1</body:DocumentReference>
+       |              <body:DocumentDescription>DocumentCertificateDocumentDescription1</body:DocumentDescription>
+       |              <body:ReferenceOfDocument>DocumentCertificateReferenceOfDocument1</body:ReferenceOfDocument>
+       |            </body:DocumentCertificate>
+       |            <body:DocumentCertificate>
+       |              <body:DocumentType>DocumentCertificateDocumentType2</body:DocumentType>
+       |              <body:DocumentReference>DocumentCertificateDocumentReference2</body:DocumentReference>
+       |              <body:DocumentDescription>DocumentCertificateDocumentDescription2</body:DocumentDescription>
+       |              <body:ReferenceOfDocument>DocumentCertificateReferenceOfDocument2</body:ReferenceOfDocument>
+       |            </body:DocumentCertificate>
+       |            <body:EadEsad>
+       |              <body:LocalReferenceNumber>EadEsadLocalReferenceNumber</body:LocalReferenceNumber>
+       |              <body:InvoiceNumber>EadEsadInvoiceNumber</body:InvoiceNumber>
+       |              <body:InvoiceDate>EadEsadInvoiceDate</body:InvoiceDate>
+       |              <body:OriginTypeCode>3</body:OriginTypeCode>
+       |              <body:DateOfDispatch>EadEsadDateOfDispatch</body:DateOfDispatch>
+       |              <body:TimeOfDispatch>EadEsadTimeOfDispatch</body:TimeOfDispatch>
+       |              <body:UpstreamArc>EadEsadUpstreamArc</body:UpstreamArc>
+       |              <body:ImportSad>
+       |                <body:ImportSadNumber>ImportSadNumber1</body:ImportSadNumber>
+       |              </body:ImportSad>
+       |              <body:ImportSad>
+       |                <body:ImportSadNumber>ImportSadNumber2</body:ImportSadNumber>
+       |              </body:ImportSad>
+       |            </body:EadEsad>
+       |            <body:HeaderEadEsad>
+       |              <body:SequenceNumber>$sequenceNumber</body:SequenceNumber>
+       |              <body:DateAndTimeOfUpdateValidation>HeaderEadEsadDateTime</body:DateAndTimeOfUpdateValidation>
+       |              <body:DestinationTypeCode>10</body:DestinationTypeCode>
+       |              <body:JourneyTime>H10</body:JourneyTime>
+       |              <body:TransportArrangement>2</body:TransportArrangement>
+       |            </body:HeaderEadEsad>
+       |            <body:TransportMode>
+       |              <body:TransportModeCode>TransportModeTransportModeCode</body:TransportModeCode>
+       |              <body:ComplementaryInformation>TransportModeComplementaryInformation</body:ComplementaryInformation>
+       |            </body:TransportMode>
+       |            <body:MovementGuarantee>
+       |              <body:GuarantorTypeCode>123</body:GuarantorTypeCode>
+       |              <body:GuarantorTrader>
+       |                <body:TraderExciseNumber>GuarantorTraderErn1</body:TraderExciseNumber>
+       |                <body:TraderName>GuarantorTraderName1</body:TraderName>
+       |                <body:StreetName>GuarantorTraderStreetName1</body:StreetName>
+       |                <body:StreetNumber>GuarantorTraderStreetNumber1</body:StreetNumber>
+       |                <body:Postcode>GuarantorTraderPostcode1</body:Postcode>
+       |                <body:City>GuarantorTraderCity1</body:City>
+       |                <body:VatNumber>GuarantorTraderVatNumber1</body:VatNumber>
+       |              </body:GuarantorTrader>
+       |              <body:GuarantorTrader>
+       |                <body:TraderExciseNumber>GuarantorTraderErn2</body:TraderExciseNumber>
+       |                <body:TraderName>GuarantorTraderName2</body:TraderName>
+       |                <body:StreetName>GuarantorTraderStreetName2</body:StreetName>
+       |                <body:StreetNumber>GuarantorTraderStreetNumber2</body:StreetNumber>
+       |                <body:Postcode>GuarantorTraderPostcode2</body:Postcode>
+       |                <body:City>GuarantorTraderCity2</body:City>
+       |                <body:VatNumber>GuarantorTraderVatNumber2</body:VatNumber>
+       |              </body:GuarantorTrader>
+       |            </body:MovementGuarantee>
+       |            <body:BodyEadEsad>
+       |              <body:BodyRecordUniqueReference>1</body:BodyRecordUniqueReference>
+       |              <body:ExciseProductCode>BodyEadEsadExciseProductCode1</body:ExciseProductCode>
+       |              <body:CnCode>BodyEadEsadCnCode1</body:CnCode>
+       |              <body:Quantity>2</body:Quantity>
+       |              <body:GrossMass>3</body:GrossMass>
+       |              <body:NetMass>4</body:NetMass>
+       |              <body:AlcoholicStrengthByVolumeInPercentage>5</body:AlcoholicStrengthByVolumeInPercentage>
+       |              <body:DegreePlato>6</body:DegreePlato>
+       |              <body:FiscalMark>BodyEadEsadFiscalMark1</body:FiscalMark>
+       |              <body:FiscalMarkUsedFlag>1</body:FiscalMarkUsedFlag>
+       |              <body:DesignationOfOrigin>BodyEadEsadDesignationOfOrigin1</body:DesignationOfOrigin>
+       |              <body:SizeOfProducer>BodyEadEsadSizeOfProducer1</body:SizeOfProducer>
+       |              <body:Density>7</body:Density>
+       |              <body:CommercialDescription>BodyEadEsadCommercialDescription1</body:CommercialDescription>
+       |              <body:BrandNameOfProducts>BodyEadEsadBrandNameOfProducts1</body:BrandNameOfProducts>
+       |              <body:MaturationPeriodOrAgeOfProducts>BodyEadEsadMaturationPeriodOrAgeOfProducts1</body:MaturationPeriodOrAgeOfProducts>
+       |              <body:IndependentSmallProducersDeclaration>BodyEadEsadIndependentSmallProducersDeclaration1</body:IndependentSmallProducersDeclaration>
+       |              <body:Package>
+       |                <body:KindOfPackages>PackageKindOfPackages11</body:KindOfPackages>
+       |                <body:NumberOfPackages>1</body:NumberOfPackages>
+       |                <body:ShippingMarks>PackageShippingMarks11</body:ShippingMarks>
+       |                <body:CommercialSealIdentification>PackageCommercialSealIdentification11</body:CommercialSealIdentification>
+       |                <body:SealInformation>PackageSealInformation11</body:SealInformation>
+       |              </body:Package>
+       |              <body:Package>
+       |                <body:KindOfPackages>PackageKindOfPackages12</body:KindOfPackages>
+       |                <body:NumberOfPackages>2</body:NumberOfPackages>
+       |                <body:ShippingMarks>PackageShippingMarks12</body:ShippingMarks>
+       |                <body:CommercialSealIdentification>PackageCommercialSealIdentification12</body:CommercialSealIdentification>
+       |                <body:SealInformation>PackageSealInformation12</body:SealInformation>
+       |              </body:Package>
+       |              <body:WineProduct>
+       |                <body:WineProductCategory>1</body:WineProductCategory>
+       |                <body:WineGrowingZoneCode>WineProductWineGrowingZoneCode1</body:WineGrowingZoneCode>
+       |                <body:ThirdCountryOfOrigin>WineProductThirdCountryOfOrigin1</body:ThirdCountryOfOrigin>
+       |                <body:OtherInformation>WineProductOtherInformation1</body:OtherInformation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>WineOperationCode11</body:WineOperationCode>
+       |                </body:WineOperation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>WineOperationCode12</body:WineOperationCode>
+       |                </body:WineOperation>
+       |              </body:WineProduct>
+       |            </body:BodyEadEsad>
+       |            <body:BodyEadEsad>
+       |              <body:BodyRecordUniqueReference>2</body:BodyRecordUniqueReference>
+       |              <body:ExciseProductCode>BodyEadEsadExciseProductCode2</body:ExciseProductCode>
+       |              <body:CnCode>BodyEadEsadCnCode2</body:CnCode>
+       |              <body:Quantity>3</body:Quantity>
+       |              <body:GrossMass>4</body:GrossMass>
+       |              <body:NetMass>5</body:NetMass>
+       |              <body:AlcoholicStrengthByVolumeInPercentage>6</body:AlcoholicStrengthByVolumeInPercentage>
+       |              <body:DegreePlato>7</body:DegreePlato>
+       |              <body:FiscalMark>BodyEadEsadFiscalMark2</body:FiscalMark>
+       |              <body:FiscalMarkUsedFlag>0</body:FiscalMarkUsedFlag>
+       |              <body:DesignationOfOrigin>BodyEadEsadDesignationOfOrigin2</body:DesignationOfOrigin>
+       |              <body:SizeOfProducer>BodyEadEsadSizeOfProducer2</body:SizeOfProducer>
+       |              <body:Density>8</body:Density>
+       |              <body:CommercialDescription>BodyEadEsadCommercialDescription2</body:CommercialDescription>
+       |              <body:BrandNameOfProducts>BodyEadEsadBrandNameOfProducts2</body:BrandNameOfProducts>
+       |              <body:MaturationPeriodOrAgeOfProducts>BodyEadEsadMaturationPeriodOrAgeOfProducts2</body:MaturationPeriodOrAgeOfProducts>
+       |              <body:IndependentSmallProducersDeclaration>BodyEadEsadIndependentSmallProducersDeclaration2</body:IndependentSmallProducersDeclaration>
+       |              <body:Package>
+       |                <body:KindOfPackages>PackageKindOfPackages21</body:KindOfPackages>
+       |                <body:NumberOfPackages>3</body:NumberOfPackages>
+       |                <body:ShippingMarks>PackageShippingMarks21</body:ShippingMarks>
+       |                <body:CommercialSealIdentification>PackageCommercialSealIdentification21</body:CommercialSealIdentification>
+       |                <body:SealInformation>PackageSealInformation21</body:SealInformation>
+       |              </body:Package>
+       |              <body:Package>
+       |                <body:KindOfPackages>PackageKindOfPackages22</body:KindOfPackages>
+       |                <body:NumberOfPackages>4</body:NumberOfPackages>
+       |                <body:ShippingMarks>PackageShippingMarks22</body:ShippingMarks>
+       |                <body:CommercialSealIdentification>PackageCommercialSealIdentification22</body:CommercialSealIdentification>
+       |                <body:SealInformation>PackageSealInformation22</body:SealInformation>
+       |              </body:Package>
+       |              <body:WineProduct>
+       |                <body:WineProductCategory>2</body:WineProductCategory>
+       |                <body:WineGrowingZoneCode>WineProductWineGrowingZoneCode2</body:WineGrowingZoneCode>
+       |                <body:ThirdCountryOfOrigin>WineProductThirdCountryOfOrigin2</body:ThirdCountryOfOrigin>
+       |                <body:OtherInformation>WineProductOtherInformation2</body:OtherInformation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>WineOperationCode21</body:WineOperationCode>
+       |                </body:WineOperation>
+       |                <body:WineOperation>
+       |                  <body:WineOperationCode>WineOperationCode22</body:WineOperationCode>
+       |                </body:WineOperation>
+       |              </body:WineProduct>
+       |            </body:BodyEadEsad>
+       |            <body:TransportDetails>
+       |              <body:TransportUnitCode>TransportDetailsTransportUnitCode1</body:TransportUnitCode>
+       |              <body:IdentityOfTransportUnits>TransportDetailsIdentityOfTransportUnits1</body:IdentityOfTransportUnits>
+       |              <body:CommercialSealIdentification>TransportDetailsCommercialSealIdentification1</body:CommercialSealIdentification>
+       |              <body:ComplementaryInformation>TransportDetailsComplementaryInformation1</body:ComplementaryInformation>
+       |              <body:SealInformation>TransportDetailsSealInformation1</body:SealInformation>
+       |            </body:TransportDetails>
+       |            <body:TransportDetails>
+       |              <body:TransportUnitCode>TransportDetailsTransportUnitCode2</body:TransportUnitCode>
+       |              <body:IdentityOfTransportUnits>TransportDetailsIdentityOfTransportUnits2</body:IdentityOfTransportUnits>
+       |              <body:CommercialSealIdentification>TransportDetailsCommercialSealIdentification2</body:CommercialSealIdentification>
+       |              <body:ComplementaryInformation>TransportDetailsComplementaryInformation2</body:ComplementaryInformation>
+       |              <body:SealInformation>TransportDetailsSealInformation2</body:SealInformation>
+       |            </body:TransportDetails>
+       |          </body:EADESADContainer>
+       |        </body:Body>
+       |      </body:IE801>
+       |    </mov:currentMovement>
+       |    <mov:eventHistory>
+       |          <urn:IE818 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+       |      <urn:Header>
+       |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+       |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+       |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+       |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+       |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+       |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+       |      </urn:Header>
+       |      <urn:Body>
+       |        <urn:AcceptedOrRejectedReportOfReceiptExport>
+       |          <urn:Attributes>
+       |            <urn:DateAndTimeOfValidationOfReportOfReceiptExport>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfReportOfReceiptExport>
+       |          </urn:Attributes>
+       |          <urn:ConsigneeTrader language="en">
+       |            <urn:Traderid>XIWK000000206</urn:Traderid>
+       |            <urn:TraderName>SEED TRADER NI</urn:TraderName>
+       |            <urn:StreetNumber>1</urn:StreetNumber>
+       |            <urn:StreetName>Catherdral</urn:StreetName>
+       |            <urn:Postcode>BT3 7BF</urn:Postcode>
+       |            <urn:City>Salford</urn:City>
+       |          </urn:ConsigneeTrader>
+       |          <ie:ExciseMovement xmlns:ie="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
+       |            <urn:AdministrativeReferenceCode>21GB00000000000351266</urn:AdministrativeReferenceCode>
+       |            <urn:SequenceNumber>2</urn:SequenceNumber>
+       |          </ie:ExciseMovement>
+       |          <urn:DeliveryPlaceTrader language="en">
+       |            <urn:Traderid>XI00000000207</urn:Traderid>
+       |            <urn:TraderName>SEED TRADER NI 2</urn:TraderName>
+       |            <urn:StreetNumber>2</urn:StreetNumber>
+       |            <urn:StreetName>Catherdral</urn:StreetName>
+       |            <urn:Postcode>BT3 7BF</urn:Postcode>
+       |            <urn:City>Salford</urn:City>
+       |          </urn:DeliveryPlaceTrader>
+       |          <urn:DestinationOffice>
+       |            <urn:ReferenceNumber>XI004098</urn:ReferenceNumber>
+       |          </urn:DestinationOffice>
+       |          <urn:ReportOfReceiptExport>
+       |            <urn:DateOfArrivalOfExciseProducts>2021-09-08</urn:DateOfArrivalOfExciseProducts>
+       |            <urn:GlobalConclusionOfReceipt>1</urn:GlobalConclusionOfReceipt>
+       |            <urn:ComplementaryInformation>some great reason</urn:ComplementaryInformation>
+       |          </urn:ReportOfReceiptExport>
+       |          <urn:BodyReportOfReceiptExport>
+       |            <urn:BodyRecordUniqueReference>1</urn:BodyRecordUniqueReference>
+       |            <urn:IndicatorOfShortageOrExcess>E</urn:IndicatorOfShortageOrExcess>
+       |            <urn:ObservedShortageOrExcess>21</urn:ObservedShortageOrExcess>
+       |            <urn:ExciseProductCode>W300</urn:ExciseProductCode>
+       |            <urn:RefusedQuantity>1</urn:RefusedQuantity>
+       |            <urn:UnsatisfactoryReason>
+       |              <urn:UnsatisfactoryReasonCode>1</urn:UnsatisfactoryReasonCode>
+       |              <urn:ComplementaryInformation>some info</urn:ComplementaryInformation>
+       |            </urn:UnsatisfactoryReason>
+       |            <urn:UnsatisfactoryReason>
+       |              <urn:UnsatisfactoryReasonCode>2</urn:UnsatisfactoryReasonCode>
+       |            </urn:UnsatisfactoryReason>
+       |          </urn:BodyReportOfReceiptExport>
+       |        </urn:AcceptedOrRejectedReportOfReceiptExport>
+       |      </urn:Body>
+       |    </urn:IE818>
+       |    <urn:IE803 xmlns:ie803="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE803:V3.13">
+       |      <urn:Header>
+       |        <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |        <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |        <urn:DateOfPreparation>2020-12-03</urn:DateOfPreparation>
+       |        <urn:TimeOfPreparation>13:36:43.326</urn:TimeOfPreparation>
+       |        <urn:MessageIdentifier>GB100000000289576</urn:MessageIdentifier>
+       |      </urn:Header>
+       |      <urn:Body>
+       |        <urn:NotificationOfDivertedEADESAD>
+       |          <urn:ExciseNotification>
+       |            <urn:NotificationType>2</urn:NotificationType>
+       |            <urn:NotificationDateAndTime>2024-06-05T00:00:01</urn:NotificationDateAndTime>
+       |            <urn:AdministrativeReferenceCode>20GB00000000000341760</urn:AdministrativeReferenceCode>
+       |            <urn:SequenceNumber>1</urn:SequenceNumber>
+       |          </urn:ExciseNotification>
+       |          <urn:DownstreamArc>
+       |            <urn:AdministrativeReferenceCode>$testArc</urn:AdministrativeReferenceCode>
+       |          </urn:DownstreamArc>
+       |          <urn:DownstreamArc>
+       |            <urn:AdministrativeReferenceCode>${testArc.dropRight(1)}1</urn:AdministrativeReferenceCode>
+       |          </urn:DownstreamArc>
+       |        </urn:NotificationOfDivertedEADESAD>
+       |      </urn:Body>
+       |    </urn:IE803>
+       |
+       |    <!-- Alert Event -->
+       |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+       |        <ie819:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+       |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+       |        </ie819:Header>
+       |        <ie819:Body>
+       |          <ie819:AlertOrRejectionOfEADESAD>
+       |            <ie819:Attributes>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |            </ie819:Attributes>
+       |            <ie819:ConsigneeTrader language="en">
+       |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+       |              <ie819:TraderName>Bizz</ie819:TraderName>
+       |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+       |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+       |              <ie819:City>Shropshire</ie819:City>
+       |            </ie819:ConsigneeTrader>
+       |            <ie819:ExciseMovement>
+       |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+       |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+       |            </ie819:ExciseMovement>
+       |            <ie819:DestinationOffice>
+       |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+       |            </ie819:DestinationOffice>
+       |            <ie819:AlertOrRejection>
+       |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+       |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
+       |            </ie819:AlertOrRejection>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>2</ie819:AlertOrRejectionOfMovementReasonCode>
+       |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
+       |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>0</ie819:AlertOrRejectionOfMovementReasonCode>
+       |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
+       |              <ie819:ComplementaryInformation>Info</ie819:ComplementaryInformation>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |          </ie819:AlertOrRejectionOfEADESAD>
+       |        </ie819:Body>
+       |      </ie819:IE819>
+       |
+       |      <!-- 2nd Alert Event -->
+       |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+       |        <ie819:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+       |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+       |        </ie819:Header>
+       |        <ie819:Body>
+       |          <ie819:AlertOrRejectionOfEADESAD>
+       |            <ie819:Attributes>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |            </ie819:Attributes>
+       |            <ie819:ConsigneeTrader language="en">
+       |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+       |              <ie819:TraderName>Bizz</ie819:TraderName>
+       |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+       |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+       |              <ie819:City>Shropshire</ie819:City>
+       |            </ie819:ConsigneeTrader>
+       |            <ie819:ExciseMovement>
+       |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+       |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+       |            </ie819:ExciseMovement>
+       |            <ie819:DestinationOffice>
+       |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+       |            </ie819:DestinationOffice>
+       |            <ie819:AlertOrRejection>
+       |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+       |              <ie819:EadEsadRejectedFlag>0</ie819:EadEsadRejectedFlag>
+       |            </ie819:AlertOrRejection>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>1</ie819:AlertOrRejectionOfMovementReasonCode>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |          </ie819:AlertOrRejectionOfEADESAD>
+       |        </ie819:Body>
+       |      </ie819:IE819>
+       |
+       |      <!-- Rejection Event -->
+       |      <ie819:IE819 xmlns:ie819="ie819:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE819:V3.13">
+       |        <ie819:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+       |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+       |        </ie819:Header>
+       |        <ie819:Body>
+       |          <ie819:AlertOrRejectionOfEADESAD>
+       |            <ie819:Attributes>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |            </ie819:Attributes>
+       |            <ie819:ConsigneeTrader language="en">
+       |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
+       |              <ie819:TraderName>Bizz</ie819:TraderName>
+       |              <ie819:StreetName>GRANGE CENTRAL</ie819:StreetName>
+       |              <ie819:Postcode>tf3 4er</ie819:Postcode>
+       |              <ie819:City>Shropshire</ie819:City>
+       |            </ie819:ConsigneeTrader>
+       |            <ie819:ExciseMovement>
+       |              <ie819:AdministrativeReferenceCode>18GB00000000000232361</ie819:AdministrativeReferenceCode>
+       |              <ie819:SequenceNumber>1</ie819:SequenceNumber>
+       |            </ie819:ExciseMovement>
+       |            <ie819:DestinationOffice>
+       |              <ie819:ReferenceNumber>GB004098</ie819:ReferenceNumber>
+       |            </ie819:DestinationOffice>
+       |            <ie819:AlertOrRejection>
+       |              <ie819:DateOfAlertOrRejection>2023-12-18</ie819:DateOfAlertOrRejection>
+       |              <ie819:EadEsadRejectedFlag>1</ie819:EadEsadRejectedFlag>
+       |            </ie819:AlertOrRejection>
+       |            <ie819:AlertOrRejectionOfEadEsadReason>
+       |              <ie819:AlertOrRejectionOfMovementReasonCode>3</ie819:AlertOrRejectionOfMovementReasonCode>
+       |            </ie819:AlertOrRejectionOfEadEsadReason>
+       |          </ie819:AlertOrRejectionOfEADESAD>
+       |        </ie819:Body>
+       |      </ie819:IE819>
+       |    </mov:eventHistory>
+       |  </mov:movementView>""".stripMargin
 
 
   def maxGetMovementResponse(sequenceNumber: Int = 1): GetMovementResponse = GetMovementResponse(
@@ -1821,20 +1889,40 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         NotificationOfAlertOrRejectionModel(
           notificationType = Alert,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
-          alertRejectReason = ProductDoesNotMatchOrder,
-          alertRejectReasonInformation = Some("Info")
+          alertRejectReason = Seq(
+            AlertOrRejectionReasonModel(
+              reason = ProductDoesNotMatchOrder,
+              additionalInformation = Some("Info")
+            ),
+            AlertOrRejectionReasonModel(
+              reason = EADNotConcernRecipient,
+              additionalInformation = Some("Info")
+            ),
+            AlertOrRejectionReasonModel(
+              reason = Other,
+              additionalInformation = Some("Info")
+            ),
+            AlertOrRejectionReasonModel(
+              reason = QuantityDoesNotMatchOrder,
+              additionalInformation = Some("Info")
+            )
+          )
         ),
         NotificationOfAlertOrRejectionModel(
           notificationType = Alert,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
-          alertRejectReason = EADNotConcernRecipient,
-          alertRejectReasonInformation = None
+          alertRejectReason = Seq(AlertOrRejectionReasonModel(
+            reason = EADNotConcernRecipient,
+            additionalInformation = None
+          ))
         ),
         NotificationOfAlertOrRejectionModel(
           notificationType = Rejection,
           notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
-          alertRejectReason = QuantityDoesNotMatchOrder,
-          alertRejectReasonInformation = None
+          alertRejectReason = Seq(AlertOrRejectionReasonModel(
+            reason = QuantityDoesNotMatchOrder,
+            additionalInformation = None
+          ))
         )
       )
     )
@@ -2121,7 +2209,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             Json.obj(
               "reason" -> "shortage"
             )
-        )
+          )
         )
       ),
       "otherInformation" -> "some great reason"
@@ -2137,18 +2225,42 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       Json.obj(
         "notificationType" -> "0",
         "notificationDateAndTime" -> "2023-12-18T09:00:00",
-        "alertRejectReason" -> "2",
-        "alertRejectReasonInformation" -> "Info"
+        "alertRejectReason" -> Json.arr(
+          Json.obj(
+            "reason" -> "2",
+            "additionalInformation" -> "Info"
+          ),
+          Json.obj(
+            "reason" -> "1",
+            "additionalInformation" -> "Info"
+          ),
+          Json.obj(
+            "reason" -> "0",
+            "additionalInformation" -> "Info"
+          ),
+          Json.obj(
+            "reason" -> "3",
+            "additionalInformation" -> "Info"
+          )
+        )
       ),
       Json.obj(
         "notificationType" -> "0",
         "notificationDateAndTime" -> "2023-12-18T10:00:00",
-        "alertRejectReason" -> "1"
+        "alertRejectReason" -> Json.arr(
+          Json.obj(
+            "reason" -> "1"
+          )
+        )
       ),
       Json.obj(
         "notificationType" -> "1",
         "notificationDateAndTime" -> "2023-12-19T09:00:00",
-        "alertRejectReason" -> "3"
+        "alertRejectReason" -> Json.arr(
+          Json.obj(
+            "reason" -> "3"
+          )
+        )
       )
     )
   )
