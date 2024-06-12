@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json._
+import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.{CancellationReasonModel, CancellationReasonType}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType.{EADNotConcernRecipient, Other, ProductDoesNotMatchOrder, QuantityDoesNotMatchOrder}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType.{Alert, Rejection}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
@@ -340,11 +341,12 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |            <body:Attributes>
        |              <body:DateAndTimeOfValidationOfCancellation>2008-09-04T10:22:53</body:DateAndTimeOfValidationOfCancellation>
        |            </body:Attributes>
-       |            <body:ExciseMovement>
+       |            <body:ExciseMovementEad>
        |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
-       |            </body:ExciseMovement>
+       |            </body:ExciseMovementEad>
        |            <body:Cancellation>
-       |              <body:CancellationReasonCode>1</body:CancellationReasonCode>
+       |              <body:CancellationReasonCode>0</body:CancellationReasonCode>
+       |              <body:ComplementaryInformation>some info</body:ComplementaryInformation>
        |            </body:Cancellation>
        |          </body:CancellationOfEAD>
        |        </body:Body>
@@ -368,7 +370,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |            </body:Attributes>
        |            <body:ExciseMovement>
        |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
-       |              <body:SequenceNumber>1</body:SequenceNumber>
+       |              <body:SequenceNumber>0</body:SequenceNumber>
        |            </body:ExciseMovement>
        |          </body:ReminderMessageForExciseMovement>
        |        </body:Body>
@@ -1023,7 +1025,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           complementaryInformation = None,
           dateTime = LocalDateTime.parse("2024-06-18T08:18:56")
         )
-      )
+      ),
+      cancelMovement = Some(CancellationReasonModel(CancellationReasonType.Other, Some("some info")))
     )
   )
 
@@ -1263,6 +1266,10 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         "explanationCode"          -> "5",
         "dateTime"                 -> "2024-06-18T08:18:56"
       )
+    ),
+    "cancelMovement" -> Json.obj(
+      "reason" -> "0",
+      "complementaryInformation" -> "some info"
     )
   )
 
@@ -1830,6 +1837,30 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |            </ie837:ExplanationOnDelayForDelivery>
        |         </ie837:Body>
        |      </ie837:IE837>
+       |    <urn:IE810 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.01">
+       |      <urn:Header>
+       |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
+       |        <urn1:MessageRecipient xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.GB</urn1:MessageRecipient>
+       |        <urn1:DateOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">2021-09-10</urn1:DateOfPreparation>
+       |        <urn1:TimeOfPreparation xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">11:11:09</urn1:TimeOfPreparation>
+       |        <urn1:MessageIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">XI100000000291919</urn1:MessageIdentifier>
+       |        <urn1:CorrelationIdentifier xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">PORTAL5a1b930650c54fbca85cf509add5182e</urn1:CorrelationIdentifier>
+       |      </urn:Header>
+       |      <urn:Body>
+       |        <urn:CancellationOfEAD>
+       |          <urn:Attributes>
+       |            <urn:DateAndTimeOfValidationOfCancellation>2021-09-10T11:11:12</urn:DateAndTimeOfValidationOfCancellation>
+       |          </urn:Attributes>
+       |          <urn:ExciseMovementEadType language="en">
+       |            <urn:AdministrativeReferenceCode>21GB00000000000351266</urn:AdministrativeReferenceCode>
+       |          </urn:ExciseMovementEadType>
+       |          <urn:Cancellation>
+       |            <urn:CancellationReasonCode>0</urn:CancellationReasonCode>
+       |            <urn:ComplementaryInformation>some info</urn:ComplementaryInformation>
+       |          </urn:Cancellation>
+       |        </urn:CancellationOfEAD>
+       |      </urn:Body>
+       |    </urn:IE810>
        |    </mov:eventHistory>
        |  </mov:movementView>""".stripMargin
 
@@ -2243,7 +2274,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           complementaryInformation = None,
           dateTime = LocalDateTime.parse("2024-06-18T08:18:56")
         )
-      )
+      ),
+      cancelMovement = Some(CancellationReasonModel(CancellationReasonType.Other, Some("some info")))
     )
   )
 
@@ -2613,6 +2645,10 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         "explanationCode" -> "5",
         "dateTime" -> "2024-06-18T08:18:56"
       )
+    ),
+    "cancelMovement" -> Json.obj(
+      "reason" -> "0",
+      "complementaryInformation" -> "some info",
     )
   )
 
