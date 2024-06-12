@@ -18,6 +18,8 @@ package uk.gov.hmrc.emcstfe.models.response.getMovement
 
 import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType.{EADNotConcernRecipient, Other, ProductDoesNotMatchOrder, QuantityDoesNotMatchOrder}
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType.{Alert, Rejection}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
@@ -96,8 +98,48 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
           notificationType = SplitMovement,
           notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
           downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
-        )))
-      )
+        )),
+        notificationOfAlertOrRejection = Seq(
+          NotificationOfAlertOrRejectionModel(
+            notificationType = Alert,
+            notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
+            alertRejectReason = Seq(
+              AlertOrRejectionReasonModel(
+                reason = ProductDoesNotMatchOrder,
+                additionalInformation = Some("Info")
+              ),
+              AlertOrRejectionReasonModel(
+                reason = EADNotConcernRecipient,
+                additionalInformation = Some("Info")
+              ),
+              AlertOrRejectionReasonModel(
+                reason = Other,
+                additionalInformation = Some("Info")
+              ),
+              AlertOrRejectionReasonModel(
+                reason = QuantityDoesNotMatchOrder,
+                additionalInformation = Some("Info")
+              )
+            )
+          ),
+          NotificationOfAlertOrRejectionModel(
+            notificationType = Alert,
+            notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 10, 0, 0),
+            alertRejectReason = Seq(AlertOrRejectionReasonModel(
+              reason = EADNotConcernRecipient,
+              additionalInformation = None
+            ))
+          ),
+          NotificationOfAlertOrRejectionModel(
+            notificationType = Rejection,
+            notificationDateAndTime = LocalDateTime.of(2023, 12, 19, 9, 0, 0),
+            alertRejectReason = Seq(AlertOrRejectionReasonModel(
+              reason = QuantityDoesNotMatchOrder,
+              additionalInformation = None
+            ))
+          )
+        )
+      ))
 
     }
 

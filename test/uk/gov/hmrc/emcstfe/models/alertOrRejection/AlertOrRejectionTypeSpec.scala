@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
-import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType._
+import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType.{Alert, Rejection}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-class AlertOrRejectionReasonTypeSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
+class AlertOrRejectionTypeSpec extends TestBaseSpec {
 
-  "AlertOrRejectionReasonType" must {
+  "AlertOrRejectionType" must {
 
     "have the correct underlying enum values" in {
-      Other.toString shouldBe "0"
-      EADNotConcernRecipient.toString shouldBe "1"
-      ProductDoesNotMatchOrder.toString shouldBe "2"
-      QuantityDoesNotMatchOrder.toString shouldBe "3"
+      Alert.toString shouldBe "0"
+      Rejection.toString shouldBe "1"
     }
   }
 }

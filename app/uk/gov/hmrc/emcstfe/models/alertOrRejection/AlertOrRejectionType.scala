@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.emcstfe.models.alertOrRejection
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
-import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType._
-import uk.gov.hmrc.emcstfe.support.TestBaseSpec
+import uk.gov.hmrc.emcstfe.models.common.{Enumerable, WithName}
 
-class AlertOrRejectionReasonTypeSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
+sealed trait AlertOrRejectionType
 
-  "AlertOrRejectionReasonType" must {
+object AlertOrRejectionType extends Enumerable.Implicits {
 
-    "have the correct underlying enum values" in {
-      Other.toString shouldBe "0"
-      EADNotConcernRecipient.toString shouldBe "1"
-      ProductDoesNotMatchOrder.toString shouldBe "2"
-      QuantityDoesNotMatchOrder.toString shouldBe "3"
-    }
-  }
+  case object Alert extends WithName("0") with AlertOrRejectionType
+  case object Rejection extends WithName("1") with AlertOrRejectionType
+
+  val values: Seq[AlertOrRejectionType] = Seq(Alert, Rejection)
+
+  implicit val enumerable: Enumerable[AlertOrRejectionType] = Enumerable(values.map(v => v.toString -> v): _*)
 }
