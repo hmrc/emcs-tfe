@@ -123,9 +123,9 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
 
     "return NO_CONTENT" when {
 
-      "the ERN is not in the traffic percentage nor was in private beta" in new Test("createMovement", ern = "GBRC123458889", isPrivateBetaEnabled = false, isPublicBetaEnabled = true) {
+      "the ERN is not in the traffic percentage nor was in private beta" in new Test("createMovement", ern = "GBWK812541450", isPrivateBetaEnabled = false, isPublicBetaEnabled = true) {
         override def setupStubs(): StubMapping = {
-          AuthStub.authorised("GBRC123458889")
+          AuthStub.authorised("GBWK812541450") //79%
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.NOT_FOUND, Json.obj())
         }
 

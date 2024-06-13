@@ -51,7 +51,7 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
         MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
 
-        val ern = "GBRC1234561089"
+        val ern = "GBWK846834276" //11%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         await(service.isEligible(testErn, "service")) shouldBe Right(true)
       }
@@ -62,7 +62,7 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
         MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
 
-        val ern = "GBRC1234561089"
+        val ern = "GBRC1234561089" //11%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         await(service.isEligible(testErn, "service")) shouldBe Right(true)
       }
@@ -75,7 +75,7 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         MockUserAllowListConnector.check("service", requestModel).returns(Future.successful(Right(false)))
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
         MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
-        val ern = "GBRC123456789"
+        val ern = "GBWK846834276" //11%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         await(service.isEligible(testErn, "service")) shouldBe Right(false)
       }
@@ -108,15 +108,15 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
       "the ERN is in the traffic percentile (equal to)" in new Test {
         MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(11))
 
-        val ern = "GBRC1234561089"
+        val ern = "GBWK846834276" //11%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         service.checkPublicBetaEligibility("createMovement") shouldBe true
       }
 
-      "the ERN is in the traffic percentile (less than to)" in new Test {
+      "the ERN is in the traffic percentile (less than)" in new Test {
         MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(11))
 
-        val ern = "GBRC1234560989"
+        val ern = "GBWK946856224" //7%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         service.checkPublicBetaEligibility("createMovement") shouldBe true
       }
@@ -127,7 +127,7 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
       "the ERN is not in the traffic percentile" in new Test {
         MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(1))
 
-        val ern = "GBRC123456789"
+        val ern = "GBRC123456789" //5%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         service.checkPublicBetaEligibility("createMovement") shouldBe false
       }
