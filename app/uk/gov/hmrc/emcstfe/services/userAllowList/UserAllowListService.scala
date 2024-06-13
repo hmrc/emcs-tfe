@@ -52,12 +52,12 @@ class UserAllowListService @Inject()(connector: UserAllowListConnector,
   }
 
   private[services] def checkPublicBetaEligibility(service: String)(implicit request: UserRequest[_]): Boolean = {
-    // Drop the last 2 chars from the ERN and take 2 from the result (which saves performing a modulus calculation)
-    // It adds 1 to prevent returning 0 as a final result so the 'ernAsPercentile' is between 1-100
+    // Calculate the hashcode of the ERN (converting it to a positive integer 0xfffffff) and taking the last 2 characters
+    // of the output and using that as the percentile
     config.publicBetaTrafficPercentageForService(service).exists { trafficPercentage =>
       request.allUserERNs.map { userErn =>
-        val ernAsPercentile = userErn.dropRight(2).takeRight(2)
-        ernAsPercentile.toInt + 1 <= trafficPercentage
+        val ernAsPercentile = (userErn.hashCode & 0xfffffff).toString.takeRight(2)
+        ernAsPercentile.toInt <= trafficPercentage
       }.exists(identity)
     }
   }
