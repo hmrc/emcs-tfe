@@ -599,6 +599,49 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          </ie819:AlertOrRejectionOfEADESAD>
        |        </ie819:Body>
        |      </ie819:IE819>
+       |
+       |      <!-- Movement accepted by customs -->
+       |      <ie829:IE829 xmlns:ie829="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE829:V3.13">
+       |        <ie829:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+       |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+       |        </ie829:Header>
+       |        <ie829:Body>
+       |          <ie829:NotificationOfAcceptedExport>
+       |            <ie829:Attributes>
+       |              <ie829:DateAndTimeOfIssuance>2023-12-19T09:00:00</ie829:DateAndTimeOfIssuance>
+       |            </ie829:Attributes>
+       |            <ie829:ConsigneeTrader>
+       |              <ie829:Traderid>BE345345345</ie829:Traderid>
+       |              <ie829:TraderName>PEAR Supermarket</ie829:TraderName>
+       |              <ie829:StreetName>Angels Business Park</ie829:StreetName>
+       |              <ie829:Postcode>BD1 3NN</ie829:Postcode>
+       |              <ie829:City>Bradford</ie829:City>
+       |              <ie829:EoriNumber>GB00000578901</ie829:EoriNumber>
+       |            </ie829:ConsigneeTrader>
+       |            <ie829:ExciseMovementEad>
+       |              <ie829:AdministrativeReferenceCode>18GB00000000000232361</ie829:AdministrativeReferenceCode>
+       |              <ie829:SequenceNumber>1</ie829:SequenceNumber>
+       |              <ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>1</ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>
+       |            </ie829:ExciseMovementEad>
+       |            <ie829:ExportPlaceCustomsOffice>
+       |              <ie829:ReferenceNumber>GB000383</ie829:ReferenceNumber>
+       |            </ie829:ExportPlaceCustomsOffice>
+       |            <ie829:ExportDeclarationAcceptanceRelease>
+       |              <ie829:ReferenceNumberOfSenderCustomsOffice>GB000101</ie829:ReferenceNumberOfSenderCustomsOffice>
+       |              <ie829:IdentificationOfSenderCustomsOfficer>John Doe</ie829:IdentificationOfSenderCustomsOfficer>
+       |              <ie829:DateOfAcceptance>2024-02-05</ie829:DateOfAcceptance>
+       |              <ie829:DateOfRelease>2024-02-06</ie829:DateOfRelease>
+       |              <ie829:DocumentReferenceNumber>645564546</ie829:DocumentReferenceNumber>
+       |            </ie829:ExportDeclarationAcceptanceRelease>
+       |          </ie829:NotificationOfAcceptedExport>
+       |        </ie829:Body>
+       |      </ie829:IE829>
+       |
        |    </mov:eventHistory>
        |  </mov:movementView>""".stripMargin
 
@@ -879,6 +922,28 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             additionalInformation = None
           ))
         )
+      ),
+      notificationOfAcceptedExport = Some(
+        NotificationOfAcceptedExportModel(
+          customsOfficeNumber = "GB000383",
+          dateOfAcceptance = LocalDate.of(2024, 2, 5),
+          referenceNumberOfSenderCustomsOffice = "GB000101",
+          identificationOfSenderCustomsOfficer = "John Doe",
+          documentReferenceNumber = "645564546",
+          consigneeTrader = TraderModel(
+            traderExciseNumber = Some("BE345345345"),
+            traderName = Some("PEAR Supermarket"),
+            address = Some(
+              AddressModel(
+                streetNumber = None,
+                street = Some("Angels Business Park"),
+                postcode = Some("BD1 3NN"),
+                city = Some("Bradford")
+              )),
+            vatNumber = None,
+            eoriNumber = Some("GB00000578901")
+          )
+        )
       )
     )
   )
@@ -1079,6 +1144,23 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             "reason" -> "3"
           )
         )
+      )
+    ),
+    "notificationOfAcceptedExport" -> Json.obj(
+      "customsOfficeNumber" -> "GB000383",
+      "dateOfAcceptance" -> "2024-02-05",
+      "referenceNumberOfSenderCustomsOffice" -> "GB000101",
+      "identificationOfSenderCustomsOfficer" -> "John Doe",
+      "documentReferenceNumber" -> "645564546",
+      "consigneeTrader" -> Json.obj(
+        "traderExciseNumber" -> "BE345345345",
+        "traderName"         -> "PEAR Supermarket",
+        "address" -> Json.obj(
+          "street"   -> "Angels Business Park",
+          "postcode" -> "BD1 3NN",
+          "city"     -> "Bradford"
+        ),
+        "eoriNumber" -> "GB00000578901"
       )
     )
   )
@@ -1549,6 +1631,49 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          </ie819:AlertOrRejectionOfEADESAD>
        |        </ie819:Body>
        |      </ie819:IE819>
+       |
+       |      <!-- Movement accepted by customs -->
+       |      <ie829:IE829 xmlns:ie829="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE829:V3.13">
+       |        <ie829:Header>
+       |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
+       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
+       |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
+       |        </ie829:Header>
+       |        <ie829:Body>
+       |          <ie829:NotificationOfAcceptedExport>
+       |            <ie829:Attributes>
+       |              <ie829:DateAndTimeOfIssuance>2023-12-19T09:00:00</ie829:DateAndTimeOfIssuance>
+       |            </ie829:Attributes>
+       |            <ie829:ConsigneeTrader>
+       |              <ie829:Traderid>BE345345345</ie829:Traderid>
+       |              <ie829:TraderName>PEAR Supermarket</ie829:TraderName>
+       |              <ie829:StreetName>Angels Business Park</ie829:StreetName>
+       |              <ie829:Postcode>BD1 3NN</ie829:Postcode>
+       |              <ie829:City>Bradford</ie829:City>
+       |              <ie829:EoriNumber>GB00000578901</ie829:EoriNumber>
+       |            </ie829:ConsigneeTrader>
+       |            <ie829:ExciseMovementEad>
+       |              <ie829:AdministrativeReferenceCode>18GB00000000000232361</ie829:AdministrativeReferenceCode>
+       |              <ie829:SequenceNumber>1</ie829:SequenceNumber>
+       |              <ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>1</ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>
+       |            </ie829:ExciseMovementEad>
+       |            <ie829:ExportPlaceCustomsOffice>
+       |              <ie829:ReferenceNumber>GB000383</ie829:ReferenceNumber>
+       |            </ie829:ExportPlaceCustomsOffice>
+       |            <ie829:ExportDeclarationAcceptanceRelease>
+       |              <ie829:ReferenceNumberOfSenderCustomsOffice>GB000101</ie829:ReferenceNumberOfSenderCustomsOffice>
+       |              <ie829:IdentificationOfSenderCustomsOfficer>John Doe</ie829:IdentificationOfSenderCustomsOfficer>
+       |              <ie829:DateOfAcceptance>2024-02-05</ie829:DateOfAcceptance>
+       |              <ie829:DateOfRelease>2024-02-06</ie829:DateOfRelease>
+       |              <ie829:DocumentReferenceNumber>645564546</ie829:DocumentReferenceNumber>
+       |            </ie829:ExportDeclarationAcceptanceRelease>
+       |          </ie829:NotificationOfAcceptedExport>
+       |        </ie829:Body>
+       |      </ie829:IE829>
+       |
        |    </mov:eventHistory>
        |  </mov:movementView>""".stripMargin
 
@@ -1924,6 +2049,28 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             additionalInformation = None
           ))
         )
+      ),
+      notificationOfAcceptedExport = Some(
+        NotificationOfAcceptedExportModel(
+          customsOfficeNumber = "GB000383",
+          dateOfAcceptance = LocalDate.of(2024, 2, 5),
+          referenceNumberOfSenderCustomsOffice = "GB000101",
+          identificationOfSenderCustomsOfficer = "John Doe",
+          documentReferenceNumber = "645564546",
+          consigneeTrader = TraderModel(
+            traderExciseNumber = Some("BE345345345"),
+            traderName = Some("PEAR Supermarket"),
+            address = Some(
+              AddressModel(
+                streetNumber = None,
+                street = Some("Angels Business Park"),
+                postcode = Some("BD1 3NN"),
+                city = Some("Bradford")
+              )),
+            vatNumber = None,
+            eoriNumber = Some("GB00000578901")
+          )
+        )
       )
     )
   )
@@ -2261,6 +2408,23 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             "reason" -> "3"
           )
         )
+      )
+    ),
+    "notificationOfAcceptedExport" -> Json.obj(
+      "customsOfficeNumber" -> "GB000383",
+      "dateOfAcceptance" -> "2024-02-05",
+      "referenceNumberOfSenderCustomsOffice" -> "GB000101",
+      "identificationOfSenderCustomsOfficer" -> "John Doe",
+      "documentReferenceNumber" -> "645564546",
+      "consigneeTrader" -> Json.obj(
+        "traderExciseNumber" -> "BE345345345",
+        "traderName"         -> "PEAR Supermarket",
+        "address" -> Json.obj(
+          "street"   -> "Angels Business Park",
+          "postcode" -> "BD1 3NN",
+          "city"     -> "Bradford"
+        ),
+        "eoriNumber" -> "GB00000578901"
       )
     )
   )
