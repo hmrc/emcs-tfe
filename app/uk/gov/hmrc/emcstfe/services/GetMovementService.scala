@@ -69,8 +69,8 @@ class GetMovementService @Inject()(
     }
   }
 
-  private def shouldReturnDataFromCache(cacheSequenceNumber: Int, requestedSequenceNumber: Option[Int], forceFetchNew: Boolean) =
-    requestedSequenceNumber.contains(cacheSequenceNumber) || (!forceFetchNew && requestedSequenceNumber.isEmpty)
+  private def shouldReturnDataFromCache(cacheSequenceNumber: Int, requestedSequenceNumber: Option[Int], forceFetchNew: Boolean): Boolean =
+    !forceFetchNew && (requestedSequenceNumber.isEmpty || requestedSequenceNumber.contains(cacheSequenceNumber))
 
   private[services] def getMovementIfChanged(getMovementRequest: GetMovementRequest, repositoryResult: GetMovementMongoResponse)
                                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementResponse]] = {

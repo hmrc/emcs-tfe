@@ -239,20 +239,44 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
               MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse()))
 
-              await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse())
+              await(service.getMovement(getMovementRequest, forceFetchNew = forceFetchNew)) shouldBe Right(getMovementResponse())
             }
-            "retrieving from mongo returns a match, sequenceNumber is the same so data returned from Cache" in new Test {
+            if(forceFetchNew) {
+              "retrieving from mongo returns a match, sequenceNumber is the same but forceFetch is true so always get latest" in new Test {
 
-              override lazy val sequenceNumber = Some(1)
+                override lazy val sequenceNumber = Some(1)
 
-              MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false).twice()
 
-              MockGetMovementRepository
-                .get(testArc)
-                .returns(Future.successful(Some(getMovementMongoResponse())))
+                MockGetMovementRepository
+                  .get(testArc)
+                  .returns(Future.successful(Some(getMovementMongoResponse())))
 
-              await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse())
+                MockChrisConnector
+                  .postChrisSOAPRequest(getMovementRequest)
+                  .returns(Future.successful(Right(XML.loadString(getMovementResponseBody()))))
+
+                MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody())))
+
+                MockGetMovementRepository.set().returns(Future.successful(getMovementMongoResponse()))
+
+                await(service.getMovement(getMovementRequest, forceFetchNew = forceFetchNew)) shouldBe Right(getMovementResponse())
+              }
+            } else {
+              "retrieving from mongo returns a match, sequenceNumber is the same so data returned from Cache" in new Test {
+
+                override lazy val sequenceNumber = Some(1)
+
+                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+
+                MockGetMovementRepository
+                  .get(testArc)
+                  .returns(Future.successful(Some(getMovementMongoResponse())))
+
+                await(service.getMovement(getMovementRequest, forceFetchNew = forceFetchNew)) shouldBe Right(getMovementResponse())
+              }
             }
+
             "retrieving from mongo returns a match, sequenceNumber is different so a fresh call to GetMovement is made (ChRIS) without saving to Mongo" in new Test {
 
               override lazy val sequenceNumber = Some(1)
@@ -269,7 +293,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
               MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody())))
 
-              await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse())
+              await(service.getMovement(getMovementRequest, forceFetchNew = forceFetchNew)) shouldBe Right(getMovementResponse())
             }
             "retrieving from mongo returns a match, sequenceNumber is different so a fresh call to GetMovement is made (EIS) without saving to Mongo" in new Test {
 
@@ -285,7 +309,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
 
               MockXmlUtils.trimWhitespaceFromXml().returns(scala.xml.Utility.trim(XML.loadString(getMovementResponseBody())))
 
-              await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Right(getMovementResponse())
+              await(service.getMovement(getMovementRequest, forceFetchNew = forceFetchNew)) shouldBe Right(getMovementResponse())
             }
           }
           "return a Left" when {
@@ -301,7 +325,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
                 .postChrisSOAPRequest(getMovementRequest)
                 .returns(Future.successful(Left(XmlValidationError)))
 
-              await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Left(XmlValidationError)
+              await(service.getMovement(getMovementRequest, forceFetchNew = forceFetchNew)) shouldBe Left(XmlValidationError)
             }
             "GetMovement call response cannot be extracted" in new Test {
 
@@ -315,7 +339,7 @@ class GetMovementServiceSpec extends TestBaseSpec with GetMovementFixture with G
                 .postChrisSOAPRequest(getMovementRequest)
                 .returns(Future.successful(Left(SoapExtractionError)))
 
-              await(service.getMovement(getMovementRequest, forceFetchNew = true)) shouldBe Left(SoapExtractionError)
+              await(service.getMovement(getMovementRequest, forceFetchNew = forceFetchNew)) shouldBe Left(SoapExtractionError)
             }
           }
         }
