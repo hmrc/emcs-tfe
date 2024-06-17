@@ -53,7 +53,14 @@ trait IntegrationBaseSpec
     "getMovement.replaceIndexes" -> testReplaceIndexes.toString,
     "beta.public.createMovement.trafficPercentage" -> "50",
     "beta.public.changeDestination.trafficPercentage" -> "50",
-    "beta.public.navHub.trafficPercentage" -> "50"
+    "beta.public.tfeNavHub.trafficPercentage" -> "50",
+    "beta.public.tfeMessageInbox.trafficPercentage" -> "50",
+    "beta.public.tfeDrafts.trafficPercentage" -> "50",
+    "beta.public.tfeHome.trafficPercentage" -> "50",
+    "beta.public.tfeSearchMovements.trafficPercentage" -> "50",
+    "beta.public.tfeViewMovement.trafficPercentage" -> "50",
+    "beta.public.tfeChangeDestination.trafficPercentage" -> "50",
+    "beta.public.tfePreValidate.trafficPercentage" -> "50"
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

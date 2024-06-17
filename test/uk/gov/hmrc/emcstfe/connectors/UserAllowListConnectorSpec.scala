@@ -46,11 +46,11 @@ class UserAllowListConnectorSpec extends TestBaseSpec
       "downstream call is successful" in new Test {
 
         MockHttpClient.post(
-          url = s"$fakeUrl/emcs-tfe/navHub/check",
+          url = s"$fakeUrl/emcs-tfe/tfeNavHub/check",
           body = checkRequest
         ).returns(Future.successful(Right(true)))
 
-        await(connector.check("navHub", checkRequest)) shouldBe Right(true)
+        await(connector.check("tfeNavHub", checkRequest)) shouldBe Right(true)
       }
     }
 

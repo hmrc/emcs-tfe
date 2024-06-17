@@ -69,7 +69,7 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
 
     "return NO_CONTENT" when {
 
-      "the ERN is not in the private beta list (only private beta feature enabled)" in new Test("navHub", ern = testErn, isPrivateBetaEnabled = true, isPublicBetaEnabled = false) {
+      "the ERN is not in the private beta list (only private beta feature enabled)" in new Test("tfeNavHub", ern = testErn, isPrivateBetaEnabled = true, isPublicBetaEnabled = false) {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.NOT_FOUND, Json.obj())
@@ -109,7 +109,7 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
         response.status shouldBe Status.OK
       }
 
-      "the ERN is not in the traffic percentage for public beta but was in private beta" in new Test("navHub", ern = "GBRC123458889", isPrivateBetaEnabled = false, isPublicBetaEnabled = true) {
+      "the ERN is not in the traffic percentage for public beta but was in private beta" in new Test("tfeNavHub", ern = "GBRC123458889", isPrivateBetaEnabled = false, isPublicBetaEnabled = true) {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised("GBRC123458889")
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, Json.obj())
