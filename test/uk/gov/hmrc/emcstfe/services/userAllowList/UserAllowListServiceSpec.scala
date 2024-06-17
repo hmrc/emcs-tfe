@@ -51,18 +51,18 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
         MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
 
-        val ern = "GBWK846834276" //11%
+        val ern = "GBWK846834276" //12%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         await(service.isEligible(testErn, "service")) shouldBe Right(true)
       }
 
       "private beta is disabled, public beta is enabled and the ERN is in the traffic percentile" in new Test {
         MockUserAllowListConnector.check("service", requestModel).returns(Future.successful(Right(false)))
-        MockedAppConfig.publicBetaTrafficPercentageForService("service").returns(Some(11))
+        MockedAppConfig.publicBetaTrafficPercentageForService("service").returns(Some(12))
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
         MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
 
-        val ern = "GBRC1234561089" //11%
+        val ern = "GBRC1234561089" //12%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         await(service.isEligible(testErn, "service")) shouldBe Right(true)
       }
@@ -75,7 +75,7 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         MockUserAllowListConnector.check("service", requestModel).returns(Future.successful(Right(false)))
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
         MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
-        val ern = "GBWK846834276" //11%
+        val ern = "GBWK846834276" //12%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         await(service.isEligible(testErn, "service")) shouldBe Right(false)
       }
@@ -106,17 +106,17 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
   "checkPublicBetaEligibility" should {
     "return true" when {
       "the ERN is in the traffic percentile (equal to)" in new Test {
-        MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(11))
+        MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(12))
 
-        val ern = "GBWK846834276" //11%
+        val ern = "GBWK846834276" //12%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         service.checkPublicBetaEligibility("createMovement") shouldBe true
       }
 
       "the ERN is in the traffic percentile (less than)" in new Test {
-        MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(11))
+        MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(12))
 
-        val ern = "GBWK946856224" //7%
+        val ern = "GBWK946856224" //8%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         service.checkPublicBetaEligibility("createMovement") shouldBe true
       }
@@ -124,10 +124,18 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
 
     "return false" when {
 
-      "the ERN is not in the traffic percentile" in new Test {
+      "the ERN is in not traffic percentile (greater than by 1 (boundary))" in new Test {
+        MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(11))
+
+        val ern = "GBWK846834276" //12%
+        implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
+        service.checkPublicBetaEligibility("createMovement") shouldBe false
+      }
+
+      "the ERN is not in the traffic percentile (greater than by many)" in new Test {
         MockedAppConfig.publicBetaTrafficPercentageForService("createMovement").returns(Some(1))
 
-        val ern = "GBRC123456789" //5%
+        val ern = "GBRC123456789" //6%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         service.checkPublicBetaEligibility("createMovement") shouldBe false
       }

@@ -56,8 +56,8 @@ class UserAllowListService @Inject()(connector: UserAllowListConnector,
     // of the output and using that as the percentile
     config.publicBetaTrafficPercentageForService(service).exists { trafficPercentage =>
       request.allUserERNs.map { userErn =>
-        val ernAsPercentile = (userErn.hashCode & 0xfffffff).toString.takeRight(2)
-        ernAsPercentile.toInt <= trafficPercentage
+        val ernAsPercentile = (userErn.hashCode & 0xfffffff).toString.takeRight(2).toInt + 1
+        ernAsPercentile <= trafficPercentage
       }.exists(identity)
     }
   }
