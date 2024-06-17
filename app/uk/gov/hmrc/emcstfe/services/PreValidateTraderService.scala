@@ -38,7 +38,7 @@ class PreValidateTraderService @Inject()(eisConnector: EisConnector, val config:
       exciseTraderValidationRequest = ExciseTraderValidationRequest(
         exciseTraderRequest = ExciseTraderRequest(
           exciseRegistrationNumber = preValidateTraderRequest.ern,
-          entityGroup = "UK Record", // Legacy EMCS only has this one option due to Brexit ? API ETDS12 may remove the need to pass this going forward
+          entityGroup = preValidateTraderRequest.entityGroup,
           validateProductAuthorisationRequest = preValidateTraderRequest.productCodes.map(code => ValidateProductAuthorisationRequest(Product(code)))
         )
       )

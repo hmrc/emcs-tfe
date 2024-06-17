@@ -25,6 +25,7 @@ trait PreValidateFixtures extends BaseFixtures {
 
   val preValidateTraderModelRequest = PreValidateTraderModel(
     ern = testErn,
+    entityGroup = "UK Record",
     productCodes = Seq("W200", "S200", "W300")
   )
 
