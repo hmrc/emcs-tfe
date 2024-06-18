@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.preValidate
 
 import play.api.libs.json.{Format, Json}
 
-case class PreValidateTraderModel (ern: String, productCodes: Seq[String])
+case class PreValidateTraderModel (ern: String, entityGroup: String, productCodes: Seq[String])
 
 object PreValidateTraderModel {
   implicit val format: Format[PreValidateTraderModel] = Json.format
