@@ -22,6 +22,7 @@ import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnecto
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISBusinessError, EISRIMValidationError, EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -152,6 +153,25 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
             .returns(Future.successful(true))
 
           await(service.setSubmittedDraftId(testErn, testDraftId, submittedDraftId)) shouldBe true
+        }
+      }
+    }
+
+    "when calling formatErrorForLogging" should {
+      "return the error code and reason" when {
+        "error code is 12" in new Test(true) {
+          service.formatErrorForLogging(RIMValidationError(None, Some(12), Some("reason"), None)) shouldBe "Some(12) (errorReason: Some(reason))"
+          service.formatErrorForLogging(RIMValidationError(None, Some(12), None, None)) shouldBe "Some(12) (errorReason: None)"
+        }
+        "error code is 13" in new Test(true) {
+          service.formatErrorForLogging(RIMValidationError(None, Some(13), Some("reason"), None)) shouldBe "Some(13) (errorReason: Some(reason))"
+          service.formatErrorForLogging(RIMValidationError(None, Some(13), None, None)) shouldBe "Some(13) (errorReason: None)"
+        }
+      }
+      "return only the error code" when {
+        "error code is not 12 or 13" in new Test(true) {
+            service.formatErrorForLogging(RIMValidationError(None, Some(1000), None, None)) shouldBe "Some(1000)"
+            service.formatErrorForLogging(RIMValidationError(None, None, None, None)) shouldBe "None"
         }
       }
     }

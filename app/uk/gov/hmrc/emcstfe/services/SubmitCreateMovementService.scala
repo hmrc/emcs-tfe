@@ -21,6 +21,7 @@ import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.FeatureSwitching
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -50,7 +51,7 @@ class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
     response match {
     //If the submission fails due to RIM validation errors, store the errors in Mongo for persistence
     case Left(rimError: EISRIMValidationError) =>
-      logger.warn(s"[handleResponse] - RIM validation error codes for correlation ID - ${rimError.errorResponse.emcsCorrelationId}: ${rimError.errorResponse.validatorResults.map(_.flatMap(_.errorType))}")
+      logger.warn(s"[handleResponse] - RIM validation error codes for correlation ID - ${rimError.errorResponse.emcsCorrelationId}: ${rimError.errorResponse.validatorResults.map(_.flatMap(formatErrorForLogging))}")
       createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
         requestModel.exciseRegistrationNumber,
         requestModel.draftId,
@@ -59,7 +60,7 @@ class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
         _ => Left(rimError)
       }
     case Left(rimError: ChRISRIMValidationError) =>
-      logger.warn(s"[handleResponse] - RIM validation error codes for correlation ID - ${requestModel.correlationUUID}: ${rimError.errorResponse.rimValidationErrors.map(_.errorType)}")
+      logger.warn(s"[handleResponse] - RIM validation error codes for correlation ID - ${requestModel.correlationUUID}: ${rimError.errorResponse.rimValidationErrors.map(formatErrorForLogging)}")
       createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
         requestModel.exciseRegistrationNumber,
         requestModel.draftId,
@@ -77,6 +78,11 @@ class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
         _ => Right(value)
       }
     case response => Future.successful(response)
+  }
+
+  private[services] def formatErrorForLogging(error: RIMValidationError): String = error match {
+    case RIMValidationError(_, Some(errorType), reason, _) if (errorType == 12) | (errorType == 13) => s"Some($errorType) (errorReason: $reason)"
+    case RIMValidationError(_, errorType, _, _) => s"$errorType"
   }
 
 }
