@@ -458,7 +458,8 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
               notificationOfAlertOrRejection = Seq(),
               notificationOfAcceptedExport = None,
               notificationOfDelay = Seq(),
-              cancelMovement = None
+              cancelMovement = None,
+              notificationOfCustomsRejection = None
             )))
       }
 
@@ -972,6 +973,69 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          </body:CancellationOfEAD>
             |        </body:Body>
             |      </body:IE810>
+            |
+            |      <!-- Movement rejected by customs -->
+            |      <ie839:IE839 xmlns="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE839:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13">
+            |	    <ie839:Header>
+            |		  <urn:MessageSender>NDEA.AT</urn:MessageSender>
+            |		  <urn:MessageRecipient>NDEA.XI</urn:MessageRecipient>
+            |		  <urn:DateOfPreparation>2024-01-14</urn:DateOfPreparation>
+            |		  <urn:TimeOfPreparation>20:02:21.879</urn:TimeOfPreparation>
+            |		  <urn:MessageIdentifier>GB10111000036818</urn:MessageIdentifier>
+            |		  <urn:CorrelationIdentifier>AT10007777600036751</urn:CorrelationIdentifier>
+            |	    </ie839:Header>
+            |	    <ie839:Body>
+            |		  <ie839:RefusalByCustoms>
+            |			<ie839:Attributes>
+            |				<ie839:DateAndTimeOfIssuance>2024-01-14T19:14:20</ie839:DateAndTimeOfIssuance>
+            |			</ie839:Attributes>
+            |   		<ie839:ConsigneeTrader language="en">
+            |              <ie839:Traderid>XIWK000000206</ie839:Traderid>
+            |              <ie839:TraderName>SEED TRADER NI</ie839:TraderName>
+            |              <ie839:StreetName>Catherdral</ie839:StreetName>
+            |              <ie839:StreetNumber>1</ie839:StreetNumber>
+            |              <ie839:Postcode>BT3 7BF</ie839:Postcode>
+            |              <ie839:City>Salford</ie839:City>
+            |			</ie839:ConsigneeTrader>
+            |			<ie839:ExportPlaceCustomsOffice>
+            |				<ie839:ReferenceNumber>AT001000</ie839:ReferenceNumber>
+            |			</ie839:ExportPlaceCustomsOffice>
+            |			<ie839:Rejection>
+            |				<ie839:RejectionDateAndTime>2024-01-14T19:14:20</ie839:RejectionDateAndTime>
+            |				<ie839:RejectionReasonCode>3</ie839:RejectionReasonCode>
+            |			</ie839:Rejection>
+            |			<ie839:ExportDeclarationInformation>
+            |				<ie839:LocalReferenceNumber>1111</ie839:LocalReferenceNumber>
+            |				<ie839:DocumentReferenceNumber>7884</ie839:DocumentReferenceNumber>
+            |				<ie839:NegativeCrosscheckValidationResults>
+            |					<ie839:UbrCrosscheckResult>
+            |						<ie839:AdministrativeReferenceCode>3</ie839:AdministrativeReferenceCode>
+            |						<ie839:SequenceNumber>11</ie839:SequenceNumber>
+            |						<ie839:BodyRecordUniqueReference>124</ie839:BodyRecordUniqueReference>
+            |						<ie839:DiagnosisCode>5</ie839:DiagnosisCode>
+            |						<ie839:ValidationResult>b</ie839:ValidationResult>
+            |						<ie839:RejectionReason>6</ie839:RejectionReason>
+            |						<ie839:CombinedNomenclatureCodeCrosscheckResult>
+            |							<ie839:ValidationResult>C</ie839:ValidationResult>
+            |							<ie839:RejectionReason>7</ie839:RejectionReason>
+            |						</ie839:CombinedNomenclatureCodeCrosscheckResult>
+            |						<ie839:NetMassCrosscheckResult>
+            |							<ie839:ValidationResult>D</ie839:ValidationResult>
+            |							<ie839:RejectionReason>8</ie839:RejectionReason>
+            |						</ie839:NetMassCrosscheckResult>
+            |					</ie839:UbrCrosscheckResult>
+            |				</ie839:NegativeCrosscheckValidationResults>
+            |				<ie839:NNonDes>
+            |					<ie839:DocumentReferenceNumber>9999</ie839:DocumentReferenceNumber>
+            |				</ie839:NNonDes>
+            |			</ie839:ExportDeclarationInformation>
+            |			<ie839:CEadVal>
+            |				<ie839:AdministrativeReferenceCode>24XI00000000000100271</ie839:AdministrativeReferenceCode>
+            |				<ie839:SequenceNumber>1</ie839:SequenceNumber>
+            |			</ie839:CEadVal>
+            |		  </ie839:RefusalByCustoms>
+            |	    </ie839:Body>
+            |      </ie839:IE839>
             |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 
@@ -1486,6 +1550,69 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          </body:CancellationOfEAD>
             |        </body:Body>
             |      </body:IE810>
+            |
+            |      <!-- Movement rejected by customs -->
+            |      <ie839:IE839 xmlns="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE839:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13">
+            |	    <ie839:Header>
+            |		  <urn:MessageSender>NDEA.AT</urn:MessageSender>
+            |		  <urn:MessageRecipient>NDEA.XI</urn:MessageRecipient>
+            |		  <urn:DateOfPreparation>2024-01-14</urn:DateOfPreparation>
+            |		  <urn:TimeOfPreparation>20:02:21.879</urn:TimeOfPreparation>
+            |		  <urn:MessageIdentifier>GB10111000036818</urn:MessageIdentifier>
+            |		  <urn:CorrelationIdentifier>AT10007777600036751</urn:CorrelationIdentifier>
+            |	    </ie839:Header>
+            |	    <ie839:Body>
+            |		  <ie839:RefusalByCustoms>
+            |			<ie839:Attributes>
+            |				<ie839:DateAndTimeOfIssuance>2024-01-14T19:14:20</ie839:DateAndTimeOfIssuance>
+            |			</ie839:Attributes>
+            |   		<ie839:ConsigneeTrader language="en">
+            |              <ie839:Traderid>XIWK000000206</ie839:Traderid>
+            |              <ie839:TraderName>SEED TRADER NI</ie839:TraderName>
+            |              <ie839:StreetName>Catherdral</ie839:StreetName>
+            |              <ie839:StreetNumber>1</ie839:StreetNumber>
+            |              <ie839:Postcode>BT3 7BF</ie839:Postcode>
+            |              <ie839:City>Salford</ie839:City>
+            |			</ie839:ConsigneeTrader>
+            |			<ie839:ExportPlaceCustomsOffice>
+            |				<ie839:ReferenceNumber>AT001000</ie839:ReferenceNumber>
+            |			</ie839:ExportPlaceCustomsOffice>
+            |			<ie839:Rejection>
+            |				<ie839:RejectionDateAndTime>2024-01-14T19:14:20</ie839:RejectionDateAndTime>
+            |				<ie839:RejectionReasonCode>3</ie839:RejectionReasonCode>
+            |			</ie839:Rejection>
+            |			<ie839:ExportDeclarationInformation>
+            |				<ie839:LocalReferenceNumber>1111</ie839:LocalReferenceNumber>
+            |				<ie839:DocumentReferenceNumber>7884</ie839:DocumentReferenceNumber>
+            |				<ie839:NegativeCrosscheckValidationResults>
+            |					<ie839:UbrCrosscheckResult>
+            |						<ie839:AdministrativeReferenceCode>3</ie839:AdministrativeReferenceCode>
+            |						<ie839:SequenceNumber>11</ie839:SequenceNumber>
+            |						<ie839:BodyRecordUniqueReference>124</ie839:BodyRecordUniqueReference>
+            |						<ie839:DiagnosisCode>5</ie839:DiagnosisCode>
+            |						<ie839:ValidationResult>b</ie839:ValidationResult>
+            |						<ie839:RejectionReason>6</ie839:RejectionReason>
+            |						<ie839:CombinedNomenclatureCodeCrosscheckResult>
+            |							<ie839:ValidationResult>C</ie839:ValidationResult>
+            |							<ie839:RejectionReason>7</ie839:RejectionReason>
+            |						</ie839:CombinedNomenclatureCodeCrosscheckResult>
+            |						<ie839:NetMassCrosscheckResult>
+            |							<ie839:ValidationResult>D</ie839:ValidationResult>
+            |							<ie839:RejectionReason>8</ie839:RejectionReason>
+            |						</ie839:NetMassCrosscheckResult>
+            |					</ie839:UbrCrosscheckResult>
+            |				</ie839:NegativeCrosscheckValidationResults>
+            |				<ie839:NNonDes>
+            |					<ie839:DocumentReferenceNumber>9999</ie839:DocumentReferenceNumber>
+            |				</ie839:NNonDes>
+            |			</ie839:ExportDeclarationInformation>
+            |			<ie839:CEadVal>
+            |				<ie839:AdministrativeReferenceCode>24XI00000000000100271</ie839:AdministrativeReferenceCode>
+            |				<ie839:SequenceNumber>1</ie839:SequenceNumber>
+            |			</ie839:CEadVal>
+            |		  </ie839:RefusalByCustoms>
+            |	    </ie839:Body>
+            |      </ie839:IE839>
             |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 

@@ -648,7 +648,8 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
           dateTime = LocalDateTime.parse("2001-12-17T09:30:47")
         )
       ),
-      cancelMovement = None
+      cancelMovement = None,
+      notificationOfCustomsRejection = None
     )
   )
 

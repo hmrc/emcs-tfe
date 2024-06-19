@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple14Semigroupal
+import cats.implicits.catsSyntaxTuple15Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -39,7 +39,8 @@ case class MovementViewHistoryAndExtraDataModel(
                                      notificationOfAlertOrRejection: Seq[NotificationOfAlertOrRejectionModel],
                                      notificationOfAcceptedExport: Option[NotificationOfAcceptedExportModel],
                                      notificationOfDelay: Seq[NotificationOfDelayModel],
-                                     cancelMovement: Option[CancellationReasonModel]
+                                     cancelMovement: Option[CancellationReasonModel],
+                                     notificationOfCustomsRejection: Option[NotificationOfCustomsRejectionModel]
                                    )
 
 object MovementViewHistoryAndExtraDataModel {
@@ -52,6 +53,8 @@ object MovementViewHistoryAndExtraDataModel {
   private[getMovement] lazy val notificationOfDelay = __ \\ "eventHistory" \ "IE837"
 
   private[getMovement] lazy val notificationOfAcceptedExport = __ \\ "eventHistory" \ "IE829"
+
+  private[getMovement] lazy val notificationOfCustomsRejection = __ \\ "eventHistory" \ "IE839"
 
   implicit lazy val xmlReader: XmlReader[MovementViewHistoryAndExtraDataModel] = (
     arc.read[String],
@@ -67,7 +70,8 @@ object MovementViewHistoryAndExtraDataModel {
     notificationOfAlertOrRejection.read[Seq[NotificationOfAlertOrRejectionModel]](strictReadSeq(NotificationOfAlertOrRejectionModel.xmlReads)),
     notificationOfAcceptedExport.read[NotificationOfAcceptedExportModel](NotificationOfAcceptedExportModel.xmlReads).optional,
     notificationOfDelay.read[Seq[NotificationOfDelayModel]](strictReadSeq(NotificationOfDelayModel.xmlReads)),
-    cancelMovement.read[CancellationReasonModel](CancellationReasonModel.xmlReads).optional
+    cancelMovement.read[CancellationReasonModel](CancellationReasonModel.xmlReads).optional,
+    notificationOfCustomsRejection.read[NotificationOfCustomsRejectionModel](NotificationOfCustomsRejectionModel.xmlReads).optional
   ).mapN(MovementViewHistoryAndExtraDataModel.apply)
 
   implicit val fmt: OFormat[MovementViewHistoryAndExtraDataModel] = Json.format
