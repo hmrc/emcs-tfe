@@ -20,6 +20,7 @@ import com.lucidchart.open.xtract.{EmptyError, ParseFailure, ParseSuccess}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType.{EADNotConcernRecipient, Other, ProductDoesNotMatchOrder, QuantityDoesNotMatchOrder}
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType.{Alert, Rejection}
+import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.{CancellationReasonModel, CancellationReasonType}
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
@@ -177,8 +178,11 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
             complementaryInformation = None,
             dateTime = LocalDateTime.parse("2024-06-18T08:18:56")
           )
-        )
-      ))
+        ),
+        cancelMovement = Some(CancellationReasonModel(CancellationReasonType.Other, Some("some info")))
+      )
+      )
+
     }
 
     "fail to read a subset of the movement fields when a field is missing" in {

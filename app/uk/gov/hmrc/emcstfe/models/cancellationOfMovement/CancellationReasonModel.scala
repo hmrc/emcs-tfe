@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.models.cancellationOfMovement
 
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import com.lucidchart.open.xtract.__
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
@@ -35,4 +37,12 @@ case class CancellationReasonModel(reason: CancellationReasonType,
 
 object CancellationReasonModel {
   implicit val fmt: OFormat[CancellationReasonModel] = Json.format
+  private lazy val reasonCode = __ \ "CancellationReasonCode"
+  private lazy val ComplementaryInformation = __ \ "ComplementaryInformation"
+
+  val xmlReads = (
+    reasonCode.read[CancellationReasonType](CancellationReasonType.xmlReads("CancellationReasonCode")(CancellationReasonType.enumerable)),
+    ComplementaryInformation.read[String].optional
+  ).mapN(CancellationReasonModel.apply)
+
 }

@@ -457,7 +457,8 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
               )),
               notificationOfAlertOrRejection = Seq(),
               notificationOfAcceptedExport = None,
-              notificationOfDelay = Seq()
+              notificationOfDelay = Seq(),
+              cancelMovement = None
             )))
       }
 
@@ -947,6 +948,30 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            </ie837:ExplanationOnDelayForDelivery>
             |         </ie837:Body>
             |      </ie837:IE837>
+            |    <body:IE810 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE810:V2.02">
+            |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+            |          <head:MessageSender>token</head:MessageSender>
+            |          <head:MessageRecipient>token</head:MessageRecipient>
+            |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+            |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+            |          <head:MessageIdentifier>token</head:MessageIdentifier>
+            |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+            |        </body:Header>
+            |        <body:Body>
+            |          <body:CancellationOfEAD>
+            |            <body:Attributes>
+            |              <body:DateAndTimeOfValidationOfCancellation>2008-09-04T10:22:53</body:DateAndTimeOfValidationOfCancellation>
+            |            </body:Attributes>
+            |            <body:ExciseMovementEad>
+            |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
+            |            </body:ExciseMovementEad>
+            |            <body:Cancellation>
+            |              <body:CancellationReasonCode>0</body:CancellationReasonCode>
+            |              <body:ComplementaryInformation>some info</body:ComplementaryInformation>
+            |            </body:Cancellation>
+            |          </body:CancellationOfEAD>
+            |        </body:Body>
+            |      </body:IE810>
             |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 
@@ -1437,6 +1462,30 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            </ie837:ExplanationOnDelayForDelivery>
             |         </ie837:Body>
             |      </ie837:IE837>
+            |    <body:IE810 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE810:V2.02">
+            |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+            |          <head:MessageSender>token</head:MessageSender>
+            |          <head:MessageRecipient>token</head:MessageRecipient>
+            |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+            |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+            |          <head:MessageIdentifier>token</head:MessageIdentifier>
+            |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+            |        </body:Header>
+            |        <body:Body>
+            |          <body:CancellationOfEAD>
+            |            <body:Attributes>
+            |              <body:DateAndTimeOfValidationOfCancellation>2008-09-04T10:22:53</body:DateAndTimeOfValidationOfCancellation>
+            |            </body:Attributes>
+            |            <body:ExciseMovementEad>
+            |              <body:AdministrativeReferenceCode>13AB7778889991ABCDEF9</body:AdministrativeReferenceCode>
+            |            </body:ExciseMovementEad>
+            |            <body:Cancellation>
+            |              <body:CancellationReasonCode>0</body:CancellationReasonCode>
+            |              <body:ComplementaryInformation>some info</body:ComplementaryInformation>
+            |            </body:Cancellation>
+            |          </body:CancellationOfEAD>
+            |        </body:Body>
+            |      </body:IE810>
             |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 
