@@ -20,7 +20,7 @@ import cats.implicits.catsSyntaxTuple5Semigroupal
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
-import uk.gov.hmrc.emcstfe.models.explainDelay.{DelayReasonType, DelayType}
+import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader._
 
 import java.time.LocalDateTime
