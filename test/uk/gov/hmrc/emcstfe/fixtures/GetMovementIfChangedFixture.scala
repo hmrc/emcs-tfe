@@ -625,7 +625,8 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
       numberOfItems = 2,
       reportOfReceipt = None,
       notificationOfDivertedMovement = None,
-      notificationOfAlertOrRejection = Seq()
+      notificationOfAlertOrRejection = Seq(),
+      notificationOfAcceptedExport = None
     )
   )
 

@@ -138,6 +138,28 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
               additionalInformation = None
             ))
           )
+        ),
+        notificationOfAcceptedExport = Some(
+          NotificationOfAcceptedExportModel(
+            customsOfficeNumber = "GB000383",
+            dateOfAcceptance = LocalDate.of(2024, 2, 5),
+            referenceNumberOfSenderCustomsOffice = "GB000101",
+            identificationOfSenderCustomsOfficer = "John Doe",
+            documentReferenceNumber = "645564546",
+            consigneeTrader = TraderModel(
+              traderExciseNumber = Some("BE345345345"),
+              traderName = Some("PEAR Supermarket"),
+              address = Some(
+                AddressModel(
+                  streetNumber = None,
+                  street = Some("Angels Business Park"),
+                  postcode = Some("BD1 3NN"),
+                  city = Some("Bradford")
+                )),
+              vatNumber = None,
+              eoriNumber = Some("GB00000578901")
+            )
+          )
         )
       ))
 
