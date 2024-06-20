@@ -19,10 +19,13 @@ package uk.gov.hmrc.emcstfe.fixtures
 import play.api.libs.json.{JsString, JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.common._
+import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
+import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.ChangeOfDestination
 import uk.gov.hmrc.emcstfe.models.response.getMovement._
 import uk.gov.hmrc.emcstfe.models.response.{Packaging, RawGetMovementResponse, WineProduct}
 
+import java.time.LocalDateTime
 import java.util.Base64
 import scala.xml.XML
 
@@ -339,7 +342,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |          <head:MessageSender>token</head:MessageSender>
                                                |          <head:MessageRecipient>token</head:MessageRecipient>
                                                |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+                                               |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
                                                |          <head:MessageIdentifier>token</head:MessageIdentifier>
                                                |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
                                                |        </urn:Header>
@@ -362,7 +365,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |          <head:MessageSender>token</head:MessageSender>
                                                |          <head:MessageRecipient>token</head:MessageRecipient>
                                                |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+                                               |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
                                                |          <head:MessageIdentifier>token</head:MessageIdentifier>
                                                |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
                                                |        </urn:Header>
@@ -386,7 +389,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |          <head:MessageSender>token</head:MessageSender>
                                                |          <head:MessageRecipient>token</head:MessageRecipient>
                                                |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+                                               |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
                                                |          <head:MessageIdentifier>token</head:MessageIdentifier>
                                                |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
                                                |        </urn:Header>
@@ -394,7 +397,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |          <urn:NotificationOfDivertedEADESAD>
                                                |            <urn:ExciseNotification>
                                                |              <urn:NotificationType>1</urn:NotificationType>
-                                               |              <urn:NotificationDateAndTime>2001-12-17T09:30:47.0Z</urn:NotificationDateAndTime>
+                                               |              <urn:NotificationDateAndTime>2001-12-17T09:30:47.00</urn:NotificationDateAndTime>
                                                |              <urn:AdministrativeReferenceCode>13AB1234567891ABCDEF9</urn:AdministrativeReferenceCode>
                                                |              <urn:SequenceNumber>1</urn:SequenceNumber>
                                                |            </urn:ExciseNotification>
@@ -406,7 +409,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |          <head:MessageSender>token</head:MessageSender>
                                                |          <head:MessageRecipient>token</head:MessageRecipient>
                                                |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-                                               |          <head:TimeOfPreparation>14:20:0Z</head:TimeOfPreparation>
+                                               |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
                                                |          <head:MessageIdentifier>token</head:MessageIdentifier>
                                                |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
                                                |        </urn:Header>
@@ -416,9 +419,9 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
                                                |              <urn:SubmitterIdentification>837Submitter</urn:SubmitterIdentification>
                                                |              <urn:SubmitterType>1</urn:SubmitterType>
                                                |              <urn:ExplanationCode>1</urn:ExplanationCode>
-                                               |              <urn:ComplementaryInformation language="to">837 complementory info</urn:ComplementaryInformation>
+                                               |              <urn:ComplementaryInformation language="to">837 complementary info</urn:ComplementaryInformation>
                                                |              <urn:MessageRole>1</urn:MessageRole>
-                                               |              <urn:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:47.0Z</urn:DateAndTimeOfValidationOfExplanationOnDelay>
+                                               |              <urn:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:47.00</urn:DateAndTimeOfValidationOfExplanationOnDelay>
                                                |            </urn:Attributes>
                                                |            <urn:ExciseMovement>
                                                |              <urn:AdministrativeReferenceCode>13AB1234567891ABCDEF9</urn:AdministrativeReferenceCode>
@@ -624,9 +627,24 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
       dateAndTimeOfValidationOfEadEsad = "2008-09-04T10:22:50",
       numberOfItems = 2,
       reportOfReceipt = None,
-      notificationOfDivertedMovement = None,
       notificationOfAlertOrRejection = Seq(),
-      notificationOfAcceptedExport = None
+      notificationOfAcceptedExport = None,
+      notificationOfDivertedMovement = Some(
+        NotificationOfDivertedMovementModel(
+          notificationType = ChangeOfDestination,
+          notificationDateAndTime = LocalDateTime.parse("2001-12-17T09:30:47"),
+          downstreamArcs = List()
+        )
+      ),
+      notificationOfDelay = Seq(
+        NotificationOfDelayModel(
+          submitterIdentification = "837Submitter",
+          submitterType = SubmitterType.Consignor,
+          explanationCode = DelayReasonType.CancelledCommercialTransaction,
+          complementaryInformation = Some("837 complementary info"),
+          dateTime = LocalDateTime.parse("2001-12-17T09:30:47")
+        )
+      )
     )
   )
 

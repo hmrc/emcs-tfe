@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple12Semigroupal
+import cats.implicits.catsSyntaxTuple13Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -36,16 +36,15 @@ case class MovementViewHistoryAndExtraDataModel(
                                      reportOfReceipt: Option[SubmitReportOfReceiptModel],
                                      notificationOfDivertedMovement: Option[NotificationOfDivertedMovementModel],
                                      notificationOfAlertOrRejection: Seq[NotificationOfAlertOrRejectionModel],
-                                     notificationOfAcceptedExport: Option[NotificationOfAcceptedExportModel]
-                                   )
+                                     notificationOfAcceptedExport: Option[NotificationOfAcceptedExportModel],
+                                     notificationOfDelay: Seq[NotificationOfDelayModel])
 
 object MovementViewHistoryAndExtraDataModel {
 
   private[getMovement] lazy val reportOfReceipt = __ \\ "eventHistory" \ "IE818" \ "Body" \ "AcceptedOrRejectedReportOfReceiptExport"
-
   private[getMovement] lazy val notificationOfDivertedMovement = __ \\ "eventHistory" \ "IE803"
-
   private[getMovement] lazy val notificationOfAlertOrRejection = __ \\ "eventHistory" \ "IE819"
+  private[getMovement] lazy val notificationOfDelay = __ \\ "eventHistory" \ "IE837"
 
   private[getMovement] lazy val notificationOfAcceptedExport = __ \\ "eventHistory" \ "IE829"
 
@@ -61,7 +60,8 @@ object MovementViewHistoryAndExtraDataModel {
     reportOfReceipt.read[SubmitReportOfReceiptModel](SubmitReportOfReceiptModel.xmlReads).optional,
     notificationOfDivertedMovement.read[NotificationOfDivertedMovementModel](NotificationOfDivertedMovementModel.xmlReads).optional,
     notificationOfAlertOrRejection.read[Seq[NotificationOfAlertOrRejectionModel]](strictReadSeq(NotificationOfAlertOrRejectionModel.xmlReads)),
-    notificationOfAcceptedExport.read[NotificationOfAcceptedExportModel](NotificationOfAcceptedExportModel.xmlReads).optional
+    notificationOfAcceptedExport.read[NotificationOfAcceptedExportModel](NotificationOfAcceptedExportModel.xmlReads).optional,
+    notificationOfDelay.read[Seq[NotificationOfDelayModel]](strictReadSeq(NotificationOfDelayModel.xmlReads))
   ).mapN(MovementViewHistoryAndExtraDataModel.apply)
 
   implicit val fmt: OFormat[MovementViewHistoryAndExtraDataModel] = Json.format
