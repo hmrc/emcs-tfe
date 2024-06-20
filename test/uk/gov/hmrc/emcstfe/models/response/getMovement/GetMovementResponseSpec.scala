@@ -456,7 +456,8 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
                 downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
               )),
               notificationOfAlertOrRejection = Seq(),
-              notificationOfAcceptedExport = None
+              notificationOfAcceptedExport = None,
+              notificationOfDelay = Seq()
             )))
       }
 
@@ -864,6 +865,88 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          </ie829:NotificationOfAcceptedExport>
             |        </ie829:Body>
             |      </ie829:IE829>
+            |
+            |      <body:IE837 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE837:V2.02">
+            |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+            |          <head:MessageSender>token</head:MessageSender>
+            |          <head:MessageRecipient>token</head:MessageRecipient>
+            |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+            |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+            |          <head:MessageIdentifier>token</head:MessageIdentifier>
+            |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+            |        </body:Header>
+            |        <body:Body>
+            |          <body:ExplanationOnDelayForDelivery>
+            |            <body:Attributes>
+            |              <body:SubmitterIdentification>837Submitter</body:SubmitterIdentification>
+            |              <body:SubmitterType>1</body:SubmitterType>
+            |              <body:ExplanationCode>1</body:ExplanationCode>
+            |              <body:ComplementaryInformation language="to">837 complementary info</body:ComplementaryInformation>
+            |              <body:MessageRole>1</body:MessageRole>
+            |              <body:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:47.00</body:DateAndTimeOfValidationOfExplanationOnDelay>
+            |            </body:Attributes>
+            |            <body:ExciseMovement>
+            |              <body:AdministrativeReferenceCode>13AB1234567891ABCDEF9</body:AdministrativeReferenceCode>
+            |              <body:SequenceNumber/>
+            |            </body:ExciseMovement>
+            |          </body:ExplanationOnDelayForDelivery>
+            |        </body:Body>
+            |      </body:IE837>
+            |
+            |      <!-- Explanation of Delay to Report a Receipt (IE837) -->
+            |      <ie837:IE837 xmlns:ie837="ie837:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.13">
+            |         <ie837:Header>
+            |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
+            |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+            |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
+            |            <urn:TimeOfPreparation>07:11:31.898476</urn:TimeOfPreparation>
+            |            <urn:MessageIdentifier>GB100000000305526</urn:MessageIdentifier>
+            |            <urn:CorrelationIdentifier>PORTALb32df82fde8741b4beb3fb832a9cdb76</urn:CorrelationIdentifier>
+            |         </ie837:Header>
+            |         <ie837:Body>
+            |            <ie837:ExplanationOnDelayForDelivery>
+            |               <ie837:Attributes>
+            |                  <ie837:SubmitterIdentification>GBWK001234569</ie837:SubmitterIdentification>
+            |                  <ie837:SubmitterType>1</ie837:SubmitterType>
+            |                  <ie837:ExplanationCode>6</ie837:ExplanationCode>
+            |                  <ie837:ComplementaryInformation language="en">Lorry crashed off cliff</ie837:ComplementaryInformation>
+            |                  <ie837:MessageRole>1</ie837:MessageRole>
+            |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:11:33</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+            |               </ie837:Attributes>
+            |               <ie837:ExciseMovement>
+            |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>
+            |                  <ie837:SequenceNumber>1</ie837:SequenceNumber>
+            |               </ie837:ExciseMovement>
+            |            </ie837:ExplanationOnDelayForDelivery>
+            |         </ie837:Body>
+            |      </ie837:IE837>
+            |
+            |      <!-- Explanation of Delay to Change of Destination (IE837) -->
+            |      <ie837:IE837 xmlns:ie837="ie837:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.13">
+            |         <ie837:Header>
+            |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
+            |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+            |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
+            |            <urn:TimeOfPreparation>07:18:54.852159</urn:TimeOfPreparation>
+            |            <urn:MessageIdentifier>GB100000000305527</urn:MessageIdentifier>
+            |            <urn:CorrelationIdentifier>PORTAL07498cf951004becbc3c73c14c103b13</urn:CorrelationIdentifier>
+            |         </ie837:Header>
+            |         <ie837:Body>
+            |            <ie837:ExplanationOnDelayForDelivery>
+            |               <ie837:Attributes>
+            |                  <ie837:SubmitterIdentification>GBWK001234569</ie837:SubmitterIdentification>
+            |                  <ie837:SubmitterType>1</ie837:SubmitterType>
+            |                  <ie837:ExplanationCode>5</ie837:ExplanationCode>
+            |                  <ie837:MessageRole>2</ie837:MessageRole>
+            |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:18:56</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+            |               </ie837:Attributes>
+            |               <ie837:ExciseMovement>
+            |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>
+            |                  <ie837:SequenceNumber>1</ie837:SequenceNumber>
+            |               </ie837:ExciseMovement>
+            |            </ie837:ExplanationOnDelayForDelivery>
+            |         </ie837:Body>
+            |      </ie837:IE837>
             |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 
@@ -1272,6 +1355,88 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          </ie829:NotificationOfAcceptedExport>
             |        </ie829:Body>
             |      </ie829:IE829>
+            |
+            |      <body:IE837 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE837:V2.02">
+            |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+            |          <head:MessageSender>token</head:MessageSender>
+            |          <head:MessageRecipient>token</head:MessageRecipient>
+            |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+            |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+            |          <head:MessageIdentifier>token</head:MessageIdentifier>
+            |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+            |        </body:Header>
+            |        <body:Body>
+            |          <body:ExplanationOnDelayForDelivery>
+            |            <body:Attributes>
+            |              <body:SubmitterIdentification>837Submitter</body:SubmitterIdentification>
+            |              <body:SubmitterType>1</body:SubmitterType>
+            |              <body:ExplanationCode>1</body:ExplanationCode>
+            |              <body:ComplementaryInformation language="to">837 complementary info</body:ComplementaryInformation>
+            |              <body:MessageRole>1</body:MessageRole>
+            |              <body:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:47.00</body:DateAndTimeOfValidationOfExplanationOnDelay>
+            |            </body:Attributes>
+            |            <body:ExciseMovement>
+            |              <body:AdministrativeReferenceCode>13AB1234567891ABCDEF9</body:AdministrativeReferenceCode>
+            |              <body:SequenceNumber/>
+            |            </body:ExciseMovement>
+            |          </body:ExplanationOnDelayForDelivery>
+            |        </body:Body>
+            |      </body:IE837>
+            |
+            |      <!-- Explanation of Delay to Report a Receipt (IE837) -->
+            |      <ie837:IE837 xmlns:ie837="ie837:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.13">
+            |         <ie837:Header>
+            |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
+            |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+            |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
+            |            <urn:TimeOfPreparation>07:11:31.898476</urn:TimeOfPreparation>
+            |            <urn:MessageIdentifier>GB100000000305526</urn:MessageIdentifier>
+            |            <urn:CorrelationIdentifier>PORTALb32df82fde8741b4beb3fb832a9cdb76</urn:CorrelationIdentifier>
+            |         </ie837:Header>
+            |         <ie837:Body>
+            |            <ie837:ExplanationOnDelayForDelivery>
+            |               <ie837:Attributes>
+            |                  <ie837:SubmitterIdentification>GBWK001234569</ie837:SubmitterIdentification>
+            |                  <ie837:SubmitterType>1</ie837:SubmitterType>
+            |                  <ie837:ExplanationCode>6</ie837:ExplanationCode>
+            |                  <ie837:ComplementaryInformation language="en">Lorry crashed off cliff</ie837:ComplementaryInformation>
+            |                  <ie837:MessageRole>1</ie837:MessageRole>
+            |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:11:33</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+            |               </ie837:Attributes>
+            |               <ie837:ExciseMovement>
+            |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>
+            |                  <ie837:SequenceNumber>1</ie837:SequenceNumber>
+            |               </ie837:ExciseMovement>
+            |            </ie837:ExplanationOnDelayForDelivery>
+            |         </ie837:Body>
+            |      </ie837:IE837>
+            |
+            |      <!-- Explanation of Delay to Change of Destination (IE837) -->
+            |      <ie837:IE837 xmlns:ie837="ie837:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.13">
+            |         <ie837:Header>
+            |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
+            |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+            |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
+            |            <urn:TimeOfPreparation>07:18:54.852159</urn:TimeOfPreparation>
+            |            <urn:MessageIdentifier>GB100000000305527</urn:MessageIdentifier>
+            |            <urn:CorrelationIdentifier>PORTAL07498cf951004becbc3c73c14c103b13</urn:CorrelationIdentifier>
+            |         </ie837:Header>
+            |         <ie837:Body>
+            |            <ie837:ExplanationOnDelayForDelivery>
+            |               <ie837:Attributes>
+            |                  <ie837:SubmitterIdentification>GBWK001234569</ie837:SubmitterIdentification>
+            |                  <ie837:SubmitterType>1</ie837:SubmitterType>
+            |                  <ie837:ExplanationCode>5</ie837:ExplanationCode>
+            |                  <ie837:MessageRole>2</ie837:MessageRole>
+            |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:18:56</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+            |               </ie837:Attributes>
+            |               <ie837:ExciseMovement>
+            |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>
+            |                  <ie837:SequenceNumber>1</ie837:SequenceNumber>
+            |               </ie837:ExciseMovement>
+            |            </ie837:ExplanationOnDelayForDelivery>
+            |         </ie837:Body>
+            |      </ie837:IE837>
             |    </mov:eventHistory>
             |  </mov:movementView>""".stripMargin))
 

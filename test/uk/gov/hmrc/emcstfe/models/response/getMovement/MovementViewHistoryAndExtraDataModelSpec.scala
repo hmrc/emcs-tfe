@@ -23,6 +23,7 @@ import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionType.{Alert, 
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
+import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -160,9 +161,24 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
               eoriNumber = Some("GB00000578901")
             )
           )
+        ),
+        notificationOfDelay = Seq(
+          NotificationOfDelayModel(
+            submitterIdentification = "GBWK001234569",
+            submitterType = SubmitterType.Consignor,
+            explanationCode = DelayReasonType.Accident,
+            complementaryInformation = Some("Lorry crashed off cliff"),
+            dateTime = LocalDateTime.parse("2024-06-18T08:11:33")
+          ),
+          NotificationOfDelayModel(
+            submitterIdentification = "GBWK001234569",
+            submitterType = SubmitterType.Consignor,
+            explanationCode = DelayReasonType.Strikes,
+            complementaryInformation = None,
+            dateTime = LocalDateTime.parse("2024-06-18T08:18:56")
+          )
         )
       ))
-
     }
 
     "fail to read a subset of the movement fields when a field is missing" in {
