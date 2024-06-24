@@ -49,7 +49,7 @@ class GetMessagesRequestSpec extends TestBaseSpec {
                   (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "ExciseRegistrationNumber").text shouldBe testErn
                   (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "SortField").text shouldBe GetMessagesRequest.toChRISSortField(request.sortField)
                   (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "SortOrder").text shouldBe request.sortOrder
-                  (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "StartPosition").text shouldBe "1"
+                  (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "StartPosition").text shouldBe "0"
                   (xml \\ "Envelope" \\ "Body" \\ "Control" \\ "OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "MaxNoToReturn").text shouldBe "10"
                 }
               }
