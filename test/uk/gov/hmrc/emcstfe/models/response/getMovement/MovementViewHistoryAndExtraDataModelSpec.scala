@@ -103,7 +103,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
           notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
           downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
         )),
-        notificationOfAlertOrRejection = Seq(
+        notificationOfAlertOrRejection = Some(Seq(
           NotificationOfAlertOrRejectionModel(
             notificationType = Alert,
             notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
@@ -142,7 +142,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
               additionalInformation = None
             ))
           )
-        ),
+        )),
         notificationOfAcceptedExport = Some(
           NotificationOfAcceptedExportModel(
             customsOfficeNumber = "GB000383",
@@ -165,7 +165,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
             )
           )
         ),
-        notificationOfDelay = Seq(
+        notificationOfDelay = Some(Seq(
           NotificationOfDelayModel(
             submitterIdentification = "GBWK001234569",
             submitterType = SubmitterType.Consignor,
@@ -180,7 +180,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
             complementaryInformation = None,
             dateTime = LocalDateTime.parse("2024-06-18T08:18:56")
           )
-        ),
+        )),
         cancelMovement = Some(CancellationReasonModel(CancellationReasonType.Other, Some("some info"))),
         notificationOfCustomsRejection = Some(
           NotificationOfCustomsRejectionModel(

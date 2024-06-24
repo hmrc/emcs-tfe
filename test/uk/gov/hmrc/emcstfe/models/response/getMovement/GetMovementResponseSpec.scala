@@ -455,9 +455,9 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
                 notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
                 downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
               )),
-              notificationOfAlertOrRejection = Seq(),
+              notificationOfAlertOrRejection = None,
               notificationOfAcceptedExport = None,
-              notificationOfDelay = Seq(),
+              notificationOfDelay = None,
               cancelMovement = None,
               notificationOfCustomsRejection = None
             )))

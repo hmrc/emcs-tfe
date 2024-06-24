@@ -17,8 +17,6 @@
 package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsString, JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.CancellationReasonModel
-import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.CancellationReasonType.Other
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.Export
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
@@ -630,7 +628,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
       dateAndTimeOfValidationOfEadEsad = "2008-09-04T10:22:50",
       numberOfItems = 2,
       reportOfReceipt = None,
-      notificationOfAlertOrRejection = Seq(),
+      notificationOfAlertOrRejection = None,
       notificationOfAcceptedExport = None,
       notificationOfDivertedMovement = Some(
         NotificationOfDivertedMovementModel(
@@ -639,7 +637,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
           downstreamArcs = List()
         )
       ),
-      notificationOfDelay = Seq(
+      notificationOfDelay = Some(Seq(
         NotificationOfDelayModel(
           submitterIdentification = "837Submitter",
           submitterType = SubmitterType.Consignor,
@@ -647,7 +645,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
           complementaryInformation = Some("837 complementary info"),
           dateTime = LocalDateTime.parse("2001-12-17T09:30:47")
         )
-      ),
+      )),
       cancelMovement = None,
       notificationOfCustomsRejection = None
     )

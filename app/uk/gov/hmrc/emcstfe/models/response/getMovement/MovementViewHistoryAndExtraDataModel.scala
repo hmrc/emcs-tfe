@@ -36,9 +36,9 @@ case class MovementViewHistoryAndExtraDataModel(
                                      numberOfItems: Int,
                                      reportOfReceipt: Option[SubmitReportOfReceiptModel],
                                      notificationOfDivertedMovement: Option[NotificationOfDivertedMovementModel],
-                                     notificationOfAlertOrRejection: Seq[NotificationOfAlertOrRejectionModel],
+                                     notificationOfAlertOrRejection: Option[Seq[NotificationOfAlertOrRejectionModel]],
                                      notificationOfAcceptedExport: Option[NotificationOfAcceptedExportModel],
-                                     notificationOfDelay: Seq[NotificationOfDelayModel],
+                                     notificationOfDelay: Option[Seq[NotificationOfDelayModel]],
                                      cancelMovement: Option[CancellationReasonModel],
                                      notificationOfCustomsRejection: Option[NotificationOfCustomsRejectionModel]
                                    )
@@ -46,10 +46,13 @@ case class MovementViewHistoryAndExtraDataModel(
 object MovementViewHistoryAndExtraDataModel {
 
   private[getMovement] lazy val reportOfReceipt = __ \\ "eventHistory" \ "IE818" \ "Body" \ "AcceptedOrRejectedReportOfReceiptExport"
-  private[getMovement] lazy val notificationOfDivertedMovement = __ \\ "eventHistory" \ "IE803"
+
   private[getMovement] lazy val cancelMovement = __ \\ "eventHistory" \ "IE810" \ "Body" \ "CancellationOfEAD" \ "Cancellation"
 
+  private[getMovement] lazy val notificationOfDivertedMovement = __ \\ "eventHistory" \ "IE803"
+
   private[getMovement] lazy val notificationOfAlertOrRejection = __ \\ "eventHistory" \ "IE819"
+
   private[getMovement] lazy val notificationOfDelay = __ \\ "eventHistory" \ "IE837"
 
   private[getMovement] lazy val notificationOfAcceptedExport = __ \\ "eventHistory" \ "IE829"
@@ -67,9 +70,9 @@ object MovementViewHistoryAndExtraDataModel {
     numberOfItems.read[Seq[String]](strictReadSeq).map(_.length),
     reportOfReceipt.read[SubmitReportOfReceiptModel](SubmitReportOfReceiptModel.xmlReads).optional,
     notificationOfDivertedMovement.read[NotificationOfDivertedMovementModel](NotificationOfDivertedMovementModel.xmlReads).optional,
-    notificationOfAlertOrRejection.read[Seq[NotificationOfAlertOrRejectionModel]](strictReadSeq(NotificationOfAlertOrRejectionModel.xmlReads)),
+    notificationOfAlertOrRejection.read[Seq[NotificationOfAlertOrRejectionModel]](strictReadSeq(NotificationOfAlertOrRejectionModel.xmlReads)).seqToOptionSeq,
     notificationOfAcceptedExport.read[NotificationOfAcceptedExportModel](NotificationOfAcceptedExportModel.xmlReads).optional,
-    notificationOfDelay.read[Seq[NotificationOfDelayModel]](strictReadSeq(NotificationOfDelayModel.xmlReads)),
+    notificationOfDelay.read[Seq[NotificationOfDelayModel]](strictReadSeq(NotificationOfDelayModel.xmlReads)).seqToOptionSeq,
     cancelMovement.read[CancellationReasonModel](CancellationReasonModel.xmlReads).optional,
     notificationOfCustomsRejection.read[NotificationOfCustomsRejectionModel](NotificationOfCustomsRejectionModel.xmlReads).optional
   ).mapN(MovementViewHistoryAndExtraDataModel.apply)
