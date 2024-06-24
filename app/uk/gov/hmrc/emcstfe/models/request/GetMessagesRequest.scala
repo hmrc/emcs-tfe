@@ -34,7 +34,6 @@ case class GetMessagesRequest(exciseRegistrationNumber: String,
   // page 1 -> start at 0
   // page 2 -> start at 10
   // page 3 -> start at 20
-  // NOTE: Chris starts from `1` not `0`. So, in the ChRIS Request Body a +1 is added to the result
   private def startPos: BigInt = startPosition.getOrElse[Int]((page - 1) * maxNoToReturn)
 
   override def metricName: String = "messages"
@@ -45,7 +44,7 @@ case class GetMessagesRequest(exciseRegistrationNumber: String,
         <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
         <Parameter Name="SortField">{GetMessagesRequest.toChRISSortField(sortField)}</Parameter>
         <Parameter Name="SortOrder">{sortOrder}</Parameter>
-        <Parameter Name="StartPosition">{startPos + 1}</Parameter>
+        <Parameter Name="StartPosition">{startPos}</Parameter>
         <Parameter Name="MaxNoToReturn">{maxNoToReturn}</Parameter>
       </Parameters>
     )
