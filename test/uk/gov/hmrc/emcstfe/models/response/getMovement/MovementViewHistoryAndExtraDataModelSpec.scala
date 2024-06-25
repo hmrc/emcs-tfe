@@ -26,6 +26,8 @@ import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionDiagnosisCodeType.DestinationTypeIsNotExport
+import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionReasonCodeType.ExportDataNotFound
 import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -101,7 +103,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
           notificationDateAndTime = LocalDateTime.of(2024, 6, 5, 0, 0, 1),
           downstreamArcs = Seq(testArc, s"${testArc.dropRight(1)}1")
         )),
-        notificationOfAlertOrRejection = Seq(
+        notificationOfAlertOrRejection = Some(Seq(
           NotificationOfAlertOrRejectionModel(
             notificationType = Alert,
             notificationDateAndTime = LocalDateTime.of(2023, 12, 18, 9, 0, 0),
@@ -140,7 +142,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
               additionalInformation = None
             ))
           )
-        ),
+        )),
         notificationOfAcceptedExport = Some(
           NotificationOfAcceptedExportModel(
             customsOfficeNumber = "GB000383",
@@ -163,7 +165,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
             )
           )
         ),
-        notificationOfDelay = Seq(
+        notificationOfDelay = Some(Seq(
           NotificationOfDelayModel(
             submitterIdentification = "GBWK001234569",
             submitterType = SubmitterType.Consignor,
@@ -178,11 +180,50 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
             complementaryInformation = None,
             dateTime = LocalDateTime.parse("2024-06-18T08:18:56")
           )
-        ),
-        cancelMovement = Some(CancellationReasonModel(CancellationReasonType.Other, Some("some info")))
-      )
-      )
-
+        )),
+        cancelMovement = Some(CancellationReasonModel(CancellationReasonType.Other, Some("some info"))),
+        notificationOfCustomsRejection = Some(
+          NotificationOfCustomsRejectionModel(
+            customsOfficeReferenceNumber = Some("AT001000"),
+            rejectionDateAndTime = LocalDateTime.of(2024, 1, 14, 19, 14, 20),
+            rejectionReasonCode = ExportDataNotFound,
+            localReferenceNumber = Some("1111"),
+            documentReferenceNumber = Some("7884"),
+            diagnoses = Seq(
+              CustomsRejectionDiagnosis(
+                bodyRecordUniqueReference = "100",
+                diagnosisCode = DestinationTypeIsNotExport
+              ),
+              CustomsRejectionDiagnosis(
+                bodyRecordUniqueReference = "101",
+                diagnosisCode = DestinationTypeIsNotExport
+              ),
+              CustomsRejectionDiagnosis(
+                bodyRecordUniqueReference = "102",
+                diagnosisCode = DestinationTypeIsNotExport
+              ),
+              CustomsRejectionDiagnosis(
+                bodyRecordUniqueReference = "103",
+                diagnosisCode = DestinationTypeIsNotExport
+              )
+            ),
+            consignee = Some(
+              TraderModel(
+                traderExciseNumber = Some("XIWK000000206"),
+                traderName = Some("SEED TRADER NI"),
+                address = Some(
+                  AddressModel(
+                    streetNumber = Some("1"),
+                    street = Some("Catherdral"),
+                    postcode = Some("BT3 7BF"),
+                    city = Some("Salford")
+                  )),
+                vatNumber = None,
+                eoriNumber = None
+              ))
+          )
+        )
+      ))
     }
 
     "fail to read a subset of the movement fields when a field is missing" in {
