@@ -47,37 +47,32 @@ class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
     createMovementUserAnswersRepository.setSubmittedDraftId(ern, draftId, submittedDraftId)
 
   private def handleResponse[A](requestModel: SubmitCreateMovementRequest, response: Either[ErrorResponse, A])
-                               (implicit ec: ExecutionContext): Future[Either[ErrorResponse, A]] =
+                               (implicit ec: ExecutionContext): Future[Either[ErrorResponse, A]] = {
     response match {
     //If the submission fails due to RIM validation errors, store the errors in Mongo for persistence
     case Left(rimError: EISRIMValidationError) =>
       logger.warn(s"[handleResponse][${requestModel.exciseRegistrationNumber}] - RIM validation error codes for correlation ID - ${rimError.errorResponse.emcsCorrelationId}: ${rimError.errorResponse.validatorResults.map(_.flatMap(formatErrorForLogging))}")
       createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
-        requestModel.exciseRegistrationNumber,
-        requestModel.draftId,
-        rimError.errorResponse.validatorResults.getOrElse(Seq.empty)
+        requestModel.exciseRegistrationNumber, requestModel.draftId, rimError.errorResponse.validatorResults.getOrElse(Seq.empty)
       ).map {
         _ => Left(rimError)
       }
     case Left(rimError: ChRISRIMValidationError) =>
       logger.warn(s"[handleResponse][${requestModel.exciseRegistrationNumber}] - RIM validation error codes for correlation ID - ${requestModel.correlationUUID}: ${rimError.errorResponse.rimValidationErrors.map(formatErrorForLogging)}")
       createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
-        requestModel.exciseRegistrationNumber,
-        requestModel.draftId,
-        rimError.errorResponse.rimValidationErrors
+        requestModel.exciseRegistrationNumber, requestModel.draftId, rimError.errorResponse.rimValidationErrors
       ).map {
         _ => Left(rimError)
       }
     //Clear any existing RIM validation errors when the movement is submitted successfully
     case Right(value) =>
       createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
-        requestModel.exciseRegistrationNumber,
-        requestModel.draftId,
-        Seq.empty
+        requestModel.exciseRegistrationNumber, requestModel.draftId, Seq.empty
       ).map {
         _ => Right(value)
       }
     case response => Future.successful(response)
+  }
   }
 
   private[services] def formatErrorForLogging(error: RIMValidationError): String = error match {

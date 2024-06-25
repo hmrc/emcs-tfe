@@ -33,7 +33,7 @@ class BaseUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixtur
     override val repo: BaseUserAnswersRepository = mockRepo
   }
 
-  val userAnswers = UserAnswers(testErn, testArc, Json.obj(), Instant.now())
+  val userAnswers = UserAnswers(testErn, testArc, Json.obj(), validationErrors = Seq.empty, Instant.now())
 
   ".get" should {
     "return a Right(Some(answers))" when {

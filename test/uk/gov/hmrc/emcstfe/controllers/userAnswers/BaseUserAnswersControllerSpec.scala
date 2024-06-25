@@ -48,7 +48,7 @@ class BaseUserAnswersControllerSpec extends TestBaseSpec
 
   private val fakeRequest = FakeRequest("GET", route)
 
-  val userAnswers = UserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers = UserAnswers(testErn, testArc, Json.obj(), validationErrors = Seq.empty, Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   s"GET $route" should {
     s"return $OK (OK)" when {

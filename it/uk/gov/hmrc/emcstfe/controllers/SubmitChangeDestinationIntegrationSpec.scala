@@ -98,6 +98,19 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
           response.header("Content-Type") shouldBe Some("application/json")
           response.json shouldBe Json.toJson(XmlValidationError)
         }
+        "downstream call returns RIM validation errors" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(chrisRimValidationResponseBody))
+          }
+
+          val response: WSResponse = await(request().post(submitChangeDestinationJsonMax))
+          response.status shouldBe Status.UNPROCESSABLE_ENTITY
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Request not processed returned by ChRIS"
+          )
+        }
         "downstream call returns a non-200 HTTP response" in new Test {
           val referenceDataResponseBody: JsValue = Json.parse(
             s"""
@@ -154,6 +167,36 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
           response.header("Content-Type") shouldBe Some("application/json")
           response.json shouldBe Json.obj(
             "message" -> "Errors parsing JSON, errors: List(JsonValidationError(List(error.path.missing),List()))"
+          )
+        }
+
+        "downstream call returns a 422 (not RIM validation errors)" in new Test {
+          override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.UNPROCESSABLE_ENTITY, Json.obj("foo" -> "bar").toString())
+          }
+
+          val response: WSResponse = await(request().post(submitChangeDestinationJsonMax))
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Request not processed returned by EIS, error response: {\"foo\":\"bar\"}"
+          )
+        }
+
+        "downstream call returns RIM validation errors" in new Test {
+          override def setupStubs(): StubMapping = {
+            enable(SendToEIS)
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.UNPROCESSABLE_ENTITY, eisRimValidationJsonResponse.toString())
+          }
+
+          val response: WSResponse = await(request().post(submitChangeDestinationJsonMax))
+          response.status shouldBe Status.UNPROCESSABLE_ENTITY
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Request not processed returned by EIS, correlation ID: 7be1db16-e8fb-4e81-97e5-3d3e2d21f6c4"
           )
         }
 
