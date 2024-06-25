@@ -25,6 +25,7 @@ import uk.gov.hmrc.emcstfe.models.common.DestinationType._
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
+import uk.gov.hmrc.emcstfe.models.explainShortageExcess.BodyAnalysisModel
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionDiagnosisCodeType.DestinationTypeIsNotExport
@@ -764,6 +765,43 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |		  </ie839:RefusalByCustoms>
        |	    </ie839:Body>
        |      </ie839:IE839>
+       |
+       |      <!-- Explanation of Shortage or Excess (Excess - Individual items) -->
+       |      <ie871:IE871 xmlns:ie871="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.13">
+       |          <ie871:Header>
+       |              <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |              <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |              <urn:DateOfPreparation>2024-06-24</urn:DateOfPreparation>
+       |              <urn:TimeOfPreparation>08:46:49.496924</urn:TimeOfPreparation>
+       |              <urn:MessageIdentifier>69c710d7-abb6-4e3c-a571-9555f4a5c7f5</urn:MessageIdentifier>
+       |              <urn:CorrelationIdentifier>PORTAL8515fc03cc404bc2ab201cfa4996fb2f</urn:CorrelationIdentifier>
+       |          </ie871:Header>
+       |          <ie871:Body>
+       |              <ie871:ExplanationOnReasonForShortage>
+       |                  <ie871:Attributes>
+       |                      <ie871:SubmitterType>2</ie871:SubmitterType>
+       |                  </ie871:Attributes>
+       |                  <ie871:ConsigneeTrader language="en">
+       |                      <ie871:Traderid>GBWK345678990</ie871:Traderid>
+       |                      <ie871:TraderName>consignee business</ie871:TraderName>
+       |                      <ie871:StreetName>Joke Street</ie871:StreetName>
+       |                      <ie871:StreetNumber>1</ie871:StreetNumber>
+       |                      <ie871:Postcode>JO11KE</ie871:Postcode>
+       |                      <ie871:City>Joke town</ie871:City>
+       |                  </ie871:ConsigneeTrader>
+       |                  <ie871:ExciseMovement>
+       |                      <ie871:AdministrativeReferenceCode>23GB00000000000380611</ie871:AdministrativeReferenceCode>
+       |                      <ie871:SequenceNumber>1</ie871:SequenceNumber>
+       |                  </ie871:ExciseMovement>
+       |                  <ie871:BodyAnalysis>
+       |                      <ie871:ExciseProductCode>B000</ie871:ExciseProductCode>
+       |                      <ie871:BodyRecordUniqueReference>1</ie871:BodyRecordUniqueReference>
+       |                      <ie871:Explanation language="en">4 more than I expected</ie871:Explanation>
+       |                      <ie871:ActualQuantity>5</ie871:ActualQuantity>
+       |                  </ie871:BodyAnalysis>
+       |              </ie871:ExplanationOnReasonForShortage>
+       |          </ie871:Body>
+       |      </ie871:IE871>
        |    </mov:eventHistory>
        |  </mov:movementView>""".stripMargin
 
@@ -1118,6 +1156,20 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             )
           )
         )
+      ),
+      notificationOfShortageOrExcess = Some(
+        NotificationOfShortageOrExcessModel(
+          submitterType = SubmitterType.Consignee,
+          globalExplanation = None,
+          individualItemReasons = Some(Seq(
+            BodyAnalysisModel(
+              exciseProductCode = "B000",
+              bodyRecordUniqueReference = 1,
+              explanation = "4 more than I expected",
+              actualQuantity = Some(5)
+            )
+          ))
+        )
       )
     )
   )
@@ -1383,6 +1435,17 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           "street"       -> "Catherdral",
           "postcode"     -> "BT3 7BF",
           "city"         -> "Salford"
+        )
+      )
+    ),
+    "notificationOfShortageOrExcess" -> Json.obj(
+      "submitterType" -> "2",
+      "individualItemReasons" -> Json.arr(
+        Json.obj(
+          "exciseProductCode" -> "B000",
+          "bodyRecordUniqueReference" -> 1,
+          "explanation" -> "4 more than I expected",
+          "actualQuantity" -> 5
         )
       )
     )
@@ -2088,6 +2151,43 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |		  </ie839:RefusalByCustoms>
        |	    </ie839:Body>
        |      </ie839:IE839>
+       |
+       |      <!-- Explanation of Shortage or Excess (Excess - Individual items) -->
+       |      <ie871:IE871 xmlns:ie871="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.13">
+       |          <ie871:Header>
+       |              <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |              <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |              <urn:DateOfPreparation>2024-06-24</urn:DateOfPreparation>
+       |              <urn:TimeOfPreparation>08:46:49.496924</urn:TimeOfPreparation>
+       |              <urn:MessageIdentifier>69c710d7-abb6-4e3c-a571-9555f4a5c7f5</urn:MessageIdentifier>
+       |              <urn:CorrelationIdentifier>PORTAL8515fc03cc404bc2ab201cfa4996fb2f</urn:CorrelationIdentifier>
+       |          </ie871:Header>
+       |          <ie871:Body>
+       |              <ie871:ExplanationOnReasonForShortage>
+       |                  <ie871:Attributes>
+       |                      <ie871:SubmitterType>2</ie871:SubmitterType>
+       |                  </ie871:Attributes>
+       |                  <ie871:ConsigneeTrader language="en">
+       |                      <ie871:Traderid>GBWK345678990</ie871:Traderid>
+       |                      <ie871:TraderName>consignee business</ie871:TraderName>
+       |                      <ie871:StreetName>Joke Street</ie871:StreetName>
+       |                      <ie871:StreetNumber>1</ie871:StreetNumber>
+       |                      <ie871:Postcode>JO11KE</ie871:Postcode>
+       |                      <ie871:City>Joke town</ie871:City>
+       |                  </ie871:ConsigneeTrader>
+       |                  <ie871:ExciseMovement>
+       |                      <ie871:AdministrativeReferenceCode>23GB00000000000380611</ie871:AdministrativeReferenceCode>
+       |                      <ie871:SequenceNumber>1</ie871:SequenceNumber>
+       |                  </ie871:ExciseMovement>
+       |                  <ie871:BodyAnalysis>
+       |                      <ie871:ExciseProductCode>B000</ie871:ExciseProductCode>
+       |                      <ie871:BodyRecordUniqueReference>1</ie871:BodyRecordUniqueReference>
+       |                      <ie871:Explanation language="en">4 more than I expected</ie871:Explanation>
+       |                      <ie871:ActualQuantity>5</ie871:ActualQuantity>
+       |                  </ie871:BodyAnalysis>
+       |              </ie871:ExplanationOnReasonForShortage>
+       |          </ie871:Body>
+       |      </ie871:IE871>
        |    </mov:eventHistory>
        |  </mov:movementView>""".stripMargin
 
@@ -2543,6 +2643,20 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
               eoriNumber = None
           ))
         )
+      ),
+      notificationOfShortageOrExcess = Some(
+        NotificationOfShortageOrExcessModel(
+          submitterType = SubmitterType.Consignee,
+          globalExplanation = None,
+          individualItemReasons = Some(Seq(
+            BodyAnalysisModel(
+              exciseProductCode = "B000",
+              bodyRecordUniqueReference = 1,
+              explanation = "4 more than I expected",
+              actualQuantity = Some(5)
+            )
+          ))
+        )
       )
     )
   )
@@ -2950,6 +3064,17 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           "street" -> "Catherdral",
           "postcode" -> "BT3 7BF",
           "city" -> "Salford"
+        )
+      )
+    ),
+    "notificationOfShortageOrExcess" -> Json.obj(
+      "submitterType" -> "2",
+      "individualItemReasons" -> Json.arr(
+        Json.obj(
+          "exciseProductCode" -> "B000",
+          "bodyRecordUniqueReference" -> 1,
+          "explanation" -> "4 more than I expected",
+          "actualQuantity" -> 5
         )
       )
     )
