@@ -100,7 +100,7 @@ object SubmitReportOfReceiptModel {
   private[reportOfReceipt] lazy val receiptedItems: XPath = __ \\ "BodyReportOfReceiptExport"
 
 
-  val xmlReads: XmlReader[SubmitReportOfReceiptModel] = (
+  implicit val xmlReads: XmlReader[SubmitReportOfReceiptModel] = (
     arc.read[String],
     sequenceNumber.read[Int],
     dateAndTimeOfValidationOfReportOfReceiptExport.read[Option[String]],

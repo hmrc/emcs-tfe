@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.models.explainShortageExcess
 
+import cats.implicits.catsSyntaxTuple4Semigroupal
+import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
@@ -38,5 +40,18 @@ case class BodyAnalysisModel(
 }
 
 object BodyAnalysisModel {
+
   implicit val fmt: OFormat[BodyAnalysisModel] = Json.format
+
+  private lazy val exciseProductCode: XPath = __ \\ "ExciseProductCode"
+  private lazy val bodyRecordUniqueReference: XPath = __ \\ "BodyRecordUniqueReference"
+  private lazy val explanation: XPath = __ \\ "Explanation"
+  private lazy val actualQuantity: XPath = __ \\ "ActualQuantity"
+
+  implicit lazy val xmlReads: XmlReader[BodyAnalysisModel] = (
+    exciseProductCode.read[String],
+    bodyRecordUniqueReference.read[Int],
+    explanation.read[String],
+    actualQuantity.read[String].map(BigDecimal(_)).optional
+  ).mapN(BodyAnalysisModel.apply)
 }

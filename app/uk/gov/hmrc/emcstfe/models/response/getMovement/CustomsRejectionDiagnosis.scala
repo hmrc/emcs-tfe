@@ -29,7 +29,7 @@ object CustomsRejectionDiagnosis {
 
   private lazy val diagnosisCode = __ \\ "DiagnosisCode"
 
-  val xmlReads: XmlReader[CustomsRejectionDiagnosis] = (
+  implicit val xmlReads: XmlReader[CustomsRejectionDiagnosis] = (
     bodyRecordUniqueReference.read[String],
     diagnosisCode.read[CustomsRejectionDiagnosisCodeType](CustomsRejectionDiagnosisCodeType.xmlReads("DiagnosisCode")(CustomsRejectionDiagnosisCodeType.enumerable))
   ).mapN(CustomsRejectionDiagnosis.apply)

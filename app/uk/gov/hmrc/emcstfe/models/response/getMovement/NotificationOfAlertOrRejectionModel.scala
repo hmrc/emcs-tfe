@@ -42,6 +42,6 @@ object NotificationOfAlertOrRejectionModel {
   implicit lazy val xmlReads: XmlReader[NotificationOfAlertOrRejectionModel] = (
     notificationType.read[AlertOrRejectionType](AlertOrRejectionType.xmlReads("EadEsadRejectedFlag")(AlertOrRejectionType.enumerable)),
     notificationDateTime.read[LocalDateTime],
-    alertRejectReason.read[Seq[AlertOrRejectionReasonModel]](strictReadSeq(AlertOrRejectionReasonModel.xmlReads))
+    alertRejectReason.read[Seq[AlertOrRejectionReasonModel]](strictReadSeq)
   ).mapN(NotificationOfAlertOrRejectionModel.apply)
 }

@@ -25,6 +25,7 @@ import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.Satisfactory
 import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
+import uk.gov.hmrc.emcstfe.models.explainShortageExcess.BodyAnalysisModel
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionDiagnosisCodeType.DestinationTypeIsNotExport
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionReasonCodeType.ExportDataNotFound
@@ -221,6 +222,20 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
                 vatNumber = None,
                 eoriNumber = None
               ))
+          )
+        ),
+        notificationOfShortageOrExcess = Some(
+          NotificationOfShortageOrExcessModel(
+            submitterType = SubmitterType.Consignee,
+            globalExplanation = None,
+            individualItemReasons = Some(Seq(
+              BodyAnalysisModel(
+                exciseProductCode = "B000",
+                bodyRecordUniqueReference = 1,
+                explanation = "4 more than I expected",
+                actualQuantity = Some(5)
+              )
+            ))
           )
         )
       ))

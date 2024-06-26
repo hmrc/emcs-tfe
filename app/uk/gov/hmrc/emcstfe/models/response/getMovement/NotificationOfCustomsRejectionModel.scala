@@ -53,13 +53,13 @@ object NotificationOfCustomsRejectionModel {
 
   private lazy val customsOfficeReferenceNumber = __ \\ "ExportPlaceCustomsOffice" \ "ReferenceNumber"
 
-  val xmlReads: XmlReader[NotificationOfCustomsRejectionModel] = (
+  implicit val xmlReads: XmlReader[NotificationOfCustomsRejectionModel] = (
     customsOfficeReferenceNumber.read[Option[String]],
     rejectionDateAndTime.read[LocalDateTime],
     rejectionReasonCode.read[CustomsRejectionReasonCodeType](CustomsRejectionReasonCodeType.xmlReads("RejectionReasonCode")(CustomsRejectionReasonCodeType.enumerable)),
     localReferenceNumber.read[Option[String]],
     documentReferenceNumber.read[Option[String]],
-    diagnoses.read[Seq[CustomsRejectionDiagnosis]](strictReadSeq(CustomsRejectionDiagnosis.xmlReads)),
+    diagnoses.read[Seq[CustomsRejectionDiagnosis]](strictReadSeq),
     consignee.read[Option[TraderModel]](TraderModel.xmlReads(ConsigneeTrader).optional).map(model => if (model.exists(_.isEmpty)) None else model),
   ).mapN(NotificationOfCustomsRejectionModel.apply)
 }
