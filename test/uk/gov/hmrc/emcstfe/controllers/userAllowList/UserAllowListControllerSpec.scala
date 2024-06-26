@@ -19,16 +19,19 @@ package uk.gov.hmrc.emcstfe.controllers.userAllowList
 import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
 import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.MockUserAllowListService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class UserAllowListControllerSpec extends TestBaseSpec with FakeAuthAction {
+class UserAllowListControllerSpec extends TestBaseSpec with FakeAuthAction with MockAppConfig {
 
-  trait Test extends MockUserAllowListService {
-    val controller = new UserAllowListController(Helpers.stubControllerComponents(), mockUserAllowListService, FakeSuccessAuthAction)
+  class Test(excludedErns: Seq[String] = Seq.empty) extends MockUserAllowListService {
+    val controller = new UserAllowListController(Helpers.stubControllerComponents(), mockUserAllowListService, mockAppConfig, FakeSuccessAuthAction)
+
+    MockedAppConfig.listOfErnsToExcludeFromPublicBeta.returns(excludedErns)
   }
 
   "GET /beta/eligibility/:ern/:serviceName" should {
@@ -48,6 +51,12 @@ class UserAllowListControllerSpec extends TestBaseSpec with FakeAuthAction {
       "the ERN is NOT in a beta phase" in new Test {
 
         MockedUserAllowListService.isEligible(testErn, "service").returns(Future.successful(Right(false)))
+        val result = controller.checkEligibility(testErn, "service")(FakeRequest())
+        status(result) shouldBe NO_CONTENT
+      }
+
+      "the ERN is specifically excluded from beta phase" in new Test(excludedErns = Seq(testErn)) {
+
         val result = controller.checkEligibility(testErn, "service")(FakeRequest())
         status(result) shouldBe NO_CONTENT
       }

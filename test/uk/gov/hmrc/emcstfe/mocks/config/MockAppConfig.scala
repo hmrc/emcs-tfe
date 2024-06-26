@@ -47,5 +47,7 @@ trait MockAppConfig extends MockFactory {
     def internalAuthToken: CallHandler0[String] = ((() => mockAppConfig.internalAuthToken()): () => String).expects()
     def userAllowListBaseUrl: CallHandler0[String] = ((() => mockAppConfig.userAllowListBaseUrl()): () => String).expects()
     def nrsBrokerBaseUrl: CallHandler0[String] = ((() => mockAppConfig.nrsBrokerBaseUrl()): () => String).expects()
+
+    def listOfErnsToExcludeFromPublicBeta: CallHandler0[Seq[String]] = (() => mockAppConfig.listOfErnsToExcludeFromPublicBeta).expects()
   }
 }
