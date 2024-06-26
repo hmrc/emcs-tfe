@@ -139,4 +139,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def internalAuthToken(): String = configuration.get[String]("internal-auth.token")
 
   def publicBetaTrafficPercentageForService(serviceName: String): Option[Int] = configuration.getOptional[Int](s"beta.public.$serviceName.trafficPercentage")
+
+  def listOfErnsToExcludeFromPublicBeta: Seq[String] = configuration.get[Seq[String]]("beta.public.listOfErnsToExclude")
 }
