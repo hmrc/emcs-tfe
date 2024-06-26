@@ -185,7 +185,8 @@ object GetMovementResponse extends JsonUtils with XmlReaderUtils {
         "notificationOfDelay"                             -> o.movementViewHistoryAndExtraData.notificationOfDelay,
         "cancelMovement"                                  -> o.movementViewHistoryAndExtraData.cancelMovement,
         "notificationOfCustomsRejection"                  -> o.movementViewHistoryAndExtraData.notificationOfCustomsRejection,
-        "notificationOfShortageOrExcess"                  -> o.movementViewHistoryAndExtraData.notificationOfShortageOrExcess
+        "notificationOfShortageOrExcess"                  -> o.movementViewHistoryAndExtraData.notificationOfShortageOrExcess,
+        "interruptedMovement"                             -> o.movementViewHistoryAndExtraData.InterruptedMovement
       )
       .removeNullValues()
 

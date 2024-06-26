@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple16Semigroupal
+import cats.implicits.catsSyntaxTuple17Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.CancellationReasonModel
+import uk.gov.hmrc.emcstfe.models.interruptionOfMovement.InterruptionReasonModel
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse._
 
@@ -41,7 +42,8 @@ case class MovementViewHistoryAndExtraDataModel(
                                      notificationOfDelay: Option[Seq[NotificationOfDelayModel]],
                                      cancelMovement: Option[CancellationReasonModel],
                                      notificationOfCustomsRejection: Option[NotificationOfCustomsRejectionModel],
-                                     notificationOfShortageOrExcess: Option[NotificationOfShortageOrExcessModel]
+                                     notificationOfShortageOrExcess: Option[NotificationOfShortageOrExcessModel],
+                                     InterruptedMovement: Option[InterruptionReasonModel]
                                    )
 
 object MovementViewHistoryAndExtraDataModel {
@@ -49,6 +51,7 @@ object MovementViewHistoryAndExtraDataModel {
   private[getMovement] lazy val reportOfReceipt = __ \\ "eventHistory" \ "IE818" \ "Body" \ "AcceptedOrRejectedReportOfReceiptExport"
 
   private[getMovement] lazy val cancelMovement = __ \\ "eventHistory" \ "IE810" \ "Body" \ "CancellationOfEAD" \ "Cancellation"
+  private[getMovement] lazy val interruptedMovement = __ \\ "eventHistory" \ "IE807"
 
   private[getMovement] lazy val notificationOfDivertedMovement = __ \\ "eventHistory" \ "IE803"
 
@@ -78,7 +81,8 @@ object MovementViewHistoryAndExtraDataModel {
     notificationOfDelay.read[Seq[NotificationOfDelayModel]](strictReadSeq).seqToOptionSeq,
     cancelMovement.read[CancellationReasonModel].optional,
     notificationOfCustomsRejection.read[NotificationOfCustomsRejectionModel].optional,
-    notificationOfShortageOrExcess.read[NotificationOfShortageOrExcessModel].optional
+    notificationOfShortageOrExcess.read[NotificationOfShortageOrExcessModel].optional,
+    interruptedMovement.read[InterruptionReasonModel](InterruptionReasonModel.xmlReads).optional
   ).mapN(MovementViewHistoryAndExtraDataModel.apply)
 
   implicit val fmt: OFormat[MovementViewHistoryAndExtraDataModel] = Json.format

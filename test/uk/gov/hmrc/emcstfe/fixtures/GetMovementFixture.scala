@@ -26,6 +26,7 @@ import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.BodyAnalysisModel
+import uk.gov.hmrc.emcstfe.models.interruptionOfMovement.{InterruptionReasonModel, InterruptionReasonType}
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionDiagnosisCodeType.DestinationTypeIsNotExport
@@ -330,6 +331,26 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          </body:EADESADContainer>
        |        </body:Body>
        |      </body:IE801>
+       |      <body:IE807 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE807:V2.02">
+       |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+       |          <head:MessageSender>token</head:MessageSender>
+       |          <head:MessageRecipient>token</head:MessageRecipient>
+       |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+       |          <head:MessageIdentifier>token</head:MessageIdentifier>
+       |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+       |        </body:Header>
+       |        <body:Body>
+       |          <body:InterruptionOfMovement>
+       |            <body:Attributes>
+       |              <body:ComplementaryInformation>some info</body:ComplementaryInformation>
+       |              <body:DateAndTimeOfIssuance>2008-09-04T10:22:53</body:DateAndTimeOfIssuance>
+       |              <body:ReasonForInterruptionCode>0</body:ReasonForInterruptionCode>
+       |              <body:ReferenceNumberOfExciseOffice>FR1234</body:ReferenceNumberOfExciseOffice>
+       |            </body:Attributes>
+       |          </body:InterruptionOfMovement>
+       |        </body:Body>
+       |      </body:IE807>
        |      <body:IE810 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE810:V2.02">
        |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
        |          <head:MessageSender>token</head:MessageSender>
@@ -1170,7 +1191,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             )
           ))
         )
-      )
+      ),
+      InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info")))
     )
   )
 
@@ -1414,6 +1436,11 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     "cancelMovement" -> Json.obj(
       "reason" -> "0",
       "complementaryInformation" -> "some info"
+    ),
+    "interruptedMovement" -> Json.obj(
+      "reasonCode" -> "0",
+      "referenceNumberOfExciseOffice" -> "FR1234",
+      "complementaryInformation" -> "some info",
     ),
     "notificationOfCustomsRejection" -> Json.obj(
       "customsOfficeReferenceNumber" -> "AT001000",
@@ -2015,6 +2042,26 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |            </ie837:ExplanationOnDelayForDelivery>
        |         </ie837:Body>
        |      </ie837:IE837>
+       |      <body:IE807 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE807:V2.02">
+       |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+       |          <head:MessageSender>token</head:MessageSender>
+       |          <head:MessageRecipient>token</head:MessageRecipient>
+       |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+       |          <head:MessageIdentifier>token</head:MessageIdentifier>
+       |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+       |        </body:Header>
+       |        <body:Body>
+       |          <body:InterruptionOfMovement>
+       |            <body:Attributes>
+       |              <body:ComplementaryInformation>some info</body:ComplementaryInformation>
+       |              <body:DateAndTimeOfIssuance>2008-09-04T10:22:53</body:DateAndTimeOfIssuance>
+       |              <body:ReasonForInterruptionCode>0</body:ReasonForInterruptionCode>
+       |              <body:ReferenceNumberOfExciseOffice>FR1234</body:ReferenceNumberOfExciseOffice>
+       |            </body:Attributes>
+       |          </body:InterruptionOfMovement>
+       |        </body:Body>
+       |      </body:IE807>
        |    <urn:IE810 xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.01">
        |      <urn:Header>
        |        <urn1:MessageSender xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01">NDEA.XI</urn1:MessageSender>
@@ -2657,7 +2704,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
             )
           ))
         )
-      )
+      ),
+      InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info")))
     )
   )
 
@@ -3030,6 +3078,11 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
     ),
     "cancelMovement" -> Json.obj(
       "reason" -> "0",
+      "complementaryInformation" -> "some info",
+    ),
+    "interruptedMovement" -> Json.obj(
+      "reasonCode" -> "0",
+      "referenceNumberOfExciseOffice" -> "FR1234",
       "complementaryInformation" -> "some info",
     ),
     "notificationOfCustomsRejection" -> Json.obj(
