@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple3Semigroupal
+import cats.implicits.catsSyntaxTuple4Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Format, Json}
@@ -24,7 +24,10 @@ import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.BodyAnalysisModel
 import uk.gov.hmrc.emcstfe.utils.XmlReaderUtils
 
+import java.time.LocalDate
+
 case class NotificationOfShortageOrExcessModel(submitterType: SubmitterType,
+                                               globalDateOfAnalysis: Option[LocalDate],
                                                globalExplanation: Option[String],
                                                individualItemReasons: Option[Seq[BodyAnalysisModel]])
 
@@ -33,11 +36,13 @@ object NotificationOfShortageOrExcessModel extends XmlReaderUtils {
   implicit val format: Format[NotificationOfShortageOrExcessModel] = Json.format[NotificationOfShortageOrExcessModel]
 
   private lazy val submitterType: XPath = __ \\ "SubmitterType"
+  private lazy val globalDate: XPath = __ \\ "DateOfAnalysis"
   private lazy val globalExplanation: XPath = __ \\ "GlobalExplanation"
   private lazy val bodyAnalysis: XPath = __ \\ "BodyAnalysis"
 
   implicit lazy val xmlReads: XmlReader[NotificationOfShortageOrExcessModel] = (
     submitterType.read[SubmitterType](SubmitterType.xmlReads("SubmitterType")(SubmitterType.enumerable)),
+    globalDate.read[String].map(LocalDate.parse).optional,
     globalExplanation.read[String].optional,
     bodyAnalysis.read[Seq[BodyAnalysisModel]](strictReadSeq).seqToOptionSeq
   ).mapN(NotificationOfShortageOrExcessModel.apply)

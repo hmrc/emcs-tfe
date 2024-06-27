@@ -23,6 +23,7 @@ import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.BodyAnalysisModel
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
+import java.time.LocalDate
 import scala.xml.XML
 
 class NotificationOfShortageOrExcessModelSpec extends TestBaseSpec with GetMovementFixture {
@@ -44,6 +45,7 @@ class NotificationOfShortageOrExcessModelSpec extends TestBaseSpec with GetMovem
         TestModel.xmlReads.read(XML.loadString(maxGetMovementResponseBody())) shouldBe ParseSuccess(TestModel(
           NotificationOfShortageOrExcessModel(
             submitterType = SubmitterType.Consignee,
+            globalDateOfAnalysis = None,
             globalExplanation = None,
             individualItemReasons = Some(Seq(
               BodyAnalysisModel(
@@ -100,6 +102,7 @@ class NotificationOfShortageOrExcessModelSpec extends TestBaseSpec with GetMovem
         TestModel.xmlReads.read(XML.loadString(response)) shouldBe ParseSuccess(TestModel(
           NotificationOfShortageOrExcessModel(
             submitterType = SubmitterType.Consignor,
+            globalDateOfAnalysis = Some(LocalDate.of(2024, 6, 24)),
             globalExplanation = Some("Shortage"),
             individualItemReasons = None
           )
