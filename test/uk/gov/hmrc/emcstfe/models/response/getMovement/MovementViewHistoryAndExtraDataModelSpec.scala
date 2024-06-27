@@ -26,6 +26,7 @@ import uk.gov.hmrc.emcstfe.models.common.WrongWithMovement.{Excess, Shortage}
 import uk.gov.hmrc.emcstfe.models.common._
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.BodyAnalysisModel
+import uk.gov.hmrc.emcstfe.models.interruptionOfMovement.{InterruptionReasonModel, InterruptionReasonType}
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionDiagnosisCodeType.DestinationTypeIsNotExport
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionReasonCodeType.ExportDataNotFound
@@ -237,8 +238,11 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
               )
             ))
           )
-        )
-      ))
+        ),
+        InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info")))
+      )
+      )
+
     }
 
     "fail to read a subset of the movement fields when a field is missing" in {

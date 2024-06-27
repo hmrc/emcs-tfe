@@ -460,7 +460,8 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
               notificationOfDelay = None,
               cancelMovement = None,
               notificationOfCustomsRejection = None,
-              notificationOfShortageOrExcess = None
+              notificationOfShortageOrExcess = None,
+              InterruptedMovement = None
             )))
       }
 
@@ -950,6 +951,26 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            </ie837:ExplanationOnDelayForDelivery>
             |         </ie837:Body>
             |      </ie837:IE837>
+            |      <body:IE807 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE807:V2.02">
+            |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+            |          <head:MessageSender>token</head:MessageSender>
+            |          <head:MessageRecipient>token</head:MessageRecipient>
+            |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+            |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+            |          <head:MessageIdentifier>token</head:MessageIdentifier>
+            |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+            |        </body:Header>
+            |        <body:Body>
+            |          <body:InterruptionOfMovement>
+            |            <body:Attributes>
+            |              <body:ComplementaryInformation>some info</body:ComplementaryInformation>
+            |              <body:DateAndTimeOfIssuance>2008-09-04T10:22:53</body:DateAndTimeOfIssuance>
+            |              <body:ReasonForInterruptionCode>0</body:ReasonForInterruptionCode>
+            |              <body:ReferenceNumberOfExciseOffice>FR1234</body:ReferenceNumberOfExciseOffice>
+            |            </body:Attributes>
+            |          </body:InterruptionOfMovement>
+            |        </body:Body>
+            |      </body:IE807>
             |    <body:IE810 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE810:V2.02">
             |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
             |          <head:MessageSender>token</head:MessageSender>
@@ -1564,6 +1585,26 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            </ie837:ExplanationOnDelayForDelivery>
             |         </ie837:Body>
             |      </ie837:IE837>
+            |      <body:IE807 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE807:V2.02">
+            |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
+            |          <head:MessageSender>token</head:MessageSender>
+            |          <head:MessageRecipient>token</head:MessageRecipient>
+            |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
+            |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+            |          <head:MessageIdentifier>token</head:MessageIdentifier>
+            |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
+            |        </body:Header>
+            |        <body:Body>
+            |          <body:InterruptionOfMovement>
+            |            <body:Attributes>
+            |              <body:ComplementaryInformation>some info</body:ComplementaryInformation>
+            |              <body:DateAndTimeOfIssuance>2008-09-04T10:22:53</body:DateAndTimeOfIssuance>
+            |              <body:ReasonForInterruptionCode>0</body:ReasonForInterruptionCode>
+            |              <body:ReferenceNumberOfExciseOffice>FR1234</body:ReferenceNumberOfExciseOffice>
+            |            </body:Attributes>
+            |          </body:InterruptionOfMovement>
+            |        </body:Body>
+            |      </body:IE807>
             |    <body:IE810 xmlns:body="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:IE810:V2.02">
             |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
             |          <head:MessageSender>token</head:MessageSender>
