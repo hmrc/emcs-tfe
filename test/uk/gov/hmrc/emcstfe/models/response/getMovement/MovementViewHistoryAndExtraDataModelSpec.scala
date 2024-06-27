@@ -228,6 +228,7 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
         notificationOfShortageOrExcess = Some(
           NotificationOfShortageOrExcessModel(
             submitterType = SubmitterType.Consignee,
+            globalDateOfAnalysis = None,
             globalExplanation = None,
             individualItemReasons = Some(Seq(
               BodyAnalysisModel(

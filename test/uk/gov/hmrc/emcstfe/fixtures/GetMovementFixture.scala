@@ -1181,6 +1181,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       notificationOfShortageOrExcess = Some(
         NotificationOfShortageOrExcessModel(
           submitterType = SubmitterType.Consignee,
+          globalDateOfAnalysis = None,
           globalExplanation = None,
           individualItemReasons = Some(Seq(
             BodyAnalysisModel(
@@ -2695,6 +2696,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         NotificationOfShortageOrExcessModel(
           submitterType = SubmitterType.Consignee,
           globalExplanation = None,
+          globalDateOfAnalysis = None,
           individualItemReasons = Some(Seq(
             BodyAnalysisModel(
               exciseProductCode = "B000",
