@@ -73,7 +73,7 @@ class BaseUserAnswersRepositoryImpl(collectionName: String,
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  private def by(ern: String, arc: String): Bson =
+  protected def by(ern: String, arc: String): Bson =
     Filters.and(
       Filters.equal(UserAnswers.ernKey, ern),
       Filters.equal(UserAnswers.arcKey, arc)

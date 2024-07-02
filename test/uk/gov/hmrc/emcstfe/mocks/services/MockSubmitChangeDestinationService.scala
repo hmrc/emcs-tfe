@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import org.scalamock.handlers.CallHandler4
+import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
+import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
 import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitChangeDestinationService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,13 +31,13 @@ trait MockSubmitChangeDestinationService extends MockFactory  {
   lazy val mockService: SubmitChangeDestinationService = mock[SubmitChangeDestinationService]
 
   object MockService extends Matchers {
-    def submit(submission: SubmitChangeDestinationModel): CallHandler4[SubmitChangeDestinationModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
-      (mockService.submit(_: SubmitChangeDestinationModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(submission, *, *, *)
+    def submit(request: SubmitChangeDestinationRequest): CallHandler3[SubmitChangeDestinationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
+      (mockService.submit(_: SubmitChangeDestinationRequest)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(request, *, *)
 
-    def submitViaEIS(submission: SubmitChangeDestinationModel): CallHandler4[SubmitChangeDestinationModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
-      (mockService.submitViaEIS(_: SubmitChangeDestinationModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(submission, *, *, *)
+    def submitViaEIS(request: SubmitChangeDestinationRequest): CallHandler3[SubmitChangeDestinationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
+      (mockService.submitViaEIS(_: SubmitChangeDestinationRequest)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(request, *, *)
   }
 }
 

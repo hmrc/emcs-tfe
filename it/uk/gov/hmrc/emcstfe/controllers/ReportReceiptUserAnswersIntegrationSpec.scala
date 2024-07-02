@@ -33,7 +33,7 @@ import java.time.temporal.ChronoUnit
 
 class ReportReceiptUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
 
-  val userAnswers = UserAnswers(testErn, testArc, Json.obj(), Instant.now().truncatedTo(ChronoUnit.MILLIS))
+  val userAnswers = UserAnswers(testErn, testArc, Json.obj(), validationErrors = Seq.empty, Instant.now().truncatedTo(ChronoUnit.MILLIS))
 
   def uri: String = s"/user-answers/report-receipt/$testErn/$testArc"
 

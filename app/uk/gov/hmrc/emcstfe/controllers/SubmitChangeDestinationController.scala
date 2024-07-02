@@ -20,15 +20,17 @@ import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
+import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
 import uk.gov.hmrc.emcstfe.services.SubmitChangeDestinationService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SubmitChangeDestinationController @Inject()(cc: ControllerComponents,
@@ -39,17 +41,20 @@ class SubmitChangeDestinationController @Inject()(cc: ControllerComponents,
 
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitChangeDestinationModel] { submission =>
+      val requestModel = SubmitChangeDestinationRequest(submission, isEnabled(ValidateUsingFS41Schema))
       if (isEnabled(SendToEIS)) {
-        service.submitViaEIS(submission).map(handleResponse(_))
+        service.submitViaEIS(requestModel).flatMap(handleResponse(_))
       } else {
-        service.submit(submission).map(handleResponse(_))
+        service.submit(requestModel).flatMap(handleResponse(_))
       }
     }
   }
 
-  def handleResponse[A](response: Either[ErrorResponse, A])(implicit writes: Writes[A]): Result =
+  def handleResponse[A](response: Either[ErrorResponse, A])(implicit writes: Writes[A]): Future[Result] =
     response match {
-      case Left(value) => InternalServerError(Json.toJson(value))
-      case Right(value) => Ok(Json.toJson(value))
+      case Left(value: EISRIMValidationError) => Future(UnprocessableEntity(Json.toJson(value)))
+      case Left(value: ChRISRIMValidationError) => Future(UnprocessableEntity(Json.toJson(value)))
+      case Left(value) => Future(InternalServerError(Json.toJson(value)))
+      case Right(value) => Future(Ok(Json.toJson(value)))
     }
 }

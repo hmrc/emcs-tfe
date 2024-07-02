@@ -16,15 +16,27 @@
 
 package uk.gov.hmrc.emcstfe.repositories
 
+import com.google.inject.ImplementedBy
+import org.mongodb.scala.model.Updates
 import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
+import uk.gov.hmrc.emcstfe.repositories.ChangeDestinationUserAnswersRepository._
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.Codecs
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+
+@ImplementedBy(classOf[ChangeDestinationUserAnswersRepositoryImpl])
+trait ChangeDestinationUserAnswersRepository {
+
+  def setValidationErrorMessagesForDraftMovement(ern: String, draftId: String, errors: Seq[RIMValidationError]): Future[Boolean]
+
+}
 
 @Singleton
-class ChangeDestinationUserAnswersRepository @Inject()(implicit mongoComponent: MongoComponent,
+class ChangeDestinationUserAnswersRepositoryImpl @Inject()(implicit mongoComponent: MongoComponent,
                                                        appConfig: AppConfig,
                                                        time: TimeMachine,
                                                        ec: ExecutionContext)
@@ -32,4 +44,18 @@ class ChangeDestinationUserAnswersRepository @Inject()(implicit mongoComponent: 
     collectionName = "change-destination-user-answers",
     ttl = appConfig.changeDestinationUserAnswersTTL(),
     replaceIndexes = appConfig.changeDestinationUserAnswersReplaceIndexes()
-  )
+  ) with ChangeDestinationUserAnswersRepository {
+
+  def setValidationErrorMessagesForDraftMovement(ern: String, arc: String, errors: Seq[RIMValidationError]): Future[Boolean] =
+    collection
+      .findOneAndUpdate(
+        filter = by(ern = ern, arc = arc),
+        update = Updates.set(validationErrorsField, Codecs.toBson(errors))
+      )
+      .toFuture()
+      .map(_ => true)
+}
+
+object ChangeDestinationUserAnswersRepository {
+  val validationErrorsField = "validationErrors"
+}

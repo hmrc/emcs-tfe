@@ -28,7 +28,7 @@ import scala.concurrent.duration.Duration
 class BaseUserAnswersRepositorySpec extends RepositoryBaseSpec[UserAnswers] {
 
   val instantNow = Instant.now.truncatedTo(ChronoUnit.MILLIS)
-  val userAnswers = UserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  val userAnswers = UserAnswers(testErn, testArc, Json.obj("foo" -> "bar"), validationErrors = Seq.empty, Instant.ofEpochSecond(1))
   val timeMachine: TimeMachine = () => instantNow
 
   protected override val repository: BaseUserAnswersRepositoryImpl = new BaseUserAnswersRepositoryImpl(

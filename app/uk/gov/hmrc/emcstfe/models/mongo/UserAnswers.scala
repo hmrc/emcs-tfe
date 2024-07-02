@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfe.models.mongo
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -25,6 +26,7 @@ import java.time.Instant
 final case class UserAnswers(ern: String,
                              arc: String,
                              data: JsObject,
+                             validationErrors: Seq[RIMValidationError],
                              lastUpdated: Instant)
 
 object UserAnswers {
@@ -33,11 +35,13 @@ object UserAnswers {
   val arcKey: String = "arc"
   val dataKey: String = "data"
   val lastUpdatedKey: String = "lastUpdated"
+  val validationErrorsKey: String = "validationErrors"
 
   val reads: Reads[UserAnswers] = (
     (__ \ ernKey).read[String] and
       (__ \ arcKey).read[String] and
       (__ \ dataKey).read[JsObject] and
+      (__ \ validationErrorsKey).readNullable[Seq[RIMValidationError]].map(_.getOrElse(Seq.empty)) and
       (__ \ lastUpdatedKey).read(MongoJavatimeFormats.instantFormat)
     )(UserAnswers.apply _)
 
@@ -45,6 +49,7 @@ object UserAnswers {
     (__ \ ernKey).write[String] and
       (__ \ arcKey).write[String] and
       (__ \ dataKey).write[JsObject] and
+      (__ \ validationErrorsKey).write[Seq[RIMValidationError]] and
       (__ \ lastUpdatedKey).write(MongoJavatimeFormats.instantFormat)
     )(unlift(UserAnswers.unapply))
 
