@@ -17,14 +17,14 @@
 package uk.gov.hmrc.emcstfe.models.mongo
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
+import uk.gov.hmrc.emcstfe.fixtures.{BaseFixtures, ChRISResponsesFixture}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class UserAnswersSpec extends TestBaseSpec with BaseFixtures {
+class UserAnswersSpec extends TestBaseSpec with BaseFixtures with ChRISResponsesFixture {
 
   val instant = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
@@ -34,6 +34,7 @@ class UserAnswersSpec extends TestBaseSpec with BaseFixtures {
     data = Json.obj(
       "foo" -> "bar"
     ),
+    validationErrors = Seq(chrisRimValidationError),
     lastUpdated = instant
   )
 
@@ -42,6 +43,9 @@ class UserAnswersSpec extends TestBaseSpec with BaseFixtures {
     "arc" -> testArc,
     "data" -> Json.obj(
       "foo" -> "bar"
+    ),
+    "validationErrors" -> Json.arr(
+      Json.toJson(chrisRimValidationError)
     ),
     "lastUpdated" -> Json.toJson(instant)(MongoJavatimeFormats.instantWrites)
   )

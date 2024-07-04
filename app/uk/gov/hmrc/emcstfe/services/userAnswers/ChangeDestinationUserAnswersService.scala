@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.services.userAnswers
 
-import uk.gov.hmrc.emcstfe.repositories.ChangeDestinationUserAnswersRepository
+import uk.gov.hmrc.emcstfe.repositories.ChangeDestinationUserAnswersRepositoryImpl
 
 import javax.inject.Inject
 
-class ChangeDestinationUserAnswersService @Inject()(override val repo: ChangeDestinationUserAnswersRepository) extends BaseUserAnswersService
+class ChangeDestinationUserAnswersService @Inject()(override val repo: ChangeDestinationUserAnswersRepositoryImpl) extends BaseUserAnswersService
