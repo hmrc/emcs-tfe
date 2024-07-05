@@ -28,6 +28,8 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   override lazy val config: AppConfig = this
 
+  def referenceDataBaseUrl: String = servicesConfig.baseUrl("emcs-tfe-reference-data") + "/emcs-tfe-reference-data"
+
   def chrisUrl: String          = servicesConfig.baseUrl("chris")
   def downstreamStubUrl: String = servicesConfig.baseUrl("downstream-stub")
 

@@ -20,6 +20,8 @@ import com.lucidchart.open.xtract.ParseError
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.response.rimValidation.{ChRISRIMValidationErrorResponse, EISRIMValidationErrorResponse}
 
+import scala.util.control.NoStackTrace
+
 sealed trait ErrorResponse {
   val message: String
 }
@@ -34,6 +36,12 @@ object ErrorResponse {
   case object UnexpectedDownstreamResponseError extends ErrorResponse {
     val message = "Unexpected downstream response status"
   }
+
+  case object JsonValidationError extends ErrorResponse {
+    val message = "JSON validation error"
+  }
+
+  case class DocumentTypesException(message: String) extends Exception(message) with NoStackTrace with ErrorResponse
 
   case object XmlValidationError extends ErrorResponse {
     val message = "XML validation error"

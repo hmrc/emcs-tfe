@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.config
 
 import com.google.inject.AbstractModule
+import uk.gov.hmrc.emcstfe.connectors.{GetDocumentTypesConnector, GetDocumentTypesConnectorImpl}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionImpl}
 import uk.gov.hmrc.emcstfe.utils.{TimeMachine, TimeMachineImpl}
 
@@ -27,5 +28,7 @@ class Module extends AbstractModule {
     bind(classOf[AppConfig]).asEagerSingleton()
     bind(classOf[AuthAction]).to(classOf[AuthActionImpl]).asEagerSingleton()
     bind(classOf[TimeMachine]).to(classOf[TimeMachineImpl])
+    bind(classOf[GetDocumentTypesConnector]).to(classOf[GetDocumentTypesConnectorImpl]).asEagerSingleton()
+
   }
 }

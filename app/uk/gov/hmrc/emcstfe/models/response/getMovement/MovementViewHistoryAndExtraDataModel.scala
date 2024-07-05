@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple17Semigroupal
+import cats.implicits.catsSyntaxTuple18Semigroupal
 import com.lucidchart.open.xtract.XmlReader.strictReadSeq
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
@@ -43,7 +43,8 @@ case class MovementViewHistoryAndExtraDataModel(
                                      cancelMovement: Option[CancellationReasonModel],
                                      notificationOfCustomsRejection: Option[NotificationOfCustomsRejectionModel],
                                      notificationOfShortageOrExcess: Option[NotificationOfShortageOrExcessModel],
-                                     InterruptedMovement: Option[InterruptionReasonModel]
+                                     InterruptedMovement: Option[InterruptionReasonModel],
+                                     manualClosureResponse: Option[ManualClosureResponseModel]
                                    )
 
 object MovementViewHistoryAndExtraDataModel {
@@ -52,6 +53,8 @@ object MovementViewHistoryAndExtraDataModel {
 
   private[getMovement] lazy val cancelMovement = __ \\ "eventHistory" \ "IE810" \ "Body" \ "CancellationOfEAD" \ "Cancellation"
   private[getMovement] lazy val interruptedMovement = __ \\ "eventHistory" \ "IE807"
+
+  private[getMovement] lazy val manualClosureResponse = __ \\ "eventHistory" \ "IE881" \ "Body"
 
   private[getMovement] lazy val notificationOfDivertedMovement = __ \\ "eventHistory" \ "IE803"
 
@@ -82,7 +85,8 @@ object MovementViewHistoryAndExtraDataModel {
     cancelMovement.read[CancellationReasonModel].optional,
     notificationOfCustomsRejection.read[NotificationOfCustomsRejectionModel].optional,
     notificationOfShortageOrExcess.read[NotificationOfShortageOrExcessModel].optional,
-    interruptedMovement.read[InterruptionReasonModel](InterruptionReasonModel.xmlReads).optional
+    interruptedMovement.read[InterruptionReasonModel](InterruptionReasonModel.xmlReads).optional,
+    manualClosureResponse.read[ManualClosureResponseModel].optional
   ).mapN(MovementViewHistoryAndExtraDataModel.apply)
 
   implicit val fmt: OFormat[MovementViewHistoryAndExtraDataModel] = Json.format
