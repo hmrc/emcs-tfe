@@ -22,13 +22,16 @@ import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, SearchDraftMovementsResponse}
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.services.recovery
-import uk.gov.hmrc.emcstfe.utils.Logging
+import uk.gov.hmrc.emcstfe.utils.{Logging, UUIDGenerator}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateMovementUserAnswersService @Inject()(repo: CreateMovementUserAnswersRepository) extends Logging {
+class CreateMovementUserAnswersService @Inject()(
+                                                  repo: CreateMovementUserAnswersRepository,
+                                                  uuidGenerator: UUIDGenerator
+                                                ) extends Logging {
 
   def get(ern: String, draftId: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[CreateMovementUserAnswers]]] =
     repo.get(ern, draftId).map(answers => Right(answers)).recover(recovery)
@@ -46,7 +49,7 @@ class CreateMovementUserAnswersService @Inject()(repo: CreateMovementUserAnswers
     repo.markDraftAsUnsubmitted(ern, draftId).map(Right(_)).recover(recovery)
 
   def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure])(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Option[String]]] =
-    repo.setSubmissionErrorMessagesForDraftMovement(ern, submittedDraftId, errors).map(Right(_)).recover(recovery)
+    repo.setSubmissionErrorMessagesForDraftMovement(ern, submittedDraftId, uuidGenerator.randomUUID, errors).map(Right(_)).recover(recovery)
 
   def searchDrafts(ern: String, searchOptions: GetDraftMovementSearchOptions)(implicit executionContext: ExecutionContext): Future[Either[ErrorResponse, SearchDraftMovementsResponse]] =
     repo.searchDrafts(ern, searchOptions).map(Right(_)).recover(recovery)

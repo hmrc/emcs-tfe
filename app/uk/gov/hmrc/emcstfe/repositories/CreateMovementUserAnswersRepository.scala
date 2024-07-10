@@ -54,7 +54,7 @@ trait CreateMovementUserAnswersRepository {
 
   def markDraftAsUnsubmitted(ern: String, draftId: String): Future[Boolean]
 
-  def setSubmissionErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]]
+  def setSubmissionErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, newDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]]
 
   def setValidationErrorMessagesForDraftMovement(ern: String, draftId: String, errors: Seq[RIMValidationError]): Future[Boolean]
 
@@ -147,16 +147,24 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
         collection
           .updateOne(
             filter = byDraftId(ern, draftId),
-            update = Updates.set(hasBeenSubmittedField, false))
+            update = Updates.combine(
+                Updates.set(hasBeenSubmittedField, false),
+                Updates.set(submittedDraftIdField, Codecs.toBson(None))
+              )
+          )
           .headOption()
           .map(_.exists(_.getModifiedCount == 1L))
     }
 
-  def setSubmissionErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]] =
+  def setSubmissionErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, newDraftId: String, errors: Seq[MovementSubmissionFailure]): Future[Option[String]] =
     collection
       .findOneAndUpdate(
         filter = bySubmittedDraftId(ern, submittedDraftId),
-        update = Updates.set(submissionFailuresField, Codecs.toBson(errors))
+        update = Updates.combine(
+          Updates.set(submissionFailuresField, Codecs.toBson(errors)),
+          Updates.set(draftIdField, newDraftId)
+        ),
+        options = FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
       )
       .headOption()
       .map(_.map(_.draftId))

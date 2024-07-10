@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.mocks.repository
 
-import org.scalamock.handlers.{CallHandler1, CallHandler2, CallHandler3}
+import org.scalamock.handlers.{CallHandler1, CallHandler2, CallHandler3, CallHandler4}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
@@ -46,8 +46,9 @@ trait MockCreateMovementUserAnswersRepository extends MockFactory {
     def markDraftAsUnsubmitted(ern: String, draftId: String): CallHandler2[String, String, Future[Boolean]] =
       (mockCreateMovementUserAnswersRepository.markDraftAsUnsubmitted(_: String, _: String)).expects(ern, draftId)
 
-    def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, movementSubmissionFailures: Seq[MovementSubmissionFailure]): CallHandler3[String, String, Seq[MovementSubmissionFailure], Future[Option[String]]] =
-      (mockCreateMovementUserAnswersRepository.setSubmissionErrorMessagesForDraftMovement(_: String, _: String, _: Seq[MovementSubmissionFailure])).expects(ern, submittedDraftId, movementSubmissionFailures)
+    def setErrorMessagesForDraftMovement(ern: String, submittedDraftId: String, newDraftId: String, movementSubmissionFailures: Seq[MovementSubmissionFailure]): CallHandler4[String, String, String, Seq[MovementSubmissionFailure], Future[Option[String]]] =
+      (mockCreateMovementUserAnswersRepository.setSubmissionErrorMessagesForDraftMovement(_: String, _: String, _: String, _: Seq[MovementSubmissionFailure]))
+        .expects(ern, submittedDraftId, newDraftId, movementSubmissionFailures)
 
     def setValidationErrorMessagesForDraftMovement(ern: String, draftId: String, validationErrors: Seq[RIMValidationError]): CallHandler3[String, String, Seq[RIMValidationError], Future[Boolean]] =
       (mockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(_: String, _: String, _: Seq[RIMValidationError])).expects(ern, draftId, validationErrors)
