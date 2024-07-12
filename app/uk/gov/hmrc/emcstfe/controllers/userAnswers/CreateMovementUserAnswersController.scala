@@ -100,7 +100,9 @@ class CreateMovementUserAnswersController @Inject()(cc: ControllerComponents,
         withJsonBody[Seq[MovementSubmissionFailure]] {
           errors =>
             createMovementUserAnswersService.setErrorMessagesForDraftMovement(ern, submittedDraftId, errors) map {
-              case Right(Some(draftId)) => Ok(Json.obj("draftId" -> draftId))
+              case Right(Some(updatedDraftId)) =>
+                logger.info(s"[setErrorMessages] - Draft ID : $submittedDraftId reinstated as $updatedDraftId")
+                Ok(Json.obj("draftId" -> updatedDraftId))
               case Right(None) => NotFound("The draft movement could not be found")
               case Left(mongoError) =>
                 logger.warn(s"[setErrorMessages] - An error occurred setting the submission failures into draft: ${mongoError.message}")

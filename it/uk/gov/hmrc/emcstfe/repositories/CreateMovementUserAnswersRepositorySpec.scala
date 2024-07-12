@@ -225,7 +225,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       "there is a record with this ern and lrn" in {
         val mongoEntry = userAnswers.copy(submittedDraftId = Some(testDraftId))
         insert(mongoEntry).futureValue
-        repository.setSubmissionErrorMessagesForDraftMovement(testErn, testDraftId, Seq(movementSubmissionFailureModel)).futureValue shouldBe Some(testDraftId)
+        repository.setSubmissionErrorMessagesForDraftMovement(testErn, testDraftId, testNewDraftId, Seq(movementSubmissionFailureModel)).futureValue shouldBe Some(testNewDraftId)
       }
     }
 
@@ -235,7 +235,7 @@ class CreateMovementUserAnswersRepositorySpec extends RepositoryBaseSpec[CreateM
       "there is no record with this ern and lrn" in {
         val mongoEntry = userAnswers.copy(submittedDraftId = Some(testDraftId))
         insert(mongoEntry).futureValue
-        repository.setSubmissionErrorMessagesForDraftMovement(testErn, "ABC1234", Seq(movementSubmissionFailureModel)).futureValue shouldBe None
+        repository.setSubmissionErrorMessagesForDraftMovement(testErn, "ABC1234", testNewDraftId, Seq(movementSubmissionFailureModel)).futureValue shouldBe None
       }
     }
   }

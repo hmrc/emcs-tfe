@@ -17,21 +17,29 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import org.mockito.Mockito.when
 import org.mongodb.scala.bson.collection.immutable.Document
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
+import play.api.inject._
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
+import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepositoryImpl
 import uk.gov.hmrc.emcstfe.stubs.AuthStub
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
+import uk.gov.hmrc.emcstfe.utils.UUIDGenerator
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture with MovementSubmissionFailureFixtures {
+
+  val mockUUIDGenerator = mock[UUIDGenerator]
 
   val testSubmittedDraftId = "12345-12346-12347"
 
@@ -53,6 +61,12 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
   }
 
   private def removeLastUpdated: JsValue => JsObject = _.as[JsObject] - "lastUpdated"
+
+  override implicit lazy val app: Application = new GuiceApplicationBuilder()
+    .in(Environment.simple(mode = Mode.Dev))
+    .configure(servicesConfig)
+    .overrides(bind[UUIDGenerator].to(mockUUIDGenerator))
+    .build()
 
   s"GET $uri" when {
 
@@ -354,10 +368,12 @@ class CreateMovementUserAnswersIntegrationSpec extends IntegrationBaseSpec with 
             AuthStub.authorised()
           }
 
+          when(mockUUIDGenerator.randomUUID).thenReturn(testNewDraftId)
+
           val response: WSResponse = await(request(putErrorMessagesUri()).put(Json.toJson(Seq(movementSubmissionFailureModel))))
 
           response.status shouldBe OK
-          response.json shouldBe Json.obj("draftId" -> testDraftId)
+          response.json shouldBe Json.obj("draftId" -> testNewDraftId)
 
         }
       }

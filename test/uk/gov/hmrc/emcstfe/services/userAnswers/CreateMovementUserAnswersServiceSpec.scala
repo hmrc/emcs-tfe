@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.services.userAnswers
 
+import org.specs2.mock.Mockito.theStubbed
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementListFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
+import uk.gov.hmrc.emcstfe.mocks.utils.MockUUIDGenerator
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions
@@ -29,9 +31,9 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import java.time.Instant
 import scala.concurrent.Future
 
-class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixture with MovementSubmissionFailureFixtures {
+class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovementListFixture with MovementSubmissionFailureFixtures with MockUUIDGenerator {
   trait Test extends MockCreateMovementUserAnswersRepository {
-    val service: CreateMovementUserAnswersService = new CreateMovementUserAnswersService(mockCreateMovementUserAnswersRepository)
+    val service: CreateMovementUserAnswersService = new CreateMovementUserAnswersService(mockCreateMovementUserAnswersRepository, mockUUIDGenerator)
   }
 
   val userAnswers: CreateMovementUserAnswers =
@@ -151,22 +153,24 @@ class CreateMovementUserAnswersServiceSpec extends TestBaseSpec with GetMovement
 
     "return a Right(Some(_))" when {
       "there is a draft with the ERN and LRN and it's updated successfully" in new Test {
-        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.successful(Some(testDraftId)))
-        await(service.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures)) shouldBe Right(Some(testDraftId))
+        MockUUIDGenerator.randomUUID.returns(testNewDraftId)
+        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, testNewDraftId, movementSubmissionFailures).returns(Future.successful(Some(testNewDraftId)))
+        await(service.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures)) shouldBe Right(Some(testNewDraftId))
       }
     }
 
     "return a Right(None)" when {
       "there isn't a draft with the ERN and LRN" in new Test {
-        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.successful(None))
+        MockUUIDGenerator.randomUUID.returns(testNewDraftId)
+        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, testNewDraftId, movementSubmissionFailures).returns(Future.successful(None))
         await(service.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures)) shouldBe Right(None)
       }
     }
 
     "return a Left" when {
       "mongo error is returned" in new Test {
-
-        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures).returns(Future.failed(new Exception("bang")))
+        MockUUIDGenerator.randomUUID.returns(testNewDraftId)
+        MockCreateMovementUserAnswersRepository.setErrorMessagesForDraftMovement(testErn, testLrn, testNewDraftId, movementSubmissionFailures).returns(Future.failed(new Exception("bang")))
         await(service.setErrorMessagesForDraftMovement(testErn, testLrn, movementSubmissionFailures)) shouldBe Left(MongoError("bang"))
       }
     }
