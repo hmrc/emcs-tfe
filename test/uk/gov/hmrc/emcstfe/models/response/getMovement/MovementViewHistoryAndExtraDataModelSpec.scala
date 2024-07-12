@@ -30,6 +30,7 @@ import uk.gov.hmrc.emcstfe.models.interruptionOfMovement.{InterruptionReasonMode
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionDiagnosisCodeType.DestinationTypeIsNotExport
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionReasonCodeType.ExportDataNotFound
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GlobalConclusionofReceiptReasonCodeType.ReceiptAcceptedAndSatisfactory
 import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -240,7 +241,8 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
             ))
           )
         ),
-        InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info")))
+        InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info"))),
+        manualClosureResponse = Some(ManualClosureResponseModel(1, Some(LocalDateTime.parse("2024-01-14T19:14:20")), ReceiptAcceptedAndSatisfactory, Some("some information"), ManualClosureRequestReasonCodeType.Other, Some("some information"), false, Some(ManualClosureRejectionReasonCodeType.Other), Some("some information"), Some(Seq(SupportingDocumentModel(Some("some information"), Some("EX95489754"), Some("1")))), Some(Seq(ManualClosureItem(1,Some("B000"),Some("E"),Some(20), Some(20), Some("some information"))))))
       )
       )
 

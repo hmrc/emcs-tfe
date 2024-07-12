@@ -31,6 +31,7 @@ import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.{ReceiptedItemsModel, SubmitReportOfReceiptModel, UnsatisfactoryModel}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionDiagnosisCodeType.DestinationTypeIsNotExport
 import uk.gov.hmrc.emcstfe.models.response.getMovement.CustomsRejectionReasonCodeType.ExportDataNotFound
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GlobalConclusionofReceiptReasonCodeType.ReceiptAcceptedAndSatisfactory
 import uk.gov.hmrc.emcstfe.models.response.getMovement.NotificationOfDivertedMovementType.SplitMovement
 import uk.gov.hmrc.emcstfe.models.response.getMovement._
 import uk.gov.hmrc.emcstfe.models.response.{Packaging, RawGetMovementResponse, WineProduct}
@@ -823,6 +824,47 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |              </ie871:ExplanationOnReasonForShortage>
        |          </ie871:Body>
        |      </ie871:IE871>
+       |
+       |      <!-- Manual Closure Response -->
+       |      <ie881:IE881 xmlns:ie881="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE881:V3.13">
+       |          <ie881:Header>
+       |              <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |              <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |              <urn:DateOfPreparation>2024-06-24</urn:DateOfPreparation>
+       |              <urn:TimeOfPreparation>08:46:49.496924</urn:TimeOfPreparation>
+       |              <urn:MessageIdentifier>69c710d7-abb6-4e3c-a571-9555f4a5c7f5</urn:MessageIdentifier>
+       |              <urn:CorrelationIdentifier>PORTAL8515fc03cc404bc2ab201cfa4996fb2f</urn:CorrelationIdentifier>
+       |          </ie881:Header>
+       |          <ie881:Body>
+       |              <ie881:ManualClosureResponse>
+       |                  <ie881:Attributes>
+       |                      <ie881:AdministrativeReferenceCode>23GB00000000000380611</ie881:AdministrativeReferenceCode>
+       |                      <ie881:SequenceNumber>1</ie881:SequenceNumber>
+       |                      <ie881:DateOfArrivalOfExciseProducts>2024-01-14T19:14:20</ie881:DateOfArrivalOfExciseProducts>
+       |                      <ie881:GlobalConclusionOfReceipt>1</ie881:GlobalConclusionOfReceipt>
+       |                      <ie881:ComplementaryInformation>some information</ie881:ComplementaryInformation>
+       |                      <ie881:ManualClosureRequestReasonCode>0</ie881:ManualClosureRequestReasonCode>
+       |                      <ie881:ManualClosureRequestReasonCodeComplement>some information</ie881:ManualClosureRequestReasonCodeComplement>
+       |                      <ie881:ManualClosureRequestAccepted>0</ie881:ManualClosureRequestAccepted>
+       |                      <ie881:ManualClosureRejectionReasonCode>0</ie881:ManualClosureRejectionReasonCode>
+       |                      <ie881:ManualClosureRejectionComplement>some information</ie881:ManualClosureRejectionComplement>
+       |                  </ie881:Attributes>
+       |                  <ie881:SupportingDocuments>
+       |                      <ie881:SupportingDocumentType>1</ie881:SupportingDocumentType>
+       |                      <ie881:ReferenceOfSupportingDocument>EX95489754</ie881:ReferenceOfSupportingDocument>
+       |                      <ie881:SupportingDocumentDescription>some information</ie881:SupportingDocumentDescription>
+       |                  </ie881:SupportingDocuments>
+       |                  <ie881:BodyManualClosure>
+       |                      <ie881:BodyRecordUniqueReference>1</ie881:BodyRecordUniqueReference>
+       |                      <ie881:IndicatorOfShortageOrExcess>E</ie881:IndicatorOfShortageOrExcess>
+       |                      <ie881:ObservedShortageOrExcess>20</ie881:ObservedShortageOrExcess>
+       |                      <ie881:ExciseProductCode>B000</ie881:ExciseProductCode>
+       |                      <ie881:RefusedQuantity>20</ie881:RefusedQuantity>
+       |                      <ie881:ComplementaryInformation>some information</ie881:ComplementaryInformation>
+       |                  </ie881:BodyManualClosure>
+       |              </ie881:ManualClosureResponse>
+       |          </ie881:Body>
+       |      </ie881:IE881>
        |    </mov:eventHistory>
        |  </mov:movementView>""".stripMargin
 
@@ -1193,7 +1235,9 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           ))
         )
       ),
-      InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info")))
+      InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info"))),
+      manualClosureResponse = Some(ManualClosureResponseModel(1, Some(LocalDateTime.parse("2024-01-14T19:14:20")), ReceiptAcceptedAndSatisfactory, Some("some information"), ManualClosureRequestReasonCodeType.Other, Some("some information"), false, Some(ManualClosureRejectionReasonCodeType.Other), Some("some information"), Some(Seq(SupportingDocumentModel(Some("some information"), Some("EX95489754"), Some("1")))), Some(Seq(ManualClosureItem(1,Some("B000"),Some("E"),Some(20), Some(20), Some("some information"))))))
+
     )
   )
 
@@ -1474,6 +1518,34 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           "bodyRecordUniqueReference" -> 1,
           "explanation" -> "4 more than I expected",
           "actualQuantity" -> 5
+        )
+      )
+    ),
+    "manualClosureResponse" -> Json.obj(
+      "sequenceNumber" -> 1,
+      "dateOfArrivalOfExciseProducts" -> "2024-01-14T19:14:20",
+      "globalConclusionOfReceipt" -> "1",
+      "complementaryInformation" -> "some information",
+      "manualClosureRequestReason" -> "0",
+      "manualClosureRequestReasonComplement" -> "some information",
+      "manualClosureRequestAccepted" -> false,
+      "manualClosureRejectionReason" -> "0",
+      "manualClosureRejectionComplement" -> "some information",
+      "supportingDocuments" -> Json.arr(
+        Json.obj(
+          "supportingDocumentDescription" -> "some information",
+          "referenceOfSupportingDocument" -> "EX95489754",
+          "supportingDocumentType" -> "1",
+        )
+      ),
+      "bodyManualClosure" -> Json.arr(
+        Json.obj(
+          "bodyRecordUniqueReference" -> 1,
+          "productCode" -> "B000",
+          "indicatorOfShortageOrExcess" -> "E",
+          "observedShortageOrExcess" -> 20,
+          "refusedQuantity" -> 20,
+          "complementaryInformation" -> "some information"
         )
       )
     )
@@ -2236,6 +2308,47 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |              </ie871:ExplanationOnReasonForShortage>
        |          </ie871:Body>
        |      </ie871:IE871>
+       |
+       |      <!-- Manual Closure Response -->
+       |      <ie881:IE881 xmlns:ie881="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE881:V3.13">
+       |          <ie881:Header>
+       |              <urn:MessageSender>NDEA.GB</urn:MessageSender>
+       |              <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
+       |              <urn:DateOfPreparation>2024-06-24</urn:DateOfPreparation>
+       |              <urn:TimeOfPreparation>08:46:49.496924</urn:TimeOfPreparation>
+       |              <urn:MessageIdentifier>69c710d7-abb6-4e3c-a571-9555f4a5c7f5</urn:MessageIdentifier>
+       |              <urn:CorrelationIdentifier>PORTAL8515fc03cc404bc2ab201cfa4996fb2f</urn:CorrelationIdentifier>
+       |          </ie881:Header>
+       |          <ie881:Body>
+       |              <ie881:ManualClosureResponse>
+       |                  <ie881:Attributes>
+       |                      <ie881:AdministrativeReferenceCode>23GB00000000000380611</ie881:AdministrativeReferenceCode>
+       |                      <ie881:SequenceNumber>1</ie881:SequenceNumber>
+       |                      <ie881:DateOfArrivalOfExciseProducts>2024-01-14T19:14:20</ie881:DateOfArrivalOfExciseProducts>
+       |                      <ie881:GlobalConclusionOfReceipt>1</ie881:GlobalConclusionOfReceipt>
+       |                      <ie881:ComplementaryInformation>some information</ie881:ComplementaryInformation>
+       |                      <ie881:ManualClosureRequestReasonCode>0</ie881:ManualClosureRequestReasonCode>
+       |                      <ie881:ManualClosureRequestReasonCodeComplement>some information</ie881:ManualClosureRequestReasonCodeComplement>
+       |                      <ie881:ManualClosureRequestAccepted>0</ie881:ManualClosureRequestAccepted>
+       |                      <ie881:ManualClosureRejectionReasonCode>0</ie881:ManualClosureRejectionReasonCode>
+       |                      <ie881:ManualClosureRejectionComplement>some information</ie881:ManualClosureRejectionComplement>
+       |                  </ie881:Attributes>
+       |                  <ie881:SupportingDocuments>
+       |                      <ie881:SupportingDocumentType>1</ie881:SupportingDocumentType>
+       |                      <ie881:ReferenceOfSupportingDocument>EX95489754</ie881:ReferenceOfSupportingDocument>
+       |                      <ie881:SupportingDocumentDescription>some information</ie881:SupportingDocumentDescription>
+       |                  </ie881:SupportingDocuments>
+       |                  <ie881:BodyManualClosure>
+       |                      <ie881:BodyRecordUniqueReference>1</ie881:BodyRecordUniqueReference>
+       |                      <ie881:IndicatorOfShortageOrExcess>E</ie881:IndicatorOfShortageOrExcess>
+       |                      <ie881:ObservedShortageOrExcess>20</ie881:ObservedShortageOrExcess>
+       |                      <ie881:ExciseProductCode>B000</ie881:ExciseProductCode>
+       |                      <ie881:RefusedQuantity>20</ie881:RefusedQuantity>
+       |                      <ie881:ComplementaryInformation>some information</ie881:ComplementaryInformation>
+       |                  </ie881:BodyManualClosure>
+       |              </ie881:ManualClosureResponse>
+       |          </ie881:Body>
+       |      </ie881:IE881>
        |    </mov:eventHistory>
        |  </mov:movementView>""".stripMargin
 
@@ -2707,7 +2820,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           ))
         )
       ),
-      InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info")))
+      InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info"))),
+      manualClosureResponse = Some(ManualClosureResponseModel(1, Some(LocalDateTime.parse("2024-01-14T19:14:20")), ReceiptAcceptedAndSatisfactory, Some("some information"), ManualClosureRequestReasonCodeType.Other, Some("some information"), false, Some(ManualClosureRejectionReasonCodeType.Other), Some("some information"), Some(Seq(SupportingDocumentModel(Some("some information"), Some("EX95489754"), Some("1")))), Some(Seq(ManualClosureItem(1,Some("B000"),Some("E"),Some(20), Some(20), Some("some information"))))))
     )
   )
 
@@ -3130,6 +3244,34 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           "bodyRecordUniqueReference" -> 1,
           "explanation" -> "4 more than I expected",
           "actualQuantity" -> 5
+        )
+      )
+    ),
+    "manualClosureResponse" -> Json.obj(
+      "sequenceNumber" -> 1,
+      "dateOfArrivalOfExciseProducts" -> "2024-01-14T19:14:20",
+      "globalConclusionOfReceipt" -> "1",
+      "complementaryInformation" -> "some information",
+      "manualClosureRequestReason" -> "0",
+      "manualClosureRequestReasonComplement" -> "some information",
+      "manualClosureRequestAccepted" -> false,
+      "manualClosureRejectionReason" -> "0",
+      "manualClosureRejectionComplement" -> "some information",
+      "supportingDocuments" -> Json.arr(
+        Json.obj(
+          "supportingDocumentDescription" -> "some information",
+          "referenceOfSupportingDocument" -> "EX95489754",
+          "supportingDocumentType" -> "1",
+        )
+      ),
+      "bodyManualClosure" -> Json.arr(
+        Json.obj(
+          "bodyRecordUniqueReference" -> 1,
+          "productCode" -> "B000",
+          "indicatorOfShortageOrExcess" -> "E",
+          "observedShortageOrExcess" -> 20,
+          "refusedQuantity" -> 20,
+          "complementaryInformation" -> "some information"
         )
       )
     )

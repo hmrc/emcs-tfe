@@ -649,7 +649,8 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
       cancelMovement = None,
       notificationOfCustomsRejection = None,
       notificationOfShortageOrExcess = None,
-      InterruptedMovement = None
+      InterruptedMovement = None,
+      manualClosureResponse = None
     )
   )
 

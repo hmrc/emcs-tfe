@@ -42,8 +42,6 @@ class ChrisXMLHttpParser @Inject()(soapUtils: XmlUtils) extends Logging {
     logger.debug(s"[rawXMLHttpReads] ChRIS Response:\n\n  - Status: '${response.status}'\n\n - Body: '${response.body}'")
     response.status match {
       case OK =>
-        println("*"*20)
-        println(response.body)
         Try(XML.loadString(response.body)) match {
           case Failure(exception) =>
             logger.warn("[rawXMLHttpReads] Unable to read response body as XML", exception)

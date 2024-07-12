@@ -54,7 +54,7 @@ object MovementViewHistoryAndExtraDataModel {
   private[getMovement] lazy val cancelMovement = __ \\ "eventHistory" \ "IE810" \ "Body" \ "CancellationOfEAD" \ "Cancellation"
   private[getMovement] lazy val interruptedMovement = __ \\ "eventHistory" \ "IE807"
 
-  private[getMovement] lazy val manualClosureResponse = __ \\ "eventHistory" \ "IE881" \ "Body"
+  private[getMovement] lazy val manualClosureResponse = __ \\ "eventHistory" \ "IE881"
 
   private[getMovement] lazy val notificationOfDivertedMovement = __ \\ "eventHistory" \ "IE803"
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,15 +28,7 @@ case class SupportingDocumentModel(
     supportingDocumentDescription: Option[String],
     referenceOfSupportingDocument: Option[String],
     supportingDocumentType: Option[String]
-) extends XmlBaseModel with XmlWriterUtils {
-
-  def toXml(implicit request: UserRequest[_]): Elem = <urn:SupportingDocuments>
-    {supportingDocumentDescription.mapNodeSeq(x => <urn:SupportingDocumentDescription>{x}</urn:SupportingDocumentDescription>)}
-    {referenceOfSupportingDocument.mapNodeSeq(x => <urn:ReferenceOfSupportingDocument>{x}</urn:ReferenceOfSupportingDocument>)}
-    {supportingDocumentType.mapNodeSeq(x => <urn:SupportingDocumentType>{x}</urn:SupportingDocumentType>)}
-  </urn:SupportingDocuments>
-
-}
+)
 
 object SupportingDocumentModel {
 
