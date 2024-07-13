@@ -22,10 +22,10 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
-import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
+import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeDestinationRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
-import uk.gov.hmrc.emcstfe.services.SubmitChangeDestinationService
+import uk.gov.hmrc.emcstfe.services.{GetMovementService, SubmitChangeDestinationService}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -34,18 +34,25 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class SubmitChangeDestinationController @Inject()(cc: ControllerComponents,
-                                                  service: SubmitChangeDestinationService,
+                                                  submitChangeDestinationService: SubmitChangeDestinationService,
+                                                  getMovementService: GetMovementService,
                                                   val config: AppConfig,
                                                   override val auth: AuthAction
                                                  )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging with FeatureSwitching {
 
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitChangeDestinationModel] { submission =>
-      val requestModel = SubmitChangeDestinationRequest(submission, isEnabled(ValidateUsingFS41Schema))
-      if (isEnabled(SendToEIS)) {
-        service.submitViaEIS(requestModel).flatMap(handleResponse(_))
-      } else {
-        service.submit(requestModel).flatMap(handleResponse(_))
+      getMovementService.getMovement(GetMovementRequest(ern, arc, None), forceFetchNew = true).flatMap {
+        case Left(error) =>
+          logger.error(s"[submit] Failed to retrieve movement for $ern and $arc")
+          Future.successful(InternalServerError(Json.toJson(error)))
+        case Right(movement) =>
+          val requestModel = SubmitChangeDestinationRequest(submission, movement, isEnabled(ValidateUsingFS41Schema))
+          if (isEnabled(SendToEIS)) {
+            submitChangeDestinationService.submitViaEIS(requestModel).flatMap(result => handleResponse(result))
+          } else {
+            submitChangeDestinationService.submit(requestModel).flatMap(result => handleResponse(result))
+          }
       }
     }
   }

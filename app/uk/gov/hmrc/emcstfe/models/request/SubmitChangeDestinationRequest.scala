@@ -20,13 +20,15 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, TaxWarehouse}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{CertifiedConsignee, DirectDelivery, ExemptedOrganisations, Export, RegisteredConsignee, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryCertifiedConsignee, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 
 import java.util.Base64
 
-case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, useFS41SchemaVersion: Boolean)
+case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, movement: GetMovementResponse, useFS41SchemaVersion: Boolean)
                                          (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
 
   private val arcCountryCode = body.updateEadEsad.administrativeReferenceCode.substring(2, 4)
@@ -34,10 +36,23 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, us
 
   val messageSender: String = Constants.NDEA ++ arcCountryCode
 
+  // The recipient of the message is determined by the destination type of the movement (BR41)
   val messageRecipient: String =
     Constants.NDEA ++ (body.destinationChanged.destinationTypeCode match {
-      case TaxWarehouse => countryCode(body.destinationChanged.newConsigneeTrader.flatMap(_.traderExciseNumber))
-      case Export => countryCode(body.destinationChanged.deliveryPlaceCustomsOffice.map(_.referenceNumber))
+
+      case TaxWarehouse | RegisteredConsignee | TemporaryRegisteredConsignee | DirectDelivery | CertifiedConsignee | TemporaryCertifiedConsignee | ReturnToThePlaceOfDispatchOfTheConsignor =>
+        // Taken from the CONSIGNEE of the existing version of the movement
+        countryCode(movement.consigneeTrader.flatMap(_.traderExciseNumber))
+
+      case ExemptedOrganisations =>
+        // Taken from the COMPLEMENT_CONSIGNEE(TRADER).MEMBER_STATE_CODE of the existing version of the movement
+        countryCode(movement.memberStateCode)
+
+      case Export =>
+        // Taken from the DELIVERY_PLACE_CUSTOMS_OFFICE of the existing version of the movement
+        // IF = GR THEN CHANGE TO EL
+        countryCode(movement.deliveryPlaceCustomsOfficeReferenceNumber).replace("GR", "EL")
+
       case _ => Constants.GB
     })
 

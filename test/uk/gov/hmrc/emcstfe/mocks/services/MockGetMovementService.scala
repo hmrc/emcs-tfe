@@ -27,11 +27,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockGetMovementService extends MockFactory  {
-  lazy val mockService: GetMovementService = mock[GetMovementService]
+  lazy val mockGetMovementService: GetMovementService = mock[GetMovementService]
 
-  object MockService {
+  object MockGetMovementService {
     def getMovement(getMovementRequest: GetMovementRequest, forceFetchNew: Boolean): CallHandler4[GetMovementRequest, Boolean, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, GetMovementResponse]]] = {
-      (mockService.getMovement(_: GetMovementRequest, _: Boolean)(_: HeaderCarrier, _: ExecutionContext))
+      (mockGetMovementService.getMovement(_: GetMovementRequest, _: Boolean)(_: HeaderCarrier, _: ExecutionContext))
         .expects(getMovementRequest, forceFetchNew, *, *)
     }
   }
