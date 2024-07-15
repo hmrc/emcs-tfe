@@ -170,18 +170,44 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
       "generating MessageRecipient" when {
         "destination type is TaxWarehouse" should {
-          "use the newConsigneeTrader traderId for the Country Code" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), useFS41SchemaVersion = false)
-            request.messageRecipient shouldBe "NDEA.FR"
-          }
 
-          "use GB as default when newConsigneeTrader does NOT exist" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse, newConsigneeTrader = None)), useFS41SchemaVersion = false)
+          "use the deliveryPlaceTrader taderId first for the Country code" in {
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
 
-          "use GB as default when newConsigneeTrader traderId does NOT exist" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse, newConsigneeTrader = Some(minTraderModel))), useFS41SchemaVersion = false)
+          "if deliveryPlaceTrader does not exist - try and use the newConsigneeTrader traderId for the Country Code" in {
+            val request = SubmitChangeDestinationRequest(
+              model.copy(destinationChanged = model.destinationChanged.copy(
+                destinationTypeCode = TaxWarehouse,
+                deliveryPlaceTrader = None
+              )),
+              useFS41SchemaVersion = false
+            )
+            request.messageRecipient shouldBe "NDEA.FR"
+          }
+
+          "use GB as default when neither deliveryPlaceTrader nor newConsigneeTrader does NOT exist" in {
+            val request = SubmitChangeDestinationRequest(
+              model.copy(destinationChanged = model.destinationChanged.copy(
+                destinationTypeCode = TaxWarehouse,
+                deliveryPlaceTrader = None,
+                newConsigneeTrader = None
+              )),
+              useFS41SchemaVersion = false
+            )
+            request.messageRecipient shouldBe "NDEA.GB"
+          }
+
+          "use GB as default when deliveryPlaceTrader nor newConsigneeTrader traderId does NOT exist" in {
+            val request = SubmitChangeDestinationRequest(
+              model.copy(destinationChanged = model.destinationChanged.copy(
+                destinationTypeCode = TaxWarehouse,
+                deliveryPlaceTrader = None,
+                newConsigneeTrader = Some(minTraderModel)
+              )),
+              useFS41SchemaVersion = false
+            )
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }

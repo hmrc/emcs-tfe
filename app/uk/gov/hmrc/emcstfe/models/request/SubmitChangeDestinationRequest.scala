@@ -36,8 +36,13 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, us
 
   val messageRecipient: String =
     Constants.NDEA ++ (body.destinationChanged.destinationTypeCode match {
-      case TaxWarehouse => countryCode(body.destinationChanged.newConsigneeTrader.flatMap(_.traderExciseNumber))
-      case Export => countryCode(body.destinationChanged.deliveryPlaceCustomsOffice.map(_.referenceNumber))
+      case TaxWarehouse =>
+        val ern = body.destinationChanged.deliveryPlaceTrader.flatMap(_.traderExciseNumber).fold(
+          body.destinationChanged.newConsigneeTrader.flatMap(_.traderExciseNumber)
+        )(Some(_))
+        countryCode(ern)
+      case Export =>
+        countryCode(body.destinationChanged.deliveryPlaceCustomsOffice.map(_.referenceNumber))
       case _ => Constants.GB
     })
 
