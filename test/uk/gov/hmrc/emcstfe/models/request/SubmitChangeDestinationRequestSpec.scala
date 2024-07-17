@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.request
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.{SubmitChangeDestinationFixtures, TraderModelFixtures}
 import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, UnknownDestination}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.util.Base64
@@ -225,9 +225,16 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
           }
         }
 
+        "destination type is ReturnToThePlaceOfDispatchOfTheConsignor" should {
+          "use the country code from the ARC" in {
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), useFS41SchemaVersion = false)
+            request.messageRecipient shouldBe "NDEA.DE"
+          }
+        }
+
         "destination type is anything else" should {
           "use GB" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), useFS41SchemaVersion = false)
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = UnknownDestination)), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }

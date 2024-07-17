@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, TaxWarehouse}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse}
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
@@ -43,6 +43,8 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, us
         countryCode(ern)
       case Export =>
         countryCode(body.destinationChanged.deliveryPlaceCustomsOffice.map(_.referenceNumber))
+      case ReturnToThePlaceOfDispatchOfTheConsignor =>
+        arcCountryCode
       case _ => Constants.GB
     })
 
