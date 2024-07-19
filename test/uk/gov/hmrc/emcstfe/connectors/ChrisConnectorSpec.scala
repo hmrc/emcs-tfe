@@ -429,7 +429,7 @@ class ChrisConnectorSpec extends TestBaseSpec with Status with MimeTypes with He
 
     import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
-    val submitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = false)
+    val submitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = false)
 
     "return a Right" when {
       "downstream call is successful" in new Test {

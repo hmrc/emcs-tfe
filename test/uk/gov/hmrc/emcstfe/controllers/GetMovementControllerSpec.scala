@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class GetMovementControllerSpec extends TestBaseSpec with MockGetMovementService with GetMovementFixture with FakeAuthAction {
 
   private val fakeRequest = FakeRequest("GET", "/movement/:ern/:arc")
-  private val controller = new GetMovementController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
+  private val controller = new GetMovementController(Helpers.stubControllerComponents(), mockGetMovementService, FakeSuccessAuthAction)
 
   "GET /movement/:ern/:arc" should {
     "return 200" when {
@@ -40,7 +40,7 @@ class GetMovementControllerSpec extends TestBaseSpec with MockGetMovementService
 
         val getMovementRequest = GetMovementRequest(testErn, testArc, Some(1))
 
-        MockService.getMovement(getMovementRequest, forceFetchNew = false).returns(Future.successful(Right(getMovementResponse())))
+        MockGetMovementService.getMovement(getMovementRequest, forceFetchNew = false).returns(Future.successful(Right(getMovementResponse())))
 
         val result = controller.getMovement(testErn, testArc, sequenceNumber = Some(1))(fakeRequest)
 
@@ -53,7 +53,7 @@ class GetMovementControllerSpec extends TestBaseSpec with MockGetMovementService
 
         val getMovementRequest = GetMovementRequest(testErn, testArc)
 
-        MockService.getMovement(getMovementRequest, forceFetchNew = true).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+        MockGetMovementService.getMovement(getMovementRequest, forceFetchNew = true).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
         val result = controller.getMovement(testErn, testArc, forceFetchNew = true)(fakeRequest)
 

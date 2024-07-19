@@ -28,15 +28,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait MockSubmitChangeDestinationService extends MockFactory  {
 
-  lazy val mockService: SubmitChangeDestinationService = mock[SubmitChangeDestinationService]
+  lazy val mockSubmitChangeDestinationService: SubmitChangeDestinationService = mock[SubmitChangeDestinationService]
 
-  object MockService extends Matchers {
+  object MockSubmitChangeDestinationService extends Matchers {
     def submit(request: SubmitChangeDestinationRequest): CallHandler3[SubmitChangeDestinationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
-      (mockService.submit(_: SubmitChangeDestinationRequest)(_: HeaderCarrier, _: ExecutionContext))
+      (mockSubmitChangeDestinationService.submit(_: SubmitChangeDestinationRequest)(_: HeaderCarrier, _: ExecutionContext))
         .expects(request, *, *)
 
     def submitViaEIS(request: SubmitChangeDestinationRequest): CallHandler3[SubmitChangeDestinationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
-      (mockService.submitViaEIS(_: SubmitChangeDestinationRequest)(_: HeaderCarrier, _: ExecutionContext))
+      (mockSubmitChangeDestinationService.submitViaEIS(_: SubmitChangeDestinationRequest)(_: HeaderCarrier, _: ExecutionContext))
         .expects(request, *, *)
   }
 }

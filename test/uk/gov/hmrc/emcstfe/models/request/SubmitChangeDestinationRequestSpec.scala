@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.emcstfe.fixtures.{SubmitChangeDestinationFixtures, TraderModelFixtures}
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures, TraderModelFixtures}
 import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, UnknownDestination}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -26,20 +26,20 @@ import java.util.Base64
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeDestinationFixtures with TraderModelFixtures {
+class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeDestinationFixtures with TraderModelFixtures with GetMovementFixture {
 
   import DeliveryPlaceCustomsOfficeFixtures._
   import DestinationChangedFixtures._
   import SubmitChangeDestinationFixtures._
   import UpdateEadEsadFixtures._
 
-  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = false)
+  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = false)
 
   "requestBody" when {
 
     "useFS41SchemaVersion is enabled" should {
 
-      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = true)
+      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = true)
 
       "generate the correct request XML" in {
 
@@ -163,7 +163,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
       "generating MessageSender" should {
         "use the country code from the ARC" in {
-          val request = SubmitChangeDestinationRequest(model, useFS41SchemaVersion = false)
+          val request = SubmitChangeDestinationRequest(model, getMovementResponse(), useFS41SchemaVersion = false)
           request.messageSender shouldBe "NDEA.DE"
         }
       }
@@ -172,7 +172,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
         "destination type is TaxWarehouse" should {
 
           "use the deliveryPlaceTrader taderId first for the Country code" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), useFS41SchemaVersion = false)
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), getMovementResponse(), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
 
@@ -182,6 +182,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
                 destinationTypeCode = TaxWarehouse,
                 deliveryPlaceTrader = None
               )),
+              getMovementResponse(),
               useFS41SchemaVersion = false
             )
             request.messageRecipient shouldBe "NDEA.FR"
@@ -194,6 +195,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
                 deliveryPlaceTrader = None,
                 newConsigneeTrader = None
               )),
+              getMovementResponse(),
               useFS41SchemaVersion = false
             )
             request.messageRecipient shouldBe "NDEA.GB"
@@ -206,6 +208,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
                 deliveryPlaceTrader = None,
                 newConsigneeTrader = Some(minTraderModel)
               )),
+              getMovementResponse(),
               useFS41SchemaVersion = false
             )
             request.messageRecipient shouldBe "NDEA.GB"
@@ -214,27 +217,27 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
         "destination type is Export" should {
           "use the deliveryPlaceCustomsOffice referenceNumber for the Country Code when it exists" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export)), useFS41SchemaVersion = false)
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export)), getMovementResponse(), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.IT"
           }
 
           "use GB as default when deliveryPlaceCustomsOffice does NOT exist" in {
 
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)), useFS41SchemaVersion = false)
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)), getMovementResponse(), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }
 
         "destination type is ReturnToThePlaceOfDispatchOfTheConsignor" should {
           "use the country code from the ARC" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), useFS41SchemaVersion = false)
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), getMovementResponse(), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.DE"
           }
         }
 
         "destination type is anything else" should {
           "use GB" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = UnknownDestination)), useFS41SchemaVersion = false)
+            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = UnknownDestination)), getMovementResponse(), useFS41SchemaVersion = false)
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }
@@ -264,7 +267,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
     "useFS41SchemaVersion is enabled" should {
 
-      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = true)
+      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = true)
 
       "generate the correct XML body" in {
         val expectedRequest = wrapInControlDoc(
