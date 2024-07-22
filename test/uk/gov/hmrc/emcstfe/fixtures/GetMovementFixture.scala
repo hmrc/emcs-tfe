@@ -1236,7 +1236,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         )
       ),
       InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info"))),
-      manualClosureResponse = Some(ManualClosureResponseModel(1, Some(LocalDateTime.parse("2024-01-14T19:14:20")), ReceiptAcceptedAndSatisfactory, Some("some information"), ManualClosureRequestReasonCodeType.Other, Some("some information"), false, Some(ManualClosureRejectionReasonCodeType.Other), Some("some information"), Some(Seq(SupportingDocumentModel(Some("some information"), Some("EX95489754"), Some("1")))), Some(Seq(ManualClosureItem(1,Some("B000"),Some("E"),Some(20), Some(20), Some("some information"))))))
+      manualClosureResponse = Some(ManualClosureResponseModel(1, Some(LocalDateTime.parse("2024-01-14T19:14:20")), Some(ReceiptAcceptedAndSatisfactory), Some("some information"), ManualClosureRequestReasonCodeType.Other, Some("some information"), false, Some(ManualClosureRejectionReasonCodeType.Other), Some("some information"), Some(Seq(SupportingDocumentModel(Some("some information"), Some("EX95489754"), Some("1")))), Some(Seq(ManualClosureItem(1,Some("B000"),Some("E"),Some(20), Some(20), Some("some information"))))))
 
     )
   )
@@ -2821,7 +2821,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
         )
       ),
       InterruptedMovement = Some(InterruptionReasonModel(InterruptionReasonType.Other, "FR1234", Some("some info"))),
-      manualClosureResponse = Some(ManualClosureResponseModel(1, Some(LocalDateTime.parse("2024-01-14T19:14:20")), ReceiptAcceptedAndSatisfactory, Some("some information"), ManualClosureRequestReasonCodeType.Other, Some("some information"), false, Some(ManualClosureRejectionReasonCodeType.Other), Some("some information"), Some(Seq(SupportingDocumentModel(Some("some information"), Some("EX95489754"), Some("1")))), Some(Seq(ManualClosureItem(1,Some("B000"),Some("E"),Some(20), Some(20), Some("some information"))))))
+      manualClosureResponse = Some(ManualClosureResponseModel(1, Some(LocalDateTime.parse("2024-01-14T19:14:20")), Some(ReceiptAcceptedAndSatisfactory), Some("some information"), ManualClosureRequestReasonCodeType.Other, Some("some information"), false, Some(ManualClosureRejectionReasonCodeType.Other), Some("some information"), Some(Seq(SupportingDocumentModel(Some("some information"), Some("EX95489754"), Some("1")))), Some(Seq(ManualClosureItem(1,Some("B000"),Some("E"),Some(20), Some(20), Some("some information"))))))
     )
   )
 

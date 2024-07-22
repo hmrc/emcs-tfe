@@ -30,7 +30,7 @@ import java.time.LocalDateTime
 case class ManualClosureResponseModel(
     sequenceNumber: Int,
     dateOfArrivalOfExciseProducts: Option[LocalDateTime],
-    globalConclusionOfReceipt: GlobalConclusionofReceiptReasonCodeType,
+    globalConclusionOfReceipt: Option[GlobalConclusionofReceiptReasonCodeType],
     complementaryInformation: Option[String],
     manualClosureRequestReason: ManualClosureRequestReasonCodeType,
     manualClosureRequestReasonComplement: Option[String],
@@ -69,7 +69,7 @@ object ManualClosureResponseModel extends XmlReaderUtils {
   implicit val xmlReads: XmlReader[ManualClosureResponseModel] = (
     sequenceNumber.read[Int],
     dateOfArrivalOfExciseProducts.read[Option[LocalDateTime]],
-    globalConclusionOfReceipt.read[GlobalConclusionofReceiptReasonCodeType](GlobalConclusionofReceiptReasonCodeType.xmlReads("GlobalConclusionOfReceipt")(GlobalConclusionofReceiptReasonCodeType.enumerable)),
+    globalConclusionOfReceipt.read[GlobalConclusionofReceiptReasonCodeType](GlobalConclusionofReceiptReasonCodeType.xmlReads("GlobalConclusionOfReceipt")(GlobalConclusionofReceiptReasonCodeType.enumerable)).optional,
     complementaryInformation.read[String].optional,
     manualClosureRequestReasonCode.read[ManualClosureRequestReasonCodeType](ManualClosureRequestReasonCodeType.xmlReads("ManualClosureRequestReasonCode")(ManualClosureRequestReasonCodeType.enumerable)),
     manualClosureRequestReasonCodeComplement.read[String].optional,
