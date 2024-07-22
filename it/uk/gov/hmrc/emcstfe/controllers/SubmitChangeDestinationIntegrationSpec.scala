@@ -19,11 +19,12 @@ package uk.gov.hmrc.emcstfe.controllers
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
+import play.api.http.Status.OK
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
-import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures}
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
@@ -31,7 +32,11 @@ import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import scala.xml.XML
 
-class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with SubmitChangeDestinationFixtures with FeatureSwitching {
+class SubmitChangeDestinationIntegrationSpec
+  extends IntegrationBaseSpec
+    with SubmitChangeDestinationFixtures
+    with GetMovementFixture
+    with FeatureSwitching {
 
   override val config: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -45,6 +50,16 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
     def downstreamUri: String = s"/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3"
 
     def downstreamEisUri: String = s"/emcs/digital-submit-new-message/v1"
+
+    def downstreamGetMovementUri: String = "/ChRISOSB/EMCS/EMCSApplicationService/2"
+
+    def downstreamEisGetMovementUri: String = "/emcs/movements/v1/movement"
+
+    def downstreamEisGetMovementQueryParam: Map[String, String] =
+      Seq(
+        Some("exciseregistrationnumber" -> testErn),
+        Some("arc" -> testArc)
+      ).flatten.toMap
 
     def request(): WSRequest = {
       setupStubs()
@@ -64,6 +79,7 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
         "all downstream calls are successful" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamGetMovementUri, Status.OK, XML.loadString(getMovementSoapWrapper()))
             DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(chrisSuccessSOAPResponseBody))
           }
 
@@ -77,6 +93,7 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
         "downstream call returns unexpected XML" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamGetMovementUri, Status.OK, XML.loadString(getMovementSoapWrapper()))
             DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, <Message>Success!</Message>)
           }
 
@@ -90,6 +107,7 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
 
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamGetMovementUri, Status.OK, XML.loadString(getMovementSoapWrapper()))
             DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, responseBody)
           }
 
@@ -101,6 +119,7 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
         "downstream call returns RIM validation errors" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamGetMovementUri, Status.OK, XML.loadString(getMovementSoapWrapper()))
             DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(chrisRimValidationResponseBody))
           }
 
@@ -122,6 +141,7 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
 
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamGetMovementUri, Status.OK, XML.loadString(getMovementSoapWrapper()))
             DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
           }
 
@@ -142,6 +162,7 @@ class SubmitChangeDestinationIntegrationSpec extends IntegrationBaseSpec with Su
           override def setupStubs(): StubMapping = {
             enable(SendToEIS)
             AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisGetMovementUri, downstreamEisGetMovementQueryParam, OK, getRawMovementJson())
             DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
           }
 

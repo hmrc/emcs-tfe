@@ -20,13 +20,14 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{CertifiedConsignee, Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryCertifiedConsignee}
 import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 
 import java.util.Base64
 
-case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, useFS41SchemaVersion: Boolean)
+case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, movement: GetMovementResponse, useFS41SchemaVersion: Boolean)
                                          (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
 
   private val arcCountryCode = body.updateEadEsad.administrativeReferenceCode.substring(2, 4)
@@ -43,6 +44,10 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, us
         countryCode(ern)
       case Export =>
         countryCode(body.destinationChanged.deliveryPlaceCustomsOffice.map(_.referenceNumber))
+      case CertifiedConsignee | TemporaryCertifiedConsignee =>
+        // I want to keep the consignee the same and change the place of destination
+        // so we need to use the country code from the existing consignee of the movement
+        countryCode(movement.consigneeTrader.flatMap(_.traderExciseNumber))
       case ReturnToThePlaceOfDispatchOfTheConsignor =>
         arcCountryCode
       case _ => Constants.GB

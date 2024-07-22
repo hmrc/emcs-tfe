@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.fixtures.SubmitChangeDestinationFixtures
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
 import uk.gov.hmrc.emcstfe.mocks.repository.MockChangeDestinationUserAnswersRepository
@@ -28,13 +28,14 @@ import scala.concurrent.Future
 
 class SubmitChangeDestinationServiceSpec extends TestBaseSpec
   with SubmitChangeDestinationFixtures
+  with GetMovementFixture
   with MockAppConfig
   with MockChangeDestinationUserAnswersRepository {
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
   class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
-    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, useFS41SchemaVersion = useFS41SchemaVersion)
+    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = useFS41SchemaVersion)
     val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockChrisConnector, mockEisConnector, mockChangeDestinationUserAnswersRepository, mockAppConfig)
   }
 
