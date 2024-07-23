@@ -24,7 +24,7 @@ import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpReads}
 
 import java.time.Instant
-import java.time.temporal.ChronoUnit
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseEisConnector extends Logging {
@@ -33,8 +33,16 @@ trait BaseEisConnector extends Logging {
 
   def bearer(token: String) = s"Bearer $token"
 
+  def now: Instant = Instant.now
+
+  //Note: required to always output 3 fractional digits to include .000Z (by default, .000 would be removed)
+  val dateTimeFormatter: DateTimeFormatter = new DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .appendInstant(3)
+    .toFormatter
+
   private def eisSubmissionHeaders(correlationId: String, forwardedHost: String, token: String): Seq[(String, String)] = Seq(
-    EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+    EisHeaders.dateTime -> dateTimeFormatter.format(now),
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
     EisHeaders.source -> "TFE",
@@ -44,7 +52,7 @@ trait BaseEisConnector extends Logging {
   )
 
   private def eisConsumptionHeaders(correlationId: String, forwardedHost: String, token: String): Seq[(String, String)] = Seq(
-    EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+    EisHeaders.dateTime -> dateTimeFormatter.format(now),
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
     EisHeaders.source -> "TFE",
