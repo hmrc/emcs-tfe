@@ -429,8 +429,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
        |          <head:MessageSender>token</head:MessageSender>
        |          <head:MessageRecipient>token</head:MessageRecipient>
-       |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-       |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+       |          <head:DateOfPreparation>2001-12-17</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>09:30:47</head:TimeOfPreparation>
        |          <head:MessageIdentifier>token</head:MessageIdentifier>
        |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
        |        </body:Header>
@@ -442,7 +442,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |              <body:ExplanationCode>1</body:ExplanationCode>
        |              <body:ComplementaryInformation language="to">837 complementary info</body:ComplementaryInformation>
        |              <body:MessageRole>1</body:MessageRole>
-       |              <body:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:47.00</body:DateAndTimeOfValidationOfExplanationOnDelay>
+       |              <body:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:48</body:DateAndTimeOfValidationOfExplanationOnDelay>
        |            </body:Attributes>
        |            <body:ExciseMovement>
        |              <body:AdministrativeReferenceCode>13AB1234567891ABCDEF9</body:AdministrativeReferenceCode>
@@ -501,14 +501,14 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:TimeOfPreparation>09:00:00</urn:TimeOfPreparation>
        |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
        |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
        |        </ie819:Header>
        |        <ie819:Body>
        |          <ie819:AlertOrRejectionOfEADESAD>
        |            <ie819:Attributes>
-       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:01</ie819:DateAndTimeOfValidationOfAlertRejection>
        |            </ie819:Attributes>
        |            <ie819:ConsigneeTrader language="en">
        |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
@@ -554,14 +554,14 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-       |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:TimeOfPreparation>10:00:00</urn:TimeOfPreparation>
        |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
        |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
        |        </ie819:Header>
        |        <ie819:Body>
        |          <ie819:AlertOrRejectionOfEADESAD>
        |            <ie819:Attributes>
-       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:01</ie819:DateAndTimeOfValidationOfAlertRejection>
        |            </ie819:Attributes>
        |            <ie819:ConsigneeTrader language="en">
        |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
@@ -594,14 +594,14 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
-       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:TimeOfPreparation>09:00:00</urn:TimeOfPreparation>
        |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
        |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
        |        </ie819:Header>
        |        <ie819:Body>
        |          <ie819:AlertOrRejectionOfEADESAD>
        |            <ie819:Attributes>
-       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:01</ie819:DateAndTimeOfValidationOfAlertRejection>
        |            </ie819:Attributes>
        |            <ie819:ConsigneeTrader language="en">
        |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
@@ -677,7 +677,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
-       |            <urn:TimeOfPreparation>07:11:31.898476</urn:TimeOfPreparation>
+       |            <urn:TimeOfPreparation>08:11:32.500000</urn:TimeOfPreparation>
        |            <urn:MessageIdentifier>GB100000000305526</urn:MessageIdentifier>
        |            <urn:CorrelationIdentifier>PORTALb32df82fde8741b4beb3fb832a9cdb76</urn:CorrelationIdentifier>
        |         </ie837:Header>
@@ -689,7 +689,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |                  <ie837:ExplanationCode>6</ie837:ExplanationCode>
        |                  <ie837:ComplementaryInformation language="en">Lorry crashed off cliff</ie837:ComplementaryInformation>
        |                  <ie837:MessageRole>1</ie837:MessageRole>
-       |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:11:33</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+       |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:11:34</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
        |               </ie837:Attributes>
        |               <ie837:ExciseMovement>
        |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>
@@ -705,7 +705,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
-       |            <urn:TimeOfPreparation>07:18:54.852159</urn:TimeOfPreparation>
+       |            <urn:TimeOfPreparation>08:18:56.499999</urn:TimeOfPreparation>
        |            <urn:MessageIdentifier>GB100000000305527</urn:MessageIdentifier>
        |            <urn:CorrelationIdentifier>PORTAL07498cf951004becbc3c73c14c103b13</urn:CorrelationIdentifier>
        |         </ie837:Header>
@@ -716,7 +716,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |                  <ie837:SubmitterType>1</ie837:SubmitterType>
        |                  <ie837:ExplanationCode>5</ie837:ExplanationCode>
        |                  <ie837:MessageRole>2</ie837:MessageRole>
-       |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:18:56</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+       |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:18:57</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
        |               </ie837:Attributes>
        |               <ie837:ExciseMovement>
        |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>
@@ -1891,14 +1891,14 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:TimeOfPreparation>09:00:00</urn:TimeOfPreparation>
        |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
        |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
        |        </ie819:Header>
        |        <ie819:Body>
        |          <ie819:AlertOrRejectionOfEADESAD>
        |            <ie819:Attributes>
-       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T09:00:01</ie819:DateAndTimeOfValidationOfAlertRejection>
        |            </ie819:Attributes>
        |            <ie819:ConsigneeTrader language="en">
        |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
@@ -1944,14 +1944,14 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-       |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:TimeOfPreparation>10:00:00</urn:TimeOfPreparation>
        |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
        |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
        |        </ie819:Header>
        |        <ie819:Body>
        |          <ie819:AlertOrRejectionOfEADESAD>
        |            <ie819:Attributes>
-       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-18T10:00:01</ie819:DateAndTimeOfValidationOfAlertRejection>
        |            </ie819:Attributes>
        |            <ie819:ConsigneeTrader language="en">
        |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
@@ -1984,14 +1984,14 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
-       |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+       |          <urn:TimeOfPreparation>09:00:00</urn:TimeOfPreparation>
        |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
        |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
        |        </ie819:Header>
        |        <ie819:Body>
        |          <ie819:AlertOrRejectionOfEADESAD>
        |            <ie819:Attributes>
-       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:00</ie819:DateAndTimeOfValidationOfAlertRejection>
+       |              <ie819:DateAndTimeOfValidationOfAlertRejection>2023-12-19T09:00:01</ie819:DateAndTimeOfValidationOfAlertRejection>
        |            </ie819:Attributes>
        |            <ie819:ConsigneeTrader language="en">
        |              <ie819:Traderid>GBWK123456789</ie819:Traderid>
@@ -2067,7 +2067,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
-       |            <urn:TimeOfPreparation>07:11:31.898476</urn:TimeOfPreparation>
+       |            <urn:TimeOfPreparation>08:11:33</urn:TimeOfPreparation>
        |            <urn:MessageIdentifier>GB100000000305526</urn:MessageIdentifier>
        |            <urn:CorrelationIdentifier>PORTALb32df82fde8741b4beb3fb832a9cdb76</urn:CorrelationIdentifier>
        |         </ie837:Header>
@@ -2079,7 +2079,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |                  <ie837:ExplanationCode>6</ie837:ExplanationCode>
        |                  <ie837:ComplementaryInformation language="en">Lorry crashed off cliff</ie837:ComplementaryInformation>
        |                  <ie837:MessageRole>1</ie837:MessageRole>
-       |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:11:33</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+       |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:11:34</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
        |               </ie837:Attributes>
        |               <ie837:ExciseMovement>
        |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>
@@ -2095,7 +2095,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
        |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
        |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
-       |            <urn:TimeOfPreparation>07:18:54.852159</urn:TimeOfPreparation>
+       |            <urn:TimeOfPreparation>08:18:56</urn:TimeOfPreparation>
        |            <urn:MessageIdentifier>GB100000000305527</urn:MessageIdentifier>
        |            <urn:CorrelationIdentifier>PORTAL07498cf951004becbc3c73c14c103b13</urn:CorrelationIdentifier>
        |         </ie837:Header>
@@ -2106,7 +2106,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |                  <ie837:SubmitterType>1</ie837:SubmitterType>
        |                  <ie837:ExplanationCode>5</ie837:ExplanationCode>
        |                  <ie837:MessageRole>2</ie837:MessageRole>
-       |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:18:56</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+       |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:18:57</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
        |               </ie837:Attributes>
        |               <ie837:ExciseMovement>
        |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>

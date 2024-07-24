@@ -408,8 +408,8 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
        |        <urn:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
        |          <head:MessageSender>token</head:MessageSender>
        |          <head:MessageRecipient>token</head:MessageRecipient>
-       |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-       |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+       |          <head:DateOfPreparation>2001-12-17</head:DateOfPreparation>
+       |          <head:TimeOfPreparation>09:30:47</head:TimeOfPreparation>
        |          <head:MessageIdentifier>token</head:MessageIdentifier>
        |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
        |        </urn:Header>
@@ -421,7 +421,7 @@ trait GetMovementIfChangedFixture extends BaseFixtures with TraderModelFixtures 
        |              <urn:ExplanationCode>1</urn:ExplanationCode>
        |              <urn:ComplementaryInformation language="to">837 complementary info</urn:ComplementaryInformation>
        |              <urn:MessageRole>1</urn:MessageRole>
-       |              <urn:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:47.00</urn:DateAndTimeOfValidationOfExplanationOnDelay>
+       |              <urn:DateAndTimeOfValidationOfExplanationOnDelay>2001-12-17T09:30:48.00</urn:DateAndTimeOfValidationOfExplanationOnDelay>
        |            </urn:Attributes>
        |            <urn:ExciseMovement>
        |              <urn:AdministrativeReferenceCode>13AB1234567891ABCDEF9</urn:AdministrativeReferenceCode>

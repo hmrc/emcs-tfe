@@ -16,14 +16,16 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple5Semigroupal
+import cats.implicits.catsSyntaxTuple6Semigroupal
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
+import uk.gov.hmrc.emcstfe.utils.DateUtils
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader._
 
-import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 case class NotificationOfDelayModel(submitterIdentification: String,
                                     submitterType: SubmitterType,
@@ -31,7 +33,7 @@ case class NotificationOfDelayModel(submitterIdentification: String,
                                     complementaryInformation: Option[String],
                                     dateTime: LocalDateTime)
 
-object NotificationOfDelayModel {
+object NotificationOfDelayModel extends DateUtils {
 
   implicit val format: Format[NotificationOfDelayModel] = Json.format[NotificationOfDelayModel]
 
@@ -39,13 +41,29 @@ object NotificationOfDelayModel {
   private lazy val submitterType: XPath = __ \\ "SubmitterType"
   private lazy val explanationCode: XPath = __ \\ "ExplanationCode"
   private lazy val complementaryInformation: XPath = __ \\ "ComplementaryInformation"
-  private lazy val dateTime: XPath = __ \\ "DateAndTimeOfValidationOfExplanationOnDelay"
+  private lazy val notificationDate: XPath = __ \\ "DateOfPreparation"
+  private lazy val notificationTime: XPath = __ \\ "TimeOfPreparation"
 
   implicit lazy val xmlReads: XmlReader[NotificationOfDelayModel] = (
     submitterIdentification.read[String],
     submitterType.read[SubmitterType](SubmitterType.xmlReads("SubmitterType")(SubmitterType.enumerable)),
     explanationCode.read[DelayReasonType](DelayReasonType.xmlReads("ExplanationCode")(DelayReasonType.enumerable)),
     complementaryInformation.read[String].optional,
-    dateTime.read[LocalDateTime]
+    notificationDate.read[LocalDate],
+    notificationTime.read[LocalTime]
   ).mapN(NotificationOfDelayModel.apply)
+
+  def apply(submitterIdentification: String,
+            submitterType: SubmitterType,
+            explanationCode: DelayReasonType,
+            complementaryInformation: Option[String],
+            notificationDate: LocalDate,
+            notificationTime: LocalTime): NotificationOfDelayModel =
+    NotificationOfDelayModel(
+      submitterIdentification,
+      submitterType,
+      explanationCode,
+      complementaryInformation,
+      LocalDateTime.of(notificationDate, notificationTime.roundToNearestSecond())
+    )
 }

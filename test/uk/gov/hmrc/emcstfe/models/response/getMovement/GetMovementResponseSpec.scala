@@ -702,7 +702,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-            |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+            |          <urn:TimeOfPreparation>08:59:59.541503</urn:TimeOfPreparation>
             |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
             |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
             |        </ie819:Header>
@@ -755,7 +755,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-            |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
+            |          <urn:TimeOfPreparation>09:59:59.541503</urn:TimeOfPreparation>
             |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
             |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
             |        </ie819:Header>
@@ -795,7 +795,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
-            |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+            |          <urn:TimeOfPreparation>08:59:59.541503</urn:TimeOfPreparation>
             |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
             |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
             |        </ie819:Header>
@@ -875,8 +875,8 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
             |          <head:MessageSender>token</head:MessageSender>
             |          <head:MessageRecipient>token</head:MessageRecipient>
-            |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-            |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+            |          <head:DateOfPreparation>2001-12-17</head:DateOfPreparation>
+            |          <head:TimeOfPreparation>09:30:47</head:TimeOfPreparation>
             |          <head:MessageIdentifier>token</head:MessageIdentifier>
             |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
             |        </body:Header>
@@ -904,7 +904,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
-            |            <urn:TimeOfPreparation>07:11:31.898476</urn:TimeOfPreparation>
+            |            <urn:TimeOfPreparation>08:11:33</urn:TimeOfPreparation>
             |            <urn:MessageIdentifier>GB100000000305526</urn:MessageIdentifier>
             |            <urn:CorrelationIdentifier>PORTALb32df82fde8741b4beb3fb832a9cdb76</urn:CorrelationIdentifier>
             |         </ie837:Header>
@@ -932,7 +932,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
-            |            <urn:TimeOfPreparation>07:18:54.852159</urn:TimeOfPreparation>
+            |            <urn:TimeOfPreparation>08:18:56</urn:TimeOfPreparation>
             |            <urn:MessageIdentifier>GB100000000305527</urn:MessageIdentifier>
             |            <urn:CorrelationIdentifier>PORTAL07498cf951004becbc3c73c14c103b13</urn:CorrelationIdentifier>
             |         </ie837:Header>
@@ -1377,7 +1377,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-            |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+            |          <urn:TimeOfPreparation>08:59:59.541503</urn:TimeOfPreparation>
             |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
             |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
             |        </ie819:Header>
@@ -1430,7 +1430,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |          <urn:DateOfPreparation>2023-12-18</urn:DateOfPreparation>
-            |          <urn:TimeOfPreparation>09:59:59.441503</urn:TimeOfPreparation>
+            |          <urn:TimeOfPreparation>09:59:59.541503</urn:TimeOfPreparation>
             |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
             |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
             |        </ie819:Header>
@@ -1470,7 +1470,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |          <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |          <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |          <urn:DateOfPreparation>2023-12-19</urn:DateOfPreparation>
-            |          <urn:TimeOfPreparation>08:59:59.441503</urn:TimeOfPreparation>
+            |          <urn:TimeOfPreparation>08:59:59.541503</urn:TimeOfPreparation>
             |          <urn:MessageIdentifier>9de3f13e-7559-4f4d-8851-b954b01210c0</urn:MessageIdentifier>
             |          <urn:CorrelationIdentifier>e8803427-c7e5-4539-83b7-d174f511e70c</urn:CorrelationIdentifier>
             |        </ie819:Header>
@@ -1550,8 +1550,8 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |        <body:Header xmlns:head="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE3:TMS:V2.02">
             |          <head:MessageSender>token</head:MessageSender>
             |          <head:MessageRecipient>token</head:MessageRecipient>
-            |          <head:DateOfPreparation>1967-08-13</head:DateOfPreparation>
-            |          <head:TimeOfPreparation>14:20:00</head:TimeOfPreparation>
+            |          <head:DateOfPreparation>2001-12-17</head:DateOfPreparation>
+            |          <head:TimeOfPreparation>09:30:47</head:TimeOfPreparation>
             |          <head:MessageIdentifier>token</head:MessageIdentifier>
             |          <head:CorrelationIdentifier>token</head:CorrelationIdentifier>
             |        </body:Header>
@@ -1579,7 +1579,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
-            |            <urn:TimeOfPreparation>07:11:31.898476</urn:TimeOfPreparation>
+            |            <urn:TimeOfPreparation>08:11:33</urn:TimeOfPreparation>
             |            <urn:MessageIdentifier>GB100000000305526</urn:MessageIdentifier>
             |            <urn:CorrelationIdentifier>PORTALb32df82fde8741b4beb3fb832a9cdb76</urn:CorrelationIdentifier>
             |         </ie837:Header>
@@ -1591,7 +1591,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |                  <ie837:ExplanationCode>6</ie837:ExplanationCode>
             |                  <ie837:ComplementaryInformation language="en">Lorry crashed off cliff</ie837:ComplementaryInformation>
             |                  <ie837:MessageRole>1</ie837:MessageRole>
-            |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:11:33</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
+            |                  <ie837:DateAndTimeOfValidationOfExplanationOnDelay>2024-06-18T08:11:34</ie837:DateAndTimeOfValidationOfExplanationOnDelay>
             |               </ie837:Attributes>
             |               <ie837:ExciseMovement>
             |                  <ie837:AdministrativeReferenceCode>18GB00000000000232361</ie837:AdministrativeReferenceCode>
@@ -1607,7 +1607,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <urn:MessageSender>NDEA.GB</urn:MessageSender>
             |            <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>
             |            <urn:DateOfPreparation>2024-06-18</urn:DateOfPreparation>
-            |            <urn:TimeOfPreparation>07:18:54.852159</urn:TimeOfPreparation>
+            |            <urn:TimeOfPreparation>08:18:56.452159</urn:TimeOfPreparation>
             |            <urn:MessageIdentifier>GB100000000305527</urn:MessageIdentifier>
             |            <urn:CorrelationIdentifier>PORTAL07498cf951004becbc3c73c14c103b13</urn:CorrelationIdentifier>
             |         </ie837:Header>

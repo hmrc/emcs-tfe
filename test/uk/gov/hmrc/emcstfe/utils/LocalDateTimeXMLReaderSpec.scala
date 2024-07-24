@@ -20,7 +20,7 @@ import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader.LocalDateTimeParseFailure
 
-import java.time.LocalDateTime
+import java.time.{LocalDate, LocalDateTime, LocalTime}
 import scala.xml.Elem
 
 class LocalDateTimeXMLReaderSpec extends TestBaseSpec {
@@ -44,6 +44,52 @@ class LocalDateTimeXMLReaderSpec extends TestBaseSpec {
         val xml: Elem = <ldt>2020-06-04T14:56:21BANGFOO</ldt>
 
         LocalDateTimeXMLReader.xmlLocalDateTimeReads.read(xml) shouldBe ParseFailure(LocalDateTimeParseFailure("Text '2020-06-04T14:56:21BANGFOO' could not be parsed, unparsed text found at index 19"))
+      }
+    }
+  }
+
+  "LocalDateXMLReader" must {
+
+    "successfully parse a LD" when {
+
+      "XML response contains a valid LocalDateTime format" in {
+
+        val xml: Elem = <ld>2020-06-04</ld>
+
+        LocalDateTimeXMLReader.xmlLocalDateReads.read(xml) shouldBe ParseSuccess(LocalDate.of(2020, 6, 4))
+      }
+    }
+
+    "fail to parse a LD" when {
+
+      "XML response is NOT a valid LocalDate format" in {
+
+        val xml: Elem = <ld>2020-06-BANGFOO</ld>
+
+        LocalDateTimeXMLReader.xmlLocalDateReads.read(xml) shouldBe ParseFailure(LocalDateTimeParseFailure("Text '2020-06-BANGFOO' could not be parsed at index 8"))
+      }
+    }
+  }
+
+  "LocalTimeXMLReader" must {
+
+    "successfully parse a LT" when {
+
+      "XML response contains a valid LocalTime format" in {
+
+        val xml: Elem = <lt>04:06:22.123456789</lt>
+
+        LocalDateTimeXMLReader.xmlLocalTimeReads.read(xml) shouldBe ParseSuccess(LocalTime.of(4, 6, 22, 123456789))
+      }
+    }
+
+    "fail to parse a LT" when {
+
+      "XML response is NOT a valid LocalTime format" in {
+
+        val xml: Elem = <lt>04:06:BANGFOO</lt>
+
+        LocalDateTimeXMLReader.xmlLocalTimeReads.read(xml) shouldBe ParseFailure(LocalDateTimeParseFailure("Text '04:06:BANGFOO' could not be parsed, unparsed text found at index 5"))
       }
     }
   }

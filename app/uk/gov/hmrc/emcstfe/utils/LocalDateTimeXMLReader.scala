@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.utils
 
 import com.lucidchart.open.xtract.{ParseError, ParseFailure, ParseSuccess, XmlReader}
 
-import java.time.LocalDateTime
+import java.time.{LocalDate, LocalDateTime, LocalTime}
 import scala.util.{Failure, Success, Try}
 import scala.xml.NodeSeq
 
@@ -28,6 +28,18 @@ object LocalDateTimeXMLReader {
 
   implicit val xmlLocalDateTimeReads: XmlReader[LocalDateTime] = (xml: NodeSeq) =>
     Try(LocalDateTime.parse(xml.text)) match {
+      case Success(value) => ParseSuccess(value)
+      case Failure(e)     => ParseFailure(LocalDateTimeParseFailure(e.getMessage))
+    }
+
+  implicit val xmlLocalDateReads: XmlReader[LocalDate] = (xml: NodeSeq) =>
+    Try(LocalDate.parse(xml.text)) match {
+      case Success(value) => ParseSuccess(value)
+      case Failure(e)     => ParseFailure(LocalDateTimeParseFailure(e.getMessage))
+    }
+
+  implicit val xmlLocalTimeReads: XmlReader[LocalTime] = (xml: NodeSeq) =>
+    Try(LocalTime.parse(xml.text)) match {
       case Success(value) => ParseSuccess(value)
       case Failure(e)     => ParseFailure(LocalDateTimeParseFailure(e.getMessage))
     }
