@@ -42,7 +42,7 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec
   with FakeAuthAction
   with EISResponsesFixture {
 
-  class Fixture(authAction: AuthAction, optIsNRSEnabled: Option[Boolean] = Some(true)) {
+  class Fixture(authAction: AuthAction, optIsNRSEnabled: Option[Boolean]) {
     optIsNRSEnabled.foreach { isNRSEnabled =>
       MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
 

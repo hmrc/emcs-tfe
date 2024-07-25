@@ -21,8 +21,6 @@ import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.models.FeatureSwitch
 
-import scala.concurrent.duration.Duration
-
 trait MockAppConfig extends MockFactory {
   lazy val mockAppConfig: AppConfig = mock[AppConfig]
 
