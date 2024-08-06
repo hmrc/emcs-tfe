@@ -134,6 +134,7 @@ class ChrisXMLHttpParserSpec extends TestBaseSpec with MockXmlUtils with GetMove
             result match {
               case Left(XmlParseError(errors)) => errors.nonEmpty shouldBe true
               case Right(_) => fail("Result was of type 'Right' when expecting 'Left'")
+              case Left(_) => fail("Result was not a Left[XmlParseError] response")
             }
           }
         }

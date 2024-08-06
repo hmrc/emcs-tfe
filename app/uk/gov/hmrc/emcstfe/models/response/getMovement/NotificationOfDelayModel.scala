@@ -24,7 +24,6 @@ import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType
 import uk.gov.hmrc.emcstfe.utils.DateUtils
 import uk.gov.hmrc.emcstfe.utils.LocalDateTimeXMLReader._
 
-import java.time.temporal.ChronoUnit
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 case class NotificationOfDelayModel(submitterIdentification: String,

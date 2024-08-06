@@ -21,7 +21,6 @@ import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS, ValidateUsingFS41Schema}
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeDestinationRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
@@ -55,7 +54,7 @@ class SubmitChangeDestinationController @Inject()(cc: ControllerComponents,
     }
   }
 
-  private def handleSubmission(requestModel: SubmitChangeDestinationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext, req: UserRequest[_]): Future[Result] = {
+  private def handleSubmission(requestModel: SubmitChangeDestinationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     if (isEnabled(SendToEIS)) {
       submitChangeDestinationService.submitViaEIS(requestModel).flatMap(result => handleResponse(result))
     } else {

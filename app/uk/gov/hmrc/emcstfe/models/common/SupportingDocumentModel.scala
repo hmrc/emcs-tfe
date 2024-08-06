@@ -19,10 +19,6 @@ package uk.gov.hmrc.emcstfe.models.common
 import cats.implicits.catsSyntaxTuple3Semigroupal
 import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.utils.XmlWriterUtils
-
-import scala.xml.Elem
 
 case class SupportingDocumentModel(
     supportingDocumentDescription: Option[String],
