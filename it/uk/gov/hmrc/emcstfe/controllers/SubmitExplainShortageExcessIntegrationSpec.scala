@@ -16,17 +16,15 @@
 
 package uk.gov.hmrc.emcstfe.controllers
 
-import com.github.tomakehurst.wiremock.client.WireMock.{putRequestedFor, urlEqualTo, verify}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
-import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitExplainShortageExcessFixtures}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
-import uk.gov.hmrc.emcstfe.models.nrs.explainShortageExcess.ExplainShortageExcessNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
@@ -37,7 +35,7 @@ import scala.xml.XML
 class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec
   with SubmitExplainShortageExcessFixtures
   with FeatureSwitching
-  with NRSBrokerFixtures {
+  {
 
   import SubmitExplainShortageExcessFixtures._
 
@@ -52,8 +50,6 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec
 
     def downstreamEisUri: String = s"/emcs/digital-submit-new-message/v1"
 
-    def downstreamNRSBrokerUri: String = s"/emcs-tfe-nrs-message-broker/trader/$testErn/nrs/submission"
-
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri, "Content-Type" -> "application/json")
@@ -62,7 +58,6 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec
 
   override def beforeEach(): Unit = {
     disable(SendToEIS)
-    sys.props -= EnableNRS.configName
     super.beforeEach()
   }
 
@@ -172,39 +167,6 @@ class SubmitExplainShortageExcessIntegrationSpec extends IntegrationBaseSpec
           response.header("Content-Type") shouldBe Some("application/json")
           response.json shouldBe Json.toJson(EISInternalServerError("bad things"))
         }
-      }
-    }
-
-    "when submitting payloads to NRS (downstream submission agnostic)" must {
-
-      "return a success" in new Test {
-
-        /*
-          This uses JsonUnit (a Wiremock-provided library) to ignore some unmatchable body elements.
-          In this case userSubmissionTimestamp is naturally impossible to match accurately.
-          Header data is made up as part of the request processing, so the tests can't accurately replicate this.
-          If userSubmissionTimestamp or headerData was missing in the actual payload then the test would fail.
-         */
-        val nrsRequestBody: JsObject = {
-          Json.toJson(createNRSPayload(ExplainShortageExcessNRSSubmission(submitExplainShortageExcessModelMax(Consignor), testErn)))
-            .as[JsObject]
-            .deepMerge(Json.obj("metadata" -> Json.obj("userSubmissionTimestamp" -> f"$${json-unit.any-string}", "headerData" -> f"$${json-unit.ignore}")))
-        }
-
-        override def setupStubs(): StubMapping = {
-          enable(SendToEIS)
-          enable(EnableNRS)
-          AuthStub.authorised(withIdentityData = true)
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
-          DownstreamStub.onSuccessWithRequestBodyAndHeaders(DownstreamStub.PUT, downstreamNRSBrokerUri, status = Status.ACCEPTED, requestBody = Some(Json.stringify(nrsRequestBody)), responseBody = nrsBrokerResponseJson, headers = Map("Authorization" -> testAuthToken))
-        }
-
-        val response: WSResponse = await(request().post(submitExplainShortageExcessJsonMax(Consignor)))
-        response.status shouldBe Status.OK
-        response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe eisSuccessJson()
-        verify(1, putRequestedFor(urlEqualTo(s"/emcs-tfe-nrs-message-broker/trader/$testErn/nrs/submission")))
-        wireMockServer.findAllUnmatchedRequests.size() shouldBe 0
       }
     }
   }

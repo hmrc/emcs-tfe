@@ -20,7 +20,6 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.{Consignee, Consignor}
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ConsignorTrader, ExciseMovementModel, SubmitterType}
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.{AnalysisModel, AttributesModel, BodyAnalysisModel, SubmitExplainShortageExcessModel}
-import uk.gov.hmrc.emcstfe.models.nrs.explainShortageExcess.ExplainShortageExcessNRSSubmission
 
 import scala.xml.Elem
 
@@ -178,21 +177,6 @@ trait SubmitExplainShortageExcessFixtures extends ChRISResponsesFixture with Tra
     def submitExplainShortageExcessJsonMin(submitterType: SubmitterType): JsObject = Json.obj(
       "attributes" -> attributesJson(submitterType),
       "exciseMovement" -> exciseMovementJson
-    )
-  }
-
-  def explainShortageExcessNRSSubmission(submitterType: SubmitterType, ern: String): ExplainShortageExcessNRSSubmission = {
-    val submissionModel = SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax(submitterType)
-    ExplainShortageExcessNRSSubmission(
-      ern = ern,
-      arc = submissionModel.exciseMovement.arc,
-      sequenceNumber = submissionModel.exciseMovement.sequenceNumber,
-      submitterType = submitterType,
-      consigneeTrader = submissionModel.consigneeTrader,
-      consignorTrader = submissionModel.consignorTrader,
-      individualItems = submissionModel.bodyAnalysis,
-      dateOfAnalysis = submissionModel.analysis.map(_.dateOfAnalysis),
-      globalExplanation = submissionModel.analysis.map(_.globalExplanation)
     )
   }
 }

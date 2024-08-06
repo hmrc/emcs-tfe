@@ -17,16 +17,15 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 
-import play.api.Play.materializer
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, SendToEIS}
-import uk.gov.hmrc.emcstfe.fixtures.{NRSBrokerFixtures, SubmitAlertOrRejectionFixtures}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
+import uk.gov.hmrc.emcstfe.fixtures.{BaseFixtures, SubmitAlertOrRejectionFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.services.{MockNRSBrokerService, MockSubmitAlertOrRejectionService}
+import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitAlertOrRejectionService
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -37,87 +36,73 @@ class SubmitAlertOrRejectionControllerSpec extends TestBaseSpec
   with SubmitAlertOrRejectionFixtures
   with FakeAuthAction
   with MockAppConfig
-  with MockNRSBrokerService
-  with NRSBrokerFixtures {
+  with BaseFixtures {
 
-  class Fixture(authAction: AuthAction, optIsNRSEnabled: Option[Boolean] = Some(true)) {
-
-    optIsNRSEnabled.foreach { isNRSEnabled =>
-      MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
-
-      if (isNRSEnabled) {
-        MockNRSBrokerService.submitPayload(alertRejectNRSSubmission, testErn).returns(Future.successful(Right(nrsBrokerResponseModel)))
-      }
-    }
-
+  class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/alert-or-rejection").withBody(Json.toJson(maxSubmitAlertOrRejectionModel))
-    val controller = new SubmitAlertOrRejectionController(Helpers.stubControllerComponents(), mockService, mockNRSBrokerService, authAction, mockAppConfig)
+    val controller = new SubmitAlertOrRejectionController(Helpers.stubControllerComponents(), mockService, authAction, mockAppConfig)
   }
 
   s"POST ${routes.SubmitAlertOrRejectionController.submit(testErn, testArc)}" when {
 
-    Seq(true, false).foreach { nrsEnabled =>
-      s"when calling NRS is $nrsEnabled" when {
+    "calling ChRIS" when {
+      "user is authorised" must {
+        s"return ${Status.OK} (OK)" when {
+          "the ChRIS service returns a Right" in new Fixture(FakeSuccessAuthAction) {
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+            MockService.submit(maxSubmitAlertOrRejectionModel).returns(Future.successful(Right(chrisSuccessResponse)))
 
-        "calling ChRIS" when {
-          "user is authorised" must {
-            s"return ${Status.OK} (OK)" when {
-              "the ChRIS service returns a Right" in new Fixture(FakeSuccessAuthAction, optIsNRSEnabled = Some(nrsEnabled)) {
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
-                MockService.submit(maxSubmitAlertOrRejectionModel).returns(Future.successful(Right(chrisSuccessResponse)))
+            val result = controller.submit(testErn, testArc)(fakeRequest)
 
-                val result = controller.submit(testErn, testArc)(fakeRequest)
-
-                status(result) shouldBe Status.OK
-                contentAsJson(result) shouldBe chrisSuccessJson()
-              }
-            }
-
-            s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-              "the ChRIS service returns a Left" in new Fixture(FakeSuccessAuthAction, optIsNRSEnabled = Some(nrsEnabled)) {
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
-                MockService.submit(maxSubmitAlertOrRejectionModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
-
-                val result = controller.submit(testErn, testArc)(fakeRequest)
-
-                status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-                contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
-              }
-            }
+            status(result) shouldBe Status.OK
+            contentAsJson(result) shouldBe chrisSuccessJson()
           }
         }
-        "calling EIS" when {
-          "user is authorised" must {
-            s"return ${Status.OK} (OK)" when {
-              "the EIS service returns a Right" in new Fixture(FakeSuccessAuthAction, optIsNRSEnabled = Some(nrsEnabled)) {
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
-                MockService.submitViaEIS(maxSubmitAlertOrRejectionModel).returns(Future.successful(Right(eisSuccessResponse)))
 
-                val result = controller.submit(testErn, testArc)(fakeRequest)
+        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+          "the ChRIS service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+            MockService.submit(maxSubmitAlertOrRejectionModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-                status(result) shouldBe Status.OK
-                contentAsJson(result) shouldBe eisSuccessJson()
-              }
-            }
+            val result = controller.submit(testErn, testArc)(fakeRequest)
 
-            s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-              "the EIS service returns a Left" in new Fixture(FakeSuccessAuthAction, optIsNRSEnabled = Some(nrsEnabled)) {
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
-                MockService.submitViaEIS(maxSubmitAlertOrRejectionModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
+          }
+        }
+      }
+    }
+    "calling EIS" when {
+      "user is authorised" must {
+        s"return ${Status.OK} (OK)" when {
+          "the EIS service returns a Right" in new Fixture(FakeSuccessAuthAction) {
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+            MockService.submitViaEIS(maxSubmitAlertOrRejectionModel).returns(Future.successful(Right(eisSuccessResponse)))
 
-                val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testArc)(fakeRequest)
 
-                status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-                contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
-              }
-            }
+            status(result) shouldBe Status.OK
+            contentAsJson(result) shouldBe eisSuccessJson()
+          }
+        }
+
+        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+          "the EIS service returns a Left" in new Fixture(FakeSuccessAuthAction) {
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+            MockService.submitViaEIS(maxSubmitAlertOrRejectionModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+
+            val result = controller.submit(testErn, testArc)(fakeRequest)
+
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
           }
         }
       }
     }
 
+
     "user is NOT authorised" must {
-      s"return ${Status.FORBIDDEN} (FORBIDDEN)" in new Fixture(FakeFailedAuthAction, optIsNRSEnabled = None) {
+      s"return ${Status.FORBIDDEN} (FORBIDDEN)" in new Fixture(FakeFailedAuthAction) {
 
         val result = controller.submit(testErn, testArc)(fakeRequest)
 

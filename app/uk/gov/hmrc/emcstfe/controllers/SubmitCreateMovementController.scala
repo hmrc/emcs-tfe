@@ -24,12 +24,10 @@ import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config._
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
-import uk.gov.hmrc.emcstfe.models.nrs.createMovement.CreateMovementNRSSubmission
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
 import uk.gov.hmrc.emcstfe.services.SubmitCreateMovementService
-import uk.gov.hmrc.emcstfe.services.nrs.NRSBrokerService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -40,18 +38,13 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton()
 class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
                                                service: SubmitCreateMovementService,
-                                               nrsBrokerService: NRSBrokerService,
                                                val config: AppConfig,
                                                override val auth: AuthAction
                                               )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging with FeatureSwitching {
 
   def submit(ern: String, draftId: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitCreateMovementModel] { submission =>
-      if (isEnabled(EnableNRS)) {
-        nrsBrokerService.submitPayload(CreateMovementNRSSubmission(ern, submission), ern).flatMap(_ => handleSubmission(ern, draftId, submission))
-      } else {
-        handleSubmission(ern, draftId, submission)
-      }
+      handleSubmission(ern, draftId, submission)
     }
   }
 

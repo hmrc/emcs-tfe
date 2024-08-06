@@ -17,9 +17,9 @@
 package uk.gov.hmrc.emcstfe.utils
 
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.emcstfe.fixtures.NRSBrokerFixtures
+import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
 
-class SHA256HashingSpec extends PlaySpec with NRSBrokerFixtures {
+class SHA256HashingSpec extends PlaySpec with BaseFixtures {
 
   ".getHash" should {
 

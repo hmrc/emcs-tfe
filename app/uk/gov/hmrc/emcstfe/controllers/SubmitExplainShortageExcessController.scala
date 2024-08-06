@@ -20,13 +20,11 @@ import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
-import uk.gov.hmrc.emcstfe.models.nrs.explainShortageExcess.ExplainShortageExcessNRSSubmission
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.SubmitExplainShortageExcessService
-import uk.gov.hmrc.emcstfe.services.nrs.NRSBrokerService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -37,7 +35,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton()
 class SubmitExplainShortageExcessController @Inject()(cc: ControllerComponents,
                                                       service: SubmitExplainShortageExcessService,
-                                                      nrsBrokerService: NRSBrokerService,
                                                       override val auth: AuthAction,
                                                       val config: AppConfig
                                                      )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging with FeatureSwitching {
@@ -45,12 +42,7 @@ class SubmitExplainShortageExcessController @Inject()(cc: ControllerComponents,
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) {
     implicit request =>
       withJsonBody[SubmitExplainShortageExcessModel] {
-        submission =>
-          if(isEnabled(EnableNRS)) {
-            nrsBrokerService.submitPayload(ExplainShortageExcessNRSSubmission(submission, ern), ern).flatMap(_ => handleSubmission(submission))
-          } else {
-            handleSubmission(submission)
-          }
+        submission => handleSubmission(submission)
       }
   }
 
