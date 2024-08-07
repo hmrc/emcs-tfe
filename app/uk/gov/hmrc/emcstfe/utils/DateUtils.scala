@@ -17,10 +17,7 @@
 package uk.gov.hmrc.emcstfe.utils
 
 import java.time._
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Locale
-import scala.util.{Failure, Success, Try}
 
 trait DateUtils {
 

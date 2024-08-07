@@ -22,51 +22,30 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableNRS, SendToEIS, ValidateUsingFS41Schema}
-import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, NRSBrokerFixtures, SubmitChangeDestinationFixtures}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{SendToEIS, ValidateUsingFS41Schema}
+import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.services.{MockGetMovementService, MockNRSBrokerService, MockSubmitChangeDestinationService}
-import uk.gov.hmrc.emcstfe.models.nrs.changeDestination.ChangeDestinationNRSSubmission
+import uk.gov.hmrc.emcstfe.mocks.services.{MockGetMovementService, MockSubmitChangeDestinationService}
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeDestinationRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISBusinessError, EISRIMValidationError, EISServiceUnavailableError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitChangeDestinationControllerSpec
-    extends TestBaseSpec
-    with MockSubmitChangeDestinationService
-    with SubmitChangeDestinationFixtures
-    with MockGetMovementService
-    with GetMovementFixture
-    with MockNRSBrokerService
-    with NRSBrokerFixtures
-    with MockAppConfig
-    with FakeAuthAction {
+class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmitChangeDestinationService with SubmitChangeDestinationFixtures with MockGetMovementService with GetMovementFixture with MockAppConfig with FakeAuthAction {
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
-  class Fixture(authAction: AuthAction, optIsNRSEnabled: Option[Boolean]) {
-
-    optIsNRSEnabled.foreach { isNRSEnabled =>
-      MockedAppConfig.getFeatureSwitchValue(EnableNRS).returns(isNRSEnabled)
-
-      if (isNRSEnabled) {
-        MockNRSBrokerService
-          .submitPayload(ChangeDestinationNRSSubmission(testErn, SubmitChangeDestinationFixtures.submitChangeDestinationModelMax), testErn)
-          .returns(Future.successful(Right(nrsBrokerResponseModel)))
-      }
-    }
-
+  class Fixture(authAction: AuthAction) {
     val fakeRequest: FakeRequest[JsValue]             = FakeRequest("POST", "/change-destination").withBody(Json.toJson(submitChangeDestinationModelMax))
-    val controller: SubmitChangeDestinationController = new SubmitChangeDestinationController(Helpers.stubControllerComponents(), mockSubmitChangeDestinationService, mockGetMovementService, mockNRSBrokerService, mockAppConfig, authAction)
+    val controller: SubmitChangeDestinationController = new SubmitChangeDestinationController(Helpers.stubControllerComponents(), mockSubmitChangeDestinationService, mockGetMovementService, mockAppConfig, authAction)
     val requestModel: SubmitChangeDestinationRequest  = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = true)
   }
 
   s"POST ${routes.SubmitChangeDestinationController.submit(testErn, testArc)}" when {
 
     "user is NOT authorised" must {
-      s"return ${Status.FORBIDDEN} (FORBIDDEN)" in new Fixture(FakeFailedAuthAction, None) {
+      s"return ${Status.FORBIDDEN} (FORBIDDEN)" in new Fixture(FakeFailedAuthAction) {
 
         val result = controller.submit(testErn, testArc)(fakeRequest)
 
@@ -77,7 +56,7 @@ class SubmitChangeDestinationControllerSpec
     "user is authorised" must {
 
       "return a 500 (InternalServerError)" when {
-        "unable to fetch the movement" in new Fixture(FakeSuccessAuthAction, None) {
+        "unable to fetch the movement" in new Fixture(FakeSuccessAuthAction) {
 
           MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
@@ -88,135 +67,131 @@ class SubmitChangeDestinationControllerSpec
         }
       }
 
-      Seq(true, false).foreach { nrsEnabled =>
-        s"NRS Enabled is '$nrsEnabled'" when {
-          "when calling ChRIS" should {
+      "when calling ChRIS" should {
 
-            s"return ${Status.OK} (OK)" when {
-              "service returns a Right" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
+        s"return ${Status.OK} (OK)" when {
+          "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
-                MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
+            MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 
-                MockSubmitChangeDestinationService.submit(requestModel).returns(Future.successful(Right(chrisSuccessResponse)))
+            MockSubmitChangeDestinationService.submit(requestModel).returns(Future.successful(Right(chrisSuccessResponse)))
 
-                val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testArc)(fakeRequest)
 
-                status(result) shouldBe Status.OK
-                contentAsJson(result) shouldBe chrisSuccessJson()
-              }
-            }
+            status(result) shouldBe Status.OK
+            contentAsJson(result) shouldBe chrisSuccessJson()
+          }
+        }
 
-            s"return ${Status.UNPROCESSABLE_ENTITY} (UNPROCESSABLE_ENTITY)" when {
-              "service returns a Left(EISRIMValidationError) - when it is a RIM Validation error" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
+        s"return ${Status.UNPROCESSABLE_ENTITY} (UNPROCESSABLE_ENTITY)" when {
+          "service returns a Left(EISRIMValidationError) - when it is a RIM Validation error" in new Fixture(FakeSuccessAuthAction) {
 
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
-                MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
+            MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 
-                MockSubmitChangeDestinationService.submit(requestModel).returns(Future.successful(Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse))))
+            MockSubmitChangeDestinationService.submit(requestModel).returns(Future.successful(Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse))))
 
-                val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testArc)(fakeRequest)
 
-                status(result) shouldBe Status.UNPROCESSABLE_ENTITY
-                contentAsJson(result) shouldBe Json.obj("message" -> ChRISRIMValidationError(chrisRIMValidationErrorResponse).message)
-              }
-            }
+            status(result) shouldBe Status.UNPROCESSABLE_ENTITY
+            contentAsJson(result) shouldBe Json.obj("message" -> ChRISRIMValidationError(chrisRIMValidationErrorResponse).message)
+          }
+        }
 
-            s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-              "service returns a Left" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
+        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+          "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
 
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
 
-                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
-                MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
+            MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 
-                MockSubmitChangeDestinationService.submit(requestModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+            MockSubmitChangeDestinationService.submit(requestModel).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-                val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testArc)(fakeRequest)
 
-                status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-                contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
-              }
-            }
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
+          }
+        }
+      }
+
+      "when calling EIS" should {
+        s"return ${Status.OK} (OK)" when {
+          "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
+
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+            MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
+
+            MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Right(eisSuccessResponse)))
+
+            val result = controller.submit(testErn, testArc)(fakeRequest)
+
+            status(result) shouldBe Status.OK
+            contentAsJson(result) shouldBe eisSuccessJson()
+          }
+        }
+
+        s"return ${Status.UNPROCESSABLE_ENTITY} (UNPROCESSABLE_ENTITY)" when {
+          "service returns a Left(EISRIMValidationError) - when it is a RIM Validation error" in new Fixture(FakeSuccessAuthAction) {
+
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+
+            MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
+
+            MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Left(EISRIMValidationError(eisRimValidationResponse))))
+
+            val result = controller.submit(testErn, testArc)(fakeRequest)
+
+            status(result) shouldBe Status.UNPROCESSABLE_ENTITY
+            contentAsJson(result) shouldBe Json.obj("message" -> EISRIMValidationError(eisRimValidationResponse).message)
           }
 
-          "when calling EIS" should {
-            s"return ${Status.OK} (OK)" when {
-              "service returns a Right" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
+          "service returns a Left(EISBusinessError) - when it is not a RIM Validation error" in new Fixture(FakeSuccessAuthAction) {
 
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
-                MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
+            MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 
-                MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Right(eisSuccessResponse)))
+            MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Left(EISBusinessError("foobar"))))
 
-                val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testArc)(fakeRequest)
 
-                status(result) shouldBe Status.OK
-                contentAsJson(result) shouldBe eisSuccessJson()
-              }
-            }
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            contentAsJson(result) shouldBe Json.obj("message" -> EISBusinessError("foobar").message)
+          }
+        }
 
-            s"return ${Status.UNPROCESSABLE_ENTITY} (UNPROCESSABLE_ENTITY)" when {
-              "service returns a Left(EISRIMValidationError) - when it is a RIM Validation error" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
+        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+          "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
 
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
-                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
+            MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
-                MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
+            MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 
-                MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Left(EISRIMValidationError(eisRimValidationResponse))))
+            MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
 
-                val result = controller.submit(testErn, testArc)(fakeRequest)
+            val result = controller.submit(testErn, testArc)(fakeRequest)
 
-                status(result) shouldBe Status.UNPROCESSABLE_ENTITY
-                contentAsJson(result) shouldBe Json.obj("message" -> EISRIMValidationError(eisRimValidationResponse).message)
-              }
-
-              "service returns a Left(EISBusinessError) - when it is not a RIM Validation error" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
-
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
-
-                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
-
-                MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
-
-                MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Left(EISBusinessError("foobar"))))
-
-                val result = controller.submit(testErn, testArc)(fakeRequest)
-
-                status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-                contentAsJson(result) shouldBe Json.obj("message" -> EISBusinessError("foobar").message)
-              }
-            }
-
-            s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-              "service returns a Left" in new Fixture(FakeSuccessAuthAction, Some(nrsEnabled)) {
-
-                MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
-
-                MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
-
-                MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
-
-                MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
-
-                val result = controller.submit(testErn, testArc)(fakeRequest)
-
-                status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-                contentAsJson(result) shouldBe Json.obj("message" -> EISServiceUnavailableError("SERVICE_UNAVAILABLE").message)
-              }
-            }
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            contentAsJson(result) shouldBe Json.obj("message" -> EISServiceUnavailableError("SERVICE_UNAVAILABLE").message)
           }
         }
       }

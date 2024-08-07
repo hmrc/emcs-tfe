@@ -20,7 +20,6 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.AlertOrRejectionReasonType._
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.{AlertOrRejectionReasonModel, SubmitAlertOrRejectionModel}
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, ExciseMovementModel}
-import uk.gov.hmrc.emcstfe.models.nrs.alertReject.AlertRejectNRSSubmission
 
 import java.time.LocalDate
 
@@ -148,16 +147,4 @@ trait SubmitAlertOrRejectionFixtures extends BaseFixtures with TraderModelFixtur
         </urn:EadEsadRejectedFlag>
       </urn:AlertOrRejection>
     </urn:AlertOrRejectionOfEADESAD>
-
-  val alertRejectNRSSubmission: AlertRejectNRSSubmission = AlertRejectNRSSubmission(
-    arc = maxSubmitAlertOrRejectionModel.exciseMovement.arc,
-    sequenceNumber = maxSubmitAlertOrRejectionModel.exciseMovement.sequenceNumber,
-    consigneeTrader = maxSubmitAlertOrRejectionModel.consigneeTrader,
-    exciseMovement = maxSubmitAlertOrRejectionModel.exciseMovement,
-    destinationOffice = maxSubmitAlertOrRejectionModel.destinationOffice,
-    dateOfAlertOrRejection = maxSubmitAlertOrRejectionModel.dateOfAlertOrRejection,
-    isRejected = maxSubmitAlertOrRejectionModel.isRejected,
-    alertOrRejectionReasons = maxSubmitAlertOrRejectionModel.alertOrRejectionReasons
-  )
-
-}
+  }

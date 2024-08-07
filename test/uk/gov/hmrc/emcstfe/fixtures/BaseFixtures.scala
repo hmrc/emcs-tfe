@@ -59,4 +59,9 @@ trait BaseFixtures {
     {records}
   </con:Result>
 
+  val testPlainTextPayload: String =
+    """{
+      |    "testing": "emcs-tfe",
+      |    "version": "1"
+      |}""".stripMargin
 }

@@ -111,9 +111,5 @@ object ErrorResponse {
     val message = s"no action found in the request"
   }
 
-  case class NRSBrokerJsonParsingError(errors: Seq[JsonValidationError]) extends ErrorResponse {
-    val message = s"Errors parsing JSON, errors: $errors"
-  }
-
   case class IdentityDataException(message: String) extends ErrorResponse
 }
