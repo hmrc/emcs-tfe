@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.services.userAllowList
 
 import play.api.test.FakeRequest
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnablePrivateBeta, EnablePublicBeta}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnablePrivateBeta, EnablePublicBetaThrottling}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockUserAllowListConnector
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
@@ -49,7 +49,7 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         MockUserAllowListConnector.check("service", requestModel).returns(Future.successful(Right(true)))
         MockedAppConfig.publicBetaTrafficPercentageForService("service").returns(Some(1))
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
-        MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
+        MockedAppConfig.isEnabled(EnablePublicBetaThrottling.configName).returns(true)
 
         val ern = "GBWK846834276" //12%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
@@ -60,7 +60,7 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         MockUserAllowListConnector.check("service", requestModel).returns(Future.successful(Right(false)))
         MockedAppConfig.publicBetaTrafficPercentageForService("service").returns(Some(12))
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
-        MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
+        MockedAppConfig.isEnabled(EnablePublicBetaThrottling.configName).returns(true)
 
         val ern = "GBRC1234561089" //12%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
@@ -74,7 +74,7 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         MockedAppConfig.publicBetaTrafficPercentageForService("service").returns(Some(1))
         MockUserAllowListConnector.check("service", requestModel).returns(Future.successful(Right(false)))
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
-        MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(true)
+        MockedAppConfig.isEnabled(EnablePublicBetaThrottling.configName).returns(true)
         val ern = "GBWK846834276" //12%
         implicit lazy val userRequest: UserRequest[_] = UserRequest(FakeRequest(), ern, testInternalId, testCredId, Set(ern))
         await(service.isEligible(testErn, "service")) shouldBe Right(false)
@@ -86,10 +86,10 @@ class UserAllowListServiceSpec extends TestBaseSpec with MockAppConfig {
         await(service.isEligible(testErn, "service")) shouldBe Right(false)
       }
 
-      "neither private beta or public are enabled" in new Test {
+      "neither private beta or public are enabled (return true, global access)" in new Test {
         MockedAppConfig.isEnabled(EnablePrivateBeta.configName).returns(false)
-        MockedAppConfig.isEnabled(EnablePublicBeta.configName).returns(false)
-        await(service.isEligible(testErn, "service")) shouldBe Right(false)
+        MockedAppConfig.isEnabled(EnablePublicBetaThrottling.configName).returns(false)
+        await(service.isEligible(testErn, "service")) shouldBe Right(true)
       }
     }
 

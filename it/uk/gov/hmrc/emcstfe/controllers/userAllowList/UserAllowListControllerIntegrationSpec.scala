@@ -21,7 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnablePrivateBeta, EnablePublicBeta, FeatureSwitching}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnablePrivateBeta, EnablePublicBetaThrottling, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
@@ -39,7 +39,7 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
 
     def request(): WSRequest = {
       if(isPrivateBetaEnabled) enable(EnablePrivateBeta) else disable(EnablePrivateBeta)
-      if(isPublicBetaEnabled) enable(EnablePublicBeta) else disable(EnablePublicBeta)
+      if(isPublicBetaEnabled) enable(EnablePublicBetaThrottling) else disable(EnablePublicBetaThrottling)
       setupStubs()
       buildRequest(uri, "Content-Type" -> "application/json")
     }
@@ -48,7 +48,7 @@ class UserAllowListControllerIntegrationSpec extends IntegrationBaseSpec with Fe
   override protected def afterAll(): Unit = {
     super.afterAll()
     sys.props -= EnablePrivateBeta.configName
-    sys.props -= EnablePublicBeta.configName
+    sys.props -= EnablePublicBetaThrottling.configName
   }
 
   "Calling the eligibility endpoint (private beta enabled)" should {
