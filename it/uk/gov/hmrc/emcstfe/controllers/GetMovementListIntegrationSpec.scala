@@ -81,6 +81,7 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
         "return a success" when {
           "all downstream calls are successful" in new Test {
             override def setupStubs(): StubMapping = {
+              disable(SendToEIS)
               AuthStub.authorised()
               DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(getMovementListSoapWrapper))
             }
@@ -95,6 +96,7 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
           "downstream call returns unexpected XML" in new Test {
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
+              disable(SendToEIS)
               DownstreamStub.onSuccess(
                 DownstreamStub.POST,
                 downstreamUri,
@@ -115,6 +117,7 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
 
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
+              disable(SendToEIS)
               DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, referenceDataResponseBody)
             }
 
@@ -134,6 +137,7 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
 
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
+              disable(SendToEIS)
               DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
             }
 
