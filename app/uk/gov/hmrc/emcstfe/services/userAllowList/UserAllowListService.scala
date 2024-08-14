@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.services.userAllowList
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.UserAllowListConnector
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnablePrivateBeta, EnablePublicBeta, FeatureSwitching}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnablePrivateBeta, EnablePublicBetaThrottling, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request.userAllowList.CheckUserAllowListRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
@@ -32,7 +32,7 @@ class UserAllowListService @Inject()(connector: UserAllowListConnector,
 
   def isEligible(ern: String, service: String)(implicit hc: HeaderCarrier, request: UserRequest[_]): Future[Either[ErrorResponse, Boolean]] = {
     lazy val isPrivateBetaEnabled = isEnabled(EnablePrivateBeta)
-    lazy val isPublicBetaEnabled = isEnabled(EnablePublicBeta)
+    lazy val isPublicBetaEnabled = isEnabled(EnablePublicBetaThrottling)
     val userAllowListRequestModel = CheckUserAllowListRequest(ern)
     if(isPrivateBetaEnabled) {
       connector.check(service, userAllowListRequestModel)
@@ -47,7 +47,8 @@ class UserAllowListService @Inject()(connector: UserAllowListConnector,
         )
       }
     } else {
-      Future(Right(false))
+      //neither public throttling nor private beta is enabled, so full access is allowed
+      Future(Right(true))
     }
   }
 
