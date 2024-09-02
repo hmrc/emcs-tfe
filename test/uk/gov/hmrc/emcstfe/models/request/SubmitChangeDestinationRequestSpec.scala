@@ -33,7 +33,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
   import SubmitChangeDestinationFixtures._
   import UpdateEadEsadFixtures._
 
-  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = false)
+  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse())
 
   "for the MessageSender and MessageRecipient headers" when {
 
@@ -47,7 +47,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
     "generating MessageSender" should {
       "use the country code from the ARC" in {
-        val request = SubmitChangeDestinationRequest(model, getMovementResponse(), useFS41SchemaVersion = false)
+        val request = SubmitChangeDestinationRequest(model, getMovementResponse())
         request.messageSender shouldBe "NDEA.DE"
       }
     }
@@ -56,7 +56,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
       "destination type is TaxWarehouse" should {
 
         "use the deliveryPlaceTrader taderId first for the Country code" in {
-          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), getMovementResponse(), useFS41SchemaVersion = false)
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), getMovementResponse())
           request.messageRecipient shouldBe "NDEA.GB"
         }
 
@@ -66,8 +66,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
               destinationTypeCode = TaxWarehouse,
               deliveryPlaceTrader = None
             )),
-            getMovementResponse(),
-            useFS41SchemaVersion = false
+            getMovementResponse()
           )
           request.messageRecipient shouldBe "NDEA.FR"
         }
@@ -79,8 +78,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
               deliveryPlaceTrader = None,
               newConsigneeTrader = None
             )),
-            getMovementResponse(),
-            useFS41SchemaVersion = false
+            getMovementResponse()
           )
           request.messageRecipient shouldBe "NDEA.GB"
         }
@@ -92,8 +90,7 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
               deliveryPlaceTrader = None,
               newConsigneeTrader = Some(minTraderModel)
             )),
-            getMovementResponse(),
-            useFS41SchemaVersion = false
+            getMovementResponse()
           )
           request.messageRecipient shouldBe "NDEA.GB"
         }
@@ -101,27 +98,27 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
       "destination type is Export" should {
         "use the deliveryPlaceCustomsOffice referenceNumber for the Country Code when it exists" in {
-          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export)), getMovementResponse(), useFS41SchemaVersion = false)
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export)), getMovementResponse())
           request.messageRecipient shouldBe "NDEA.IT"
         }
 
         "use GB as default when deliveryPlaceCustomsOffice does NOT exist" in {
 
-          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)), getMovementResponse(), useFS41SchemaVersion = false)
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)), getMovementResponse())
           request.messageRecipient shouldBe "NDEA.GB"
         }
       }
 
       "destination type is ReturnToThePlaceOfDispatchOfTheConsignor" should {
         "use the country code from the ARC" in {
-          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), getMovementResponse(), useFS41SchemaVersion = false)
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), getMovementResponse())
           request.messageRecipient shouldBe "NDEA.DE"
         }
       }
 
       "destination type is anything else" should {
         "use GB" in {
-          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = UnknownDestination)), getMovementResponse(), useFS41SchemaVersion = false)
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = UnknownDestination)), getMovementResponse())
           request.messageRecipient shouldBe "NDEA.GB"
         }
       }
@@ -136,82 +133,41 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
   ".eisXMLBody" when {
 
-    "useFS41SchemaVersion is enabled" should {
+    implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse())
 
-      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = true)
+    "generate the correct XML body" in {
+      val expectedRequest = wrapInControlDoc(
+        <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.13">
+          <urn:Header>
+            <urn1:MessageSender>
+              {request.messageSender}
+            </urn1:MessageSender>
+            <urn1:MessageRecipient>
+              {request.messageRecipient}
+            </urn1:MessageRecipient>
+            <urn1:DateOfPreparation>
+              {request.preparedDate.toString}
+            </urn1:DateOfPreparation>
+            <urn1:TimeOfPreparation>
+              {request.preparedTime.toString}
+            </urn1:TimeOfPreparation>
+            <urn1:MessageIdentifier>
+              {request.messageUUID}
+            </urn1:MessageIdentifier>
+            <urn1:CorrelationIdentifier>
+              {request.correlationUUID}
+            </urn1:CorrelationIdentifier>
+          </urn:Header>
+          <urn:Body>
+            {submitChangeDestinationXmlMax}
+          </urn:Body>
+        </urn:IE813>
+      )
 
-      "generate the correct XML body" in {
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.13">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {submitChangeDestinationXmlMax}
-            </urn:Body>
-          </urn:IE813>
-        )
+      val requestXml = XML.loadString(request.eisXMLBody())
+      val expectedXml = trim(expectedRequest)
 
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
-    }
-
-    "useFS41SchemaVersion is disabled" should {
-
-      "generate the correct XML body" in {
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {submitChangeDestinationXmlMax}
-            </urn:Body>
-          </urn:IE813>
-        )
-
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
+      requestXml shouldBe expectedXml
     }
   }
 

@@ -18,9 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Action, ControllerComponents, Result}
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeDestinationRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
@@ -36,9 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubmitChangeDestinationController @Inject()(cc: ControllerComponents,
                                                   submitChangeDestinationService: SubmitChangeDestinationService,
                                                   getMovementService: GetMovementService,
-                                                  val config: AppConfig,
                                                   override val auth: AuthAction
-                                                 )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging with FeatureSwitching {
+                                                 )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
 
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitChangeDestinationModel] { submission =>
@@ -47,7 +44,7 @@ class SubmitChangeDestinationController @Inject()(cc: ControllerComponents,
           logger.error(s"[submit] Failed to retrieve movement for $ern and $arc")
           Future.successful(InternalServerError(Json.toJson(error)))
         case Right(movement) =>
-          val requestModel = SubmitChangeDestinationRequest(submission, movement, isEnabled(ValidateUsingFS41Schema))
+          val requestModel = SubmitChangeDestinationRequest(submission, movement)
           submitChangeDestinationService.submitViaEIS(requestModel).flatMap(result => handleResponse(result))
       }
     }

@@ -28,7 +28,7 @@ import scala.xml.XML
 
 class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCancellationOfMovementFixtures {
 
-  implicit val request: SubmitCancellationOfMovementRequest = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel, useFS41SchemaVersion = false)
+  implicit val request: SubmitCancellationOfMovementRequest = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
 
   "for the MessageSender and MessageRecipient headers" when {
 
@@ -37,7 +37,7 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
       "the destination type is Export" in {
         val testModel = maxSubmitCancellationOfMovementModel.copy(exciseMovement = ExciseMovementModel("01DE0000012345", 1))
 
-        SubmitCancellationOfMovementRequest(testModel, useFS41SchemaVersion = false).messageRecipient shouldBe "NDEA.DE"
+        SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.DE"
       }
 
       "the destination type is ExemptedOrganisations" when {
@@ -45,13 +45,13 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
         "memberStateCode exists" in {
           val testModel = maxSubmitCancellationOfMovementModel.copy(destinationType = ExemptedOrganisations, memberStateCode = Some("FR"))
 
-          SubmitCancellationOfMovementRequest(testModel, useFS41SchemaVersion = false).messageRecipient shouldBe "NDEA.FR"
+          SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.FR"
         }
 
         "memberStateCode does NOT exists" in {
           val testModel = maxSubmitCancellationOfMovementModel.copy(destinationType = ExemptedOrganisations, memberStateCode = None)
 
-          SubmitCancellationOfMovementRequest(testModel, useFS41SchemaVersion = false).messageRecipient shouldBe "NDEA.GB"
+          SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.GB"
         }
       }
 
@@ -63,7 +63,7 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
             consigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("FR00001")))
           )
 
-          SubmitCancellationOfMovementRequest(testModel, useFS41SchemaVersion = false).messageRecipient shouldBe "NDEA.FR"
+          SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.FR"
         }
 
         "consignee trader is None, default to GB" in {
@@ -72,92 +72,52 @@ class SubmitCancellationOfMovementRequestSpec extends TestBaseSpec with SubmitCa
             consigneeTrader = None
           )
 
-          SubmitCancellationOfMovementRequest(testModel, useFS41SchemaVersion = false).messageRecipient shouldBe "NDEA.GB"
+          SubmitCancellationOfMovementRequest(testModel).messageRecipient shouldBe "NDEA.GB"
         }
       }
     }
 
     "have the correct MessageSender" in {
-      SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel, useFS41SchemaVersion = false).messageSender shouldBe "NDEA.GB"
+      SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel).messageSender shouldBe "NDEA.GB"
     }
   }
 
   ".eisXMLBody" when {
 
-    "useFS41SchemaVersion is disabled" should {
+    implicit val request = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel)
 
-      "generate the correct XML body" in {
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE810 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.01">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {maxSubmitCancellationOfMovementModelXml}
-            </urn:Body>
-          </urn:IE810>)
+    "generate the correct XML body" in {
+      val expectedRequest = wrapInControlDoc(
+        <urn:IE810 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.13">
+          <urn:Header>
+            <urn1:MessageSender>
+              {request.messageSender}
+            </urn1:MessageSender>
+            <urn1:MessageRecipient>
+              {request.messageRecipient}
+            </urn1:MessageRecipient>
+            <urn1:DateOfPreparation>
+              {request.preparedDate.toString}
+            </urn1:DateOfPreparation>
+            <urn1:TimeOfPreparation>
+              {request.preparedTime.toString}
+            </urn1:TimeOfPreparation>
+            <urn1:MessageIdentifier>
+              {request.messageUUID}
+            </urn1:MessageIdentifier>
+            <urn1:CorrelationIdentifier>
+              {request.correlationUUID}
+            </urn1:CorrelationIdentifier>
+          </urn:Header>
+          <urn:Body>
+            {maxSubmitCancellationOfMovementModelXml}
+          </urn:Body>
+        </urn:IE810>)
 
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
+      val requestXml = XML.loadString(request.eisXMLBody())
+      val expectedXml = trim(expectedRequest)
 
-        requestXml shouldBe expectedXml
-      }
-    }
-
-    "useFS41SchemaVersion is enabled" should {
-
-      implicit val request = SubmitCancellationOfMovementRequest(maxSubmitCancellationOfMovementModel, useFS41SchemaVersion = true)
-
-      "generate the correct XML body" in {
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE810 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE810:V3.13">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {maxSubmitCancellationOfMovementModelXml}
-            </urn:Body>
-          </urn:IE810>)
-
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
+      requestXml shouldBe expectedXml
     }
   }
 

@@ -42,7 +42,7 @@ class SubmitCreateMovementController @Inject()(cc: ControllerComponents,
   def submit(ern: String, draftId: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitCreateMovementModel] { submission =>
 
-      val submissionRequest = SubmitCreateMovementRequest(submission, draftId, isEnabled(ValidateUsingFS41Schema))
+      val submissionRequest = SubmitCreateMovementRequest(submission, draftId)
       val correlationId = if(isEnabled(DefaultDraftMovementCorrelationId)) DEFAULT_CORRELATION_ID else submissionRequest.correlationUUID
 
       service.submitViaEIS(submissionRequest).flatMap(responseModel => handleResponse(responseModel.map(_.copy(

@@ -26,18 +26,18 @@ import scala.xml.XML
 
 class SubmitExplainDelayRequestSpec extends TestBaseSpec with SubmitExplainDelayFixtures {
 
-  implicit val request: SubmitExplainDelayRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel, useFS41SchemaVersion = false)
+  implicit val request: SubmitExplainDelayRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
 
   "for the MessageSender and MessageRecipient headers" when {
 
     val model = maxSubmitExplainDelayModel.copy(arc = "01DE0000012345")
 
     "have the correct MessageSender" in {
-      SubmitExplainDelayRequest(model, useFS41SchemaVersion = false).messageSender shouldBe "NDEA.GB"
+      SubmitExplainDelayRequest(model).messageSender shouldBe "NDEA.GB"
     }
 
     "have the correct MessageRecipient" in {
-      SubmitExplainDelayRequest(model, useFS41SchemaVersion = false).messageRecipient shouldBe "NDEA.DE"
+      SubmitExplainDelayRequest(model).messageRecipient shouldBe "NDEA.DE"
     }
   }
 
@@ -49,80 +49,40 @@ class SubmitExplainDelayRequestSpec extends TestBaseSpec with SubmitExplainDelay
 
   ".eisXMLBody" when {
 
-    "useFS41SchemaVersion is enabled" should {
+    implicit val request = SubmitExplainDelayRequest(maxSubmitExplainDelayModel)
 
-      implicit val request = SubmitExplainDelayRequest(maxSubmitExplainDelayModel, useFS41SchemaVersion = true)
+    "generate the correct XML body" in {
+      val expectedRequest = wrapInControlDoc(
+        <urn:IE837 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.13">
+          <urn:Header>
+            <urn1:MessageSender>
+              {request.messageSender}
+            </urn1:MessageSender>
+            <urn1:MessageRecipient>
+              {request.messageRecipient}
+            </urn1:MessageRecipient>
+            <urn1:DateOfPreparation>
+              {request.preparedDate.toString}
+            </urn1:DateOfPreparation>
+            <urn1:TimeOfPreparation>
+              {request.preparedTime.toString}
+            </urn1:TimeOfPreparation>
+            <urn1:MessageIdentifier>
+              {request.messageUUID}
+            </urn1:MessageIdentifier>
+            <urn1:CorrelationIdentifier>
+              {request.correlationUUID}
+            </urn1:CorrelationIdentifier>
+          </urn:Header>
+          <urn:Body>
+            {maxSubmitExplainDelayModelXML}
+          </urn:Body>
+        </urn:IE837>)
 
-      "generate the correct XML body" in {
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE837 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.13">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {maxSubmitExplainDelayModelXML}
-            </urn:Body>
-          </urn:IE837>)
+      val requestXml = XML.loadString(request.eisXMLBody())
+      val expectedXml = trim(expectedRequest)
 
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
-    }
-
-    "useFS41SchemaVersion is disabled" should {
-
-      "generate the correct XML body" in {
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE837 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.01">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {maxSubmitExplainDelayModelXML}
-            </urn:Body>
-          </urn:IE837>)
-
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
+      requestXml shouldBe expectedXml
     }
   }
 

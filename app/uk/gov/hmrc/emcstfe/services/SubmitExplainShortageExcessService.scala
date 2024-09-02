@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
@@ -30,12 +28,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitExplainShortageExcessService @Inject()(eisConnector: EisConnector,
-                                                   val config: AppConfig) extends Logging with FeatureSwitching {
+class SubmitExplainShortageExcessService @Inject()(eisConnector: EisConnector) extends Logging {
 
   def submitViaEIS(submission: SubmitExplainShortageExcessModel)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submit[EISSubmissionSuccessResponse](SubmitExplainShortageExcessRequest(submission, isEnabled(ValidateUsingFS41Schema)), "submitExplainShortageExcessEISRequest")
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitExplainShortageExcessRequest(submission), "submitExplainShortageExcessEISRequest")
 
 
 }

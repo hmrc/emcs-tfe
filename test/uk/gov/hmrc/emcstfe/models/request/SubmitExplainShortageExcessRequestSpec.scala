@@ -48,24 +48,24 @@ class SubmitExplainShortageExcessRequestSpec extends TestBaseSpec with SubmitExp
     "SubmitterType.Consignor" when {
       "generating MessageSender" should {
         "use the country code from the ARC" in {
-          val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor), useFS41SchemaVersion = false)
+          val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor))
           request.messageSender shouldBe "NDEA.DE"
         }
       }
       "generating MessageRecipient" should {
         "use the country code from the ConsigneeTrader Traderid" when {
           "ConsigneeTrader Traderid is defined" in {
-            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor), useFS41SchemaVersion = false)
+            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor))
             request.messageRecipient shouldBe "NDEA.FR"
           }
         }
         "use GB" when {
           "ConsigneeTrader is not defined" in {
-            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor, consigneeTrader = None), useFS41SchemaVersion = false)
+            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor, consigneeTrader = None))
             request.messageRecipient shouldBe "NDEA.GB"
           }
           "ConsigneeTrader Traderid is not defined" in {
-            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderExciseNumber = None))), useFS41SchemaVersion = false)
+            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignor, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderExciseNumber = None))))
             request.messageRecipient shouldBe "NDEA.GB"
           }
         }
@@ -76,24 +76,24 @@ class SubmitExplainShortageExcessRequestSpec extends TestBaseSpec with SubmitExp
       "generating MessageSender" should {
         "use the country code from the ConsigneeTrader Traderid" when {
           "ConsigneeTrader Traderid is defined" in {
-            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee), useFS41SchemaVersion = false)
+            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee))
             request.messageSender shouldBe "NDEA.FR"
           }
         }
         "use GB" when {
           "ConsigneeTrader is not defined" in {
-            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee, consigneeTrader = None), useFS41SchemaVersion = false)
+            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee, consigneeTrader = None))
             request.messageSender shouldBe "NDEA.GB"
           }
           "ConsigneeTrader Traderid is not defined" in {
-            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderExciseNumber = None))), useFS41SchemaVersion = false)
+            val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee, consigneeTrader = Some(defaultConsigneeTraderModel.copy(traderExciseNumber = None))))
             request.messageSender shouldBe "NDEA.GB"
           }
         }
       }
       "generating MessageRecipient" should {
         "use the country code from the ARC" in {
-          val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee), useFS41SchemaVersion = false)
+          val request = SubmitExplainShortageExcessRequest(model(SubmitterType.Consignee))
           request.messageRecipient shouldBe "NDEA.DE"
         }
       }
@@ -102,95 +102,53 @@ class SubmitExplainShortageExcessRequestSpec extends TestBaseSpec with SubmitExp
 
   ".exciseRegistrationNumber" should {
     "be correct" in {
-      val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor), useFS41SchemaVersion = false)
+      val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
       request.exciseRegistrationNumber shouldBe testErn
     }
   }
 
   ".eisXMLBody" when {
 
-    "useFS41SchemaVersion is enabled" should {
+    "generate the correct XML body" in {
+      implicit val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
 
-      "generate the correct XML body" in {
-        implicit val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor), useFS41SchemaVersion = true)
+      val expectedRequest = wrapInControlDoc(
+        <urn:IE871 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.13">
+          <urn:Header>
+            <urn1:MessageSender>
+              {request.messageSender}
+            </urn1:MessageSender>
+            <urn1:MessageRecipient>
+              {request.messageRecipient}
+            </urn1:MessageRecipient>
+            <urn1:DateOfPreparation>
+              {request.preparedDate.toString}
+            </urn1:DateOfPreparation>
+            <urn1:TimeOfPreparation>
+              {request.preparedTime.toString}
+            </urn1:TimeOfPreparation>
+            <urn1:MessageIdentifier>
+              {request.messageUUID}
+            </urn1:MessageIdentifier>
+            <urn1:CorrelationIdentifier>
+              {request.correlationUUID}
+            </urn1:CorrelationIdentifier>
+          </urn:Header>
+          <urn:Body>
+            {submitExplainShortageExcessXmlMax(Consignor)}
+          </urn:Body>
+        </urn:IE871>)
 
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE871 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.13">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {submitExplainShortageExcessXmlMax(Consignor)}
-            </urn:Body>
-          </urn:IE871>)
+      val requestXml = XML.loadString(request.eisXMLBody())
+      val expectedXml = trim(expectedRequest)
 
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
-    }
-
-    "useFS41SchemaVersion is disabled" should {
-
-      "generate the correct XML body" in {
-        implicit val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor), useFS41SchemaVersion = false)
-
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE871 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.01">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {submitExplainShortageExcessXmlMax(Consignor)}
-            </urn:Body>
-          </urn:IE871>)
-
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
+      requestXml shouldBe expectedXml
     }
   }
 
   ".toJson" should {
     "create the correct JSON body" in {
-      val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor), useFS41SchemaVersion = false)
+      val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
 
       val expectedResult = Json.obj(
         "user" -> testErn,

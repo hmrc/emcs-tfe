@@ -26,7 +26,7 @@ import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 
 import java.util.Base64
 
-case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, movement: GetMovementResponse, useFS41SchemaVersion: Boolean)
+case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, movement: GetMovementResponse)
                                          (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
 
   private val arcCountryCode = body.updateEadEsad.administrativeReferenceCode.substring(2, 4)
@@ -62,8 +62,7 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, mo
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsObject =

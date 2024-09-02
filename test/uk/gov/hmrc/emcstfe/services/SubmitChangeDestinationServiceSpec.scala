@@ -34,61 +34,57 @@ class SubmitChangeDestinationServiceSpec extends TestBaseSpec
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
-  class Test(useFS41SchemaVersion: Boolean) extends MockEisConnector {
-    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = useFS41SchemaVersion)
+  trait Test extends MockEisConnector {
+    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse())
     val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockEisConnector, mockChangeDestinationUserAnswersRepository, mockAppConfig)
   }
 
   "SubmitChangeDestinationService" when {
-    Seq(true, false).foreach { useFS41SchemaVersion =>
-      s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
-        "when calling submitViaEIS" must {
-          "return a Right" when {
-            "connector call is successful and Json is the correct format" in new Test(useFS41SchemaVersion) {
+    "when calling submitViaEIS" must {
+      "return a Right" when {
+        "connector call is successful and Json is the correct format" in new Test {
 
-              MockEisConnector.submit(submitChangeDestinationRequest).returns(
-                Future.successful(Right(eisSuccessResponse))
-              )
+          MockEisConnector.submit(submitChangeDestinationRequest).returns(
+            Future.successful(Right(eisSuccessResponse))
+          )
 
-              MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, Seq.empty)
-                .returns(Future.successful(true))
+          MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, Seq.empty)
+            .returns(Future.successful(true))
 
-              await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Right(eisSuccessResponse)
-            }
-          }
+          await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Right(eisSuccessResponse)
+        }
+      }
 
-          "return a Left" when {
+      "return a Left" when {
 
-            "EIS returns a 422 error with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
+        "EIS returns a 422 error with RIM validation errors (inserting the errors into Mongo)" in new Test {
 
-              MockEisConnector.submit(submitChangeDestinationRequest).returns(
-                Future.successful(Left(EISRIMValidationError(eisRimValidationResponse)))
-              )
+          MockEisConnector.submit(submitChangeDestinationRequest).returns(
+            Future.successful(Left(EISRIMValidationError(eisRimValidationResponse)))
+          )
 
-              MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, eisRimValidationResponse.validatorResults.get)
-                .returns(Future.successful(true))
+          MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, eisRimValidationResponse.validatorResults.get)
+            .returns(Future.successful(true))
 
-              await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISRIMValidationError(eisRimValidationResponse))
-            }
+          await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISRIMValidationError(eisRimValidationResponse))
+        }
 
-            "EIS returns a 422 error without RIM validation errors" in new Test(useFS41SchemaVersion) {
+        "EIS returns a 422 error without RIM validation errors" in new Test {
 
-              MockEisConnector.submit(submitChangeDestinationRequest).returns(
-                Future.successful(Left(EISBusinessError("wrong")))
-              )
+          MockEisConnector.submit(submitChangeDestinationRequest).returns(
+            Future.successful(Left(EISBusinessError("wrong")))
+          )
 
-              await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISBusinessError("wrong"))
-            }
+          await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISBusinessError("wrong"))
+        }
 
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
+        "connector call is unsuccessful" in new Test {
 
-              MockEisConnector.submit(submitChangeDestinationRequest).returns(
-                Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-              )
+          MockEisConnector.submit(submitChangeDestinationRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
 
-              await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
-            }
-          }
+          await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
         }
       }
     }

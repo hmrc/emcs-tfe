@@ -25,7 +25,7 @@ import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
-case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovementModel, useFS41SchemaVersion: Boolean)
+case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovementModel)
                                               (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
 
@@ -51,8 +51,7 @@ case class SubmitCancellationOfMovementRequest(body: SubmitCancellationOfMovemen
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsObject =

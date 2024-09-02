@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
@@ -32,12 +30,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmitReportOfReceiptService @Inject()(eisConnector: EisConnector,
-                                             val config: AppConfig,
-                                             metricsService: MetricsService) extends Logging with FeatureSwitching {
+                                             metricsService: MetricsService) extends Logging {
 
   def submitViaEIS(submission: SubmitReportOfReceiptModel)
             (implicit hc: HeaderCarrier, ec: ExecutionContext, request: UserRequest[_]): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
-    eisConnector.submit[EISSubmissionSuccessResponse](SubmitReportOfReceiptRequest(submission, isEnabled(ValidateUsingFS41Schema)), "submitReportOfReceiptEISRequest").map(handleResponse(_, submission))
+    eisConnector.submit[EISSubmissionSuccessResponse](SubmitReportOfReceiptRequest(submission), "submitReportOfReceiptEISRequest").map(handleResponse(_, submission))
 
   private def handleResponse[A](response: Either[ErrorResponse, A], submission: SubmitReportOfReceiptModel): Either[ErrorResponse, A] = response match {
     case r@Right(_) =>

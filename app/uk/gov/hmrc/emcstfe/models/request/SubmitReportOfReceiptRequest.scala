@@ -26,7 +26,7 @@ import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
-case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel, useFS41SchemaVersion: Boolean)
+case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
                                        (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
 
   private val arcCountryCode = body.arc.substring(2, 4)
@@ -50,8 +50,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel, useFS4
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsObject =

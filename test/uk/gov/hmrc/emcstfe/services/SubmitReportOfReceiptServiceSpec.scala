@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
-import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{PartiallyRefused, Refused, Satisfactory, Unsatisfactory}
@@ -28,61 +26,55 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfReceiptFixtures with MockAppConfig {
+class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfReceiptFixtures {
 
-  class Test(useFS41SchemaVersion: Boolean) extends MockEisConnector with MockMetricsService {
-    val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = useFS41SchemaVersion)
-
-    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockEisConnector, mockAppConfig, mockMetricsService)
-    MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
+  trait Test extends MockEisConnector with MockMetricsService {
+    val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
+    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockEisConnector, mockMetricsService)
   }
 
   "SubmitReportOfReceiptService" when {
-    Seq(true, false).foreach { useFS41SchemaVersion =>
-      s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
-        "when calling submit" must {
-          "return a Right" when {
-            "connector call is successful and Json is the correct format" when {
+    "when calling submit" must {
+      "return a Right" when {
+        "connector call is successful and Json is the correct format" when {
 
-              Seq(
-                PartiallyRefused -> "partially-refused",
-                Refused -> "refused",
-                Satisfactory -> "satisfactory",
-                Unsatisfactory -> "unsatisfactory"
-              ).foreach { statusAndMetricName =>
+          Seq(
+            PartiallyRefused -> "partially-refused",
+            Refused -> "refused",
+            Satisfactory -> "satisfactory",
+            Unsatisfactory -> "unsatisfactory"
+          ).foreach { statusAndMetricName =>
 
-                s"status is ${statusAndMetricName._2}" in new Test(useFS41SchemaVersion) {
+            s"status is ${statusAndMetricName._2}" in new Test {
 
-                  val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = statusAndMetricName._1)
+              val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = statusAndMetricName._1)
 
-                  override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
-                    SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = useFS41SchemaVersion)
+              override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
+                SubmitReportOfReceiptRequest(model)
 
-                  MockEisConnector
-                    .submit(submitReportOfReceiptRequest)
-                    .returns(Future.successful(Right(eisSuccessResponse)))
+              MockEisConnector
+                .submit(submitReportOfReceiptRequest)
+                .returns(Future.successful(Right(eisSuccessResponse)))
 
-                  MockMetricsService.rorStatusCounter(statusAndMetricName._2)
+              MockMetricsService.rorStatusCounter(statusAndMetricName._2)
 
-                  await(service.submitViaEIS(model)) shouldBe Right(eisSuccessResponse)
+              await(service.submitViaEIS(model)) shouldBe Right(eisSuccessResponse)
 
 
-                }
-              }
             }
+          }
+        }
 
-            "return a Left" when {
-              "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
+        "return a Left" when {
+          "connector call is unsuccessful" in new Test {
 
-                MockEisConnector
-                  .submit(submitReportOfReceiptRequest)
-                  .returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
+            MockEisConnector
+              .submit(submitReportOfReceiptRequest)
+              .returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
 
-                MockMetricsService.rorStatusCounter("failed-submission")
+            MockMetricsService.rorStatusCounter("failed-submission")
 
-                await(service.submitViaEIS(maxSubmitReportOfReceiptModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
-              }
-            }
+            await(service.submitViaEIS(maxSubmitReportOfReceiptModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
           }
         }
       }

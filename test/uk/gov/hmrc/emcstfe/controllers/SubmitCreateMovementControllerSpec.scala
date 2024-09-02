@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{DefaultDraftMovementCorrelationId, ValidateUsingFS41Schema}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.DefaultDraftMovementCorrelationId
 import uk.gov.hmrc.emcstfe.fixtures.{CreateMovementFixtures, EISResponsesFixture}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitCreateMovementService
@@ -43,12 +43,10 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
     "user is authorised" must {
 
-      val requestModel: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true)
+      val requestModel: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
 
       s"return ${Status.OK} (OK)" when {
         "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
-
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
           MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
 
@@ -66,8 +64,6 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
       s"return ${Status.UNPROCESSABLE_ENTITY} (UNPROCESSABLE_ENTITY)" when {
         "service returns a Left(EISRIMValidationError) - when it is a RIM Validation error" in new Fixture(FakeSuccessAuthAction) {
 
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
-
           MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
 
           MockService.submitViaEIS(requestModel).returns(Future.successful(Left(EISRIMValidationError(eisRimValidationResponse))))
@@ -79,8 +75,6 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
         }
 
         "service returns a Left(EISBusinessError) - when it is not a RIM Validation error" in new Fixture(FakeSuccessAuthAction) {
-
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
           MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
 
@@ -96,8 +90,6 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
       s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
         "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
 
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
-
           MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(false)
 
           MockService.submitViaEIS(requestModel).returns(Future.successful(Left(EISServiceUnavailableError("SERVICE_UNAVAILABLE"))))
@@ -111,11 +103,9 @@ class SubmitCreateMovementControllerSpec extends TestBaseSpec with MockSubmitCre
 
       "default the correlation ID" when {
 
-        val requestModel: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true)
+        val requestModel: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
 
         "the DefaultDraftMovementCorrelationId is enabled" in new Fixture(FakeSuccessAuthAction) {
-
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
           MockedAppConfig.getFeatureSwitchValue(DefaultDraftMovementCorrelationId).returns(true)
 

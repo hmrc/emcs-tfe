@@ -22,9 +22,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures}
-import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.{MockGetMovementService, MockSubmitChangeDestinationService}
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeDestinationRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISServiceUnavailableError, UnexpectedDownstreamResponseError}
@@ -32,14 +30,14 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmitChangeDestinationService with SubmitChangeDestinationFixtures with MockGetMovementService with GetMovementFixture with MockAppConfig with FakeAuthAction {
+class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmitChangeDestinationService with SubmitChangeDestinationFixtures with MockGetMovementService with GetMovementFixture with FakeAuthAction {
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest: FakeRequest[JsValue]             = FakeRequest("POST", "/change-destination").withBody(Json.toJson(submitChangeDestinationModelMax))
-    val controller: SubmitChangeDestinationController = new SubmitChangeDestinationController(Helpers.stubControllerComponents(), mockSubmitChangeDestinationService, mockGetMovementService, mockAppConfig, authAction)
-    val requestModel: SubmitChangeDestinationRequest  = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = true)
+    val controller: SubmitChangeDestinationController = new SubmitChangeDestinationController(Helpers.stubControllerComponents(), mockSubmitChangeDestinationService, mockGetMovementService, authAction)
+    val requestModel: SubmitChangeDestinationRequest  = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse())
   }
 
   s"POST ${routes.SubmitChangeDestinationController.submit(testErn, testArc)}" when {
@@ -70,8 +68,6 @@ class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmit
       s"return ${Status.OK} (OK)" when {
         "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
-
           MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 
           MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Right(eisSuccessResponse)))
@@ -86,8 +82,6 @@ class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmit
       s"return ${Status.UNPROCESSABLE_ENTITY} (UNPROCESSABLE_ENTITY)" when {
         "service returns a Left(EISRIMValidationError) - when it is a RIM Validation error" in new Fixture(FakeSuccessAuthAction) {
 
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
-
           MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 
           MockSubmitChangeDestinationService.submitViaEIS(requestModel).returns(Future.successful(Left(EISRIMValidationError(eisRimValidationResponse))))
@@ -99,8 +93,6 @@ class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmit
         }
 
         "service returns a Left(EISBusinessError) - when it is not a RIM Validation error" in new Fixture(FakeSuccessAuthAction) {
-
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
           MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 
@@ -115,8 +107,6 @@ class SubmitChangeDestinationControllerSpec extends TestBaseSpec with MockSubmit
 
       s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
         "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
-
-          MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(true)
 
           MockGetMovementService.getMovement(GetMovementRequest(testErn, testArc, None), forceFetchNew = true).returns(Future.successful(Right(getMovementResponse())))
 

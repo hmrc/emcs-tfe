@@ -30,7 +30,7 @@ import scala.xml.XML
 
 class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfReceiptFixtures {
 
-  implicit val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = false)
+  implicit val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
   "for the MessageSender and MessageRecipient headers" when {
 
@@ -38,7 +38,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
       "have the correct value taken from the ARC" in {
         val arcFromFrance = "01FR0000012345"
         val model = maxSubmitReportOfReceiptModel.copy(arc = arcFromFrance)
-        val request = SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = true)
+        val request = SubmitReportOfReceiptRequest(model)
         request.messageRecipient shouldBe "NDEA.FR"
       }
     }
@@ -55,13 +55,13 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
         "use the deliveryPlaceTrader for the Country Code" in {
           val userRequest: UserRequest[_] = UserRequest(FakeRequest(), "GBWK000001234", testInternalId, testCredId, Set("GBWK000001234"))
-          val request = SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = true)(userRequest)
+          val request = SubmitReportOfReceiptRequest(model)(userRequest)
           request.messageSender shouldBe "NDEA.XI"
         }
 
         "use the logged in users ERN for the country code when deliveryPlaceTrader does NOT exist" in {
           val userRequest: UserRequest[_] = UserRequest(FakeRequest(), "GBWK000001234", testInternalId, testCredId, Set("GBWK000001234"))
-          val request = SubmitReportOfReceiptRequest(model.copy(deliveryPlaceTrader = None), useFS41SchemaVersion = true)(userRequest)
+          val request = SubmitReportOfReceiptRequest(model.copy(deliveryPlaceTrader = None))(userRequest)
           request.messageSender shouldBe "NDEA.GB"
         }
 
@@ -70,12 +70,12 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
       "the destinationType is NOT a TaxWarehouse" should {
 
         "use the consigneeTrader for the Country Code" in {
-          val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(Export)), useFS41SchemaVersion = true)
+          val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(Export)))
           request.messageSender shouldBe "NDEA.GB"
         }
         "use the logged in users ERN for the country code when consigneeTrader does NOT exist" in {
           val userRequest: UserRequest[_] = UserRequest(FakeRequest(), "GBWK000001234", testInternalId, testCredId, Set("GBWK000001234"))
-          val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(Export), consigneeTrader = None), useFS41SchemaVersion = true)(userRequest)
+          val request = SubmitReportOfReceiptRequest(model.copy(destinationType = Some(Export), consigneeTrader = None))(userRequest)
           request.messageSender shouldBe "NDEA.GB"
         }
 
@@ -91,88 +91,44 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
   ".eisXMLBody" when {
 
-    "useFS41SchemaVersion is enabled" should {
+    "generate the correct XML body" in {
 
-      "generate the correct XML body" in {
+      implicit val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
-        implicit val request: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = true)
-
-        val expectedRequest = {
-          wrapInControlDoc(
-            <urn:IE818 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.13">
-              <urn:Header>
-                <urn1:MessageSender>
-                  {request.messageSender}
-                </urn1:MessageSender>
-                <urn1:MessageRecipient>
-                  {request.messageRecipient}
-                </urn1:MessageRecipient>
-                <urn1:DateOfPreparation>
-                  {request.preparedDate.toString}
-                </urn1:DateOfPreparation>
-                <urn1:TimeOfPreparation>
-                  {request.preparedTime.toString}
-                </urn1:TimeOfPreparation>
-                <urn1:MessageIdentifier>
-                  {request.messageUUID}
-                </urn1:MessageIdentifier>
-                <urn1:CorrelationIdentifier>
-                  {request.correlationUUID}
-                </urn1:CorrelationIdentifier>
-              </urn:Header>
-              <urn:Body>
-                {maxSubmitReportOfReceiptModelXML}
-              </urn:Body>
-            </urn:IE818>)
-        }
-
-
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
+      val expectedRequest = {
+        wrapInControlDoc(
+          <urn:IE818 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.13">
+            <urn:Header>
+              <urn1:MessageSender>
+                {request.messageSender}
+              </urn1:MessageSender>
+              <urn1:MessageRecipient>
+                {request.messageRecipient}
+              </urn1:MessageRecipient>
+              <urn1:DateOfPreparation>
+                {request.preparedDate.toString}
+              </urn1:DateOfPreparation>
+              <urn1:TimeOfPreparation>
+                {request.preparedTime.toString}
+              </urn1:TimeOfPreparation>
+              <urn1:MessageIdentifier>
+                {request.messageUUID}
+              </urn1:MessageIdentifier>
+              <urn1:CorrelationIdentifier>
+                {request.correlationUUID}
+              </urn1:CorrelationIdentifier>
+            </urn:Header>
+            <urn:Body>
+              {maxSubmitReportOfReceiptModelXML}
+            </urn:Body>
+          </urn:IE818>)
       }
-    }
-
-    "useFS41SchemaVersion is disabled" should {
-
-      "generate the correct XML body" in {
-
-        val expectedRequest = {
-          wrapInControlDoc(
-            <urn:IE818 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.01">
-              <urn:Header>
-                <urn1:MessageSender>
-                  {request.messageSender}
-                </urn1:MessageSender>
-                <urn1:MessageRecipient>
-                  {request.messageRecipient}
-                </urn1:MessageRecipient>
-                <urn1:DateOfPreparation>
-                  {request.preparedDate.toString}
-                </urn1:DateOfPreparation>
-                <urn1:TimeOfPreparation>
-                  {request.preparedTime.toString}
-                </urn1:TimeOfPreparation>
-                <urn1:MessageIdentifier>
-                  {request.messageUUID}
-                </urn1:MessageIdentifier>
-                <urn1:CorrelationIdentifier>
-                  {request.correlationUUID}
-                </urn1:CorrelationIdentifier>
-              </urn:Header>
-              <urn:Body>
-                {maxSubmitReportOfReceiptModelXML}
-              </urn:Body>
-            </urn:IE818>)
-        }
 
 
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
+      val requestXml = XML.loadString(request.eisXMLBody())
+      val expectedXml = trim(expectedRequest)
 
-        requestXml shouldBe expectedXml
-      }
+      requestXml shouldBe expectedXml
     }
   }
 

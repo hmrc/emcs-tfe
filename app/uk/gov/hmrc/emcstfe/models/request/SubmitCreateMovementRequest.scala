@@ -27,7 +27,7 @@ import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
-case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId: String, useFS41SchemaVersion: Boolean)
+case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId: String)
                                       (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
   private val messageNumber = 815
@@ -76,8 +76,7 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsValue =

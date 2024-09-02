@@ -81,7 +81,7 @@ class EisConnectorSpec
     "submit is called" should {
 
 
-      val submitReportOfReceiptRequest                          = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = false)
+      val submitReportOfReceiptRequest                          = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
       "return a Right" when {
         "downstream call is successful" in new Test {
