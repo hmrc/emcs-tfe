@@ -20,13 +20,12 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
 case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel, useFS41SchemaVersion: Boolean)
-                                    (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
+                                    (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
 
   private val arcCountryCode = body.arc.substring(2, 4)
@@ -35,19 +34,6 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel, useFS41Schem
 
   val messageRecipient = Constants.NDEA ++ arcCountryCode
   val messageSender: String = Constants.NDEA ++ ernCountryCode
-
-  override def requestBody: String =
-    withSubmissionRequestSoapEnvelope(
-      body = body,
-      messageNumber = messageNumber,
-      messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
-    ).toString()
-
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitexplaindelaytodeliveryportal"
-
-  override def shouldExtractFromSoap: Boolean = false
 
   override def metricName = "explain-delay"
 

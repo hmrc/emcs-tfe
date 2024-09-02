@@ -18,68 +18,26 @@ package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISBusinessError, EISRIMValidationError, EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISUnknownError}
 import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
 class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures with MockAppConfig with MockCreateMovementUserAnswersRepository {
-  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
-    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = useFS41SchemaVersion, isChRISSubmission = true)
-    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector, mockCreateMovementUserAnswersRepository, mockAppConfig)
+
+  class Test(useFS41SchemaVersion: Boolean) extends MockEisConnector {
+    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = useFS41SchemaVersion)
+    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockEisConnector, mockCreateMovementUserAnswersRepository, mockAppConfig)
   }
 
   "SubmitCreateMovementService" when {
     Seq(true, false).foreach { useFS41SchemaVersion =>
       s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
-
-        "when calling submit" must {
-
-          "return a Right" when {
-            "connector call is successful and XML is the correct format (clearing RIM validation errors)" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-                Future.successful(Right(chrisSuccessResponse))
-              )
-
-              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, Seq.empty)
-                .returns(Future.successful(true))
-
-              await(service.submit(submitCreateMovementRequest)) shouldBe Right(chrisSuccessResponse)
-            }
-          }
-          "return a Left" when {
-
-            "ChRIS returns a 200 response but with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-                Future.successful(Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse)))
-              )
-
-              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, chrisRIMValidationErrorResponse.rimValidationErrors)
-                .returns(Future.successful(true))
-
-              await(service.submit(submitCreateMovementRequest)) shouldBe Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse))
-            }
-
-
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-                Future.successful(Left(XmlValidationError))
-              )
-
-              await(service.submit(submitCreateMovementRequest)) shouldBe Left(XmlValidationError)
-            }
-          }
-        }
-
         "when calling submitViaEIS" must {
-
           "return a Right" when {
             "connector call is successful and Json is the correct format" in new Test(useFS41SchemaVersion) {
 

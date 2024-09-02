@@ -18,36 +18,9 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-import scala.xml.XML
-
 class GetMessagesStatisticsRequestSpec extends TestBaseSpec {
 
   val request = GetMessageStatisticsRequest(exciseRegistrationNumber = testErn)
-
-  "requestBody" should {
-    "generate the correct request XML" in {
-      val xml = XML.loadString(request.requestBody)
-
-
-      (xml \\ "Envelope" \\ "Header" \\ "VersionNo").text shouldBe "2.1"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Source").text shouldBe "emcs_tfe"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Identity").text shouldBe "portal"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Partner").text shouldBe "UK"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "ExciseRegistrationNumber").text shouldBe testErn
-    }
-  }
-
-  "action" should {
-    "be correct" in {
-      request.action shouldBe "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMessageStatistics"
-    }
-  }
-
-  "shouldExtractFromSoap" should {
-    "be correct" in {
-      request.shouldExtractFromSoap shouldBe true
-    }
-  }
 
   "queryParams" should {
     "return the ERN as a query param" in {

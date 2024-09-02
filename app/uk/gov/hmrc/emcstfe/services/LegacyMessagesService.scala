@@ -20,7 +20,7 @@ import cats.data.EitherT
 import play.api.mvc.Request
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.models.legacy._
-import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, LegacyMessage}
+import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse,  LegacyMessage}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}

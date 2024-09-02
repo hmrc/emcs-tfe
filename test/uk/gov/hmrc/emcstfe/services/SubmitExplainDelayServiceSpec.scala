@@ -19,46 +19,24 @@ package uk.gov.hmrc.emcstfe.services
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainDelayFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainDelayRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
 class SubmitExplainDelayServiceSpec extends TestBaseSpec with SubmitExplainDelayFixtures with MockAppConfig {
-  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
+
+  class Test(useFS41SchemaVersion: Boolean) extends MockEisConnector {
     val submitExplainDelayRequest: SubmitExplainDelayRequest = SubmitExplainDelayRequest(maxSubmitExplainDelayModel, useFS41SchemaVersion = useFS41SchemaVersion)
-    val service: SubmitExplainDelayService = new SubmitExplainDelayService(mockChrisConnector, mockEisConnector, mockAppConfig)
+    val service: SubmitExplainDelayService = new SubmitExplainDelayService(mockEisConnector, mockAppConfig)
     MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
   }
 
   "SubmitExplainDelayService" when {
     Seq(true, false).foreach { useFS41SchemaVersion =>
       s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
-        "when calling submit" must {
-          "return a Right" when {
-            "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
-                Future.successful(Right(chrisSuccessResponse))
-              )
-
-              await(service.submit(maxSubmitExplainDelayModel)) shouldBe Right(chrisSuccessResponse)
-            }
-          }
-          "return a Left" when {
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitExplainDelayChrisSOAPRequest(submitExplainDelayRequest).returns(
-                Future.successful(Left(XmlValidationError))
-              )
-
-              await(service.submit(maxSubmitExplainDelayModel)) shouldBe Left(XmlValidationError)
-            }
-          }
-        }
-
         "when calling submitViaEIS" must {
           "return a Right" when {
             "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {

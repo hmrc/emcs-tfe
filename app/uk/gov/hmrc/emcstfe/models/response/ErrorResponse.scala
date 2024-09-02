@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.response
 
 import com.lucidchart.open.xtract.ParseError
 import play.api.libs.json._
-import uk.gov.hmrc.emcstfe.models.response.rimValidation.{ChRISRIMValidationErrorResponse, EISRIMValidationErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.EISRIMValidationErrorResponse
 
 sealed trait ErrorResponse {
   val message: String
@@ -35,26 +35,10 @@ object ErrorResponse {
     val message = "Unexpected downstream response status"
   }
 
-  case object XmlValidationError extends ErrorResponse {
-    val message = "XML validation error"
-  }
-
   case class GenericParseError(message: String) extends ParseError
 
   case class XmlParseError(errors: Seq[ParseError]) extends ErrorResponse {
     val message = s"XML failed to parse, with the following errors:\n - ${errors.mkString("\n - ")}"
-  }
-
-  case object SoapExtractionError extends ErrorResponse {
-    val message = "Error extracting response body from SOAP wrapper"
-  }
-
-  case object MarkCreationError extends ErrorResponse {
-    val message = "Error creating an HMRC Mark with the supplied XML"
-  }
-
-  case object MarkPlacementError extends ErrorResponse {
-    val message = "Error placing an HMRC Mark into the supplied XML"
   }
 
   case class MongoError(msg: String) extends ErrorResponse {
@@ -79,10 +63,6 @@ object ErrorResponse {
 
   case class EISRIMValidationError(errorResponse: EISRIMValidationErrorResponse) extends ErrorResponse {
     val message = s"Request not processed returned by EIS, correlation ID: ${errorResponse.emcsCorrelationId}"
-  }
-
-  case class ChRISRIMValidationError(errorResponse: ChRISRIMValidationErrorResponse) extends ErrorResponse {
-    val message = s"Request not processed returned by ChRIS"
   }
 
   case class EISInternalServerError(errorResponse: String) extends ErrorResponse {
@@ -110,6 +90,4 @@ object ErrorResponse {
   case object NoLegacyActionProvided extends ErrorResponse {
     val message = s"no action found in the request"
   }
-
-  case class IdentityDataException(message: String) extends ErrorResponse
 }

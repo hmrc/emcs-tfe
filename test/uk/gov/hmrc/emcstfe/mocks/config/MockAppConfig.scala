@@ -25,7 +25,6 @@ trait MockAppConfig extends MockFactory {
   lazy val mockAppConfig: AppConfig = mock[AppConfig]
 
   object MockedAppConfig {
-    def chrisUrl: CallHandler[String] = ((() => mockAppConfig.chrisUrl): () => String).expects()
     def downstreamStubUrl: CallHandler[String] = ((() => mockAppConfig.downstreamStubUrl): () => String).expects()
 
     def isEnabled(featureName: String): CallHandler1[String, Boolean] = {

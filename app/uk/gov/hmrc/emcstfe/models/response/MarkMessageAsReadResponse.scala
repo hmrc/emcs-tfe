@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 
 import scala.xml.NodeSeq
@@ -26,9 +25,5 @@ case class MarkMessageAsReadResponse(recordsAffected: Int) extends LegacyMessage
 }
 
 object MarkMessageAsReadResponse {
-
-  implicit val xmlReader: XmlReader[MarkMessageAsReadResponse] =
-    (__ \\ "recordsAffected").read[Int].map(MarkMessageAsReadResponse.apply)
-
   implicit val fmt: OFormat[MarkMessageAsReadResponse] = Json.format
 }

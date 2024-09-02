@@ -16,25 +16,18 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.models.request.GetMovementListRequest
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, GetMovementList}
-import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetMovementListService @Inject()(chrisConnector: ChrisConnector,
-                                       eisConnector: EisConnector) extends Logging {
+class GetMovementListService @Inject()(eisConnector: EisConnector) {
 
   def getMovementList(getMovementListRequest: GetMovementListRequest)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementList]] = {
-    if(getMovementListRequest.isEISFeatureEnabled) {
-      eisConnector.getMovementList(getMovementListRequest).map(_.map(_.movementList))
-    } else {
-      chrisConnector.postChrisSOAPRequestAndExtractToModel[GetMovementList](getMovementListRequest)
-    }
-  }
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMovementList]] =
+    eisConnector.getMovementList(getMovementListRequest).map(_.map(_.movementList))
 }

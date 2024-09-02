@@ -33,6 +33,5 @@ trait XmlWriterUtils extends Logging {
   }
 
   def trimWhitespaceFromXml(xml: NodeSeq): NodeSeq =
-    xml.headOption.fold(NodeSeq.Empty)(scala.xml.Utility.trim)
-
+    xml.map(scala.xml.Utility.trim)
 }

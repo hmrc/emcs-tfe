@@ -18,14 +18,13 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsArray, JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage._
-import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 import scala.xml.Utility.trim
 import scala.xml.XML
 
-trait GetSubmissionFailureMessageFixtures extends BaseFixtures with SoapXmlFactory {
+trait GetSubmissionFailureMessageFixtures extends BaseFixtures {
 
   object IE704Xml {
     val fullXML: String =

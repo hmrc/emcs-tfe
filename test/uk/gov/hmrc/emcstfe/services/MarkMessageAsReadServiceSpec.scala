@@ -16,73 +16,38 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.MarkMessageAsReadFixtures
-import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.models.request.MarkMessageAsReadRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, UnexpectedDownstreamResponseError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class MarkMessageAsReadServiceSpec extends TestBaseSpec with MarkMessageAsReadFixtures with MockEisConnector with MockChrisConnector with MockAppConfig {
+class MarkMessageAsReadServiceSpec extends TestBaseSpec with MarkMessageAsReadFixtures with MockEisConnector {
 
   lazy val markMessageAsReadRequest: MarkMessageAsReadRequest = MarkMessageAsReadRequest(testErn, testMessageId)
-  lazy val service: MarkMessageAsReadService = new MarkMessageAsReadService(mockEisConnector, mockChrisConnector, mockAppConfig)
+  lazy val service: MarkMessageAsReadService = new MarkMessageAsReadService(mockEisConnector)
 
   "markMessageAsRead" when {
-    "call is sent to EIS" should {
-      "return a Right" when {
-        "connector call is successful and XML is the correct format" in {
+    "return a Right" when {
+      "connector call is successful and XML is the correct format" in {
 
-          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+        MockEisConnector.markMessageAsRead(markMessageAsReadRequest).returns(
+          Future.successful(Right(markMessageAsReadResponseModel))
+        )
 
-          MockEisConnector.markMessageAsRead(markMessageAsReadRequest).returns(
-            Future.successful(Right(markMessageAsReadResponseModel))
-          )
-
-          await(service.markMessageAsRead(markMessageAsReadRequest)) shouldBe Right(markMessageAsReadResponseModel)
-        }
-      }
-      "return a Left" when {
-        "connector call is unsuccessful" in {
-
-          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
-
-          MockEisConnector.markMessageAsRead(markMessageAsReadRequest).returns(
-            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-          )
-
-          await(service.markMessageAsRead(markMessageAsReadRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
-        }
+        await(service.markMessageAsRead(markMessageAsReadRequest)) shouldBe Right(markMessageAsReadResponseModel)
       }
     }
+    "return a Left" when {
+      "connector call is unsuccessful" in {
 
-    "call is sent to ChRIS" should {
-      "return a Right" when {
-        "connector call is successful and XML is the correct format" in {
+        MockEisConnector.markMessageAsRead(markMessageAsReadRequest).returns(
+          Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+        )
 
-          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
-
-          MockChrisConnector.postChrisSOAPRequestAndExtractToModel(markMessageAsReadRequest).returns(
-            Future.successful(Right(markMessageAsReadResponseModel))
-          )
-
-          await(service.markMessageAsRead(markMessageAsReadRequest)) shouldBe Right(markMessageAsReadResponseModel)
-        }
-      }
-      "return a Left" when {
-        "connector call is unsuccessful" in {
-
-          MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
-
-          MockChrisConnector.postChrisSOAPRequestAndExtractToModel(markMessageAsReadRequest).returns(
-            Future.successful(Left(UnexpectedDownstreamResponseError))
-          )
-
-          await(service.markMessageAsRead(markMessageAsReadRequest)) shouldBe Left(UnexpectedDownstreamResponseError)
-        }
+        await(service.markMessageAsRead(markMessageAsReadRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
       }
     }
   }

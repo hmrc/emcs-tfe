@@ -28,7 +28,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   override lazy val config: AppConfig = this
 
-  def chrisUrl: String          = servicesConfig.baseUrl("chris")
   def downstreamStubUrl: String = servicesConfig.baseUrl("downstream-stub")
 
   def eisUrl: String = servicesConfig.baseUrl("eis")
@@ -58,8 +57,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def getMovementReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.getMovement.replaceIndexes")
 
   def getFeatureSwitchValue(feature: String): Boolean = configuration.get[Boolean](feature)
-
-  def chrisBaseUrl: String = if (isEnabled(UseDownstreamStub)) downstreamStubUrl else chrisUrl
 
   def eisBaseUrl: String = if (isEnabled(UseDownstreamStub)) downstreamStubUrl else eisUrl
 
@@ -105,30 +102,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   def eisPreValidateTraderUrl(): String =
     eisBaseUrl + "/emcs/pre-validate-trader/v1"
-
-  def urlEMCSApplicationService(): String =
-    chrisBaseUrl + "/ChRISOSB/EMCS/EMCSApplicationService/2"
-
-  def urlSubmitCreateMovement(): String =
-    chrisBaseUrl + "/ChRIS/EMCS/SubmitDraftMovementPortal/3"
-
-  def urlSubmitReportOfReceipt(): String =
-    chrisBaseUrl + "/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
-
-  def urlSubmitExplainDelay(): String =
-    chrisBaseUrl + "/ChRIS/EMCS/SubmitExplainDelayToDeliveryPortal/4"
-
-  def urlSubmitChangeDestination(): String =
-    chrisBaseUrl + "/ChRIS/EMCS/SubmitChangeOfDestinationPortal/3"
-
-  def urlSubmitExplainShortageExcess(): String =
-    chrisBaseUrl + "/ChRIS/EMCS/SubmitReasonForShortagePortal/2"
-
-  def urlSubmitAlertOrRejection(): String =
-    chrisBaseUrl + "/ChRIS/EMCS/SubmitAlertOrRejectionMovementPortal/2"
-
-  def urlCancellationOfMovement(): String =
-    chrisBaseUrl + "/ChRIS/EMCS/SubmitCancellationPortal/3"
 
   def eisForwardedHost(): String = configuration.get[String]("eis.forwardedHost")
 

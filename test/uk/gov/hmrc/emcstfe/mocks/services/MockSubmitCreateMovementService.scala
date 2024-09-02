@@ -20,7 +20,7 @@ import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitCreateMovementService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -31,10 +31,6 @@ trait MockSubmitCreateMovementService extends MockFactory  {
   lazy val mockService: SubmitCreateMovementService = mock[SubmitCreateMovementService]
 
   object MockService extends Matchers {
-    def submit(requestModel: SubmitCreateMovementRequest): CallHandler3[SubmitCreateMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
-      (mockService.submit(_: SubmitCreateMovementRequest)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(requestModel, *, *)
-
     def submitViaEIS(requestModel: SubmitCreateMovementRequest): CallHandler3[SubmitCreateMovementRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
       (mockService.submitViaEIS(_: SubmitCreateMovementRequest)(_: HeaderCarrier, _: ExecutionContext))
         .expects(requestModel, *, *)

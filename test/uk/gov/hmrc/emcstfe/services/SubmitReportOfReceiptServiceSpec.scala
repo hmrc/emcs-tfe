@@ -19,21 +19,21 @@ package uk.gov.hmrc.emcstfe.services
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitReportOfReceiptFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.models.common.AcceptMovement.{PartiallyRefused, Refused, Satisfactory, Unsatisfactory}
 import uk.gov.hmrc.emcstfe.models.request.SubmitReportOfReceiptRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
 class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfReceiptFixtures with MockAppConfig {
 
-  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector with MockMetricsService {
+  class Test(useFS41SchemaVersion: Boolean) extends MockEisConnector with MockMetricsService {
     val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = useFS41SchemaVersion)
 
-    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockChrisConnector, mockEisConnector, mockAppConfig, mockMetricsService)
+    val service: SubmitReportOfReceiptService = new SubmitReportOfReceiptService(mockEisConnector, mockAppConfig, mockMetricsService)
     MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
   }
 
@@ -41,95 +41,46 @@ class SubmitReportOfReceiptServiceSpec extends TestBaseSpec with SubmitReportOfR
     Seq(true, false).foreach { useFS41SchemaVersion =>
       s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
         "when calling submit" must {
+          "return a Right" when {
+            "connector call is successful and Json is the correct format" when {
 
-          "when calling EIS" must {
+              Seq(
+                PartiallyRefused -> "partially-refused",
+                Refused -> "refused",
+                Satisfactory -> "satisfactory",
+                Unsatisfactory -> "unsatisfactory"
+              ).foreach { statusAndMetricName =>
 
-            "return a Right" when {
-              "connector call is successful and Json is the correct format" when {
+                s"status is ${statusAndMetricName._2}" in new Test(useFS41SchemaVersion) {
 
-                Seq(
-                  PartiallyRefused -> "partially-refused",
-                  Refused -> "refused",
-                  Satisfactory -> "satisfactory",
-                  Unsatisfactory -> "unsatisfactory"
-                ).foreach { statusAndMetricName =>
+                  val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = statusAndMetricName._1)
 
-                  s"status is ${statusAndMetricName._2}" in new Test(useFS41SchemaVersion) {
-
-                    val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = statusAndMetricName._1)
-
-                    override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
-                      SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = useFS41SchemaVersion)
-
-                    MockEisConnector
-                      .submit(submitReportOfReceiptRequest)
-                      .returns(Future.successful(Right(eisSuccessResponse)))
-
-                    MockMetricsService.rorStatusCounter(statusAndMetricName._2)
-
-                    await(service.submitViaEIS(model)) shouldBe Right(eisSuccessResponse)
-
-
-                  }
-                }
-              }
-
-              "return a Left" when {
-                "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
+                  override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
+                    SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = useFS41SchemaVersion)
 
                   MockEisConnector
                     .submit(submitReportOfReceiptRequest)
-                    .returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
+                    .returns(Future.successful(Right(eisSuccessResponse)))
 
-                  MockMetricsService.rorStatusCounter("failed-submission")
+                  MockMetricsService.rorStatusCounter(statusAndMetricName._2)
 
-                  await(service.submitViaEIS(maxSubmitReportOfReceiptModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+                  await(service.submitViaEIS(model)) shouldBe Right(eisSuccessResponse)
+
+
                 }
               }
             }
-          }
 
-          "when calling ChRIS" must {
+            "return a Left" when {
+              "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
 
-            "return a Right" when {
-              "connector call is successful and XML is the correct format" when {
+                MockEisConnector
+                  .submit(submitReportOfReceiptRequest)
+                  .returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
 
-                Seq(
-                  PartiallyRefused -> "partially-refused",
-                  Refused -> "refused",
-                  Satisfactory -> "satisfactory",
-                  Unsatisfactory -> "unsatisfactory"
-                ).foreach { statusAndMetricName =>
+                MockMetricsService.rorStatusCounter("failed-submission")
 
-                  s"status is ${statusAndMetricName._2}" in new Test(useFS41SchemaVersion) {
-
-                    val model = maxSubmitReportOfReceiptModel.copy(acceptMovement = statusAndMetricName._1)
-
-                    override val submitReportOfReceiptRequest: SubmitReportOfReceiptRequest =
-                      SubmitReportOfReceiptRequest(model, useFS41SchemaVersion = useFS41SchemaVersion)
-
-                    MockChrisConnector
-                      .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
-                      .returns(Future.successful(Right(chrisSuccessResponse)))
-
-                    MockMetricsService.rorStatusCounter(statusAndMetricName._2)
-
-                    await(service.submit(model)) shouldBe Right(chrisSuccessResponse)
-                  }
-                }
-              }
-
-              "return a Left" when {
-                "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-                  MockChrisConnector
-                    .submitReportOfReceiptChrisSOAPRequest(submitReportOfReceiptRequest)
-                    .returns(Future.successful(Left(XmlValidationError)))
-
-                  MockMetricsService.rorStatusCounter("failed-submission")
-
-                  await(service.submit(maxSubmitReportOfReceiptModel)) shouldBe Left(XmlValidationError)
-                }
+                await(service.submitViaEIS(maxSubmitReportOfReceiptModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
               }
             }
           }

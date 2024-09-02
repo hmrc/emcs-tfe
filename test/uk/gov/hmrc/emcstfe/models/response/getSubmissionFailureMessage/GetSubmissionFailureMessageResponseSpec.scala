@@ -55,13 +55,13 @@ class GetSubmissionFailureMessageResponseSpec extends TestBaseSpec with GetSubmi
     }
   }
 
-  "chrisReads" should {
+  "xmlReads" should {
     "turn XML into a model (related message type present)" in {
-      GetSubmissionFailureMessageResponse.chrisReads.read(XML.loadString(submissionFailureMessageDataXmlBody)) shouldBe ParseSuccess(getSubmissionFailureMessageResponseModel)
+      GetSubmissionFailureMessageResponse.xmlReads.read(XML.loadString(submissionFailureMessageDataXmlBody)) shouldBe ParseSuccess(getSubmissionFailureMessageResponseModel)
     }
 
     "turn XML into a model (without related message type present)" in {
-      GetSubmissionFailureMessageResponse.chrisReads.read(XML.loadString(submissionFailureMessageDataNoRelatedMessageTypeXmlBody)) shouldBe ParseSuccess(getSubmissionFailureMessageResponseMinimumModel)
+      GetSubmissionFailureMessageResponse.xmlReads.read(XML.loadString(submissionFailureMessageDataNoRelatedMessageTypeXmlBody)) shouldBe ParseSuccess(getSubmissionFailureMessageResponseMinimumModel)
     }
   }
 

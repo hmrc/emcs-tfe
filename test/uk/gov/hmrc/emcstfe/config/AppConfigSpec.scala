@@ -32,28 +32,6 @@ class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
       config.reportReceiptUserAnswersTTL() shouldBe Duration("15minutes")
     }
 
-    ".chris url()" should {
-      "when UseDownstreamStub is enabled" should  {
-
-        "must return to the legacy URL" in {
-          enable(UseDownstreamStub)
-          config.urlEMCSApplicationService() shouldBe s"http://localhost:8308/ChRISOSB/EMCS/EMCSApplicationService/2"
-          config.urlSubmitCreateMovement() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
-          config.urlSubmitReportOfReceipt() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
-        }
-      }
-
-      "when UseDownstreamStub is disabled" should {
-
-        "must return to the new URL" in {
-          disable(UseDownstreamStub)
-          config.urlEMCSApplicationService() shouldBe s"http://localhost:8308/ChRISOSB/EMCS/EMCSApplicationService/2"
-          config.urlSubmitCreateMovement() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitDraftMovementPortal/3"
-          config.urlSubmitReportOfReceipt() shouldBe s"http://localhost:8308/ChRIS/EMCS/SubmitReportofReceiptPortal/4"
-        }
-      }
-    }
-
     ".eis url()" should {
       "when UseDownstreamStub is enabled" should {
 

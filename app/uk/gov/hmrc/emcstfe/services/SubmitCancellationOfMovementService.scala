@@ -17,12 +17,12 @@
 package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
 import uk.gov.hmrc.emcstfe.models.request.SubmitCancellationOfMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -30,14 +30,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitCancellationOfMovementService @Inject()(chrisConnector: ChrisConnector,
-                                                    eisConnector: EisConnector,
+class SubmitCancellationOfMovementService @Inject()(eisConnector: EisConnector,
                                                     val config: AppConfig) extends Logging with FeatureSwitching {
-  def submit(submission: SubmitCancellationOfMovementModel)
-            (implicit hc: HeaderCarrier,
-             ec: ExecutionContext,
-             request: UserRequest[_]): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    chrisConnector.submitCancellationOfMovementChrisSOAPRequest[ChRISSuccessResponse](SubmitCancellationOfMovementRequest(submission, isEnabled(ValidateUsingFS41Schema)))
 
   def submitViaEIS(submission: SubmitCancellationOfMovementModel)
                   (implicit hc: HeaderCarrier,

@@ -19,10 +19,10 @@ package uk.gov.hmrc.emcstfe.services
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitExplainShortageExcessFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.request.SubmitExplainShortageExcessRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -31,47 +31,24 @@ class SubmitExplainShortageExcessServiceSpec extends TestBaseSpec with SubmitExp
 
   import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
-  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
+  class Test(useFS41SchemaVersion: Boolean) extends MockEisConnector {
     val submitExplainShortageExcessRequest: SubmitExplainShortageExcessRequest = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor), useFS41SchemaVersion = useFS41SchemaVersion)
-    val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockChrisConnector, mockEisConnector, mockAppConfig)
+    val service: SubmitExplainShortageExcessService = new SubmitExplainShortageExcessService(mockEisConnector, mockAppConfig)
     MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
   }
 
   "SubmitExplainShortageExcessService" when {
     Seq(true, false).foreach { useFS41SchemaVersion =>
       s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
-        "when calling submit" must {
-          "return a Right" when {
-            "connector call to Chris is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
-                Future.successful(Right(chrisSuccessResponse))
-              )
-
-              await(service.submit(submitExplainShortageExcessModelMax(Consignor))) shouldBe Right(chrisSuccessResponse)
-            }
-          }
-          "return a Left" when {
-            "connector call to Chris is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitExplainShortageExcessChrisSOAPRequest(submitExplainShortageExcessRequest).returns(
-                Future.successful(Left(XmlValidationError))
-              )
-
-              await(service.submit(submitExplainShortageExcessModelMax(Consignor))) shouldBe Left(XmlValidationError)
-            }
-          }
-        }
-
         "when calling submitViaEIS" must {
           "return a Right" when {
             "connector call to EIS is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
 
               MockEisConnector.submit(submitExplainShortageExcessRequest).returns(
-                Future.successful(Right(chrisSuccessResponse))
+                Future.successful(Right(eisSuccessResponse))
               )
 
-              await(service.submitViaEIS(submitExplainShortageExcessModelMax(Consignor))) shouldBe Right(chrisSuccessResponse)
+              await(service.submitViaEIS(submitExplainShortageExcessModelMax(Consignor))) shouldBe Right(eisSuccessResponse)
             }
           }
           "return a Left" when {

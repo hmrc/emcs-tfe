@@ -27,8 +27,7 @@ trait SubmitChangeDestinationFixtures extends BaseFixtures
   with TraderModelFixtures
   with MovementGuaranteeFixtures
   with TransportDetailsFixtures
-  with ChRISResponsesFixture
-  with EISResponsesFixture {
+    with EISResponsesFixture {
 
     object UpdateEadEsadFixtures {
     lazy val updateEadEsadModelMax: UpdateEadEsadModel = UpdateEadEsadModel(

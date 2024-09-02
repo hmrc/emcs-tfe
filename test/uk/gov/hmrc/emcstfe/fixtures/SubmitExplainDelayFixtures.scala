@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.models.explainDelay.DelayReasonType.Strikes
 import uk.gov.hmrc.emcstfe.models.explainDelay.DelayType.DelayWithReportReceipt
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
 
-trait SubmitExplainDelayFixtures extends BaseFixtures with ChRISResponsesFixture with EISResponsesFixture {
+trait SubmitExplainDelayFixtures extends BaseFixtures with EISResponsesFixture {
 
   val maxSubmitExplainDelayModel = SubmitExplainDelayModel(
     arc = testArc,

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import com.lucidchart.open.xtract.{XmlReader, __}
 import play.api.libs.json.{Json, OFormat}
 
 import scala.xml.NodeSeq
@@ -26,9 +25,5 @@ case class SetMessageAsLogicallyDeletedResponse(recordsAffected: Int) extends Le
 }
 
 object SetMessageAsLogicallyDeletedResponse {
-
-  implicit val xmlReader: XmlReader[SetMessageAsLogicallyDeletedResponse] =
-    (__ \\ "recordsAffected").read[Int].map(SetMessageAsLogicallyDeletedResponse.apply)
-
   implicit val fmt: OFormat[SetMessageAsLogicallyDeletedResponse] = Json.format
 }

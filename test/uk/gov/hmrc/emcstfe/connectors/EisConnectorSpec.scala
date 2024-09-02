@@ -1523,7 +1523,7 @@ class EisConnectorSpec
         undischargedMovements = Some("Accepted"),
         exciseProductCode = Some("6000")
       )
-      val getMovementListRequest = GetMovementListRequest(testErn, searchOptions, isEISFeatureEnabled = true)
+      val getMovementListRequest = GetMovementListRequest(testErn, searchOptions)
       val url = "/emcs/movements/v1/movements"
       val queryParameters = Seq(
         "exciseregistrationnumber" -> testErn,

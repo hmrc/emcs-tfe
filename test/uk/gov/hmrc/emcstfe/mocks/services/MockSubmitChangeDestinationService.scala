@@ -20,7 +20,7 @@ import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitChangeDestinationService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -31,10 +31,6 @@ trait MockSubmitChangeDestinationService extends MockFactory  {
   lazy val mockSubmitChangeDestinationService: SubmitChangeDestinationService = mock[SubmitChangeDestinationService]
 
   object MockSubmitChangeDestinationService extends Matchers {
-    def submit(request: SubmitChangeDestinationRequest): CallHandler3[SubmitChangeDestinationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
-      (mockSubmitChangeDestinationService.submit(_: SubmitChangeDestinationRequest)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(request, *, *)
-
     def submitViaEIS(request: SubmitChangeDestinationRequest): CallHandler3[SubmitChangeDestinationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
       (mockSubmitChangeDestinationService.submitViaEIS(_: SubmitChangeDestinationRequest)(_: HeaderCarrier, _: ExecutionContext))
         .expects(request, *, *)

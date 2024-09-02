@@ -18,9 +18,7 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementListRequest, GetMovementListSearchOptions}
 import uk.gov.hmrc.emcstfe.services.GetMovementListService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -31,13 +29,12 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class GetMovementListController @Inject()(cc: ControllerComponents,
                                           service: GetMovementListService,
-                                          override val auth: AuthAction,
-                                          val config: AppConfig
-                                         )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with FeatureSwitching {
+                                          override val auth: AuthAction
+                                         )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
   def getMovementList(exciseRegistrationNumber: String, searchOptions: GetMovementListSearchOptions): Action[AnyContent] =
     authorisedUserRequest(exciseRegistrationNumber) { implicit request =>
-      service.getMovementList(GetMovementListRequest(exciseRegistrationNumber, searchOptions, isEnabled(SendToEIS))).map {
+      service.getMovementList(GetMovementListRequest(exciseRegistrationNumber, searchOptions)).map {
         case Left(value) => InternalServerError(Json.toJson(value))
         case Right(value) => Ok(Json.toJson(value))
       }

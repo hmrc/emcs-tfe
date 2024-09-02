@@ -18,10 +18,10 @@ package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.mocks.repository.MockChangeDestinationUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISBusinessError, EISRIMValidationError, EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISUnknownError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -34,54 +34,14 @@ class SubmitChangeDestinationServiceSpec extends TestBaseSpec
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
-  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
+  class Test(useFS41SchemaVersion: Boolean) extends MockEisConnector {
     val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = useFS41SchemaVersion)
-    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockChrisConnector, mockEisConnector, mockChangeDestinationUserAnswersRepository, mockAppConfig)
+    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockEisConnector, mockChangeDestinationUserAnswersRepository, mockAppConfig)
   }
 
   "SubmitChangeDestinationService" when {
     Seq(true, false).foreach { useFS41SchemaVersion =>
       s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
-
-        "when calling submit" must {
-          "return a Right" when {
-            "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
-                Future.successful(Right(chrisSuccessResponse))
-              )
-
-              MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, Seq.empty)
-                .returns(Future.successful(true))
-
-              await(service.submit(submitChangeDestinationRequest)) shouldBe Right(chrisSuccessResponse)
-            }
-          }
-          "return a Left" when {
-
-            "ChRIS returns a 200 response but with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
-                Future.successful(Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse)))
-              )
-
-              MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, chrisRIMValidationErrorResponse.rimValidationErrors)
-                .returns(Future.successful(true))
-
-              await(service.submit(submitChangeDestinationRequest)) shouldBe Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse))
-            }
-
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
-                Future.successful(Left(XmlValidationError))
-              )
-
-              await(service.submit(submitChangeDestinationRequest)) shouldBe Left(XmlValidationError)
-            }
-          }
-        }
-
         "when calling submitViaEIS" must {
           "return a Right" when {
             "connector call is successful and Json is the correct format" in new Test(useFS41SchemaVersion) {

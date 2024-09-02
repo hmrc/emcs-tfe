@@ -21,7 +21,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.cancellationOfMovement.SubmitCancellationOfMovementModel
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.services.SubmitCancellationOfMovementService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -32,10 +32,6 @@ trait MockSubmitCancellationOfMovementService extends MockFactory  {
   lazy val mockService: SubmitCancellationOfMovementService = mock[SubmitCancellationOfMovementService]
 
   object MockService extends Matchers {
-    def submit(submission: SubmitCancellationOfMovementModel): CallHandler4[SubmitCancellationOfMovementModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, ChRISSuccessResponse]]] =
-      (mockService.submit(_: SubmitCancellationOfMovementModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
-        .expects(submission, *, *, *)
-
     def submitViaEIS(submission: SubmitCancellationOfMovementModel): CallHandler4[SubmitCancellationOfMovementModel, HeaderCarrier, ExecutionContext, UserRequest[_], Future[Either[ErrorResponse, EISSubmissionSuccessResponse]]] =
       (mockService.submitViaEIS(_: SubmitCancellationOfMovementModel)(_: HeaderCarrier, _: ExecutionContext, _: UserRequest[_]))
         .expects(submission, *, *, *)

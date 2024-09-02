@@ -17,24 +17,17 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import com.lucidchart.open.xtract.EmptyError
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{DefaultDraftMovementCorrelationId, FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{DefaultDraftMovementCorrelationId, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
-import uk.gov.hmrc.emcstfe.models.response.ChRISSuccessResponse
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
-import scala.xml.XML
-
-class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec
-  with CreateMovementFixtures
-
-  with FeatureSwitching {
+class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec with CreateMovementFixtures with FeatureSwitching {
 
   override val config: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -42,8 +35,6 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec
     def setupStubs(): StubMapping
 
     def uri: String = s"/create-movement/$testErn/$testArc"
-
-    def downstreamUri: String = s"/ChRIS/EMCS/SubmitDraftMovementPortal/3"
 
     def downstreamEisUri: String = s"/emcs/digital-submit-new-message/v1"
 
@@ -57,7 +48,6 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec
   override def beforeEach(): Unit = {
     super.beforeEach()
     enable(DefaultDraftMovementCorrelationId)
-    disable(SendToEIS)
   }
 
   override def afterEach(): Unit = {
@@ -67,162 +57,78 @@ class SubmitCreateMovementIntegrationSpec extends IntegrationBaseSpec
 
   "Calling the submit draft movement endpoint" must {
 
-    "when calling ChRIS" must {
-      "return a success" when {
-        "all downstream calls are successful" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(chrisSuccessSOAPResponseBody))
-          }
+    "return a success" when {
 
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.OK
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe chrisSuccessJsonNoLRN(withSubmittedDraftId = true)
+      "all downstream calls are successful" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
         }
+
+        val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
+        response.status shouldBe Status.OK
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe eisSuccessJson(withSubmittedDraftId = true, submittedDraftId = Some("PORTAL123"))
       }
-      "return an error" when {
-        "downstream call returns unexpected XML" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, <Message>Success!</Message>)
-          }
 
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(XmlParseError(Seq(EmptyError(ChRISSuccessResponse.digestValue), EmptyError(ChRISSuccessResponse.receiptDateTime), EmptyError(ChRISSuccessResponse.digestValue))))
-        }
-        "downstream call returns something other than XML" in new Test {
-          val responseBody: JsValue = Json.obj("message" -> "Success!")
-
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, responseBody)
-          }
-
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(XmlValidationError)
-        }
-
-        "downstream call returns RIM validation errors" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(chrisRimValidationResponseBody))
-          }
-
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.UNPROCESSABLE_ENTITY
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.obj(
-            "message" -> "Request not processed returned by ChRIS"
-          )
-        }
-
-        "downstream call returns a non-200 HTTP response" in new Test {
-          val referenceDataResponseBody: JsValue = Json.parse(
-            s"""
-               |{
-               |   "message": "test message"
-               |}
-               |""".stripMargin
-          )
-
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
-          }
-
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
-        }
-      }
     }
 
-    "when calling EIS" must {
+    "return an error" when {
 
-      "return a success" when {
-
-        "all downstream calls are successful" in new Test {
-
-          override def setupStubs(): StubMapping = {
-            enable(SendToEIS)
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, eisSuccessJson())
-          }
-
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.OK
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe eisSuccessJson(withSubmittedDraftId = true, submittedDraftId = Some("PORTAL123"))
+      "downstream call returns unexpected JSON" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, incompleteEisSuccessJson.toString())
         }
 
+        val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe Json.obj(
+          "message" -> "Errors parsing JSON, errors: List(JsonValidationError(List(error.path.missing),List()))"
+        )
       }
 
-      "return an error" when {
-
-        "downstream call returns unexpected JSON" in new Test {
-          override def setupStubs(): StubMapping = {
-            enable(SendToEIS)
-            AuthStub.authorised()
-            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.OK, incompleteEisSuccessJson.toString())
-          }
-
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.obj(
-            "message" -> "Errors parsing JSON, errors: List(JsonValidationError(List(error.path.missing),List()))"
-          )
+      "downstream call returns a 422 (not RIM validation errors)" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.UNPROCESSABLE_ENTITY, Json.obj("foo" -> "bar").toString())
         }
 
-        "downstream call returns a 422 (not RIM validation errors)" in new Test {
-          override def setupStubs(): StubMapping = {
-            enable(SendToEIS)
-            AuthStub.authorised()
-            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.UNPROCESSABLE_ENTITY, Json.obj("foo" -> "bar").toString())
-          }
+        val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe Json.obj(
+          "message" -> "Request not processed returned by EIS, error response: {\"foo\":\"bar\"}"
+        )
+      }
 
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.obj(
-            "message" -> "Request not processed returned by EIS, error response: {\"foo\":\"bar\"}"
-          )
+      "downstream call returns RIM validation errors" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.UNPROCESSABLE_ENTITY, eisRimValidationJsonResponse.toString())
         }
 
-        "downstream call returns RIM validation errors" in new Test {
-          override def setupStubs(): StubMapping = {
-            enable(SendToEIS)
-            AuthStub.authorised()
-            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.UNPROCESSABLE_ENTITY, eisRimValidationJsonResponse.toString())
-          }
+        val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
+        response.status shouldBe Status.UNPROCESSABLE_ENTITY
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe Json.obj(
+          "message" -> "Request not processed returned by EIS, correlation ID: 7be1db16-e8fb-4e81-97e5-3d3e2d21f6c4"
+        )
+      }
 
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.UNPROCESSABLE_ENTITY
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.obj(
-            "message" -> "Request not processed returned by EIS, correlation ID: 7be1db16-e8fb-4e81-97e5-3d3e2d21f6c4"
-          )
+      "downstream call returns a non-200 HTTP response" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.INTERNAL_SERVER_ERROR, "bad things")
         }
 
-        "downstream call returns a non-200 HTTP response" in new Test {
-
-          override def setupStubs(): StubMapping = {
-            enable(SendToEIS)
-            AuthStub.authorised()
-            DownstreamStub.onError(DownstreamStub.POST, downstreamEisUri, Status.INTERNAL_SERVER_ERROR, "bad things")
-          }
-
-          val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(EISInternalServerError("bad things"))
-        }
+        val response: WSResponse = await(request().post(CreateMovementFixtures.createMovementJsonMax))
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+        response.header("Content-Type") shouldBe Some("application/json")
+        response.json shouldBe Json.toJson(EISInternalServerError("bad things"))
       }
     }
   }

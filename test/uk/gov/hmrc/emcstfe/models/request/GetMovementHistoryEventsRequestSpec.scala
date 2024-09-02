@@ -18,37 +18,9 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-import scala.xml.XML
-
 class GetMovementHistoryEventsRequestSpec extends TestBaseSpec {
 
   val request = GetMovementHistoryEventsRequest(exciseRegistrationNumber = "My ERN", arc = "My ARC")
-
-  "requestBody" should {
-    "generate the correct request XML" in {
-      val xml = XML.loadString(request.requestBody)
-
-
-      (xml \\ "Envelope" \\ "Header" \\ "VersionNo").text shouldBe "2.1"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Source").text shouldBe "emcs_tfe"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Identity").text shouldBe "portal"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Partner").text shouldBe "UK"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "ExciseRegistrationNumber").text shouldBe "My ERN"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").filter(el => (el \ "@Name").text == "ARC").text shouldBe "My ARC"
-    }
-  }
-
-  "action" should {
-    "be correct" in {
-      request.action shouldBe "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementHistoryEvents"
-    }
-  }
-
-  "shouldExtractFromSoap" should {
-    "be correct" in {
-      request.shouldExtractFromSoap shouldBe true
-    }
-  }
 
   "queryParams" should {
     "be correct" in {

@@ -21,8 +21,6 @@ import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.{JsValue, Json, JsonValidationError}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementListFixture
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
@@ -30,16 +28,12 @@ import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 import scala.xml.XML
 
-class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovementListFixture with FeatureSwitching {
-
-  override val config: AppConfig = app.injector.instanceOf[AppConfig]
+class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovementListFixture {
 
   private trait Test {
     def setupStubs(): StubMapping
 
     def uri: String = s"/movements/$testErn"
-
-    def downstreamUri: String = "/ChRISOSB/EMCS/EMCSApplicationService/2"
 
     def downstreamEisUri: String = "/emcs/movements/v1/movements"
 
@@ -55,7 +49,7 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
       s"return FORBIDDEN ($FORBIDDEN)" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.unauthorised()
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(getMovementListSoapWrapper))
+          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamEisUri, Status.OK, XML.loadString(getMovementListSoapWrapper))
         }
 
         val response: WSResponse = await(request().get())
@@ -76,161 +70,81 @@ class GetMovementListIntegrationSpec extends IntegrationBaseSpec with GetMovemen
         }
       }
 
-      "when calling ChRIS" should {
+      val requestQueryParams: Map[String, String] = Map(
+        "exciseregistrationnumber" -> "GBWK000001234",
+        "traderrole" -> "both",
+        "sortfield" -> "dateofdispatch",
+        "sortorder" -> "D",
+        "startposition" -> "0",
+        "maxnotoreturn" -> "30"
+      )
 
-        "return a success" when {
-          "all downstream calls are successful" in new Test {
-            override def setupStubs(): StubMapping = {
-              disable(SendToEIS)
-              AuthStub.authorised()
-              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, XML.loadString(getMovementListSoapWrapper))
-            }
-
-            val response: WSResponse = await(request().get())
-            response.status shouldBe Status.OK
-            response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe getMovementListJson
+      "return a success" when {
+        "all downstream calls are successful" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.OK, getMovementListJsonResponse)
           }
-        }
-        "return an error" when {
-          "downstream call returns unexpected XML" in new Test {
-            override def setupStubs(): StubMapping = {
-              AuthStub.authorised()
-              disable(SendToEIS)
-              DownstreamStub.onSuccess(
-                DownstreamStub.POST,
-                downstreamUri,
-                Status.OK,
-                <Errors>
-                  <Error>Something went wrong</Error>
-                </Errors>
-              )
-            }
 
-            val response: WSResponse = await(request().get())
-            response.status shouldBe Status.INTERNAL_SERVER_ERROR
-            response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe Json.toJson(SoapExtractionError)
-          }
-          "downstream call returns something other than XML" in new Test {
-            val referenceDataResponseBody: JsValue = Json.obj("message" -> "Success!")
-
-            override def setupStubs(): StubMapping = {
-              AuthStub.authorised()
-              disable(SendToEIS)
-              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, referenceDataResponseBody)
-            }
-
-            val response: WSResponse = await(request().get())
-            response.status shouldBe Status.INTERNAL_SERVER_ERROR
-            response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe Json.toJson(XmlValidationError)
-          }
-          "downstream call returns a non-200 HTTP response" in new Test {
-            val referenceDataResponseBody: JsValue = Json.parse(
-              s"""
-                 |{
-                 |   "message": "test message"
-                 |}
-                 |""".stripMargin
-            )
-
-            override def setupStubs(): StubMapping = {
-              AuthStub.authorised()
-              disable(SendToEIS)
-              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
-            }
-
-            val response: WSResponse = await(request().get())
-            response.status shouldBe Status.INTERNAL_SERVER_ERROR
-            response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
-          }
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.OK
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe getMovementListJson
         }
       }
 
-      "when calling EIS" should {
+      "return an error" when {
+        "downstream call returns unexpected encoded XML" in new Test {
+          val jsonResponse = Json.obj(
+            "exciseRegistrationNumber" -> testErn,
+            "dateTime" -> "2023-09-07T12:39:20.354Z",
+            "message" -> "PHZhbHVlPm5ldmVyIGdvbm5hIGdpdmUgeW91IHVwPC92YWx1ZT4="
+          )
 
-        val requestQueryParams: Map[String, String] = Map(
-          "exciseregistrationnumber" -> "GBWK000001234",
-          "traderrole" -> "both",
-          "sortfield" -> "dateofdispatch",
-          "sortorder" -> "D",
-          "startposition" -> "0",
-          "maxnotoreturn" -> "30"
-        )
-
-        "return a success" when {
-          "all downstream calls are successful" in new Test {
-            override def setupStubs(): StubMapping = {
-              enable(SendToEIS)
-              AuthStub.authorised()
-              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.OK, getMovementListJsonResponse)
-            }
-
-            val response: WSResponse = await(request().get())
-            response.status shouldBe Status.OK
-            response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe getMovementListJson
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.OK, jsonResponse)
           }
+
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"{\\\"obj\\\":[{\\\"msg\\\":[\\\"XML failed to parse, with the following errors:\\\\n - EmptyError(/CountOfMovementsAvailable)\\\"],\\\"args\\\":[]}]}\"],\"args\":[]}]}"))
+          ))
         }
 
-        "return an error" when {
-          "downstream call returns unexpected encoded XML" in new Test {
-            val jsonResponse = Json.obj(
-              "exciseRegistrationNumber" -> testErn,
-              "dateTime" -> "2023-09-07T12:39:20.354Z",
-              "message" -> "PHZhbHVlPm5ldmVyIGdvbm5hIGdpdmUgeW91IHVwPC92YWx1ZT4="
-            )
+        "downstream call returns something other than the expected response" in new Test {
+          val responseBody: JsValue = Json.obj("message" -> "Success!")
 
-            override def setupStubs(): StubMapping = {
-              enable(SendToEIS)
-              AuthStub.authorised()
-              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.OK, jsonResponse)
-            }
-
-            val response: WSResponse = await(request().get())
-            response.status shouldBe Status.INTERNAL_SERVER_ERROR
-            response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"{\\\"obj\\\":[{\\\"msg\\\":[\\\"XML failed to parse, with the following errors:\\\\n - EmptyError(/CountOfMovementsAvailable)\\\"],\\\"args\\\":[]}]}\"],\"args\":[]}]}"))
-            ))
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.OK, responseBody)
           }
 
-          "downstream call returns something other than the expected response" in new Test {
-            val responseBody: JsValue = Json.obj("message" -> "Success!")
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"Illegal base64 character 21\"],\"args\":[]}]}"))))
+        }
 
-            override def setupStubs(): StubMapping = {
-              enable(SendToEIS)
-              AuthStub.authorised()
-              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.OK, responseBody)
-            }
+        "downstream call returns a non-200 HTTP response" in new Test {
+          val responseBody: JsValue = Json.parse(
+            s"""
+               |{
+               |   "message": "test message"
+               |}
+               |""".stripMargin
+          )
 
-            val response: WSResponse = await(request().get())
-            response.status shouldBe Status.INTERNAL_SERVER_ERROR
-            response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe Json.toJson(EISJsonParsingError(Seq(JsonValidationError("{\"obj\":[{\"msg\":[\"Illegal base64 character 21\"],\"args\":[]}]}"))))
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.INTERNAL_SERVER_ERROR, responseBody)
           }
 
-          "downstream call returns a non-200 HTTP response" in new Test {
-            val responseBody: JsValue = Json.parse(
-              s"""
-                 |{
-                 |   "message": "test message"
-                 |}
-                 |""".stripMargin
-            )
-
-            override def setupStubs(): StubMapping = {
-              enable(SendToEIS)
-              AuthStub.authorised()
-              DownstreamStub.onSuccess(DownstreamStub.GET, downstreamEisUri, requestQueryParams, Status.INTERNAL_SERVER_ERROR, responseBody)
-            }
-
-            val response: WSResponse = await(request().get())
-            response.status shouldBe Status.INTERNAL_SERVER_ERROR
-            response.header("Content-Type") shouldBe Some("application/json")
-            response.json shouldBe Json.toJson(EISInternalServerError("{\"message\":\"test message\"}"))
-          }
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.toJson(EISInternalServerError("{\"message\":\"test message\"}"))
         }
       }
     }
