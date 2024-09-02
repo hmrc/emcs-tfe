@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.mocks.config
 
-import org.scalamock.handlers.{CallHandler, CallHandler0, CallHandler1}
+import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.models.FeatureSwitch
@@ -25,21 +25,9 @@ trait MockAppConfig extends MockFactory {
   lazy val mockAppConfig: AppConfig = mock[AppConfig]
 
   object MockedAppConfig {
-    def downstreamStubUrl: CallHandler[String] = ((() => mockAppConfig.downstreamStubUrl): () => String).expects()
-
-    def isEnabled(featureName: String): CallHandler1[String, Boolean] = {
-      (mockAppConfig.getFeatureSwitchValue(_: String)).expects(featureName)
-    }
-
     def getFeatureSwitchValue(feature: FeatureSwitch): CallHandler1[String, Boolean] = {
       val featureSwitchName = feature.configName
       (mockAppConfig.getFeatureSwitchValue(_: String)).expects(featureSwitchName)
     }
-
-    def publicBetaTrafficPercentageForService(serviceName: String): CallHandler1[String, Option[Int]] = (mockAppConfig.publicBetaTrafficPercentageForService(_: String)).expects(serviceName)
-    def internalAuthToken: CallHandler0[String] = ((() => mockAppConfig.internalAuthToken()): () => String).expects()
-    def userAllowListBaseUrl: CallHandler0[String] = ((() => mockAppConfig.userAllowListBaseUrl()): () => String).expects()
-
-    def listOfErnsToExcludeFromPublicBeta: CallHandler0[Seq[String]] = (() => mockAppConfig.listOfErnsToExcludeFromPublicBeta).expects()
   }
 }

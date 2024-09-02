@@ -41,23 +41,12 @@ trait IntegrationBaseSpec
   def servicesConfig: Map[String, _] = Map(
     "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
     "microservice.services.eis.port" -> WireMockHelper.wireMockPort,
-    "microservice.services.user-allow-list.port" -> WireMockHelper.wireMockPort,
     "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort,
     "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
     "createMovementUserAnswers.TTL" -> testTtl,
     "createMovementUserAnswers.replaceIndexes" -> testReplaceIndexes,
     "getMovement.TTL" -> testTtl,
-    "getMovement.replaceIndexes" -> testReplaceIndexes.toString,
-    "beta.public.createMovement.trafficPercentage" -> "50",
-    "beta.public.changeDestination.trafficPercentage" -> "50",
-    "beta.public.tfeNavHub.trafficPercentage" -> "50",
-    "beta.public.tfeMessageInbox.trafficPercentage" -> "50",
-    "beta.public.tfeDrafts.trafficPercentage" -> "50",
-    "beta.public.tfeHome.trafficPercentage" -> "50",
-    "beta.public.tfeSearchMovements.trafficPercentage" -> "50",
-    "beta.public.tfeViewMovement.trafficPercentage" -> "50",
-    "beta.public.tfeChangeDestination.trafficPercentage" -> "50",
-    "beta.public.tfePreValidate.trafficPercentage" -> "50"
+    "getMovement.replaceIndexes" -> testReplaceIndexes.toString
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

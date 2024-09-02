@@ -60,10 +60,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   def eisBaseUrl: String = if (isEnabled(UseDownstreamStub)) downstreamStubUrl else eisUrl
 
-  private def userAllowListService: String = servicesConfig.baseUrl("user-allow-list")
-
-  def userAllowListBaseUrl(): String = s"$userAllowListService/user-allow-list"
-
   def eisSubmissionsUrl(): String =
     eisBaseUrl + "/emcs/digital-submit-new-message/v1"
 
@@ -104,10 +100,4 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
     eisBaseUrl + "/emcs/pre-validate-trader/v1"
 
   def eisForwardedHost(): String = configuration.get[String]("eis.forwardedHost")
-
-  def internalAuthToken(): String = configuration.get[String]("internal-auth.token")
-
-  def publicBetaTrafficPercentageForService(serviceName: String): Option[Int] = configuration.getOptional[Int](s"beta.public.$serviceName.trafficPercentage")
-
-  def listOfErnsToExcludeFromPublicBeta: Seq[String] = configuration.get[Seq[String]]("beta.public.listOfErnsToExclude")
 }

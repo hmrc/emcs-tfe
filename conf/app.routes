@@ -24,9 +24,5 @@ POST          /create-movement/:ern/:draftId                     uk.gov.hmrc.emc
 # Pre validate trader
 POST          /pre-validate-trader/:ern                          uk.gov.hmrc.emcstfe.controllers.PreValidateTraderController.submit(ern)
 
-# User allow list
-GET           /beta/eligibility/:ern/:serviceName                uk.gov.hmrc.emcstfe.controllers.userAllowList.UserAllowListController.checkEligibility(ern, serviceName)
-
-
 # User answers
 ->            /user-answers                                      userAnswers.Routes
