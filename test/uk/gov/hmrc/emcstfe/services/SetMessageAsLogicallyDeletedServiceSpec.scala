@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.SetMessageAsLogicallyDeletedFixtures
-import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.models.request.SetMessageAsLogicallyDeletedRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -28,16 +26,14 @@ import scala.concurrent.Future
 
 class SetMessageAsLogicallyDeletedServiceSpec extends TestBaseSpec with SetMessageAsLogicallyDeletedFixtures {
 
-  trait Test extends MockEisConnector with MockChrisConnector with MockAppConfig {
+  trait Test extends MockEisConnector {
     val setMessageAsLogicallyDeletedRequest: SetMessageAsLogicallyDeletedRequest = SetMessageAsLogicallyDeletedRequest(testErn, testMessageId)
-    val service: SetMessageAsLogicallyDeletedService = new SetMessageAsLogicallyDeletedService(mockEisConnector, mockChrisConnector, mockAppConfig)
+    val service: SetMessageAsLogicallyDeletedService = new SetMessageAsLogicallyDeletedService(mockEisConnector)
   }
 
   "setMessageAsLogicallyDeleted" should {
     "return a Right" when {
       "connector call is successful and XML is the correct format" in new Test {
-
-        MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
         MockEisConnector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest).returns(
           Future.successful(Right(setMessageAsLogicallyDeletedResponseModel))
@@ -48,8 +44,6 @@ class SetMessageAsLogicallyDeletedServiceSpec extends TestBaseSpec with SetMessa
     }
     "return a Left" when {
       "connector call is unsuccessful" in new Test {
-
-        MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
 
         MockEisConnector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest).returns(
           Future.successful(Left(EISUnknownError("Downstream failed to respond")))

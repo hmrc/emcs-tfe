@@ -28,9 +28,8 @@ trait EisMessage extends XmlWriterUtils {
   def withEisMessage[T <: XmlBaseModel](body: T,
                                         messageNumber: Int,
                                         messageSender: String,
-                                        messageRecipient: String,
-                                        isFS41SchemaVersion: Boolean)(implicit request: UserRequest[_]): String = {
-    val schemaVersion = if(isFS41SchemaVersion) "V3.13" else "V3.01"
+                                        messageRecipient: String)(implicit request: UserRequest[_]): String = {
+    val schemaVersion = "V3.13"
     trimWhitespaceFromXml(controlDocument(
       XML.loadString(
         s"""<urn:IE$messageNumber xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE$messageNumber:$schemaVersion" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:$schemaVersion">

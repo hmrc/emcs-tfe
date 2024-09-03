@@ -22,13 +22,12 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.TaxWarehouse
 import uk.gov.hmrc.emcstfe.models.common.TraderModel
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
-case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel, useFS41SchemaVersion: Boolean)
-                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
+case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
+                                       (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
 
   private val arcCountryCode = body.arc.substring(2, 4)
   private val traderModelCountryCode: Option[TraderModel] => String = _.flatMap(_.countryCode).getOrElse(exciseRegistrationNumber.substring(0, 2))
@@ -44,19 +43,6 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel, useFS4
 
   override def exciseRegistrationNumber: String = request.ern
 
-  override def requestBody: String =
-    withSubmissionRequestSoapEnvelope(
-      body = body,
-      messageNumber = messageNumber,
-      messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
-    ).toString()
-
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitreportofreceiptportal"
-
-  override def shouldExtractFromSoap: Boolean = false
-
   override def metricName: String = "report-receipt"
 
   override def eisXMLBody(): String =
@@ -64,8 +50,7 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel, useFS4
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsObject =

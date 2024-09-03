@@ -28,7 +28,6 @@ trait CreateMovementFixtures extends BaseFixtures
   with TraderModelFixtures
   with MovementGuaranteeFixtures
   with TransportDetailsFixtures
-  with ChRISResponsesFixture
   with EISResponsesFixture {
 
   object CaMAttributesFixtures {

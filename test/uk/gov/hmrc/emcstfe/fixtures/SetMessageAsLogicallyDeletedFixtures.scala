@@ -18,24 +18,8 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.response.SetMessageAsLogicallyDeletedResponse
-import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
-import scala.xml.Elem
-
-trait SetMessageAsLogicallyDeletedFixtures extends BaseFixtures with SoapXmlFactory {
-
-  lazy val deletedMessage = SetMessageAsLogicallyDeletedResponse(1)
-
-  lazy val setMessageAsLogicallyDeletedXMLResponse: String = responseSoapEnvelope(
-    <Results>
-      <Result Name="schema">&lt;recordsAffected&gt;1&lt;/recordsAffected&gt;</Result>
-    </Results>
-  )
-
-  lazy val deletedMessageXML: Elem =
-    <Results>
-      <Result Name="schema"><recordsAffected>1</recordsAffected></Result>
-    </Results>
+trait SetMessageAsLogicallyDeletedFixtures extends BaseFixtures {
 
   val setMessageAsLogicallyDeletedDownstreamJson: JsValue = Json.obj(
     "recordsAffected" -> 1

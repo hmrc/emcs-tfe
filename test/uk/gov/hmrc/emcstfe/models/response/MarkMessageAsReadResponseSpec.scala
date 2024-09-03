@@ -16,18 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.models.response
 
-import com.lucidchart.open.xtract.ParseSuccess
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.MarkMessageAsReadFixtures
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class MarkMessageAsReadResponseSpec extends TestBaseSpec with MarkMessageAsReadFixtures {
-
-  "xmlReader" should {
-    "turn XML into a model" in {
-      MarkMessageAsReadResponse.xmlReader.read(markMessageAsReadParsedChrisXml) shouldBe ParseSuccess(markMessageAsReadResponseModel)
-    }
-  }
 
   "writes" should {
     "turn a model into JSON" in {

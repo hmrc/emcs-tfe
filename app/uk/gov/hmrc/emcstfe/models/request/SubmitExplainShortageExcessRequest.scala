@@ -21,13 +21,12 @@ import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
-case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessModel, useFS41SchemaVersion: Boolean)
-                                       (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
+case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessModel)
+                                       (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
   private val messageNumber = 871
 
@@ -48,19 +47,6 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
     Constants.NDEA ++ countryCode
   }
 
-  override def requestBody: String =
-    withSubmissionRequestSoapEnvelope(
-      body = body,
-      messageNumber = messageNumber,
-      messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
-    ).toString()
-
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitreasonforshortageportal"
-
-  override def shouldExtractFromSoap: Boolean = false
-
   override def metricName = "explain-shortage-excess"
 
   override def eisXMLBody(): String =
@@ -68,8 +54,7 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsObject =

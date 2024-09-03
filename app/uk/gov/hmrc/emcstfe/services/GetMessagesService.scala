@@ -16,29 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS}
+import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.models.request.GetMessagesRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
-import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetMessagesService @Inject()(eisConnector: EisConnector,
-                                   chrisConnector: ChrisConnector,
-                                   override val config: AppConfig) extends Logging with FeatureSwitching {
+class GetMessagesService @Inject()(eisConnector: EisConnector) {
+
   def getMessages(getMessagesRequest: GetMessagesRequest)
-                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMessagesResponse]] = {
-    if(isEnabled(SendToEIS)) {
-      eisConnector.getMessages(getMessagesRequest)
-    } else {
-      chrisConnector.postChrisSOAPRequestAndExtractToModel(getMessagesRequest)
-    }
-  }
+                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, GetMessagesResponse]] =
+    eisConnector.getMessages(getMessagesRequest)
 
 }

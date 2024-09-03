@@ -81,7 +81,7 @@ class EisConnectorSpec
     "submit is called" should {
 
 
-      val submitReportOfReceiptRequest                          = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel, useFS41SchemaVersion = false)
+      val submitReportOfReceiptRequest                          = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
       "return a Right" when {
         "downstream call is successful" in new Test {
@@ -1523,7 +1523,7 @@ class EisConnectorSpec
         undischargedMovements = Some("Accepted"),
         exciseProductCode = Some("6000")
       )
-      val getMovementListRequest = GetMovementListRequest(testErn, searchOptions, isEISFeatureEnabled = true)
+      val getMovementListRequest = GetMovementListRequest(testErn, searchOptions)
       val url = "/emcs/movements/v1/movements"
       val queryParameters = Seq(
         "exciseregistrationnumber" -> testErn,

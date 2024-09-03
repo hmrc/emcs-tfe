@@ -16,21 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-case class GetMessageStatisticsRequest(exciseRegistrationNumber: String) extends EisConsumptionRequest with ChrisRequest {
-
-  override def requestBody: String =
-    withGetRequestSoapEnvelope(
-        <Parameters>
-          <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
-        </Parameters>
-    )
-
-  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMessageStatistics"
-
-  override def shouldExtractFromSoap: Boolean = true
+case class GetMessageStatisticsRequest(exciseRegistrationNumber: String) extends EisConsumptionRequest {
 
   override def metricName: String = "getMessageStatistics"
 

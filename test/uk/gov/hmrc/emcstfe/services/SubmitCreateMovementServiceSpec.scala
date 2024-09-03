@@ -18,114 +18,68 @@ package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.mocks.repository.MockCreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISBusinessError, EISRIMValidationError, EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISUnknownError}
 import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
 class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFixtures with MockAppConfig with MockCreateMovementUserAnswersRepository {
-  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
-    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = useFS41SchemaVersion, isChRISSubmission = true)
-    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockChrisConnector, mockEisConnector, mockCreateMovementUserAnswersRepository, mockAppConfig)
+
+  trait Test extends MockEisConnector {
+    val submitCreateMovementRequest: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
+    val service: SubmitCreateMovementService = new SubmitCreateMovementService(mockEisConnector, mockCreateMovementUserAnswersRepository, mockAppConfig)
   }
 
   "SubmitCreateMovementService" when {
-    Seq(true, false).foreach { useFS41SchemaVersion =>
-      s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
+    "when calling submitViaEIS" must {
+      "return a Right" when {
+        "connector call is successful and Json is the correct format" in new Test {
 
-        "when calling submit" must {
+          MockEisConnector.submit(submitCreateMovementRequest).returns(
+            Future.successful(Right(eisSuccessResponse))
+          )
 
-          "return a Right" when {
-            "connector call is successful and XML is the correct format (clearing RIM validation errors)" in new Test(useFS41SchemaVersion) {
+          MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, Seq.empty)
+            .returns(Future.successful(true))
 
-              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-                Future.successful(Right(chrisSuccessResponse))
-              )
+          await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Right(eisSuccessResponse)
+        }
+      }
 
-              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, Seq.empty)
-                .returns(Future.successful(true))
+      "return a Left" when {
 
-              await(service.submit(submitCreateMovementRequest)) shouldBe Right(chrisSuccessResponse)
-            }
-          }
-          "return a Left" when {
+        "EIS returns a 422 error with RIM validation errors (inserting the errors into Mongo)" in new Test {
 
-            "ChRIS returns a 200 response but with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
+          MockEisConnector.submit(submitCreateMovementRequest).returns(
+            Future.successful(Left(EISRIMValidationError(eisRimValidationResponse)))
+          )
 
-              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-                Future.successful(Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse)))
-              )
+          MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, eisRimValidationResponse.validatorResults.get)
+            .returns(Future.successful(true))
 
-              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, chrisRIMValidationErrorResponse.rimValidationErrors)
-                .returns(Future.successful(true))
-
-              await(service.submit(submitCreateMovementRequest)) shouldBe Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse))
-            }
-
-
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitCreateMovementChrisSOAPRequest(submitCreateMovementRequest).returns(
-                Future.successful(Left(XmlValidationError))
-              )
-
-              await(service.submit(submitCreateMovementRequest)) shouldBe Left(XmlValidationError)
-            }
-          }
+          await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISRIMValidationError(eisRimValidationResponse))
         }
 
-        "when calling submitViaEIS" must {
+        "EIS returns a 422 error without RIM validation errors" in new Test {
 
-          "return a Right" when {
-            "connector call is successful and Json is the correct format" in new Test(useFS41SchemaVersion) {
+          MockEisConnector.submit(submitCreateMovementRequest).returns(
+            Future.successful(Left(EISBusinessError("wrong")))
+          )
 
-              MockEisConnector.submit(submitCreateMovementRequest).returns(
-                Future.successful(Right(eisSuccessResponse))
-              )
+          await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISBusinessError("wrong"))
+        }
 
-              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, Seq.empty)
-                .returns(Future.successful(true))
+        "connector call is unsuccessful" in new Test {
 
-              await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Right(eisSuccessResponse)
-            }
-          }
+          MockEisConnector.submit(submitCreateMovementRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
 
-          "return a Left" when {
-
-            "EIS returns a 422 error with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
-
-              MockEisConnector.submit(submitCreateMovementRequest).returns(
-                Future.successful(Left(EISRIMValidationError(eisRimValidationResponse)))
-              )
-
-              MockCreateMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testDraftId, eisRimValidationResponse.validatorResults.get)
-                .returns(Future.successful(true))
-
-              await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISRIMValidationError(eisRimValidationResponse))
-            }
-
-            "EIS returns a 422 error without RIM validation errors" in new Test(useFS41SchemaVersion) {
-
-              MockEisConnector.submit(submitCreateMovementRequest).returns(
-                Future.successful(Left(EISBusinessError("wrong")))
-              )
-
-              await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISBusinessError("wrong"))
-            }
-
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockEisConnector.submit(submitCreateMovementRequest).returns(
-                Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-              )
-
-              await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
-            }
-          }
+          await(service.submitViaEIS(submitCreateMovementRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
         }
       }
     }
@@ -136,7 +90,7 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
 
       "return false" when {
 
-        "the repository returns false" in new Test(useFS41SchemaVersion = true) {
+        "the repository returns false" in new Test {
 
           MockCreateMovementUserAnswersRepository.setSubmittedDraftId(testErn, testDraftId, submittedDraftId)
             .returns(Future.successful(false))
@@ -147,7 +101,7 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
 
       "return true" when {
 
-        "the repository returns true" in new Test(useFS41SchemaVersion = true) {
+        "the repository returns true" in new Test {
 
           MockCreateMovementUserAnswersRepository.setSubmittedDraftId(testErn, testDraftId, submittedDraftId)
             .returns(Future.successful(true))
@@ -159,19 +113,19 @@ class SubmitCreateMovementServiceSpec extends TestBaseSpec with CreateMovementFi
 
     "when calling formatErrorForLogging" should {
       "return the error code and reason" when {
-        "error code is 12" in new Test(true) {
+        "error code is 12" in new Test {
           service.formatErrorForLogging(RIMValidationError(None, Some(12), Some("reason"), None)) shouldBe "Some(12) (errorReason: Some(reason))"
           service.formatErrorForLogging(RIMValidationError(None, Some(12), None, None)) shouldBe "Some(12) (errorReason: None)"
         }
-        "error code is 13" in new Test(true) {
+        "error code is 13" in new Test {
           service.formatErrorForLogging(RIMValidationError(None, Some(13), Some("reason"), None)) shouldBe "Some(13) (errorReason: Some(reason))"
           service.formatErrorForLogging(RIMValidationError(None, Some(13), None, None)) shouldBe "Some(13) (errorReason: None)"
         }
       }
       "return only the error code" when {
-        "error code is not 12 or 13" in new Test(true) {
-            service.formatErrorForLogging(RIMValidationError(None, Some(1000), None, None)) shouldBe "Some(1000)"
-            service.formatErrorForLogging(RIMValidationError(None, None, None, None)) shouldBe "None"
+        "error code is not 12 or 13" in new Test {
+          service.formatErrorForLogging(RIMValidationError(None, Some(1000), None, None)) shouldBe "Some(1000)"
+          service.formatErrorForLogging(RIMValidationError(None, None, None, None)) shouldBe "None"
         }
       }
     }

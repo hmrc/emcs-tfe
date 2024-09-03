@@ -23,33 +23,19 @@ import uk.gov.hmrc.emcstfe.models.common.DestinationType._
 import uk.gov.hmrc.emcstfe.models.common.MovementType._
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementType}
 import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
-case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId: String, useFS41SchemaVersion: Boolean, isChRISSubmission: Boolean)
-                                      (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
+case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId: String)
+                                      (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
   override def exciseRegistrationNumber: String = request.ern
   private val messageNumber = 815
 
   val messageRecipient = Constants.NDEA ++ messageRecipientCountryCode()
   val messageSender: String = Constants.NDEA ++ messageSenderCountryCode().getOrElse(Constants.GB)
 
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
-
-  override def shouldExtractFromSoap: Boolean = false
-
   override val correlationUUID: String = draftId
-
-  override def requestBody: String =
-    withSubmissionRequestSoapEnvelope(
-      body = body,
-      messageNumber = 815,
-      messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
-    ).toString()
 
   override def metricName = "create-movement"
 
@@ -90,8 +76,7 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsValue =

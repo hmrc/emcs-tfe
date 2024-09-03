@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-  val switches: Seq[FeatureSwitch] = Seq(UseDownstreamStub, SendToEIS, ValidateUsingFS41Schema, EnablePrivateBeta, EnablePublicBetaThrottling, DefaultDraftMovementCorrelationId)
+  val switches: Seq[FeatureSwitch] = Seq(UseDownstreamStub, DefaultDraftMovementCorrelationId)
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
@@ -36,27 +36,7 @@ class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
 case object UseDownstreamStub extends FeatureSwitch {
   override val configName: String = "features.downstreamStub"
-  override val displayName: String = "enables downstream stub (for ChRIS / EIS calls)"
-}
-
-case object SendToEIS extends FeatureSwitch {
-  override val configName: String = "features.sendToEIS"
-  override val displayName: String = "Sends message to EIS instead of ChRIS"
-}
-
-case object ValidateUsingFS41Schema extends FeatureSwitch {
-  override val configName: String = "features.validateUsingFS41Schema"
-  override val displayName: String = "Enables FS 4.1 schema validation"
-}
-
-case object EnablePrivateBeta extends FeatureSwitch {
-  override val configName: String = "beta.private.enabled"
-  override val displayName: String = "Enables private beta"
-}
-
-case object EnablePublicBetaThrottling extends FeatureSwitch {
-  override val configName: String = "beta.public.enabled"
-  override val displayName: String = "Enables public beta throttling (may need to adjust traffic percentage)"
+  override val displayName: String = "enables downstream stub (for EIS calls)"
 }
 
 case object DefaultDraftMovementCorrelationId extends FeatureSwitch {

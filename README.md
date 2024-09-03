@@ -76,7 +76,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK)
 
-**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+**Body**: [EISSubmissionSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/EISSubmissionSuccessResponse.scala)
 
 #### Error Response(s)
 
@@ -99,7 +99,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK)
 
-**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+**Body**: [EISSubmissionSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/EISSubmissionSuccessResponse.scala)
 
 #### Error Response(s)
 
@@ -122,7 +122,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK)
 
-**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+**Body**: [EISSubmissionSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/EISSubmissionSuccessResponse.scala)
 
 #### Error Response(s)
 
@@ -145,7 +145,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK)
 
-**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+**Body**: [EISSubmissionSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/EISSubmissionSuccessResponse.scala)
 
 #### Error Response(s)
 
@@ -168,7 +168,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK)
 
-**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+**Body**: [EISSubmissionSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/EISSubmissionSuccessResponse.scala)
 
 #### Error Response(s)
 
@@ -191,7 +191,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK)
 
-**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+**Body**: [EISSubmissionSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/EISSubmissionSuccessResponse.scala)
 
 #### Error Response(s)
 
@@ -214,7 +214,7 @@ E.g. to search for the first 15 movements by Consignor ordered by DateReceived a
 
 **Status**: 200 (OK)
 
-**Body**: [ChRISSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/ChRISSuccessResponse.scala)
+**Body**: [EISSubmissionSuccessResponse Model](app/uk/gov/hmrc/emcstfe/models/response/EISSubmissionSuccessResponse.scala)
 
 #### Error Response(s)
 

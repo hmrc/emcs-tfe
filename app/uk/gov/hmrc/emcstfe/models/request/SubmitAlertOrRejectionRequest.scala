@@ -20,13 +20,12 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.alertOrRejection.SubmitAlertOrRejectionModel
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 
 import java.util.Base64
 
-case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel, useFS41SchemaVersion: Boolean)
-                                        (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage{
+case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel)
+                                        (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage{
   override def exciseRegistrationNumber: String = request.ern
 
   private val arcCountryCode = body.exciseMovement.arc.substring(2, 4)
@@ -36,18 +35,6 @@ case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel, useF
   val messageRecipient = Constants.NDEA ++ arcCountryCode
   val messageSender: String = Constants.NDEA ++ consigneeCountryCode
 
-  override def requestBody: String = withSubmissionRequestSoapEnvelope(
-    body = body,
-    messageNumber = messageNumber,
-    messageSender = messageSender,
-    messageRecipient = messageRecipient,
-    isFS41SchemaVersion = useFS41SchemaVersion
-  ).toString()
-
-  override def action: String = "http://www.hmrc.gov.uk/emcs/SubmitAlertOrRejectionMovementPortal"
-
-  override def shouldExtractFromSoap: Boolean = false
-
   override def metricName = "alert-or-rejection"
 
   override def eisXMLBody(): String =
@@ -55,8 +42,7 @@ case class SubmitAlertOrRejectionRequest(body: SubmitAlertOrRejectionModel, useF
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsObject =

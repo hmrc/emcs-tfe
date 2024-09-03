@@ -21,14 +21,13 @@ import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{CertifiedConsignee, Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryCertifiedConsignee}
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 
 import java.util.Base64
 
-case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, movement: GetMovementResponse, useFS41SchemaVersion: Boolean)
-                                         (implicit request: UserRequest[_]) extends ChrisRequest with SoapEnvelope with EisSubmissionRequest with EisMessage {
+case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, movement: GetMovementResponse)
+                                         (implicit request: UserRequest[_]) extends EisSubmissionRequest with EisMessage {
 
   private val arcCountryCode = body.updateEadEsad.administrativeReferenceCode.substring(2, 4)
   private val countryCode: Option[String] => String = _.map(_.substring(0, 2)).getOrElse(Constants.GB)
@@ -56,19 +55,6 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, mo
   override def exciseRegistrationNumber: String = request.ern
   private val messageNumber: Int = 813
 
-  override def requestBody: String =
-    withSubmissionRequestSoapEnvelope(
-      body = body,
-      messageNumber = messageNumber,
-      messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
-    ).toString()
-
-  override def action: String = "http://www.hmrc.gov.uk/emcs/submitchangeofdestinationportal"
-
-  override def shouldExtractFromSoap: Boolean = false
-
   override def metricName: String = "change-of-destination"
 
   override def eisXMLBody(): String =
@@ -76,8 +62,7 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, mo
       body = body,
       messageNumber = messageNumber,
       messageSender = messageSender,
-      messageRecipient = messageRecipient,
-      isFS41SchemaVersion = useFS41SchemaVersion
+      messageRecipient = messageRecipient
     )
 
   override def toJson: JsObject =

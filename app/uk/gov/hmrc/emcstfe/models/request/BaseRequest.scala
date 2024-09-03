@@ -23,8 +23,6 @@ trait BaseRequest {
 
   def exciseRegistrationNumber: String
 
-  def uuid: String = java.util.UUID.randomUUID().toString
-
   val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
   val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
   val correlationUUID: String = UUID.randomUUID().toString

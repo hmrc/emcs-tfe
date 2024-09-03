@@ -16,71 +16,20 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions.{DEFAULT_SORT_FIELD, DEFAULT_START_POSITION, DEFAULT_TRADER_ROLE, EIS_DEFAULT_SORT_FIELD, EIS_DEFAULT_START_POSITION, EIS_DEFAULT_TRADER_ROLE}
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
+import uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions.{EIS_DEFAULT_SORT_FIELD, EIS_DEFAULT_START_POSITION, EIS_DEFAULT_TRADER_ROLE}
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
-import scala.xml.Elem
-
 case class GetMovementListRequest(exciseRegistrationNumber: String,
-                                  searchOptions: GetMovementListSearchOptions,
-                                  isEISFeatureEnabled: Boolean) extends ChrisRequest with EisConsumptionRequest {
-  override def requestBody: String = {
-    withGetRequestSoapEnvelope(
-      <Parameters>
-        <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
-        <Parameter Name="TraderRole">{searchOptions.traderRole.getOrElse(DEFAULT_TRADER_ROLE)}</Parameter>
-        <Parameter Name="SortField">{searchOptions.sortField.getOrElse(DEFAULT_SORT_FIELD)}</Parameter>
-        <Parameter Name="SortOrder">{searchOptions.sortOrder}</Parameter>
-        <Parameter Name="StartPosition">{searchOptions.startPosition.getOrElse(DEFAULT_START_POSITION)}</Parameter>
-        <Parameter Name="MaxNoToReturn">{searchOptions.maxRows}</Parameter>
-        {formatSearchParameters()}
-      </Parameters>
-    )
-  }
-
-  private def formatSearchParameters(): Seq[Elem] = {
-    Seq(
-      searchOptions.arc -> "ARC",
-      searchOptions.otherTraderId -> "OtherTraderId",
-      searchOptions.lrn -> "LocalReferenceNumber",
-      searchOptions.dateOfDispatchFrom -> "DateOfDispatchFrom",
-      searchOptions.dateOfDispatchTo -> "DateOfDispatchTo",
-      searchOptions.dateOfReceiptFrom -> "DateOfReceiptFrom",
-      searchOptions.dateOfReceiptTo -> "DateOfReceiptTo",
-      searchOptions.countryOfOrigin -> "CountryOfOrigin",
-      searchOptions.movementStatus -> "MovementStatus",
-      searchOptions.transporterTraderName -> "TransporterTraderName",
-      searchOptions.undischargedMovements -> "UndischargedMovements",
-      searchOptions.exciseProductCode -> "ExciseProductCode"
-    ).flatMap(optionalFieldWithParamName => {
-      val (fieldOpt, paramName) = optionalFieldWithParamName
-      fieldOpt.map(searchOptionField => <Parameter Name={paramName}>{searchOptionField}</Parameter>)
-    })
-  }
-
-  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovementList"
-
-  override def shouldExtractFromSoap: Boolean = true
+                                  searchOptions: GetMovementListSearchOptions) extends EisConsumptionRequest {
 
   override def metricName = "get-movement-list"
 
   override val queryParams: Seq[(String, String)] = Seq(
     "exciseregistrationnumber" -> Some(exciseRegistrationNumber),
-    "traderrole" -> Some(if(isEISFeatureEnabled) {
-      // EIS requires lowercase, ChRIS requires sentence-case
-      searchOptions.traderRole.getOrElse(EIS_DEFAULT_TRADER_ROLE).toLowerCase
-    } else {
-      searchOptions.traderRole.getOrElse(DEFAULT_TRADER_ROLE)
-    }),
-    "sortfield" -> Some(if(isEISFeatureEnabled) {
-      // EIS requires lowercase, ChRIS requires sentence-case
-      searchOptions.sortField.getOrElse(EIS_DEFAULT_SORT_FIELD).toLowerCase
-    } else {
-      searchOptions.sortField.getOrElse(DEFAULT_SORT_FIELD)
-    }),
+    "traderrole" -> Some(searchOptions.traderRole.getOrElse(EIS_DEFAULT_TRADER_ROLE).toLowerCase),
+    "sortfield" -> Some(searchOptions.sortField.getOrElse(EIS_DEFAULT_SORT_FIELD).toLowerCase),
     "sortorder" -> Some(searchOptions.sortOrder),
-    "startposition" -> Some(if(isEISFeatureEnabled) searchOptions.startPosition.getOrElse(EIS_DEFAULT_START_POSITION).toString else searchOptions.startPosition.getOrElse(DEFAULT_START_POSITION).toString),
+    "startposition" -> Some(searchOptions.startPosition.getOrElse(EIS_DEFAULT_START_POSITION).toString),
     "maxnotoreturn" -> Some(searchOptions.maxRows.toString),
     "arc" -> searchOptions.arc,
     "othertraderid" -> searchOptions.otherTraderId,

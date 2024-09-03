@@ -22,9 +22,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.{BaseFixtures, SubmitExplainShortageExcessFixtures}
-import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.services.MockSubmitExplainShortageExcessService
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType.Consignor
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
@@ -32,73 +30,41 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitExplainShortageExcessControllerSpec extends TestBaseSpec with MockSubmitExplainShortageExcessService with SubmitExplainShortageExcessFixtures with FakeAuthAction with MockAppConfig with BaseFixtures {
+class SubmitExplainShortageExcessControllerSpec extends TestBaseSpec with MockSubmitExplainShortageExcessService with SubmitExplainShortageExcessFixtures with FakeAuthAction with BaseFixtures {
 
   import SubmitExplainShortageExcessFixtures.submitExplainShortageExcessModelMax
 
   class Fixture(authAction: AuthAction) {
     val fakeRequest = FakeRequest("POST", "/explain-shortage-excess").withBody(Json.toJson(submitExplainShortageExcessModelMax(Consignor)))
-    val controller  = new SubmitExplainShortageExcessController(Helpers.stubControllerComponents(), mockService, authAction, mockAppConfig)
+    val controller  = new SubmitExplainShortageExcessController(Helpers.stubControllerComponents(), mockService, authAction)
   }
 
   s"POST ${routes.SubmitExplainShortageExcessController.submit(testErn, testArc)}" when {
 
     "user is authorised" must {
 
-      "the SendToEIS feature switch is disabled" must {
-        s"return ${Status.OK} (OK)" when {
-          "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
-            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
+      s"return ${Status.OK} (OK)" when {
+        "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-            MockService.submit(submitExplainShortageExcessModelMax(Consignor)).returns(Future.successful(Right(chrisSuccessResponse)))
+          MockService.submitViaEIS(submitExplainShortageExcessModelMax(Consignor)).returns(Future.successful(Right(eisSuccessResponse)))
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
+          val result = controller.submit(testErn, testArc)(fakeRequest)
 
-            status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe chrisSuccessJson()
-          }
-        }
-        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-          "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
-            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(false)
-
-            MockService.submit(submitExplainShortageExcessModelMax(Consignor)).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
-
-            val result = controller.submit(testErn, testArc)(fakeRequest)
-
-            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-            contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
-          }
+          status(result) shouldBe Status.OK
+          contentAsJson(result) shouldBe eisSuccessJson()
         }
       }
+      s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
+        "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
 
-      "the SendToEIS feature switch is enabled" must {
-        s"return ${Status.OK} (OK)" when {
-          "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
-            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
+          MockService.submitViaEIS(submitExplainShortageExcessModelMax(Consignor)).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-            MockService.submitViaEIS(submitExplainShortageExcessModelMax(Consignor)).returns(Future.successful(Right(eisSuccessResponse)))
+          val result = controller.submit(testErn, testArc)(fakeRequest)
 
-            val result = controller.submit(testErn, testArc)(fakeRequest)
-
-            status(result) shouldBe Status.OK
-            contentAsJson(result) shouldBe eisSuccessJson()
-          }
-        }
-        s"return ${Status.INTERNAL_SERVER_ERROR} (ISE)" when {
-          "service returns a Left" in new Fixture(FakeSuccessAuthAction) {
-            MockedAppConfig.getFeatureSwitchValue(SendToEIS).returns(true)
-
-            MockService.submitViaEIS(submitExplainShortageExcessModelMax(Consignor)).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
-
-            val result = controller.submit(testErn, testArc)(fakeRequest)
-
-            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-            contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
-          }
+          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+          contentAsJson(result) shouldBe Json.obj("message" -> UnexpectedDownstreamResponseError.message)
         }
       }
-
     }
 
     "user is NOT authorised" must {

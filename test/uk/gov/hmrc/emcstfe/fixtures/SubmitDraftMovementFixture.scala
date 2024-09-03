@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.fixtures
 
-trait SubmitDraftMovementFixture extends BaseFixtures with ChRISResponsesFixture {
+trait SubmitDraftMovementFixture extends BaseFixtures {
   lazy val submitDraftMovementRequestBody: String = """<?xml version="1.0" encoding="UTF-8"?>
                                                       |<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
                                                       |    <soapenv:Header>

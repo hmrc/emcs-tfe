@@ -18,12 +18,11 @@ package uk.gov.hmrc.emcstfe.fixtures
 
 import play.api.libs.json.{JsArray, JsObject, Json}
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.{GetMovementHistoryEventsResponse, MovementHistoryEvent}
-import uk.gov.hmrc.emcstfe.utils.SoapXmlFactory
 
 import java.util.Base64
 import scala.xml.Elem
 
-trait GetMovementHistoryEventsFixture extends BaseFixtures with SoapXmlFactory {
+trait GetMovementHistoryEventsFixture extends BaseFixtures {
 
   val emptyGetMovementHistoryEventsResponseXml: Elem = <MovementHistory xmlns="http://www.govtalk.gov.uk/taxation/InternationalTrade/Excise/MovementHistoryEvents/3"
                                                                         xmlns:ns1="http://hmrc/emcs/tfe/data"

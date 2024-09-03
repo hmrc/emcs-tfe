@@ -18,16 +18,13 @@ package uk.gov.hmrc.emcstfe.controllers
 
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Action, ControllerComponents, Result}
-import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, SendToEIS, ValidateUsingFS41Schema}
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.request.{GetMovementRequest, SubmitChangeDestinationRequest}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISRIMValidationError
 import uk.gov.hmrc.emcstfe.services.{GetMovementService, SubmitChangeDestinationService}
 import uk.gov.hmrc.emcstfe.utils.Logging
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
@@ -37,9 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubmitChangeDestinationController @Inject()(cc: ControllerComponents,
                                                   submitChangeDestinationService: SubmitChangeDestinationService,
                                                   getMovementService: GetMovementService,
-                                                  val config: AppConfig,
                                                   override val auth: AuthAction
-                                                 )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging with FeatureSwitching {
+                                                 )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
 
   def submit(ern: String, arc: String): Action[JsValue] = authorisedUserSubmissionRequest(ern) { implicit request =>
     withJsonBody[SubmitChangeDestinationModel] { submission =>
@@ -48,24 +44,15 @@ class SubmitChangeDestinationController @Inject()(cc: ControllerComponents,
           logger.error(s"[submit] Failed to retrieve movement for $ern and $arc")
           Future.successful(InternalServerError(Json.toJson(error)))
         case Right(movement) =>
-          val requestModel = SubmitChangeDestinationRequest(submission, movement, isEnabled(ValidateUsingFS41Schema))
-            handleSubmission(requestModel)
+          val requestModel = SubmitChangeDestinationRequest(submission, movement)
+          submitChangeDestinationService.submitViaEIS(requestModel).flatMap(result => handleResponse(result))
       }
-    }
-  }
-
-  private def handleSubmission(requestModel: SubmitChangeDestinationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    if (isEnabled(SendToEIS)) {
-      submitChangeDestinationService.submitViaEIS(requestModel).flatMap(result => handleResponse(result))
-    } else {
-      submitChangeDestinationService.submit(requestModel).flatMap(result => handleResponse(result))
     }
   }
 
   private def handleResponse[A](response: Either[ErrorResponse, A])(implicit writes: Writes[A]): Future[Result] =
     response match {
       case Left(value: EISRIMValidationError) => Future(UnprocessableEntity(Json.toJson(value)))
-      case Left(value: ChRISRIMValidationError) => Future(UnprocessableEntity(Json.toJson(value)))
       case Left(value) => Future(InternalServerError(Json.toJson(value)))
       case Right(value) => Future(Ok(Json.toJson(value)))
     }

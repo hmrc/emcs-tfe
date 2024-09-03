@@ -31,7 +31,7 @@ object GetMessagesResponse {
   private val message: XPath = XMLPath \\ "MessagesDataResponse" \\ "Message"
   private val totalNumberOfMessagesAvailable: XPath = XMLPath \\ "MessagesDataResponse" \\ "TotalNumberOfMessagesAvailable"
 
-  //ChRIS Reads (also used by EIS JSON reads below as an implicit XMLReader is required to Base64Model)
+  //XML Reads (also used by EIS JSON reads below as an implicit XMLReader is required to Base64Model)
   implicit val xmlReader: XmlReader[GetMessagesResponse] = (
     message.read[Seq[Message]](strictReadSeq),
     totalNumberOfMessagesAvailable.read[Long],

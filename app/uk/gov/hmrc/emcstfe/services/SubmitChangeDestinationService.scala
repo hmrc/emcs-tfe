@@ -17,12 +17,12 @@
 package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.FeatureSwitching
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISRIMValidationError
 import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.repositories.ChangeDestinationUserAnswersRepository
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,13 +31,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitChangeDestinationService @Inject()(chrisConnector: ChrisConnector,
-                                               eisConnector: EisConnector,
+class SubmitChangeDestinationService @Inject()(eisConnector: EisConnector,
                                                changeDestinationUserAnswersRepository: ChangeDestinationUserAnswersRepository,
                                                val config: AppConfig) extends Logging with FeatureSwitching {
-  def submit(request: SubmitChangeDestinationRequest)
-            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    chrisConnector.submitChangeDestinationChrisSOAPRequest[ChRISSuccessResponse](request).flatMap(handleResponse(request, _))
 
   def submitViaEIS(request: SubmitChangeDestinationRequest)
                   (implicit hc: HeaderCarrier,
@@ -53,13 +49,6 @@ class SubmitChangeDestinationService @Inject()(chrisConnector: ChrisConnector,
         logger.warn(s"[handleResponse][${requestModel.exciseRegistrationNumber}] - RIM validation error codes for ARC - $arc: ${rimError.errorResponse.validatorResults.map(_.map(formatErrorForLogging))}")
         changeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
           requestModel.exciseRegistrationNumber, arc, rimError.errorResponse.validatorResults.getOrElse(Seq.empty)
-        ).map {
-          _ => Left(rimError)
-        }
-      case Left(rimError: ChRISRIMValidationError) =>
-        logger.warn(s"[handleResponse][${requestModel.exciseRegistrationNumber}] - RIM validation error codes for ARC - $arc: ${rimError.errorResponse.rimValidationErrors.map(formatErrorForLogging)}")
-        changeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
-          requestModel.exciseRegistrationNumber, arc, rimError.errorResponse.rimValidationErrors
         ).map {
           _ => Left(rimError)
         }

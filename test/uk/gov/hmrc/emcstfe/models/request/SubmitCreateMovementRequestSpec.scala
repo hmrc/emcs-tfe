@@ -35,7 +35,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
   val deliveryPlaceCustomsOfficeCountryCode = "EE"
   val consignorTraderCountryCode = "FF"
 
-  implicit val request: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = false, isChRISSubmission = false)
+  implicit val request: SubmitCreateMovementRequest = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
 
   s".messageRecipientCountryCode()" when {
 
@@ -258,140 +258,6 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
     }
   }
 
-  "requestBody" when {
-
-    "useFS41SchemaVersion is enabled" should {
-
-      implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true, isChRISSubmission = true)
-
-      "generate the correct request XML" in {
-
-        val expectedSoapRequest =
-          <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-            <soapenv:Header>
-              <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
-                <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
-                <ns:VendorID>1259</ns:VendorID>
-                <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
-                <ns:ServiceID>1138</ns:ServiceID>
-                <ns:ServiceMessageType>HMRC-EMCS-IE815-DIRECT</ns:ServiceMessageType>
-              </ns:Info>
-              <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-                <CredentialID>
-                  {testCredId}
-                </CredentialID>
-                <Identifier>
-                  {testErn}
-                </Identifier>
-              </MetaData>
-            </soapenv:Header>
-            <soapenv:Body>
-              <urn:IE815 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE815:V3.13">
-                <urn:Header>
-                  <urn1:MessageSender>
-                    {request.messageSender}
-                  </urn1:MessageSender>
-                  <urn1:MessageRecipient>
-                    {request.messageRecipient}
-                  </urn1:MessageRecipient>
-                  <urn1:DateOfPreparation>
-                    {request.preparedDate.toString}
-                  </urn1:DateOfPreparation>
-                  <urn1:TimeOfPreparation>
-                    {request.preparedTime.toString}
-                  </urn1:TimeOfPreparation>
-                  <urn1:MessageIdentifier>
-                    {request.messageUUID}
-                  </urn1:MessageIdentifier>
-                  <urn1:CorrelationIdentifier>
-                    {request.legacyCorrelationUUID}
-                  </urn1:CorrelationIdentifier>
-                </urn:Header>
-                <urn:Body>
-                  {CreateMovementFixtures.createMovementXmlMax}
-                </urn:Body>
-              </urn:IE815>
-            </soapenv:Body>
-          </soapenv:Envelope>
-
-        trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
-      }
-    }
-
-    "useFS41SchemaVersion is disabled" should {
-
-      "generate the correct request XML" in {
-
-        val expectedSoapRequest =
-          <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-            <soapenv:Header>
-              <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
-                <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
-                <ns:VendorID>1259</ns:VendorID>
-                <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
-                <ns:ServiceID>1138</ns:ServiceID>
-                <ns:ServiceMessageType>HMRC-EMCS-IE815-DIRECT</ns:ServiceMessageType>
-              </ns:Info>
-              <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-                <CredentialID>
-                  {testCredId}
-                </CredentialID>
-                <Identifier>
-                  {testErn}
-                </Identifier>
-              </MetaData>
-            </soapenv:Header>
-            <soapenv:Body>
-              <urn:IE815 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE815:V3.01">
-                <urn:Header>
-                  <urn1:MessageSender>
-                    {request.messageSender}
-                  </urn1:MessageSender>
-                  <urn1:MessageRecipient>
-                    {request.messageRecipient}
-                  </urn1:MessageRecipient>
-                  <urn1:DateOfPreparation>
-                    {request.preparedDate.toString}
-                  </urn1:DateOfPreparation>
-                  <urn1:TimeOfPreparation>
-                    {request.preparedTime.toString}
-                  </urn1:TimeOfPreparation>
-                  <urn1:MessageIdentifier>
-                    {request.messageUUID}
-                  </urn1:MessageIdentifier>
-                  <urn1:CorrelationIdentifier>
-                    {request.legacyCorrelationUUID}
-                  </urn1:CorrelationIdentifier>
-                </urn:Header>
-                <urn:Body>
-                  {CreateMovementFixtures.createMovementXmlMax}
-                </urn:Body>
-              </urn:IE815>
-            </soapenv:Body>
-          </soapenv:Envelope>
-
-        trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
-      }
-    }
-  }
-
-
-  ".action" should {
-
-    "be correct" in {
-
-      request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitdraftmovementportal"
-    }
-  }
-
-  ".shouldExtractFromSoap" should {
-
-    "be correct" in {
-
-      request.shouldExtractFromSoap shouldBe false
-    }
-  }
-
   ".exciseRegistrationNumber" should {
 
     "be correct" in {
@@ -402,88 +268,44 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
 
   ".eisXMLBody" should {
 
-    "useFS41SchemaVersion is enabled" should {
+    implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId)
 
-      implicit val request = SubmitCreateMovementRequest(CreateMovementFixtures.createMovementModelMax, testDraftId, useFS41SchemaVersion = true, isChRISSubmission = false)
+    "generate the correct XML body" in {
 
-      "generate the correct XML body" in {
-
-        val expectedRequest = {
-          wrapInControlDoc(
-            <urn:IE815 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE815:V3.13">
-              <urn:Header>
-                <urn1:MessageSender>
-                  {request.messageSender}
-                </urn1:MessageSender>
-                <urn1:MessageRecipient>
-                  {request.messageRecipient}
-                </urn1:MessageRecipient>
-                <urn1:DateOfPreparation>
-                  {request.preparedDate.toString}
-                </urn1:DateOfPreparation>
-                <urn1:TimeOfPreparation>
-                  {request.preparedTime.toString}
-                </urn1:TimeOfPreparation>
-                <urn1:MessageIdentifier>
-                  {request.messageUUID}
-                </urn1:MessageIdentifier>
-                <urn1:CorrelationIdentifier>
-                  {testDraftId}
-                </urn1:CorrelationIdentifier>
-              </urn:Header>
-              <urn:Body>
-                {CreateMovementFixtures.createMovementXmlMax}
-              </urn:Body>
-            </urn:IE815>)
-        }
-
-
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
+      val expectedRequest = {
+        wrapInControlDoc(
+          <urn:IE815 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE815:V3.13">
+            <urn:Header>
+              <urn1:MessageSender>
+                {request.messageSender}
+              </urn1:MessageSender>
+              <urn1:MessageRecipient>
+                {request.messageRecipient}
+              </urn1:MessageRecipient>
+              <urn1:DateOfPreparation>
+                {request.preparedDate.toString}
+              </urn1:DateOfPreparation>
+              <urn1:TimeOfPreparation>
+                {request.preparedTime.toString}
+              </urn1:TimeOfPreparation>
+              <urn1:MessageIdentifier>
+                {request.messageUUID}
+              </urn1:MessageIdentifier>
+              <urn1:CorrelationIdentifier>
+                {testDraftId}
+              </urn1:CorrelationIdentifier>
+            </urn:Header>
+            <urn:Body>
+              {CreateMovementFixtures.createMovementXmlMax}
+            </urn:Body>
+          </urn:IE815>)
       }
-    }
-
-    "useFS41SchemaVersion is disabled" should {
-
-      "generate the correct XML body" in {
-
-        val expectedRequest = {
-          wrapInControlDoc(
-            <urn:IE815 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE815:V3.01">
-              <urn:Header>
-                <urn1:MessageSender>
-                  {request.messageSender}
-                </urn1:MessageSender>
-                <urn1:MessageRecipient>
-                  {request.messageRecipient}
-                </urn1:MessageRecipient>
-                <urn1:DateOfPreparation>
-                  {request.preparedDate.toString}
-                </urn1:DateOfPreparation>
-                <urn1:TimeOfPreparation>
-                  {request.preparedTime.toString}
-                </urn1:TimeOfPreparation>
-                <urn1:MessageIdentifier>
-                  {request.messageUUID}
-                </urn1:MessageIdentifier>
-                <urn1:CorrelationIdentifier>
-                  {testDraftId}
-                </urn1:CorrelationIdentifier>
-              </urn:Header>
-              <urn:Body>
-                {CreateMovementFixtures.createMovementXmlMax}
-              </urn:Body>
-            </urn:IE815>)
-        }
 
 
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
+      val requestXml = XML.loadString(request.eisXMLBody())
+      val expectedXml = trim(expectedRequest)
 
-        requestXml shouldBe expectedXml
-      }
+      requestXml shouldBe expectedXml
     }
   }
 
@@ -533,9 +355,7 @@ class SubmitCreateMovementRequestSpec extends TestBaseSpec with CreateMovementFi
       } else {
         request.copy(placeOfDispatchTrader = None)
       },
-      draftId = testDraftId,
-      useFS41SchemaVersion = false,
-      isChRISSubmission = false
+      draftId = testDraftId
     )
   }
 }

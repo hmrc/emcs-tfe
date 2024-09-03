@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
 case class GetMessagesRequest(exciseRegistrationNumber: String,
@@ -24,12 +23,10 @@ case class GetMessagesRequest(exciseRegistrationNumber: String,
                               sortOrder: String,
                               page: Int,
                               maxNoToReturn: Int = 10,
-                              startPosition: Option[Int] = None) extends EisConsumptionRequest with ChrisRequest {
+                              startPosition: Option[Int] = None) extends EisConsumptionRequest {
   require(page >= 1, "page cannot be less than 1")
   require(GetMessagesRequest.validSortFields.contains(sortField), s"sortField of $sortField is invalid. Valid sort fields: ${GetMessagesRequest.validSortFields}")
   require(GetMessagesRequest.validSortOrders.contains(sortOrder), s"sortOrder of $sortOrder is invalid. Valid sort orders: ${GetMessagesRequest.validSortOrders}")
-
-
 
   // page 1 -> start at 0
   // page 2 -> start at 10
@@ -37,21 +34,6 @@ case class GetMessagesRequest(exciseRegistrationNumber: String,
   private def startPos: BigInt = startPosition.getOrElse[Int]((page - 1) * maxNoToReturn)
 
   override def metricName: String = "messages"
-
-  override def requestBody: String =
-    withGetRequestSoapEnvelope(
-      <Parameters>
-        <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
-        <Parameter Name="SortField">{GetMessagesRequest.toChRISSortField(sortField)}</Parameter>
-        <Parameter Name="SortOrder">{sortOrder}</Parameter>
-        <Parameter Name="StartPosition">{startPos}</Parameter>
-        <Parameter Name="MaxNoToReturn">{maxNoToReturn}</Parameter>
-      </Parameters>
-    )
-
-  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMessages"
-
-  override def shouldExtractFromSoap: Boolean = true
 
   override val queryParams: Seq[(String, String)] = Seq(
     "exciseregistrationnumber" -> exciseRegistrationNumber,
@@ -63,14 +45,6 @@ case class GetMessagesRequest(exciseRegistrationNumber: String,
 }
 
 object GetMessagesRequest {
-
-  val toChRISSortField: String => String = {
-    //Note this is exhaustive due to the `require` on the class checking - ideally this could be more typesafe in future with enum
-    case "messagetype" => "MessageType"
-    case "datereceived" => "DateReceived"
-    case "arc" => "ARC"
-    case "readindicator" => "ReadIndicator"
-  }
 
   val validSortFields: Seq[String] = Seq(
     "messagetype", "datereceived", "arc", "readindicator"

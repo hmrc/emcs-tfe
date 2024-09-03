@@ -18,33 +18,31 @@ package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
-import scala.xml.XML
-
 class GetMovementRequestSpec extends TestBaseSpec {
-  val request = GetMovementRequest("My ERN", "My ARC")
+  val request = GetMovementRequest(testErn, testArc)
 
-  "requestBody" should {
-    "generate the correct request XML" in {
-      val xml = XML.loadString(request.requestBody)
+  ".queryParams" when {
 
+    "seqNo is NOT specified" should {
 
-      (xml \\ "Envelope" \\ "Header" \\ "VersionNo").text shouldBe "2.1"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Source").text shouldBe "emcs_tfe"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Identity").text shouldBe "portal"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"MetaData" \\ "Partner").text shouldBe "UK"
-      (xml \\ "Envelope" \\ "Body" \\ "Control" \\"OperationRequest" \\ "Parameters" \\ "Parameter").map(_.text) shouldBe Seq("My ERN", "My ARC")
+      "return the ERN and Arc as a query param" in {
+        request.queryParams shouldBe Seq(
+          "exciseregistrationnumber" -> testErn,
+          "arc" -> testArc
+        )
+      }
     }
-  }
 
-  "action" should {
-    "be correct" in {
-      request.action shouldBe "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement"
-    }
-  }
+    "seqNo is specified" should {
 
-  "shouldExtractFromSoap" should {
-    "be correct" in {
-      request.shouldExtractFromSoap shouldBe true
+      "return the ERN, Arc and SeqNo as a query param" in {
+        val request = GetMovementRequest(testErn, testArc, Some(2))
+        request.queryParams shouldBe Seq(
+          "exciseregistrationnumber" -> testErn,
+          "arc" -> testArc,
+          "sequencenumber" -> "2"
+        )
+      }
     }
   }
 }

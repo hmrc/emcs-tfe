@@ -28,7 +28,8 @@ object GetSubmissionFailureMessageResponse {
   private val ie704: XPath = XPath \\ "SubmissionFailureMessageDataResponse" \\ "IE704"
   private val relatedMessageType: XPath = XPath \\ "SubmissionFailureMessageDataResponse" \\ "RelatedMessageType"
 
-  implicit val chrisReads: XmlReader[GetSubmissionFailureMessageResponse] = (
+  //Used by the EIS reads for the Base64 model
+  implicit val xmlReads: XmlReader[GetSubmissionFailureMessageResponse] = (
     ie704.read[IE704Model],
     relatedMessageType.read[String].map(s => if (s.nonEmpty) Some(s) else None)
   ).mapN(GetSubmissionFailureMessageResponse.apply)

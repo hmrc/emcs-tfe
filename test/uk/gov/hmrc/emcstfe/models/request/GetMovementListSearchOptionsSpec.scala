@@ -20,7 +20,7 @@ import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 class GetMovementListSearchOptionsSpec extends TestBaseSpec {
 
-  val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions(), isEISFeatureEnabled = false)
+  val request = GetMovementListRequest(exciseRegistrationNumber = "My ERN", GetMovementListSearchOptions())
 
   "GetMovementListSearchOptions" must {
 

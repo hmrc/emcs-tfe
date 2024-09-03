@@ -33,227 +33,95 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
   import SubmitChangeDestinationFixtures._
   import UpdateEadEsadFixtures._
 
-  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = false)
+  implicit val request: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse())
 
-  "requestBody" when {
+  "for the MessageSender and MessageRecipient headers" when {
 
-    "useFS41SchemaVersion is enabled" should {
+    val model =
+      submitChangeDestinationModelMax
+        .copy(updateEadEsad = updateEadEsadModelMax.copy(administrativeReferenceCode = "01DE0000012345"))
+        .copy(destinationChanged = destinationChangedModelMax.copy(
+          newConsigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("FR0000123456"))),
+          deliveryPlaceCustomsOffice = Some(deliveryPlaceCustomsOfficeModel.copy(referenceNumber = "IT0000123456"))
+        ))
 
-      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = true)
-
-      "generate the correct request XML" in {
-
-        val expectedSoapRequest =
-          <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-            <soapenv:Header>
-              <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
-                <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
-                <ns:VendorID>1259</ns:VendorID>
-                <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
-                <ns:ServiceID>1138</ns:ServiceID>
-                <ns:ServiceMessageType>HMRC-EMCS-IE813-DIRECT</ns:ServiceMessageType>
-              </ns:Info>
-              <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-                <CredentialID>
-                  {testCredId}
-                </CredentialID>
-                <Identifier>
-                  {testErn}
-                </Identifier>
-              </MetaData>
-            </soapenv:Header>
-            <soapenv:Body>
-              <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.13">
-                <urn:Header>
-                  <urn1:MessageSender>
-                    {request.messageSender}
-                  </urn1:MessageSender>
-                  <urn1:MessageRecipient>
-                    {request.messageRecipient}
-                  </urn1:MessageRecipient>
-                  <urn1:DateOfPreparation>
-                    {request.preparedDate.toString}
-                  </urn1:DateOfPreparation>
-                  <urn1:TimeOfPreparation>
-                    {request.preparedTime.toString}
-                  </urn1:TimeOfPreparation>
-                  <urn1:MessageIdentifier>
-                    {request.messageUUID}
-                  </urn1:MessageIdentifier>
-                  <urn1:CorrelationIdentifier>
-                    {request.legacyCorrelationUUID}
-                  </urn1:CorrelationIdentifier>
-                </urn:Header>
-                <urn:Body>
-                  {submitChangeDestinationXmlMax}
-                </urn:Body>
-              </urn:IE813>
-            </soapenv:Body>
-          </soapenv:Envelope>
-
-        trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+    "generating MessageSender" should {
+      "use the country code from the ARC" in {
+        val request = SubmitChangeDestinationRequest(model, getMovementResponse())
+        request.messageSender shouldBe "NDEA.DE"
       }
     }
 
-    "useFS41SchemaVersion is disabled" should {
+    "generating MessageRecipient" when {
+      "destination type is TaxWarehouse" should {
 
-      "generate the correct request XML" in {
+        "use the deliveryPlaceTrader taderId first for the Country code" in {
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), getMovementResponse())
+          request.messageRecipient shouldBe "NDEA.GB"
+        }
 
-        val expectedSoapRequest =
-          <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-            <soapenv:Header>
-              <ns:Info xmlns:ns="http://www.hmrc.gov.uk/ws/info-header/1">
-                <ns:VendorName>EMCS_PORTAL_TFE</ns:VendorName>
-                <ns:VendorID>1259</ns:VendorID>
-                <ns:VendorProduct Version="2.0">HMRC Portal</ns:VendorProduct>
-                <ns:ServiceID>1138</ns:ServiceID>
-                <ns:ServiceMessageType>HMRC-EMCS-IE813-DIRECT</ns:ServiceMessageType>
-              </ns:Info>
-              <MetaData xmlns="http://www.hmrc.gov.uk/ChRIS/SOAP/MetaData/1">
-                <CredentialID>
-                  {testCredId}
-                </CredentialID>
-                <Identifier>
-                  {testErn}
-                </Identifier>
-              </MetaData>
-            </soapenv:Header>
-            <soapenv:Body>
-              <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01">
-                <urn:Header>
-                  <urn1:MessageSender>
-                    {request.messageSender}
-                  </urn1:MessageSender>
-                  <urn1:MessageRecipient>
-                    {request.messageRecipient}
-                  </urn1:MessageRecipient>
-                  <urn1:DateOfPreparation>
-                    {request.preparedDate.toString}
-                  </urn1:DateOfPreparation>
-                  <urn1:TimeOfPreparation>
-                    {request.preparedTime.toString}
-                  </urn1:TimeOfPreparation>
-                  <urn1:MessageIdentifier>
-                    {request.messageUUID}
-                  </urn1:MessageIdentifier>
-                  <urn1:CorrelationIdentifier>
-                    {request.legacyCorrelationUUID}
-                  </urn1:CorrelationIdentifier>
-                </urn:Header>
-                <urn:Body>
-                  {submitChangeDestinationXmlMax}
-                </urn:Body>
-              </urn:IE813>
-            </soapenv:Body>
-          </soapenv:Envelope>
+        "if deliveryPlaceTrader does not exist - try and use the newConsigneeTrader traderId for the Country Code" in {
+          val request = SubmitChangeDestinationRequest(
+            model.copy(destinationChanged = model.destinationChanged.copy(
+              destinationTypeCode = TaxWarehouse,
+              deliveryPlaceTrader = None
+            )),
+            getMovementResponse()
+          )
+          request.messageRecipient shouldBe "NDEA.FR"
+        }
 
-        trim(XML.loadString(request.requestBody)).toString shouldBe trim(expectedSoapRequest).toString
+        "use GB as default when neither deliveryPlaceTrader nor newConsigneeTrader does NOT exist" in {
+          val request = SubmitChangeDestinationRequest(
+            model.copy(destinationChanged = model.destinationChanged.copy(
+              destinationTypeCode = TaxWarehouse,
+              deliveryPlaceTrader = None,
+              newConsigneeTrader = None
+            )),
+            getMovementResponse()
+          )
+          request.messageRecipient shouldBe "NDEA.GB"
+        }
+
+        "use GB as default when deliveryPlaceTrader nor newConsigneeTrader traderId does NOT exist" in {
+          val request = SubmitChangeDestinationRequest(
+            model.copy(destinationChanged = model.destinationChanged.copy(
+              destinationTypeCode = TaxWarehouse,
+              deliveryPlaceTrader = None,
+              newConsigneeTrader = Some(minTraderModel)
+            )),
+            getMovementResponse()
+          )
+          request.messageRecipient shouldBe "NDEA.GB"
+        }
       }
-    }
 
-    "for the MessageSender and MessageRecipient headers" when {
+      "destination type is Export" should {
+        "use the deliveryPlaceCustomsOffice referenceNumber for the Country Code when it exists" in {
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export)), getMovementResponse())
+          request.messageRecipient shouldBe "NDEA.IT"
+        }
 
-      val model =
-        submitChangeDestinationModelMax
-          .copy(updateEadEsad = updateEadEsadModelMax.copy(administrativeReferenceCode = "01DE0000012345"))
-          .copy(destinationChanged = destinationChangedModelMax.copy(
-            newConsigneeTrader = Some(maxTraderModel(ConsigneeTrader).copy(traderExciseNumber = Some("FR0000123456"))),
-            deliveryPlaceCustomsOffice = Some(deliveryPlaceCustomsOfficeModel.copy(referenceNumber = "IT0000123456"))
-          ))
+        "use GB as default when deliveryPlaceCustomsOffice does NOT exist" in {
 
-      "generating MessageSender" should {
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)), getMovementResponse())
+          request.messageRecipient shouldBe "NDEA.GB"
+        }
+      }
+
+      "destination type is ReturnToThePlaceOfDispatchOfTheConsignor" should {
         "use the country code from the ARC" in {
-          val request = SubmitChangeDestinationRequest(model, getMovementResponse(), useFS41SchemaVersion = false)
-          request.messageSender shouldBe "NDEA.DE"
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), getMovementResponse())
+          request.messageRecipient shouldBe "NDEA.DE"
         }
       }
 
-      "generating MessageRecipient" when {
-        "destination type is TaxWarehouse" should {
-
-          "use the deliveryPlaceTrader taderId first for the Country code" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = TaxWarehouse)), getMovementResponse(), useFS41SchemaVersion = false)
-            request.messageRecipient shouldBe "NDEA.GB"
-          }
-
-          "if deliveryPlaceTrader does not exist - try and use the newConsigneeTrader traderId for the Country Code" in {
-            val request = SubmitChangeDestinationRequest(
-              model.copy(destinationChanged = model.destinationChanged.copy(
-                destinationTypeCode = TaxWarehouse,
-                deliveryPlaceTrader = None
-              )),
-              getMovementResponse(),
-              useFS41SchemaVersion = false
-            )
-            request.messageRecipient shouldBe "NDEA.FR"
-          }
-
-          "use GB as default when neither deliveryPlaceTrader nor newConsigneeTrader does NOT exist" in {
-            val request = SubmitChangeDestinationRequest(
-              model.copy(destinationChanged = model.destinationChanged.copy(
-                destinationTypeCode = TaxWarehouse,
-                deliveryPlaceTrader = None,
-                newConsigneeTrader = None
-              )),
-              getMovementResponse(),
-              useFS41SchemaVersion = false
-            )
-            request.messageRecipient shouldBe "NDEA.GB"
-          }
-
-          "use GB as default when deliveryPlaceTrader nor newConsigneeTrader traderId does NOT exist" in {
-            val request = SubmitChangeDestinationRequest(
-              model.copy(destinationChanged = model.destinationChanged.copy(
-                destinationTypeCode = TaxWarehouse,
-                deliveryPlaceTrader = None,
-                newConsigneeTrader = Some(minTraderModel)
-              )),
-              getMovementResponse(),
-              useFS41SchemaVersion = false
-            )
-            request.messageRecipient shouldBe "NDEA.GB"
-          }
-        }
-
-        "destination type is Export" should {
-          "use the deliveryPlaceCustomsOffice referenceNumber for the Country Code when it exists" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export)), getMovementResponse(), useFS41SchemaVersion = false)
-            request.messageRecipient shouldBe "NDEA.IT"
-          }
-
-          "use GB as default when deliveryPlaceCustomsOffice does NOT exist" in {
-
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)), getMovementResponse(), useFS41SchemaVersion = false)
-            request.messageRecipient shouldBe "NDEA.GB"
-          }
-        }
-
-        "destination type is ReturnToThePlaceOfDispatchOfTheConsignor" should {
-          "use the country code from the ARC" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = ReturnToThePlaceOfDispatchOfTheConsignor)), getMovementResponse(), useFS41SchemaVersion = false)
-            request.messageRecipient shouldBe "NDEA.DE"
-          }
-        }
-
-        "destination type is anything else" should {
-          "use GB" in {
-            val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = UnknownDestination)), getMovementResponse(), useFS41SchemaVersion = false)
-            request.messageRecipient shouldBe "NDEA.GB"
-          }
+      "destination type is anything else" should {
+        "use GB" in {
+          val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = UnknownDestination)), getMovementResponse())
+          request.messageRecipient shouldBe "NDEA.GB"
         }
       }
-    }
-  }
-
-  ".action" should {
-    "be correct" in {
-      request.action shouldBe "http://www.hmrc.gov.uk/emcs/submitchangeofdestinationportal"
-    }
-  }
-
-  ".shouldExtractFromSoap" should {
-    "be correct" in {
-      request.shouldExtractFromSoap shouldBe false
     }
   }
 
@@ -265,82 +133,41 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
   ".eisXMLBody" when {
 
-    "useFS41SchemaVersion is enabled" should {
+    implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse())
 
-      implicit val request = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = true)
+    "generate the correct XML body" in {
+      val expectedRequest = wrapInControlDoc(
+        <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.13">
+          <urn:Header>
+            <urn1:MessageSender>
+              {request.messageSender}
+            </urn1:MessageSender>
+            <urn1:MessageRecipient>
+              {request.messageRecipient}
+            </urn1:MessageRecipient>
+            <urn1:DateOfPreparation>
+              {request.preparedDate.toString}
+            </urn1:DateOfPreparation>
+            <urn1:TimeOfPreparation>
+              {request.preparedTime.toString}
+            </urn1:TimeOfPreparation>
+            <urn1:MessageIdentifier>
+              {request.messageUUID}
+            </urn1:MessageIdentifier>
+            <urn1:CorrelationIdentifier>
+              {request.correlationUUID}
+            </urn1:CorrelationIdentifier>
+          </urn:Header>
+          <urn:Body>
+            {submitChangeDestinationXmlMax}
+          </urn:Body>
+        </urn:IE813>
+      )
 
-      "generate the correct XML body" in {
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.13">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {submitChangeDestinationXmlMax}
-            </urn:Body>
-          </urn:IE813>
-        )
+      val requestXml = XML.loadString(request.eisXMLBody())
+      val expectedXml = trim(expectedRequest)
 
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
-    }
-
-    "useFS41SchemaVersion is disabled" should {
-
-      "generate the correct XML body" in {
-        val expectedRequest = wrapInControlDoc(
-          <urn:IE813 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.01" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE813:V3.01">
-            <urn:Header>
-              <urn1:MessageSender>
-                {request.messageSender}
-              </urn1:MessageSender>
-              <urn1:MessageRecipient>
-                {request.messageRecipient}
-              </urn1:MessageRecipient>
-              <urn1:DateOfPreparation>
-                {request.preparedDate.toString}
-              </urn1:DateOfPreparation>
-              <urn1:TimeOfPreparation>
-                {request.preparedTime.toString}
-              </urn1:TimeOfPreparation>
-              <urn1:MessageIdentifier>
-                {request.messageUUID}
-              </urn1:MessageIdentifier>
-              <urn1:CorrelationIdentifier>
-                {request.correlationUUID}
-              </urn1:CorrelationIdentifier>
-            </urn:Header>
-            <urn:Body>
-              {submitChangeDestinationXmlMax}
-            </urn:Body>
-          </urn:IE813>
-        )
-
-        val requestXml = XML.loadString(request.eisXMLBody())
-        val expectedXml = trim(expectedRequest)
-
-        requestXml shouldBe expectedXml
-      }
+      requestXml shouldBe expectedXml
     }
   }
 

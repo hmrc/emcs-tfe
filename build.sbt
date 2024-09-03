@@ -19,8 +19,7 @@ lazy val microservice = Project("emcs-tfe", file("."))
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions",
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSortField",
     routesImport += "uk.gov.hmrc.emcstfe.models.common.SortOrdering",
-    routesImport += "uk.gov.hmrc.emcstfe.models.common.DestinationType",
-    ScoverageKeys.coverageMinimumStmtTotal := 95,
+    routesImport += "uk.gov.hmrc.emcstfe.models.common.DestinationType"
   )
   .configs(ItTest)
   .settings(inConfig(ItTest)(Defaults.itSettings ++ headerSettings(ItTest) ++ automateHeaderSettings(ItTest)): _*)

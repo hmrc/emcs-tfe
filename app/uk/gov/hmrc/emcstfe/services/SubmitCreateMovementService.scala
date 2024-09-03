@@ -17,12 +17,12 @@
 package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.connectors.{ChrisConnector, EisConnector}
+import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.FeatureSwitching
 import uk.gov.hmrc.emcstfe.models.request.SubmitCreateMovementRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISRIMValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISRIMValidationError
 import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
-import uk.gov.hmrc.emcstfe.models.response.{ChRISSuccessResponse, EISSubmissionSuccessResponse, ErrorResponse}
+import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepository
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,13 +31,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
-                                            eisConnector: EisConnector,
+class SubmitCreateMovementService @Inject()(eisConnector: EisConnector,
                                             createMovementUserAnswersRepository: CreateMovementUserAnswersRepository,
                                             val config: AppConfig) extends Logging with FeatureSwitching {
-  def submit(requestModel: SubmitCreateMovementRequest)
-            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ChRISSuccessResponse]] =
-    chrisConnector.submitCreateMovementChrisSOAPRequest[ChRISSuccessResponse](requestModel).flatMap(handleResponse(requestModel, _))
 
   def submitViaEIS(requestModel: SubmitCreateMovementRequest)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, EISSubmissionSuccessResponse]] =
@@ -54,13 +50,6 @@ class SubmitCreateMovementService @Inject()(chrisConnector: ChrisConnector,
       logger.warn(s"[handleResponse][${requestModel.exciseRegistrationNumber}] - RIM validation error codes for correlation ID - ${rimError.errorResponse.emcsCorrelationId}: ${rimError.errorResponse.validatorResults.map(_.map(formatErrorForLogging))}")
       createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
         requestModel.exciseRegistrationNumber, requestModel.draftId, rimError.errorResponse.validatorResults.getOrElse(Seq.empty)
-      ).map {
-        _ => Left(rimError)
-      }
-    case Left(rimError: ChRISRIMValidationError) =>
-      logger.warn(s"[handleResponse][${requestModel.exciseRegistrationNumber}] - RIM validation error codes for correlation ID - ${requestModel.correlationUUID}: ${rimError.errorResponse.rimValidationErrors.map(formatErrorForLogging)}")
-      createMovementUserAnswersRepository.setValidationErrorMessagesForDraftMovement(
-        requestModel.exciseRegistrationNumber, requestModel.draftId, rimError.errorResponse.rimValidationErrors
       ).map {
         _ => Left(rimError)
       }

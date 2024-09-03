@@ -16,69 +16,39 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.ValidateUsingFS41Schema
 import uk.gov.hmrc.emcstfe.fixtures.SubmitAlertOrRejectionFixtures
-import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.models.request.SubmitAlertOrRejectionRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.EISUnknownError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
 
-class SubmitAlertOrRejectionServiceSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures with MockAppConfig {
-  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
-    val submitAlertOrRejectionRequest: SubmitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel, useFS41SchemaVersion = useFS41SchemaVersion)
-    val service: SubmitAlertOrRejectionService = new SubmitAlertOrRejectionService(mockChrisConnector, mockEisConnector, mockAppConfig)
-    MockedAppConfig.getFeatureSwitchValue(ValidateUsingFS41Schema).returns(useFS41SchemaVersion)
+class SubmitAlertOrRejectionServiceSpec extends TestBaseSpec with SubmitAlertOrRejectionFixtures {
+
+  trait Test extends MockEisConnector {
+    val submitAlertOrRejectionRequest: SubmitAlertOrRejectionRequest = SubmitAlertOrRejectionRequest(maxSubmitAlertOrRejectionModel)
+    val service: SubmitAlertOrRejectionService = new SubmitAlertOrRejectionService(mockEisConnector)
   }
 
   "SubmitAlertOrRejectionService" when {
-    Seq(true, false).foreach { useFS41SchemaVersion =>
-      s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
-        "when calling submit" must {
-          "return a Right" when {
-            "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
+    "when calling submitViaEIS" must {
+      "return a Right" when {
+        "connector call is successful and XML is the correct format" in new Test {
 
-              MockChrisConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
-                Future.successful(Right(chrisSuccessResponse))
-              )
+          MockEisConnector.submit(submitAlertOrRejectionRequest).returns(Future.successful(Right(eisSuccessResponse)))
 
-              await(service.submit(maxSubmitAlertOrRejectionModel)) shouldBe Right(chrisSuccessResponse)
-            }
-          }
-          "return a Left" when {
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitAlertOrRejectionChrisSOAPRequest(submitAlertOrRejectionRequest).returns(
-                Future.successful(Left(XmlValidationError))
-              )
-
-              await(service.submit(maxSubmitAlertOrRejectionModel)) shouldBe Left(XmlValidationError)
-            }
-          }
+          await(service.submitViaEIS(maxSubmitAlertOrRejectionModel)) shouldBe Right(eisSuccessResponse)
         }
+      }
+      "return a Left" when {
+        "connector call is unsuccessful" in new Test {
 
-        "when calling submitViaEIS" must {
-          "return a Right" when {
-            "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
+          MockEisConnector.submit(submitAlertOrRejectionRequest).returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
 
-              MockEisConnector.submit(submitAlertOrRejectionRequest).returns(Future.successful(Right(eisSuccessResponse)))
-
-              await(service.submitViaEIS(maxSubmitAlertOrRejectionModel)) shouldBe Right(eisSuccessResponse)
-            }
-          }
-          "return a Left" when {
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockEisConnector.submit(submitAlertOrRejectionRequest).returns(Future.successful(Left(EISUnknownError("Downstream failed to respond"))))
-
-              await(service.submitViaEIS(maxSubmitAlertOrRejectionModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
-            }
-          }
+          await(service.submitViaEIS(maxSubmitAlertOrRejectionModel)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
         }
       }
     }
-
   }
 }

@@ -16,31 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.chris.ChrisRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
 
 case class GetMovementRequest(exciseRegistrationNumber: String,
                               arc: String,
-                              sequenceNumber: Option[Int] = None) extends ChrisRequest with EisConsumptionRequest {
-  override def requestBody: String =
-    withGetRequestSoapEnvelope(
-      if(sequenceNumber.isDefined) {
-        <Parameters>
-          <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
-          <Parameter Name="ARC">{arc}</Parameter>
-          <Parameter Name="SequenceNumber">{sequenceNumber.get}</Parameter>
-        </Parameters>
-      } else {
-        <Parameters>
-          <Parameter Name="ExciseRegistrationNumber">{exciseRegistrationNumber}</Parameter>
-          <Parameter Name="ARC">{arc}</Parameter>
-        </Parameters>
-      }
-    )
-
-  override def action: String = "http://www.govtalk.gov.uk/taxation/internationalTrade/Excise/EMCSApplicationService/2.0/GetMovement"
-
-  override def shouldExtractFromSoap: Boolean = true
+                              sequenceNumber: Option[Int] = None) extends EisConsumptionRequest {
 
   override def metricName = "get-movement"
 

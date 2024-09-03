@@ -24,7 +24,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
-import uk.gov.hmrc.emcstfe.featureswitch.core.config.SendToEIS
 import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfe.stubs.DownstreamStub
 
@@ -41,25 +40,13 @@ trait IntegrationBaseSpec
 
   def servicesConfig: Map[String, _] = Map(
     "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
-    "microservice.services.chris.port" -> WireMockHelper.wireMockPort,
     "microservice.services.eis.port" -> WireMockHelper.wireMockPort,
-    "microservice.services.user-allow-list.port" -> WireMockHelper.wireMockPort,
     "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort,
     "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
     "createMovementUserAnswers.TTL" -> testTtl,
     "createMovementUserAnswers.replaceIndexes" -> testReplaceIndexes,
     "getMovement.TTL" -> testTtl,
-    "getMovement.replaceIndexes" -> testReplaceIndexes.toString,
-    "beta.public.createMovement.trafficPercentage" -> "50",
-    "beta.public.changeDestination.trafficPercentage" -> "50",
-    "beta.public.tfeNavHub.trafficPercentage" -> "50",
-    "beta.public.tfeMessageInbox.trafficPercentage" -> "50",
-    "beta.public.tfeDrafts.trafficPercentage" -> "50",
-    "beta.public.tfeHome.trafficPercentage" -> "50",
-    "beta.public.tfeSearchMovements.trafficPercentage" -> "50",
-    "beta.public.tfeViewMovement.trafficPercentage" -> "50",
-    "beta.public.tfeChangeDestination.trafficPercentage" -> "50",
-    "beta.public.tfePreValidate.trafficPercentage" -> "50"
+    "getMovement.replaceIndexes" -> testReplaceIndexes.toString
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
@@ -72,12 +59,10 @@ trait IntegrationBaseSpec
     startWireMock()
     DownstreamStub.onSuccess(DownstreamStub.POST, "/write/audit", OK, Json.obj())
     DownstreamStub.onSuccess(DownstreamStub.POST, "/write/audit/merged", OK, Json.obj())
-    sys.props -= SendToEIS.configName
   }
 
   override protected def afterAll(): Unit = {
     super.afterAll()
-    sys.props -= SendToEIS.configName
     stopWireMock()
   }
 

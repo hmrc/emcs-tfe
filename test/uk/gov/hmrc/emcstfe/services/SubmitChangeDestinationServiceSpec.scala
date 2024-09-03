@@ -18,10 +18,10 @@ package uk.gov.hmrc.emcstfe.services
 
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures}
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
-import uk.gov.hmrc.emcstfe.mocks.connectors.{MockChrisConnector, MockEisConnector}
+import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.mocks.repository.MockChangeDestinationUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{ChRISRIMValidationError, EISBusinessError, EISRIMValidationError, EISUnknownError, XmlValidationError}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISUnknownError}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -34,101 +34,57 @@ class SubmitChangeDestinationServiceSpec extends TestBaseSpec
 
   import SubmitChangeDestinationFixtures.submitChangeDestinationModelMax
 
-  class Test(useFS41SchemaVersion: Boolean) extends MockChrisConnector with MockEisConnector {
-    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse(), useFS41SchemaVersion = useFS41SchemaVersion)
-    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockChrisConnector, mockEisConnector, mockChangeDestinationUserAnswersRepository, mockAppConfig)
+  trait Test extends MockEisConnector {
+    val submitChangeDestinationRequest: SubmitChangeDestinationRequest = SubmitChangeDestinationRequest(submitChangeDestinationModelMax, getMovementResponse())
+    val service: SubmitChangeDestinationService = new SubmitChangeDestinationService(mockEisConnector, mockChangeDestinationUserAnswersRepository, mockAppConfig)
   }
 
   "SubmitChangeDestinationService" when {
-    Seq(true, false).foreach { useFS41SchemaVersion =>
-      s"useFS41SchemaVersion is $useFS41SchemaVersion" should {
+    "when calling submitViaEIS" must {
+      "return a Right" when {
+        "connector call is successful and Json is the correct format" in new Test {
 
-        "when calling submit" must {
-          "return a Right" when {
-            "connector call is successful and XML is the correct format" in new Test(useFS41SchemaVersion) {
+          MockEisConnector.submit(submitChangeDestinationRequest).returns(
+            Future.successful(Right(eisSuccessResponse))
+          )
 
-              MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
-                Future.successful(Right(chrisSuccessResponse))
-              )
+          MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, Seq.empty)
+            .returns(Future.successful(true))
 
-              MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, Seq.empty)
-                .returns(Future.successful(true))
+          await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Right(eisSuccessResponse)
+        }
+      }
 
-              await(service.submit(submitChangeDestinationRequest)) shouldBe Right(chrisSuccessResponse)
-            }
-          }
-          "return a Left" when {
+      "return a Left" when {
 
-            "ChRIS returns a 200 response but with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
+        "EIS returns a 422 error with RIM validation errors (inserting the errors into Mongo)" in new Test {
 
-              MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
-                Future.successful(Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse)))
-              )
+          MockEisConnector.submit(submitChangeDestinationRequest).returns(
+            Future.successful(Left(EISRIMValidationError(eisRimValidationResponse)))
+          )
 
-              MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, chrisRIMValidationErrorResponse.rimValidationErrors)
-                .returns(Future.successful(true))
+          MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, eisRimValidationResponse.validatorResults.get)
+            .returns(Future.successful(true))
 
-              await(service.submit(submitChangeDestinationRequest)) shouldBe Left(ChRISRIMValidationError(chrisRIMValidationErrorResponse))
-            }
-
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockChrisConnector.submitChangeDestinationChrisSOAPRequest(submitChangeDestinationRequest).returns(
-                Future.successful(Left(XmlValidationError))
-              )
-
-              await(service.submit(submitChangeDestinationRequest)) shouldBe Left(XmlValidationError)
-            }
-          }
+          await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISRIMValidationError(eisRimValidationResponse))
         }
 
-        "when calling submitViaEIS" must {
-          "return a Right" when {
-            "connector call is successful and Json is the correct format" in new Test(useFS41SchemaVersion) {
+        "EIS returns a 422 error without RIM validation errors" in new Test {
 
-              MockEisConnector.submit(submitChangeDestinationRequest).returns(
-                Future.successful(Right(eisSuccessResponse))
-              )
+          MockEisConnector.submit(submitChangeDestinationRequest).returns(
+            Future.successful(Left(EISBusinessError("wrong")))
+          )
 
-              MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, Seq.empty)
-                .returns(Future.successful(true))
+          await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISBusinessError("wrong"))
+        }
 
-              await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Right(eisSuccessResponse)
-            }
-          }
+        "connector call is unsuccessful" in new Test {
 
-          "return a Left" when {
+          MockEisConnector.submit(submitChangeDestinationRequest).returns(
+            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          )
 
-            "EIS returns a 422 error with RIM validation errors (inserting the errors into Mongo)" in new Test(useFS41SchemaVersion) {
-
-              MockEisConnector.submit(submitChangeDestinationRequest).returns(
-                Future.successful(Left(EISRIMValidationError(eisRimValidationResponse)))
-              )
-
-              MockChangeDestinationUserAnswersRepository.setValidationErrorMessagesForDraftMovement(testErn, testArc, eisRimValidationResponse.validatorResults.get)
-                .returns(Future.successful(true))
-
-              await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISRIMValidationError(eisRimValidationResponse))
-            }
-
-            "EIS returns a 422 error without RIM validation errors" in new Test(useFS41SchemaVersion) {
-
-              MockEisConnector.submit(submitChangeDestinationRequest).returns(
-                Future.successful(Left(EISBusinessError("wrong")))
-              )
-
-              await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISBusinessError("wrong"))
-            }
-
-            "connector call is unsuccessful" in new Test(useFS41SchemaVersion) {
-
-              MockEisConnector.submit(submitChangeDestinationRequest).returns(
-                Future.successful(Left(EISUnknownError("Downstream failed to respond")))
-              )
-
-              await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
-            }
-          }
+          await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
         }
       }
     }
