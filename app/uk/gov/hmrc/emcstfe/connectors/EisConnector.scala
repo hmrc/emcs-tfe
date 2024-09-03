@@ -20,14 +20,14 @@ import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
 import uk.gov.hmrc.emcstfe.models.request._
-import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.PreValidateRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.{PreValidateETDS12Request, PreValidateRequest}
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.models.response._
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementListResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmissionFailureMessageResponse
-import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderApiResponse
+import uk.gov.hmrc.emcstfe.models.response.prevalidate.{PreValidateTraderApiResponse, PreValidateTraderETDSResponse}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -113,5 +113,11 @@ class EisConnector @Inject()(val http: HttpClient,
                        (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[PreValidateTraderApiResponse]): Future[Either[ErrorResponse, PreValidateTraderApiResponse]] = {
     val url = appConfig.eisPreValidateTraderUrl()
     prepareJsonAndSubmit(url, request, "preValidateTrader", appConfig.eisPrevalidateBearerToken)
+  }
+
+  def preValidateTraderViaETDS12(request: PreValidateETDS12Request)
+                       (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[PreValidateTraderETDSResponse]): Future[Either[ErrorResponse, PreValidateTraderETDSResponse]] = {
+    val url = appConfig.eisPreValidateTraderViaETDS12Url()
+    prepareJsonAndSubmit(url, request, "preValidateTraderViaETDS12", appConfig.eisPrevalidateETDS12BearerToken)
   }
 }

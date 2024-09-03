@@ -42,12 +42,12 @@ class PreValidateTraderControllerSpec extends TestBaseSpec with FakeAuthAction w
       s"return ${Status.OK} (OK)" when {
         "service returns a Right" in new Fixture(FakeSuccessAuthAction) {
 
-          MockService.preValidateTrader(preValidateTraderModelRequest).returns(Future.successful(Right(preValidateApiResponseModel)))
+          MockService.preValidateTrader(preValidateTraderModelRequest).returns(Future.successful(Right(preValidateEtds12ApiResponseModel)))
 
           val result = controller.submit(testErn)(fakeRequest)
 
           status(result) shouldBe Status.OK
-          contentAsJson(result) shouldBe preValidateApiResponseAsJson
+          contentAsJson(result) shouldBe preValidateEtds12ApiResponseAsJson
         }
       }
 

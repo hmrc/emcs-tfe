@@ -22,13 +22,13 @@ import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
-import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.PreValidateRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.{PreValidateETDS12Request, PreValidateRequest}
 import uk.gov.hmrc.emcstfe.models.response._
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementListResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
 import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmissionFailureMessageResponse
-import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderApiResponse
+import uk.gov.hmrc.emcstfe.models.response.prevalidate.{PreValidateTraderApiResponse, PreValidateTraderETDSResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -89,5 +89,9 @@ trait MockEisConnector extends MockFactory {
         .expects(request, *, *, *)
     }
 
+    def preValidateTraderViaETDS12(request: PreValidateETDS12Request): CallHandler4[PreValidateETDS12Request, HeaderCarrier, ExecutionContext, Reads[PreValidateTraderETDSResponse], Future[Either[ErrorResponse, PreValidateTraderETDSResponse]]] = {
+      (mockEisConnector.preValidateTraderViaETDS12(_: PreValidateETDS12Request)(_: HeaderCarrier, _: ExecutionContext, _: Reads[PreValidateTraderETDSResponse]))
+        .expects(request, *, *, *)
+    }
   }
 }

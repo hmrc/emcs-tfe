@@ -63,6 +63,9 @@ class AppConfigSpec extends TestBaseSpec with FeatureSwitching {
       "return the correct value for eis.emc15b.token" in {
         config.eisPrevalidateBearerToken shouldBe "value-prevalidate"
       }
+      "return the correct value for eis.etds12.token" in {
+        config.eisPrevalidateETDS12BearerToken shouldBe "value-prevalidate-etds12"
+      }
     }
   }
 

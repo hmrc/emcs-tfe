@@ -47,6 +47,24 @@ case class ExciseTraderValidationResponse (
 
 case class PreValidateTraderApiResponse(exciseTraderValidationResponse: ExciseTraderValidationResponse)
 
+case class ETDSProductError(
+                             exciseProductCode: String,
+                             errorCode: Int,
+                             errorText: String)
+
+case class ETDSValidateProductAuthorisationResponse(productError: Option[Seq[ETDSProductError]] = None)
+
+case class ETDSFailDetails(
+                            validTrader: Boolean,
+                            errorCode: Option[Int],
+                            errorText: Option[String],
+                            validateProductAuthorisationResponse: Option[ETDSValidateProductAuthorisationResponse])
+
+case class PreValidateTraderETDSResponse(
+                                          processingDateTime: String,
+                                          exciseId: String,
+                                          validationResult: String,
+                                          failDetails: Option[ETDSFailDetails])
 
 object ProductError {
   implicit val format: Format[ProductError] = Json.format
@@ -66,4 +84,20 @@ object ExciseTraderValidationResponse {
 
 object PreValidateTraderApiResponse {
   implicit val format: Format[PreValidateTraderApiResponse] = Json.format
+}
+
+object ETDSProductError {
+  implicit val format: Format[ETDSProductError] = Json.format
+}
+
+object ETDSValidateProductAuthorisationResponse {
+  implicit val format: Format[ETDSValidateProductAuthorisationResponse] = Json.format
+}
+
+object ETDSFailDetails {
+  implicit val format: Format[ETDSFailDetails] = Json.format
+}
+
+object PreValidateTraderETDSResponse {
+  implicit val format: Format[PreValidateTraderETDSResponse] = Json.format
 }

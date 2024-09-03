@@ -21,78 +21,131 @@ import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnablePreValidateViaETDS12, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.fixtures.PreValidateFixtures
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
-class PreValidateIntegrationSpec extends IntegrationBaseSpec with PreValidateFixtures {
+class PreValidateIntegrationSpec
+  extends IntegrationBaseSpec
+    with PreValidateFixtures
+    with FeatureSwitching {
 
   val config: AppConfig = app.injector.instanceOf[AppConfig]
 
-  private trait Test {
+  private abstract class Test(useEtds12API: Boolean = false) {
     def setupStubs(): StubMapping
 
     def uri: String = s"/pre-validate-trader/$testErn"
 
-    def downstreamUri: String = s"/emcs/pre-validate-trader/v1"
+    def downstreamUri: String =
+      if (useEtds12API) "/etds/traderprevalidation/v1" else "/emcs/pre-validate-trader/v1"
 
     def request(): WSRequest = {
+      if (useEtds12API) enable(EnablePreValidateViaETDS12) else disable(EnablePreValidateViaETDS12)
       setupStubs()
       buildRequest(uri, "Content-Type" -> "application/json")
     }
-
   }
 
   override def beforeEach(): Unit = {
     super.beforeEach()
   }
 
-  "Calling the pre validate trader endpoint" must {
-    "return a success" when {
-      "all downstream calls are successful" in new Test {
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, preValidateApiResponseAsJson)
+  "Calling the pre validate trader endpoint" when {
+    "using the EMC15B API" should {
+
+      "return a success" when {
+        "all downstream calls are successful" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, preValidateEmc15bApiResponseAsJson)
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
+          response.status shouldBe Status.OK
+          response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
+          response.json shouldBe preValidateEtds12ApiResponseAsJson
+        }
+      }
+
+      "return an error" when {
+        "downstream call returns unexpected JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.OK, "{}")
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
+          response.json.toString.contains("Errors parsing JSON") shouldBe true
         }
 
-        val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
-        response.status shouldBe Status.OK
-        response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
-        response.json shouldBe preValidateApiResponseAsJson
+        "downstream call returns a non-200 HTTP response" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, "bad things")
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Request not processed returned by EIS, error response: bad things"
+          )
+        }
+
       }
+
     }
 
-    "return an error" when {
-      "downstream call returns unexpected JSON" in new Test {
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.OK, "{}")
-        }
+    "using the ETDS12 API" should {
 
-        val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
-        response.status shouldBe Status.INTERNAL_SERVER_ERROR
-        response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
-        response.json shouldBe Json.obj(
-          "message" -> "Errors parsing JSON, errors: List(JsonValidationError(List(error.path.missing),List()))"
-        )
+      "return a success" when {
+        "all downstream calls are successful" in new Test(useEtds12API = true) {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, preValidateEtds12ApiResponseAsJson)
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
+          response.status shouldBe Status.OK
+          response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
+          response.json shouldBe preValidateEtds12ApiResponseAsJson
+        }
       }
 
-      "downstream call returns a non-200 HTTP response" in new Test {
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, "bad things")
+      "return an error" when {
+        "downstream call returns unexpected JSON" in new Test(useEtds12API = true) {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.OK, "{}")
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
+          response.json.toString.contains("Errors parsing JSON") shouldBe true
         }
 
-        val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
-        response.status shouldBe Status.INTERNAL_SERVER_ERROR
-        response.header("Content-Type") shouldBe Some("application/json")
-        response.json shouldBe Json.obj(
-          "message" -> "Request not processed returned by EIS, error response: bad things"
-        )
+        "downstream call returns a non-200 HTTP response" in new Test(useEtds12API = true) {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onError(DownstreamStub.POST, downstreamUri, Status.INTERNAL_SERVER_ERROR, "bad things")
+          }
+
+          val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.obj(
+            "message" -> "Request not processed returned by EIS, error response: bad things"
+          )
+        }
+
       }
 
     }
-
   }
 
 }
