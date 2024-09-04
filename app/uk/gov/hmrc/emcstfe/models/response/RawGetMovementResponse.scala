@@ -21,9 +21,7 @@ import play.api.libs.json._
 
 import scala.xml.NodeSeq
 
-case class RawGetMovementResponse(dateTime: String, exciseRegistrationNumber: String, movementView: NodeSeq) extends LegacyMessage {
-  override protected def xmlBody: NodeSeq = schemaResultBody(movementView)
-}
+case class RawGetMovementResponse(dateTime: String, exciseRegistrationNumber: String, movementView: NodeSeq)
 
 object RawGetMovementResponse {
   implicit val reads: Reads[RawGetMovementResponse] = ((__ \ "dateTime").read[String] and
