@@ -22,6 +22,7 @@ import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
 import uk.gov.hmrc.emcstfe.mocks.repository.MockChangeDestinationUserAnswersRepository
 import uk.gov.hmrc.emcstfe.models.request.SubmitChangeDestinationRequest
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{EISBusinessError, EISRIMValidationError, EISUnknownError}
+import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import scala.concurrent.Future
@@ -40,7 +41,7 @@ class SubmitChangeDestinationServiceSpec extends TestBaseSpec
   }
 
   "SubmitChangeDestinationService" when {
-    "when calling submitViaEIS" must {
+    "calling submitViaEIS" must {
       "return a Right" when {
         "connector call is successful and Json is the correct format" in new Test {
 
@@ -86,6 +87,21 @@ class SubmitChangeDestinationServiceSpec extends TestBaseSpec
 
           await(service.submitViaEIS(submitChangeDestinationRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
         }
+      }
+    }
+
+    "formatErrorForLogging" must {
+      "return the errorType if the errorType is not 12 or 13" in new Test {
+        val validationError: RIMValidationError = RIMValidationError(errorCategory = Some("business"), errorType = Some(1), errorReason = Some("some error"), errorLocation = Some("some location"))
+        service.formatErrorForLogging(validationError) shouldBe "Some(1)"
+      }
+
+      "return Some(errorType) (errorReason: reason) if the errorType is 12 or 13" in new Test {
+        val validationError12: RIMValidationError = RIMValidationError(errorCategory = Some("business"), errorType = Some(12), errorReason = Some("some error"), errorLocation = Some("some location"))
+        val validationError13: RIMValidationError = RIMValidationError(errorCategory = Some("business"), errorType = Some(13), errorReason = Some("some error"), errorLocation = Some("some location"))
+
+        service.formatErrorForLogging(validationError12) shouldBe "Some(12) (errorReason: Some(some error))"
+        service.formatErrorForLogging(validationError13) shouldBe "Some(13) (errorReason: Some(some error))"
       }
     }
   }

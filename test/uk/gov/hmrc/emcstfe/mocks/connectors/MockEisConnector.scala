@@ -24,10 +24,10 @@ import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.PreValidateRequest
 import uk.gov.hmrc.emcstfe.models.response._
-import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, RawGetMessagesResponse}
+import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementListResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
-import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.{GetSubmissionFailureMessageResponse, RawGetSubmissionFailureMessageResponse}
+import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmissionFailureMessageResponse
 import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderApiResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -49,11 +49,6 @@ trait MockEisConnector extends MockFactory {
         .expects(request, *, *, *)
     }
 
-    def getRawMessages(request: GetMessagesRequest): CallHandler4[GetMessagesRequest, HeaderCarrier, ExecutionContext, Reads[RawGetMessagesResponse], Future[Either[ErrorResponse, RawGetMessagesResponse]]] = {
-      (mockEisConnector.getRawMessages(_: GetMessagesRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[RawGetMessagesResponse]))
-        .expects(request, *, *, *)
-    }
-
     def getMessageStatistics(request: GetMessageStatisticsRequest): CallHandler4[GetMessageStatisticsRequest, HeaderCarrier, ExecutionContext, Reads[GetMessageStatisticsResponse], Future[Either[ErrorResponse, GetMessageStatisticsResponse]]] = {
       (mockEisConnector.getMessageStatistics(_: GetMessageStatisticsRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetMessageStatisticsResponse]))
         .expects(request, *, *, *)
@@ -61,11 +56,6 @@ trait MockEisConnector extends MockFactory {
 
     def getSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest): CallHandler4[GetSubmissionFailureMessageRequest, HeaderCarrier, ExecutionContext, Reads[GetSubmissionFailureMessageResponse], Future[Either[ErrorResponse, GetSubmissionFailureMessageResponse]]] = {
       (mockEisConnector.getSubmissionFailureMessage(_: GetSubmissionFailureMessageRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[GetSubmissionFailureMessageResponse]))
-        .expects(request, *, *, *)
-    }
-
-    def getRawSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest): CallHandler4[GetSubmissionFailureMessageRequest, HeaderCarrier, ExecutionContext, Reads[RawGetSubmissionFailureMessageResponse], Future[Either[ErrorResponse, RawGetSubmissionFailureMessageResponse]]] = {
-      (mockEisConnector.getRawSubmissionFailureMessage(_: GetSubmissionFailureMessageRequest)(_: HeaderCarrier, _: ExecutionContext, _: Reads[RawGetSubmissionFailureMessageResponse]))
         .expects(request, *, *, *)
     }
 

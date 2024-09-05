@@ -63,8 +63,6 @@ trait GetSubmissionFailureMessageFixtures extends BaseFixtures {
         |      <ie:RelatedMessageType>IE815</ie:RelatedMessageType>
         |</p:SubmissionFailureMessageDataResponse>""".stripMargin
 
-    val rawGetSubmissionFailureMessageResponse: RawGetSubmissionFailureMessageResponse = RawGetSubmissionFailureMessageResponse("dateTime", testErn, XML.loadString(fullXML))
-
     val rawGetSubmissionFailureMessageResponseJson: JsValue = Json.obj(
       "dateTime" -> "dateTime",
       "exciseRegistrationNumber" -> testErn,

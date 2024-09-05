@@ -10,8 +10,6 @@ GET           /submission-failure-message/:ern/:messageId        uk.gov.hmrc.emc
 PUT           /message/:ern/:messageId                           uk.gov.hmrc.emcstfe.controllers.MarkMessageAsReadController.markMessageAsRead(ern, messageId)
 DELETE        /message/:ern/:messageId                           uk.gov.hmrc.emcstfe.controllers.SetMessageAsLogicallyDeletedController.setMessageAsLogicallyDeleted(ern, messageId)
 
-# Legacy messages route
-POST          /legacy/messages                                   uk.gov.hmrc.emcstfe.controllers.LegacyMessagesController.performMessagesOperation
 # Submission
 POST          /report-of-receipt/:ern/:arc                       uk.gov.hmrc.emcstfe.controllers.SubmitReportOfReceiptController.submit(ern, arc)
 POST          /explain-delay/:ern/:arc                           uk.gov.hmrc.emcstfe.controllers.SubmitExplainDelayController.submit(ern, arc)

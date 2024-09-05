@@ -23,10 +23,10 @@ import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.PreValidateRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest}
 import uk.gov.hmrc.emcstfe.models.response._
-import uk.gov.hmrc.emcstfe.models.response.getMessages.{GetMessagesResponse, RawGetMessagesResponse}
+import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementListResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovementHistoryEvents.GetMovementHistoryEventsResponse
-import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.{GetSubmissionFailureMessageResponse, RawGetSubmissionFailureMessageResponse}
+import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmissionFailureMessageResponse
 import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderApiResponse
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
@@ -73,10 +73,6 @@ class EisConnector @Inject()(val http: HttpClient,
                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetMessagesResponse]): Future[Either[ErrorResponse, GetMessagesResponse]] =
     prepareGetRequestAndSubmit(appConfig.eisGetMessagesUrl(), request, "getMessages", appConfig.eisMessagesBearerToken)
 
-  def getRawMessages(request: GetMessagesRequest)
-                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[RawGetMessagesResponse]): Future[Either[ErrorResponse, RawGetMessagesResponse]] =
-    prepareGetRequestAndSubmit(appConfig.eisGetMessagesUrl(), request, "getMessages", appConfig.eisMessagesBearerToken)
-
   def getMessageStatistics(request: GetMessageStatisticsRequest)
                           (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetMessageStatisticsResponse]): Future[Either[ErrorResponse, GetMessageStatisticsResponse]] = {
     prepareGetRequestAndSubmit(appConfig.eisGetMessageStatisticsUrl(), request, "getMessageStatistics", appConfig.eisMessagesBearerToken)
@@ -99,10 +95,6 @@ class EisConnector @Inject()(val http: HttpClient,
 
   def getSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest)
                                  (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[GetSubmissionFailureMessageResponse]): Future[Either[ErrorResponse, GetSubmissionFailureMessageResponse]] =
-    prepareGetRequestAndSubmit(appConfig.eisGetSubmissionFailureMessageUrl(), request, "getSubmissionFailureMessage", appConfig.eisMessagesBearerToken)
-
-  def getRawSubmissionFailureMessage(request: GetSubmissionFailureMessageRequest)
-                                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[RawGetSubmissionFailureMessageResponse]): Future[Either[ErrorResponse, RawGetSubmissionFailureMessageResponse]] =
     prepareGetRequestAndSubmit(appConfig.eisGetSubmissionFailureMessageUrl(), request, "getSubmissionFailureMessage", appConfig.eisMessagesBearerToken)
 
   def markMessageAsRead(request: MarkMessageAsReadRequest)
