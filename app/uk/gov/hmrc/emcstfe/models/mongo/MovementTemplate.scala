@@ -24,6 +24,7 @@ import java.time.Instant
 
 final case class MovementTemplate(ern: String,
                                   templateId: String,
+                                  templateName: String,
                                   data: JsObject,
                                   lastUpdated: Instant)
 
@@ -32,6 +33,7 @@ object MovementTemplate {
   val mongoReads: Reads[MovementTemplate] = (
     (__ \ "ern").read[String] and
       (__ \ "templateId").read[String] and
+      (__ \ "templateName").read[String] and
       (__ \ "data").read[JsObject] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     )(MovementTemplate.apply _)
@@ -39,6 +41,7 @@ object MovementTemplate {
   val mongoWrites: OWrites[MovementTemplate] = (
     (__ \ "ern").write[String] and
       (__ \ "templateId").write[String] and
+      (__ \ "templateName").write[String] and
       (__ \ "data").write[JsObject] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
     )(unlift(MovementTemplate.unapply))

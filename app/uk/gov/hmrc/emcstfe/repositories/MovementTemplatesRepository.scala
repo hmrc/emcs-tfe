@@ -42,6 +42,8 @@ trait MovementTemplatesRepository {
   def set(answers: MovementTemplate): Future[Boolean]
 
   def delete(ern: String, templateId: String): Future[Boolean]
+
+  def checkIfTemplateNameAlreadyExists(ern: String, templateName: String): Future[Boolean]
 }
 
 @Singleton
@@ -54,7 +56,7 @@ class MovementTemplatesRepositoryImpl @Inject()(mongoComponent: MongoComponent,
     mongoComponent = mongoComponent,
     domainFormat = MovementTemplate.mongoFormat,
     indexes = mongoIndexes(),
-    replaceIndexes = appConfig.createMovementUserAnswersReplaceIndexes()
+    replaceIndexes = appConfig.movementTemplatesIndexes()
   ) with MovementTemplatesRepository {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
@@ -66,6 +68,12 @@ class MovementTemplatesRepositoryImpl @Inject()(mongoComponent: MongoComponent,
     Filters.and(
       Filters.equal(ernField, ern),
       Filters.equal(templateIdField, templateId)
+    )
+
+  private def byTemplateName(ern: String, templateName: String): Bson =
+    Filters.and(
+      Filters.equal(ernField, ern),
+      Filters.equal(templateNameField, templateName)
     )
 
   def get(ern: String, templateId: String): Future[Option[MovementTemplate]] =
@@ -90,12 +98,16 @@ class MovementTemplatesRepositoryImpl @Inject()(mongoComponent: MongoComponent,
       .deleteOne(byTemplateId(ern, templateId))
       .toFuture()
       .map(_ => true)
+
+  def checkIfTemplateNameAlreadyExists(ern: String, templateName: String): Future[Boolean] =
+    collection.find(byTemplateName(ern, templateName)).headOption().map(_.isDefined)
 }
 
 object MovementTemplatesRepository {
 
   val ernField = "ern"
   val templateIdField = "templateId"
+  val templateNameField = "templateName"
   val lastUpdatedField = "lastUpdated"
 
   def mongoIndexes(): Seq[IndexModel] = Seq(
@@ -107,6 +119,15 @@ object MovementTemplatesRepository {
       IndexOptions()
         .unique(true)
         .name("ernTemplateIdIdx")
+    ),
+    IndexModel(
+      Indexes.compoundIndex(
+        Indexes.ascending(ernField),
+        Indexes.ascending(templateNameField)
+      ),
+      IndexOptions()
+        .unique(true)
+        .name("ernTemplateNameIdx")
     )
   )
 }

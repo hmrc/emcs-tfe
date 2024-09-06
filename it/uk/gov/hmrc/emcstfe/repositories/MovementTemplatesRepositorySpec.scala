@@ -35,6 +35,7 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
   val template = MovementTemplate(
     ern = testErn,
     templateId = testTemplateId,
+    templateName = testTemplateName,
     data = Json.obj("foo" -> "bar"),
     lastUpdated = Instant.ofEpochSecond(1)
   )
@@ -102,16 +103,16 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
 
       "return Seq(templates)" in {
 
-        insert(template copy (templateId = "foo1")).futureValue
-        insert(template copy (templateId = "foo2")).futureValue
-        insert(template copy (templateId = "foo3")).futureValue
+        insert(template.copy(templateId = "foo1", templateName = "foo 1")).futureValue
+        insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
+        insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
 
         val result = repository.getList(testErn).futureValue
 
         result shouldBe Seq(
-          template copy (templateId = "foo1"),
-          template copy (templateId = "foo2"),
-          template copy (templateId = "foo3")
+          template.copy(templateId = "foo1", templateName = "foo 1"),
+          template.copy(templateId = "foo2", templateName = "foo 2"),
+          template.copy(templateId = "foo3", templateName = "foo 3")
         )
       }
     }
@@ -136,6 +137,32 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
     "not fail when a template does not exist as this is already the desired outcome" in {
       val result = repository.delete(testErn, testTemplateId).futureValue
       result shouldBe true
+    }
+  }
+
+  ".checkIfTemplateNameAlreadyExists" when {
+
+    "there is a template with the same name" must {
+
+      "return true" in {
+        insert(template).futureValue
+        repository.checkIfTemplateNameAlreadyExists(testErn, testTemplateName).futureValue shouldBe true
+      }
+    }
+
+    "there is NO template with the same name" must {
+
+      "return true" in {
+        insert(template).futureValue
+        repository.checkIfTemplateNameAlreadyExists(testErn, "foo").futureValue shouldBe false
+      }
+    }
+
+    "there are no templates" must {
+
+      "return None" in {
+        repository.checkIfTemplateNameAlreadyExists(testErn, "foo").futureValue shouldBe false
+      }
     }
   }
 }

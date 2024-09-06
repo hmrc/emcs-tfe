@@ -28,6 +28,7 @@ trait BaseFixtures {
   val testMessageId = "1234"
   val testDraftId: String = "1234-5678-9012"
   val testTemplateId: String = "template1234"
+  val testTemplateName: String = "MyTemplate"
   val testNewDraftId: String = "9876-5432-1098"
   val testCredId = "cred1234567891"
   val testInternalId = "int1234567891"

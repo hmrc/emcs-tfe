@@ -90,4 +90,8 @@ object ErrorResponse {
   case object NoLegacyActionProvided extends ErrorResponse {
     val message = s"no action found in the request"
   }
+
+  case class TemplateDoesNotExist(templateId: String) extends ErrorResponse {
+    val message = s"No template exists with the templateId: $templateId"
+  }
 }

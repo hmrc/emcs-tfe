@@ -35,6 +35,8 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def createMovementUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.createMovementUserAnswers.TTL"))
   def createMovementUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.createMovementUserAnswers.replaceIndexes")
 
+  def movementTemplatesIndexes(): Boolean = configuration.get[Boolean]("mongodb.movementTemplates.replaceIndexes")
+
   def reportReceiptUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.reportReceiptUserAnswers.TTL"))
   def reportReceiptUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.reportReceiptUserAnswers.replaceIndexes")
 
