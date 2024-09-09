@@ -20,6 +20,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
+import uk.gov.hmrc.emcstfe.utils.{TimeMachine, UUIDGenerator}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -31,7 +32,9 @@ final case class CreateMovementUserAnswers(ern: String,
                                            validationErrors: Seq[RIMValidationError],
                                            lastUpdated: Instant,
                                            hasBeenSubmitted: Boolean,
-                                           submittedDraftId: Option[String])
+                                           submittedDraftId: Option[String],
+                                           createdFromTemplateId: Option[String] = None,
+                                           createdFromTemplateName: Option[String] = None)
 
 object CreateMovementUserAnswers {
 
@@ -43,7 +46,9 @@ object CreateMovementUserAnswers {
       (__ \ "validationErrors").readNullable[Seq[RIMValidationError]].map(_.getOrElse(Seq.empty)) and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat) and
       (__ \ "hasBeenSubmitted").read[Boolean] and
-      (__ \ "submittedDraftId").readNullable[String]
+      (__ \ "submittedDraftId").readNullable[String] and
+      (__ \ "createdFromTemplateId").readNullable[String] and
+      (__ \ "createdFromTemplateName").readNullable[String]
     )(CreateMovementUserAnswers.apply _)
 
   val mongoWrites: OWrites[CreateMovementUserAnswers] = (
@@ -54,10 +59,28 @@ object CreateMovementUserAnswers {
       (__ \ "validationErrors").write[Seq[RIMValidationError]] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat) and
       (__ \ "hasBeenSubmitted").write[Boolean] and
-      (__ \ "submittedDraftId").writeNullable[String]
+      (__ \ "submittedDraftId").writeNullable[String] and
+      (__ \ "createdFromTemplateId").writeNullable[String] and
+      (__ \ "createdFromTemplateName").writeNullable[String]
     )(unlift(CreateMovementUserAnswers.unapply))
 
   implicit val mongoFormat: OFormat[CreateMovementUserAnswers] = OFormat(mongoReads, mongoWrites)
 
   val responseWrites: OWrites[CreateMovementUserAnswers] = Json.writes[CreateMovementUserAnswers]
+
+  def applyFromTemplate(template: MovementTemplate)
+                       (implicit uuidGenerator: UUIDGenerator, timeMachine: TimeMachine): CreateMovementUserAnswers =
+    CreateMovementUserAnswers(
+      ern = template.ern,
+      draftId = uuidGenerator.randomUUID,
+      data = template.data,
+      submissionFailures = Seq(),
+      validationErrors = Seq(),
+      lastUpdated = timeMachine.instant(),
+      hasBeenSubmitted = false,
+      submittedDraftId = None,
+      createdFromTemplateId = Some(template.templateId),
+      createdFromTemplateName = Some(template.templateName)
+    )
+
 }

@@ -24,3 +24,6 @@ POST          /pre-validate-trader/:ern                          uk.gov.hmrc.emc
 
 # User answers
 ->            /user-answers                                      userAnswers.Routes
+
+# Templates
+->            /                                                  templates.Routes

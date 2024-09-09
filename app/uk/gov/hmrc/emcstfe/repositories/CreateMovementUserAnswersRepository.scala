@@ -330,7 +330,9 @@ object CreateMovementUserAnswersRepository {
         Indexes.ascending(ernField),
         Indexes.ascending(lrnField)
       ),
-      IndexOptions().name("ernLrnIdx")
+      IndexOptions()
+        .sparse(true)
+        .name("ernLrnIdx")
     )
   )
 }

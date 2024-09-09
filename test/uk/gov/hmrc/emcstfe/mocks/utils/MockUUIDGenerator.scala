@@ -20,7 +20,8 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.emcstfe.utils.UUIDGenerator
 
 trait MockUUIDGenerator {
-  lazy val mockUUIDGenerator: UUIDGenerator = mock[UUIDGenerator]
+
+  implicit lazy val mockUUIDGenerator: UUIDGenerator = mock[UUIDGenerator]
 
   object MockUUIDGenerator {
     def randomUUID: String = mockUUIDGenerator.randomUUID
