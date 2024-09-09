@@ -4,3 +4,6 @@ POST       /api/feature-switches                             uk.gov.hmrc.emcstfe
 
 + nocsrf
 PUT        /user-answers/create-movement/:ern/:draftId       uk.gov.hmrc.emcstfe.testOnly.controllers.InsertCreateMovementUserAnswersController.set(ern, draftId)
+
++ nocsrf
+PUT        /templates/create-template/:ern/:templateId       uk.gov.hmrc.emcstfe.testOnly.controllers.InsertMovementTemplateController.set(ern, templateId)
