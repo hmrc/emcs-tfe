@@ -19,9 +19,8 @@ package uk.gov.hmrc.emcstfe.testOnly.controllers
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.models.mongo.{CreateMovementUserAnswers, MovementTemplate}
+import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
 import uk.gov.hmrc.emcstfe.services.templates.MovementTemplatesService
-import uk.gov.hmrc.emcstfe.services.userAnswers.CreateMovementUserAnswersService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject

@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import org.scalamock.handlers.{CallHandler2, CallHandler3}
+import org.scalamock.handlers.{CallHandler2, CallHandler3, CallHandler4}
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
+import uk.gov.hmrc.emcstfe.models.mongo.{MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfe.services.templates.MovementTemplatesService
 
@@ -30,8 +30,8 @@ trait MockMovementTemplatesService extends MockFactory  {
 
   object MockMovementTemplatesService {
 
-    def getList(ern: String): CallHandler2[String, ExecutionContext, Future[Either[ErrorResponse, Seq[MovementTemplate]]]] =
-      (mockService.getList(_: String)(_: ExecutionContext)).expects(ern, *)
+    def getList(ern: String): CallHandler4[String, Int, Int, ExecutionContext, Future[Either[ErrorResponse, MovementTemplates]]] =
+      (mockService.getList(_: String, _: Int, _: Int)(_: ExecutionContext)).expects(ern, *, *, *)
 
     def get(ern: String, draftId: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Option[MovementTemplate]]]] =
       (mockService.get(_: String, _: String)(_: ExecutionContext)).expects(ern, draftId, *)

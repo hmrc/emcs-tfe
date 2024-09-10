@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementListFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.mocks.repository.{MockCreateMovementUserAnswersRepository, MockMovementTemplatesRepository}
 import uk.gov.hmrc.emcstfe.mocks.utils.MockUUIDGenerator
-import uk.gov.hmrc.emcstfe.models.mongo.{CreateMovementUserAnswers, MovementTemplate}
+import uk.gov.hmrc.emcstfe.models.mongo.{CreateMovementUserAnswers, MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MongoError, TemplateDoesNotExist}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
@@ -60,23 +60,23 @@ class MovementTemplatesServiceSpec extends TestBaseSpec
     "return a Right(Seq(templates))" when {
       "templates are successfully returned from Mongo" in new Test {
 
-        MockMovementTemplatesRepository.getList(testErn).returns(Future.successful(Seq(template)))
-        await(service.getList(testErn)) shouldBe Right(Seq(template))
+        MockMovementTemplatesRepository.getList(testErn).returns(Future.successful(MovementTemplates(Seq(template), 1)))
+        await(service.getList(testErn, 1, 1)) shouldBe Right(MovementTemplates(Seq(template), 1))
       }
     }
 
     "return a Right(Seq())" when {
       "templates are not found in Mongo" in new Test {
 
-        MockMovementTemplatesRepository.getList(testErn).returns(Future.successful(Seq()))
-        await(service.getList(testErn)) shouldBe Right(Seq())
+        MockMovementTemplatesRepository.getList(testErn).returns(Future.successful(MovementTemplates(Seq(), 0)))
+        await(service.getList(testErn, 1, 1)) shouldBe Right(MovementTemplates(Seq(), 0))
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
         MockMovementTemplatesRepository.getList(testErn).returns(Future.failed(new Exception("bang")))
-        await(service.getList(testErn)) shouldBe Left(MongoError("bang"))
+        await(service.getList(testErn, 1, 1)) shouldBe Left(MongoError("bang"))
       }
     }
   }

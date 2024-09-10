@@ -21,7 +21,7 @@ import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
+import uk.gov.hmrc.emcstfe.models.mongo.{MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.repositories.MovementTemplatesRepository._
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
@@ -37,7 +37,7 @@ trait MovementTemplatesRepository {
 
   def get(ern: String, templateId: String): Future[Option[MovementTemplate]]
 
-  def getList(ern: String): Future[Seq[MovementTemplate]]
+  def getList(ern: String, page: Int, pageSize: Int): Future[MovementTemplates]
 
   def set(answers: MovementTemplate): Future[Boolean]
 
@@ -47,17 +47,15 @@ trait MovementTemplatesRepository {
 }
 
 @Singleton
-class MovementTemplatesRepositoryImpl @Inject()(mongoComponent: MongoComponent,
-                                                appConfig: AppConfig,
-                                                time: TimeMachine
-                                               )(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[MovementTemplate](
-    collectionName = "movement-templates",
-    mongoComponent = mongoComponent,
-    domainFormat = MovementTemplate.mongoFormat,
-    indexes = mongoIndexes(),
-    replaceIndexes = appConfig.movementTemplatesIndexes()
-  ) with MovementTemplatesRepository {
+class MovementTemplatesRepositoryImpl @Inject() (mongoComponent: MongoComponent, appConfig: AppConfig, time: TimeMachine)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[MovementTemplate](
+      collectionName = "movement-templates",
+      mongoComponent = mongoComponent,
+      domainFormat = MovementTemplate.mongoFormat,
+      indexes = mongoIndexes(),
+      replaceIndexes = appConfig.movementTemplatesIndexes()
+    )
+    with MovementTemplatesRepository {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
@@ -79,8 +77,20 @@ class MovementTemplatesRepositoryImpl @Inject()(mongoComponent: MongoComponent,
   def get(ern: String, templateId: String): Future[Option[MovementTemplate]] =
     collection.find(byTemplateId(ern, templateId)).headOption()
 
-  def getList(ern: String): Future[Seq[MovementTemplate]] =
-    collection.find(byErn(ern)).toFuture()
+  def getList(ern: String, page: Int, pageSize: Int): Future[MovementTemplates] = {
+    // TODO: optimise with Aggregation and $facet
+    for {
+      templates <- collection
+        .find(byErn(ern))
+        .sort(Sorts.ascending(templateNameField))
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .toFuture()
+      count <- collection.countDocuments(byErn(ern)).toFuture()
+    } yield {
+      MovementTemplates(templates, count.toInt)
+    }
+  }
 
   def set(answers: MovementTemplate): Future[Boolean] = {
     collection
@@ -101,14 +111,15 @@ class MovementTemplatesRepositoryImpl @Inject()(mongoComponent: MongoComponent,
 
   def checkIfTemplateNameAlreadyExists(ern: String, templateName: String): Future[Boolean] =
     collection.find(byTemplateName(ern, templateName)).headOption().map(_.isDefined)
+
 }
 
 object MovementTemplatesRepository {
 
-  val ernField = "ern"
-  val templateIdField = "templateId"
+  val ernField          = "ern"
+  val templateIdField   = "templateId"
   val templateNameField = "templateName"
-  val lastUpdatedField = "lastUpdated"
+  val lastUpdatedField  = "lastUpdated"
 
   def mongoIndexes(): Seq[IndexModel] = Seq(
     IndexModel(
@@ -130,4 +141,5 @@ object MovementTemplatesRepository {
         .name("ernTemplateNameIdx")
     )
   )
+
 }

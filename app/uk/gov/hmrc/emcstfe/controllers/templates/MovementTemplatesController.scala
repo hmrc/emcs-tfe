@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.controllers.templates
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
+import uk.gov.hmrc.emcstfe.models.mongo.{MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.services.templates.MovementTemplatesService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -34,10 +34,10 @@ class MovementTemplatesController @Inject()(cc: ControllerComponents,
                                             override val auth: AuthAction
                                            )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
 
-  def getList(ern: String): Action[AnyContent] =
+  def getList(ern: String, page: Int, pageSize: Int): Action[AnyContent] =
     authorisedUserRequest(ern) { _ =>
-      movementTemplatesService.getList(ern) map {
-        case Right(Nil) => NoContent
+      movementTemplatesService.getList(ern, page, pageSize) map {
+        case Right(MovementTemplates(templates, _)) if templates.isEmpty => NoContent
         case Right(answers) => Ok(Json.toJson(answers))
         case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
       }
