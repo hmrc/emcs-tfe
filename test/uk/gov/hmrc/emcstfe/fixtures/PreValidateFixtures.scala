@@ -19,17 +19,17 @@ package uk.gov.hmrc.emcstfe.fixtures
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.models.preValidate.PreValidateTraderModel
 import uk.gov.hmrc.emcstfe.models.request.eis.preValidate._
-import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderApiResponse
+import uk.gov.hmrc.emcstfe.models.response.prevalidate.{PreValidateTraderApiResponse, PreValidateTraderETDSResponse}
 
 trait PreValidateFixtures extends BaseFixtures {
 
   val preValidateTraderModelRequest = PreValidateTraderModel(
     ern = testErn,
-    entityGroup = "UK Record",
-    productCodes = Seq("W200", "S200", "W300")
+    entityGroup = Some("UK Record"),
+    productCodes = Some(Seq("W200", "S200", "W300"))
   )
 
-  val preValidateApiRequestModel = PreValidateRequest(
+  val preValidateEmc15bApiRequestModel = PreValidateRequest(
     exciseTraderValidationRequest = ExciseTraderValidationRequest(
       exciseTraderRequest = ExciseTraderRequest(
         exciseRegistrationNumber = testErn,
@@ -49,8 +49,7 @@ trait PreValidateFixtures extends BaseFixtures {
     )
   )
 
-  val preValidateApiResponseAsJson: JsValue = Json.parse(
-    s"""
+  val preValidateEmc15bApiResponseAsJson: JsValue = Json.parse(s"""
     | {
     |   "exciseTraderValidationResponse": {
     |     "validationTimestamp": "2023-12-15T10:55:17.443Z",
@@ -69,6 +68,28 @@ trait PreValidateFixtures extends BaseFixtures {
     | }
     |""".stripMargin)
 
-  val preValidateApiResponseModel = preValidateApiResponseAsJson.as[PreValidateTraderApiResponse]
+  val preValidateEmc15bApiResponseModel = preValidateEmc15bApiResponseAsJson.as[PreValidateTraderApiResponse]
 
+  val preValidateEtds12ApiRequestModel = PreValidateETDS12Request(
+    exciseId = testErn,
+    entityGroup = Some("UK Record"),
+    products = Some(
+      Seq(
+        Product(exciseProductCode = "W200"),
+        Product(exciseProductCode = "S200"),
+        Product(exciseProductCode = "W300")
+      ))
+  )
+
+  val preValidateEtds12ApiResponseAsJson: JsValue = Json.parse(
+    s"""
+       | {
+       |  "processingDateTime": "2023-12-15T10:55:17.443Z",
+       |  "exciseId": "GBWK002281023",
+       |  "validationResult": "Pass"
+       | }
+       |""".stripMargin
+  )
+
+  val preValidateEtds12ApiResponseModel = preValidateEtds12ApiResponseAsJson.as[PreValidateTraderETDSResponse]
 }

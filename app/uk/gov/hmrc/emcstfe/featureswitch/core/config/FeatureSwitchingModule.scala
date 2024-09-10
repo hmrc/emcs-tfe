@@ -25,21 +25,27 @@ import javax.inject.Singleton
 @Singleton
 class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-  val switches: Seq[FeatureSwitch] = Seq(UseDownstreamStub, DefaultDraftMovementCorrelationId)
+  val switches: Seq[FeatureSwitch] = Seq(UseDownstreamStub, DefaultDraftMovementCorrelationId, EnablePreValidateViaETDS12)
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
       bind[FeatureSwitchRegistry].to(this).eagerly()
     )
   }
+
 }
 
 case object UseDownstreamStub extends FeatureSwitch {
-  override val configName: String = "features.downstreamStub"
+  override val configName: String  = "features.downstreamStub"
   override val displayName: String = "enables downstream stub (for EIS calls)"
 }
 
 case object DefaultDraftMovementCorrelationId extends FeatureSwitch {
-  override val configName: String = "features.defaultDraftMovementCorrelationId"
+  override val configName: String  = "features.defaultDraftMovementCorrelationId"
   override val displayName: String = "Defaults the draft movement correlation ID (local/staging only)"
+}
+
+case object EnablePreValidateViaETDS12 extends FeatureSwitch {
+  override val configName: String  = "features.enablePreValidateViaETDS12"
+  override val displayName: String = "Enables pre-validation via the ETDS12 API"
 }

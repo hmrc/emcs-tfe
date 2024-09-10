@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.services
 
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.EnablePreValidateViaETDS12
 import uk.gov.hmrc.emcstfe.fixtures.PreValidateFixtures
 import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockEisConnector
@@ -30,30 +31,67 @@ class PreValidateTraderServiceSpec extends TestBaseSpec with PreValidateFixtures
     val service: PreValidateTraderService = new PreValidateTraderService(mockEisConnector, mockAppConfig)
   }
 
-  ".preValidateTrader" should {
-    "return a Right" when {
-      "connector call is successful and a valid JSON response" in new Test {
+  ".preValidateTrader" when {
+    "using EMC15B API" should {
+      "return a Right" when {
+        "connector call is successful and a valid JSON response" in new Test {
 
-        MockEisConnector.preValidateTrader(preValidateApiRequestModel).returns(
-            Future.successful(Right(preValidateApiResponseModel))
+          MockedAppConfig.getFeatureSwitchValue(EnablePreValidateViaETDS12).returns(false)
+
+          MockEisConnector.preValidateTrader(preValidateEmc15bApiRequestModel).returns(
+            Future.successful(Right(preValidateEmc15bApiResponseModel))
           )
 
-        await(service.preValidateTrader(preValidateTraderModelRequest)) shouldBe Right(preValidateApiResponseModel)
+          await(service.preValidateTrader(preValidateTraderModelRequest)) shouldBe Right(preValidateEtds12ApiResponseModel)
 
+        }
+      }
+
+      "return a Left" when {
+        "connector call is unsuccessful" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(EnablePreValidateViaETDS12).returns(false)
+
+          MockEisConnector.preValidateTrader(preValidateEmc15bApiRequestModel)
+            .returns(
+              Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+            )
+
+          await(service.preValidateTrader(preValidateTraderModelRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
       }
     }
 
-    "return a Left" when {
-      "connector call is unsuccessful" in new Test {
+    "using ETDS12 API" should {
+      "return a Right" when {
+        "connector call is successful and a valid JSON response" in new Test {
 
-        MockEisConnector.preValidateTrader(preValidateApiRequestModel)
-          .returns(
-            Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+          MockedAppConfig.getFeatureSwitchValue(EnablePreValidateViaETDS12).returns(true)
+
+          MockEisConnector.preValidateTraderViaETDS12(preValidateEtds12ApiRequestModel).returns(
+            Future.successful(Right(preValidateEtds12ApiResponseModel))
           )
 
-        await(service.preValidateTrader(preValidateTraderModelRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+          await(service.preValidateTrader(preValidateTraderModelRequest)) shouldBe Right(preValidateEtds12ApiResponseModel)
+
+        }
       }
+
+      "return a Left" when {
+        "connector call is unsuccessful" in new Test {
+
+          MockedAppConfig.getFeatureSwitchValue(EnablePreValidateViaETDS12).returns(true)
+
+          MockEisConnector.preValidateTraderViaETDS12(preValidateEtds12ApiRequestModel)
+            .returns(
+              Future.successful(Left(EISUnknownError("Downstream failed to respond")))
+            )
+
+          await(service.preValidateTrader(preValidateTraderModelRequest)) shouldBe Left(EISUnknownError("Downstream failed to respond"))
+        }
+      }
+
+
     }
   }
-
 }

@@ -21,7 +21,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.emcstfe.models.preValidate.PreValidateTraderModel
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderApiResponse
+import uk.gov.hmrc.emcstfe.models.response.prevalidate.PreValidateTraderETDSResponse
 import uk.gov.hmrc.emcstfe.services.PreValidateTraderService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -33,7 +33,7 @@ trait MockPreValidateTraderService extends MockFactory {
 
   object MockService extends Matchers {
 
-    def preValidateTrader(preValidateTraderRequest: PreValidateTraderModel): CallHandler3[PreValidateTraderModel, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, PreValidateTraderApiResponse]]] =
+    def preValidateTrader(preValidateTraderRequest: PreValidateTraderModel): CallHandler3[PreValidateTraderModel, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, PreValidateTraderETDSResponse]]] =
         (mockService.preValidateTrader(_: PreValidateTraderModel)(_: HeaderCarrier, _: ExecutionContext)).expects(preValidateTraderRequest, *, *)
 
   }

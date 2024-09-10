@@ -77,6 +77,9 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def eisPrevalidateBearerToken: String =
     configuration.get[String]("eis.emc15b.token")
 
+  def eisPrevalidateETDS12BearerToken: String =
+    configuration.get[String]("eis.etds12.token")
+
   def eisGetMessagesUrl(): String =
     eisBaseUrl + "/emcs/messages/v1/messages"
 
@@ -100,6 +103,9 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   def eisPreValidateTraderUrl(): String =
     eisBaseUrl + "/emcs/pre-validate-trader/v1"
+
+  def eisPreValidateTraderViaETDS12Url(): String =
+    eisBaseUrl + "/etds/traderprevalidation/v1"
 
   def eisForwardedHost(): String = configuration.get[String]("eis.forwardedHost")
 }

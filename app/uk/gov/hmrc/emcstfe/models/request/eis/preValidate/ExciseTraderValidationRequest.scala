@@ -43,6 +43,16 @@ case class PreValidateRequest(exciseTraderValidationRequest: ExciseTraderValidat
   override def exciseRegistrationNumber: String = exciseTraderValidationRequest.exciseTraderRequest.exciseRegistrationNumber
 }
 
+case class PreValidateETDS12Request(exciseId: String, entityGroup: Option[String], products: Option[Seq[Product]]) extends EisSubmissionRequest {
+
+  override def metricName: String = "pre-validate-trader"
+
+  override def eisXMLBody(): String = "" // deliberate as EIS does not support XML, only JSON for pre-validate
+
+  override def toJson: JsValue = Json.toJson(this)
+
+  override def exciseRegistrationNumber: String = exciseId
+}
 
 object Product {
   implicit val format: Format[Product] = Json.format
@@ -62,4 +72,8 @@ object ExciseTraderValidationRequest {
 
 object PreValidateRequest {
   implicit val format: Format[PreValidateRequest] = Json.format
+}
+
+object PreValidateETDS12Request {
+  implicit val format: Format[PreValidateETDS12Request] = Json.format
 }
