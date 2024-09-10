@@ -30,7 +30,7 @@ final case class MovementTemplate(ern: String,
 
 object MovementTemplate {
 
-  val mongoReads: Reads[MovementTemplate] = (
+  private val mongoReads: Reads[MovementTemplate] = (
     (__ \ "ern").read[String] and
       (__ \ "templateId").read[String] and
       (__ \ "templateName").read[String] and
@@ -38,7 +38,7 @@ object MovementTemplate {
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     )(MovementTemplate.apply _)
 
-  val mongoWrites: OWrites[MovementTemplate] = (
+  private val mongoWrites: OWrites[MovementTemplate] = (
     (__ \ "ern").write[String] and
       (__ \ "templateId").write[String] and
       (__ \ "templateName").write[String] and
@@ -46,7 +46,10 @@ object MovementTemplate {
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
     )(unlift(MovementTemplate.unapply))
 
-  implicit val mongoFormat: OFormat[MovementTemplate] = OFormat(mongoReads, mongoWrites)
+  val mongoFormat: OFormat[MovementTemplate] = OFormat(mongoReads, mongoWrites)
 
-  val responseWrites: OWrites[MovementTemplate] = Json.writes[MovementTemplate]
+  private val responseWrites: OWrites[MovementTemplate] = Json.writes[MovementTemplate]
+  private val responseReads: Reads[MovementTemplate] = Json.reads[MovementTemplate]
+
+  val responseFormat: OFormat[MovementTemplate] = OFormat(responseReads, responseWrites)
 }

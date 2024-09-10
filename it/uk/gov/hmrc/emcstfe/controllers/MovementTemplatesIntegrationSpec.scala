@@ -24,7 +24,7 @@ import play.api.http.Status
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, MovementSubmissionFailureFixtures}
@@ -42,6 +42,8 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
   val mockUUIDGenerator: UUIDGenerator  = mock[UUIDGenerator]
   val instantNow: Instant               = Instant.now().truncatedTo(ChronoUnit.MILLIS)
   implicit val timeMachine: TimeMachine = () => instantNow
+
+  implicit val movementTemplateFormat: OFormat[MovementTemplate] = MovementTemplate.responseFormat
 
   val template: MovementTemplate = MovementTemplate(
     ern = testErn,

@@ -18,8 +18,14 @@ package uk.gov.hmrc.emcstfe.models.mongo
 
 import play.api.libs.json.{Json, OFormat}
 
+import scala.annotation.unused
+
 final case class MovementTemplates(templates: Seq[MovementTemplate], count: Int)
 
 object MovementTemplates {
-  implicit val format: OFormat[MovementTemplates] = Json.format[MovementTemplates]
+  /**
+   * @param f an implicit OFormat for MovementTemplate. e.g. MovementTemplate.mongoFormat
+   * @return an OFormat for MovementTemplates
+   */
+  implicit def format(implicit @unused f: OFormat[MovementTemplate]): OFormat[MovementTemplates] = Json.format[MovementTemplates]
 }

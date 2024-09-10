@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.controllers.templates
 
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
@@ -34,6 +34,8 @@ import scala.concurrent.Future
 class MovementTemplatesControllerSpec extends TestBaseSpec
   with MockMovementTemplatesService
   with FakeAuthAction {
+
+  implicit val movementTemplateFormat: OFormat[MovementTemplate] = MovementTemplate.responseFormat
 
   val instantNow = Instant.now().truncatedTo(ChronoUnit.MILLIS)
   implicit val timeMachine: TimeMachine = () => instantNow

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.controllers.templates
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.models.mongo.{MovementTemplate, MovementTemplates}
@@ -33,6 +33,8 @@ class MovementTemplatesController @Inject()(cc: ControllerComponents,
                                             movementTemplatesService: MovementTemplatesService,
                                             override val auth: AuthAction
                                            )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper with Logging {
+
+  implicit val movementTemplateFormat: OFormat[MovementTemplate] = MovementTemplate.responseFormat
 
   def getList(ern: String, page: Int, pageSize: Int): Action[AnyContent] =
     authorisedUserRequest(ern) { _ =>

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.testOnly.controllers
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, OFormat}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.emcstfe.controllers.actions.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
@@ -31,6 +31,8 @@ class InsertMovementTemplateController @Inject()(cc: ControllerComponents,
                                                  templatesService: MovementTemplatesService,
                                                  override val auth: AuthAction
                                                  )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
+
+  implicit val format: OFormat[MovementTemplate] = MovementTemplate.mongoFormat
 
   def set(@unused ern: String, @unused templateId: String): Action[JsValue] = Action.async(parse.json) { implicit request =>
     withJsonBody[MovementTemplate] {
