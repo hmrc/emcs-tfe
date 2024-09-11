@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.controllers.testOnly
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.mongodb.scala.bson.collection.immutable.Document
 import play.api.http.Status.OK
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json, OFormat}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
@@ -31,6 +31,8 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class InsertMovementTemplateIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture {
+
+  implicit val movementTemplateFormat: OFormat[MovementTemplate] = MovementTemplate.mongoFormat
 
   val template: MovementTemplate = MovementTemplate(
     ern = testErn,

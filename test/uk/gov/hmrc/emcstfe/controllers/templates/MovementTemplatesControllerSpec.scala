@@ -17,12 +17,12 @@
 package uk.gov.hmrc.emcstfe.controllers.templates
 
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.emcstfe.controllers.actions.FakeAuthAction
 import uk.gov.hmrc.emcstfe.mocks.services.MockMovementTemplatesService
-import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
+import uk.gov.hmrc.emcstfe.models.mongo.{MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.MongoError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
@@ -34,6 +34,8 @@ import scala.concurrent.Future
 class MovementTemplatesControllerSpec extends TestBaseSpec
   with MockMovementTemplatesService
   with FakeAuthAction {
+
+  implicit val movementTemplateFormat: OFormat[MovementTemplate] = MovementTemplate.responseFormat
 
   val instantNow = Instant.now().truncatedTo(ChronoUnit.MILLIS)
   implicit val timeMachine: TimeMachine = () => instantNow
@@ -58,21 +60,21 @@ class MovementTemplatesControllerSpec extends TestBaseSpec
     s"return $OK (OK)" when {
       "service returns a Right(Seq(template))" in {
 
-        MockMovementTemplatesService.getList(testErn).returns(Future.successful(Right(Seq(template))))
+        MockMovementTemplatesService.getList(testErn).returns(Future.successful(Right(MovementTemplates(Seq(template), 1))))
 
-        val result = controller.getList(testErn)(fakeRequest)
+        val result = controller.getList(testErn, 1, 1)(fakeRequest)
 
         status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe Json.toJson(Seq(template))
+        contentAsJson(result) shouldBe Json.toJson(MovementTemplates(Seq(template), 1))
       }
     }
 
     s"return $NO_CONTENT (NO_CONTENT)" when {
       "service returns a Seq()" in {
 
-        MockMovementTemplatesService.getList(testErn).returns(Future.successful(Right(Seq())))
+        MockMovementTemplatesService.getList(testErn).returns(Future.successful(Right(MovementTemplates(Seq(), 1))))
 
-        val result = controller.getList(testErn)(fakeRequest)
+        val result = controller.getList(testErn, 1, 1)(fakeRequest)
 
         status(result) shouldBe Status.NO_CONTENT
         contentAsString(result) shouldBe ""
@@ -84,7 +86,7 @@ class MovementTemplatesControllerSpec extends TestBaseSpec
 
         MockMovementTemplatesService.getList(testErn).returns(Future.successful(Left(MongoError("errMsg"))))
 
-        val result = controller.getList(testErn)(fakeRequest)
+        val result = controller.getList(testErn, 1, 1)(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))

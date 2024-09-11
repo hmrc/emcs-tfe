@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.repositories
 import org.mongodb.scala.Document
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
+import uk.gov.hmrc.emcstfe.models.mongo.{MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 
 import java.time.Instant
@@ -101,26 +101,58 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
 
     "there are templates for the ern" must {
 
-      "return Seq(templates)" in {
+      "return Seq(templates)" when {
 
-        insert(template.copy(templateId = "foo1", templateName = "foo 1")).futureValue
-        insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
-        insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
+        "number of results is less than pageSize" in {
 
-        val result = repository.getList(testErn).futureValue
+          insert(template.copy(templateId = "foo1", templateName = "foo 1")).futureValue
+          insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
+          insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
 
-        result shouldBe Seq(
-          template.copy(templateId = "foo1", templateName = "foo 1"),
-          template.copy(templateId = "foo2", templateName = "foo 2"),
-          template.copy(templateId = "foo3", templateName = "foo 3")
-        )
+          val result = repository.getList(testErn, 1, 3).futureValue
+
+          result shouldBe MovementTemplates(Seq(
+            template.copy(templateId = "foo1", templateName = "foo 1"),
+            template.copy(templateId = "foo2", templateName = "foo 2"),
+            template.copy(templateId = "foo3", templateName = "foo 3")
+          ), 3)
+        }
+
+        "number of results is greater than pageSize" in {
+
+          insert(template.copy(templateId = "foo1", templateName = "foo 1")).futureValue
+          insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
+          insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
+
+          val result = repository.getList(testErn, 1, 2).futureValue
+
+          result shouldBe MovementTemplates(Seq(
+            template.copy(templateId = "foo1", templateName = "foo 1"),
+            template.copy(templateId = "foo2", templateName = "foo 2")
+          ), 3)
+        }
+
+        "inserted data is unsorted" in {
+
+          insert(template.copy(templateId = "foo1", templateName = "foo 1")).futureValue
+          insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
+          insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
+
+          val result = repository.getList(testErn, 1, 3).futureValue
+
+          result shouldBe MovementTemplates(Seq(
+            template.copy(templateId = "foo1", templateName = "foo 1"),
+            template.copy(templateId = "foo2", templateName = "foo 2"),
+            template.copy(templateId = "foo3", templateName = "foo 3")
+          ), 3)
+        }
       }
     }
 
     "there are no templates for this ern" must {
 
-      "return Seq()" in {
-        repository.getList(testErn).futureValue shouldBe Seq()
+      "return MovementTemplates(Seq(), 0)" in {
+        repository.getList(testErn, 1, 3).futureValue shouldBe MovementTemplates(Seq(), 0)
       }
     }
   }

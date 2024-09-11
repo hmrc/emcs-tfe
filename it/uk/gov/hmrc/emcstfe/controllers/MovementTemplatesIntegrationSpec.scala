@@ -24,7 +24,7 @@ import play.api.http.Status
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK}
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, MovementSubmissionFailureFixtures}
@@ -39,9 +39,11 @@ import java.time.temporal.ChronoUnit
 
 class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovementFixture with MovementSubmissionFailureFixtures {
 
-  val mockUUIDGenerator = mock[UUIDGenerator]
-  val instantNow = Instant.now().truncatedTo(ChronoUnit.MILLIS)
+  val mockUUIDGenerator: UUIDGenerator  = mock[UUIDGenerator]
+  val instantNow: Instant               = Instant.now().truncatedTo(ChronoUnit.MILLIS)
   implicit val timeMachine: TimeMachine = () => instantNow
+
+  implicit val movementTemplateFormat: OFormat[MovementTemplate] = MovementTemplate.responseFormat
 
   val template: MovementTemplate = MovementTemplate(
     ern = testErn,
@@ -53,10 +55,10 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
 
   private trait Test {
 
-    lazy val mongoRepo: MovementTemplatesRepositoryImpl = app.injector.instanceOf[MovementTemplatesRepositoryImpl]
+    lazy val mongoRepo: MovementTemplatesRepositoryImpl          = app.injector.instanceOf[MovementTemplatesRepositoryImpl]
     lazy val draftsRepo: CreateMovementUserAnswersRepositoryImpl = app.injector.instanceOf[CreateMovementUserAnswersRepositoryImpl]
 
-    implicit val uuidGenerator = app.injector.instanceOf[UUIDGenerator]
+    implicit val uuidGenerator: UUIDGenerator = app.injector.instanceOf[UUIDGenerator]
 
     def setupStubs(): StubMapping
 
@@ -66,6 +68,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
       setupStubs()
       buildRequest(url)
     }
+
   }
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
@@ -75,7 +78,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
     .overrides(bind[TimeMachine].to(timeMachine))
     .build()
 
-  //API returns a list of available templates for a supplied ERN
+  // API returns a list of available templates for a supplied ERN
   s"GET /templates/:ern" when {
 
     "user is unauthenticated" must {
@@ -85,7 +88,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
           AuthStub.unauthorised()
         }
 
-        val response: WSResponse = await(request(s"/templates/$testErn").get())
+        val response: WSResponse = await(request(s"/templates/$testErn?page=1&pageSize=10").get())
         response.status shouldBe Status.FORBIDDEN
       }
     }
@@ -95,7 +98,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
         AuthStub.authorised("WrongERN")
       }
 
-      val response: WSResponse = await(request(s"/templates/$testErn").get())
+      val response: WSResponse = await(request(s"/templates/$testErn?page=1&pageSize=10").get())
       response.status shouldBe Status.FORBIDDEN
     }
 
@@ -110,15 +113,18 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
             AuthStub.authorised()
           }
 
-          val response: WSResponse = await(request(s"/templates/$testErn").get())
+          val response: WSResponse = await(request(s"/templates/$testErn?page=1&pageSize=10").get())
 
           response.status shouldBe OK
           response.header("Content-Type") shouldBe Some("application/json")
 
-          response.json shouldBe Json.toJson(Seq(
-            template.copy(templateId = "foo1", templateName = "foo 1"),
-            template.copy(templateId = "foo2", templateName = "foo 2")
-          ))
+          response.json shouldBe Json.obj(
+            "templates" -> Json.arr(
+              template.copy(templateId = "foo1", templateName = "foo 1"),
+              template.copy(templateId = "foo2", templateName = "foo 2")
+            ),
+            "count" -> 2
+          )
         }
       }
 
@@ -128,7 +134,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
             AuthStub.authorised()
           }
 
-          val response: WSResponse = await(request(s"/templates/$testErn").get())
+          val response: WSResponse = await(request(s"/templates/$testErn?page=1&pageSize=10").get())
 
           response.status shouldBe NO_CONTENT
         }
@@ -136,7 +142,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
     }
   }
 
-  //API returns a specific template for a supplied ERN and TemplateID
+  // API returns a specific template for a supplied ERN and TemplateID
   s"GET /template/:ern/:templateId" when {
 
     "user is unauthenticated" must {
@@ -193,7 +199,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
     }
   }
 
-  //API stores a template for a specific ern and templateId
+  // API stores a template for a specific ern and templateId
   s"PUT /template/:ern/:templateId" when {
 
     "user is unauthenticated" must {
@@ -203,9 +209,10 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
           AuthStub.unauthorised()
         }
 
-        val response: WSResponse = await(request(s"/template/$testErn/$testTemplateId").put(
-          Json.toJson(template)
-        ))
+        val response: WSResponse = await(
+          request(s"/template/$testErn/$testTemplateId").put(
+            Json.toJson(template)
+          ))
         response.status shouldBe Status.FORBIDDEN
       }
     }
@@ -215,9 +222,10 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
         AuthStub.authorised("WrongERN")
       }
 
-      val response: WSResponse = await(request(s"/template/$testErn/$testTemplateId").put(
-        Json.toJson(template)
-      ))
+      val response: WSResponse = await(
+        request(s"/template/$testErn/$testTemplateId").put(
+          Json.toJson(template)
+        ))
       response.status shouldBe Status.FORBIDDEN
     }
 
@@ -230,9 +238,10 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
             AuthStub.authorised()
           }
 
-          val response: WSResponse = await(request(s"/template/$testErn/$testTemplateId").put(
-            Json.toJson(template)
-          ))
+          val response: WSResponse = await(
+            request(s"/template/$testErn/$testTemplateId").put(
+              Json.toJson(template)
+            ))
 
           response.status shouldBe OK
           response.header("Content-Type") shouldBe Some("application/json")
@@ -251,9 +260,10 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
 
           val updatedTemplate = template.copy(data = Json.obj("foo" -> "new"))
 
-          val response: WSResponse = await(request(s"/template/$testErn/$testTemplateId").put(
-            Json.toJson(updatedTemplate)
-          ))
+          val response: WSResponse = await(
+            request(s"/template/$testErn/$testTemplateId").put(
+              Json.toJson(updatedTemplate)
+            ))
 
           response.status shouldBe OK
           response.header("Content-Type") shouldBe Some("application/json")
@@ -276,9 +286,10 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
 
           val updatedTemplate = template.copy(data = Json.obj("foo" -> "new"), templateName = "Duplicate")
 
-          val response: WSResponse = await(request(s"/template/$testErn/$testTemplateId").put(
-            Json.toJson(updatedTemplate)
-          ))
+          val response: WSResponse = await(
+            request(s"/template/$testErn/$testTemplateId").put(
+              Json.toJson(updatedTemplate)
+            ))
 
           response.status shouldBe INTERNAL_SERVER_ERROR
           response.header("Content-Type") shouldBe Some("application/json")
@@ -288,7 +299,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
     }
   }
 
-  //API deletes a template for a specific ern and templateId
+  // API deletes a template for a specific ern and templateId
   s"DELETE /template/:ern/:templateId" when {
 
     "user is unauthenticated" must {
@@ -342,7 +353,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
     }
   }
 
-  //API checks if a template exists with supplied query string ERN and TemplateName
+  // API checks if a template exists with supplied query string ERN and TemplateName
   s"GET /template/name-already-exists" when {
 
     "user is unauthenticated" must {
@@ -402,7 +413,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
     }
   }
 
-  //API creates a draft movement based on the template
+  // API creates a draft movement based on the template
   s"GET /template/:ern/:templateId/create-draft-from-template" when {
 
     "user is unauthenticated" must {
@@ -467,4 +478,5 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
       }
     }
   }
+
 }

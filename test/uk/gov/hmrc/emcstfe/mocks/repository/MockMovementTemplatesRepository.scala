@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.mocks.repository
 
-import org.scalamock.handlers.{CallHandler1, CallHandler2}
+import org.scalamock.handlers.{CallHandler1, CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.emcstfe.models.mongo.MovementTemplate
+import uk.gov.hmrc.emcstfe.models.mongo.{MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.repositories.MovementTemplatesRepository
 
 import scala.concurrent.Future
@@ -29,8 +29,8 @@ trait MockMovementTemplatesRepository extends MockFactory {
 
   object MockMovementTemplatesRepository {
 
-    def getList(ern: String): CallHandler1[String, Future[Seq[MovementTemplate]]] =
-      (mockMovementTemplatesRepository.getList(_: String)).expects(ern)
+    def getList(ern: String): CallHandler3[String, Int, Int, Future[MovementTemplates]] =
+      (mockMovementTemplatesRepository.getList(_: String, _: Int, _: Int)).expects(ern, *, *)
 
     def get(ern: String, templateId: String): CallHandler2[String, String, Future[Option[MovementTemplate]]] =
       (mockMovementTemplatesRepository.get(_: String, _: String)).expects(ern, templateId)

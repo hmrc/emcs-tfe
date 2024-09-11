@@ -2,7 +2,7 @@
 
 GET           /template/name-already-exists                             uk.gov.hmrc.emcstfe.controllers.templates.MovementTemplatesController.checkForExistingTemplate(ern, templateName)
 
-GET           /templates/:ern                                           uk.gov.hmrc.emcstfe.controllers.templates.MovementTemplatesController.getList(ern)
+GET           /templates/:ern                                           uk.gov.hmrc.emcstfe.controllers.templates.MovementTemplatesController.getList(ern, page: Int, pageSize: Int)
 GET           /template/:ern/:templateId                                uk.gov.hmrc.emcstfe.controllers.templates.MovementTemplatesController.get(ern, templateId)
 GET           /template/:ern/:templateId/create-draft-from-template     uk.gov.hmrc.emcstfe.controllers.templates.MovementTemplatesController.createDraftFromTemplate(ern, templateId)
 
