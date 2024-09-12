@@ -134,15 +134,15 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
 
         "inserted data is unsorted" in {
 
-          insert(template.copy(templateId = "foo1", templateName = "foo 1")).futureValue
+          insert(template.copy(templateId = "foo1", templateName = "Foo 1")).futureValue
           insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
-          insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
+          insert(template.copy(templateId = "foo2", templateName = "boo 2")).futureValue
 
           val result = repository.getList(testErn, 1, 3).futureValue
 
           result shouldBe MovementTemplates(Seq(
-            template.copy(templateId = "foo1", templateName = "foo 1"),
-            template.copy(templateId = "foo2", templateName = "foo 2"),
+            template.copy(templateId = "foo2", templateName = "boo 2"),
+            template.copy(templateId = "foo1", templateName = "Foo 1"),
             template.copy(templateId = "foo3", templateName = "foo 3")
           ), 3)
         }
