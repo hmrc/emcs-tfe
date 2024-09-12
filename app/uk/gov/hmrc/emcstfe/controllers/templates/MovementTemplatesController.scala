@@ -79,7 +79,7 @@ class MovementTemplatesController @Inject()(cc: ControllerComponents,
     authorisedUserRequest(ern) {
       _ =>
         movementTemplatesService.checkIfTemplateNameAlreadyExists(ern, templateName) map {
-          case Right(exists) => Ok(Json.toJson(exists))
+          case Right(exists) => Ok(Json.obj("doesExist" -> exists))
           case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
         }
     }

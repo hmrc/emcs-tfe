@@ -380,7 +380,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
     "user is authorised" must {
 
       s"return $OK (OK) true" when {
-        "when name already exists in Mongo" in new Test {
+        "name already exists in Mongo" in new Test {
 
           override def setupStubs(): StubMapping = {
             await(mongoRepo.set(template))
@@ -391,12 +391,12 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
 
           response.status shouldBe OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(true)
+          response.json shouldBe Json.obj("doesExist" -> true)
         }
       }
 
       s"return $OK (OK) false" when {
-        "when name DOES NOT already exist in Mongo" in new Test {
+        "name DOES NOT already exist in Mongo" in new Test {
 
           override def setupStubs(): StubMapping = {
             await(mongoRepo.set(template))
@@ -407,7 +407,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
 
           response.status shouldBe OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(false)
+          response.json shouldBe Json.obj("doesExist" -> false)
         }
       }
     }

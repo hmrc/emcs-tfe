@@ -200,7 +200,7 @@ class MovementTemplatesControllerSpec extends TestBaseSpec
         val result = controller.checkForExistingTemplate(testErn, testTemplateName)(fakeRequest)
 
         status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe Json.toJson(true)
+        contentAsJson(result) shouldBe Json.obj("doesExist" -> true)
       }
 
       "service returns a Right(false)" in {
@@ -209,7 +209,7 @@ class MovementTemplatesControllerSpec extends TestBaseSpec
         val result = controller.checkForExistingTemplate(testErn, testTemplateName)(fakeRequest)
 
         status(result) shouldBe Status.OK
-        contentAsJson(result) shouldBe Json.toJson(false)
+        contentAsJson(result) shouldBe Json.obj("doesExist" -> false)
       }
     }
 
