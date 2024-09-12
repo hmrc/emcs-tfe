@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.repositories
 
 import com.google.inject.ImplementedBy
+import org.mongodb.scala.bson.{BsonArray, BsonDocument}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
@@ -25,7 +26,7 @@ import uk.gov.hmrc.emcstfe.models.mongo.{MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.repositories.MovementTemplatesRepository._
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -53,7 +54,8 @@ class MovementTemplatesRepositoryImpl @Inject() (mongoComponent: MongoComponent,
       mongoComponent = mongoComponent,
       domainFormat = MovementTemplate.mongoFormat,
       indexes = mongoIndexes(),
-      replaceIndexes = appConfig.movementTemplatesIndexes()
+      replaceIndexes = appConfig.movementTemplatesIndexes(),
+      extraCodecs = Seq(Codecs.playFormatCodec(MovementTemplates.format(MovementTemplate.mongoFormat)))
     )
     with MovementTemplatesRepository {
 
@@ -78,18 +80,32 @@ class MovementTemplatesRepositoryImpl @Inject() (mongoComponent: MongoComponent,
     collection.find(byTemplateId(ern, templateId)).headOption()
 
   def getList(ern: String, page: Int, pageSize: Int): Future[MovementTemplates] = {
-    // TODO: optimise with Aggregation and $facet
-    for {
-      templates <- collection
-        .find(byErn(ern))
-        .sort(Sorts.ascending(templateNameField))
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .toFuture()
-      count <- collection.countDocuments(byErn(ern)).toFuture()
-    } yield {
-      MovementTemplates(templates, count.toInt)
-    }
+
+    val filterPipeline = Aggregates.filter(byErn(ern))
+    val upperPipeline  = Aggregates.addFields(Field("templateNameUpper", BsonDocument("$toUpper" -> BsonDocument("$ifNull" -> Seq("$templateName", "")))))
+    val sortPipeline   = Aggregates.sort(Sorts.ascending(templateNameField + "Upper"))
+
+    val aggregatePipeline = Seq(
+      filterPipeline,
+      upperPipeline,
+      sortPipeline,
+      Aggregates.facet(
+        Facet("metadata", Aggregates.count("count")),
+        Facet("templates", Aggregates.skip((page - 1) * pageSize), Aggregates.limit(pageSize))
+      ),
+      //This step takes the count from the metadata facet array, the ifNull is required in case no documents were found, in which case return 0
+      Aggregates.addFields(
+        Field(
+          "count",
+          BsonDocument(
+            "$ifNull" -> BsonArray(BsonDocument("$arrayElemAt" -> BsonArray("$metadata.count", 0)), 0)
+          ))
+      )
+    )
+
+    collection
+      .aggregate[MovementTemplates](aggregatePipeline)
+      .head()
   }
 
   def set(answers: MovementTemplate): Future[Boolean] = {
