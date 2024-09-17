@@ -22,6 +22,9 @@ POST          /create-movement/:ern/:draftId                     uk.gov.hmrc.emc
 # Pre validate trader
 POST          /pre-validate-trader/:ern                          uk.gov.hmrc.emcstfe.controllers.PreValidateTraderController.submit(ern)
 
+# Trader known facts
+GET           /trader-known-facts                                uk.gov.hmrc.emcstfe.controllers.TraderKnownFactsController.getTraderKnownFacts(exciseRegistrationId)
+
 # User answers
 ->            /user-answers                                      userAnswers.Routes
 
