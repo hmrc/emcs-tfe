@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.connectors.httpParsers
 
 import play.api.LoggerLike
-import play.api.http.Status.OK
+import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsonValidationError, Reads}
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, TraderKnownFacts}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{TraderKnownFactsParsingError, UnexpectedDownstreamResponseError}
@@ -28,7 +28,7 @@ import scala.util.{Failure, Success, Try}
 trait TraderKnownFactsHttpParser {
   val logger: LoggerLike
 
-  def modelFromJsonHttpReads(implicit jsonReads: Reads[TraderKnownFacts]): HttpReads[Either[ErrorResponse, TraderKnownFacts]] = (_: String, _: String, response: HttpResponse) => {
+  def modelFromJsonHttpReads(implicit jsonReads: Reads[TraderKnownFacts]): HttpReads[Either[ErrorResponse, Option[TraderKnownFacts]]] = (_: String, _: String, response: HttpResponse) => {
     response.status match {
       case OK => Try {
         jsonReads.reads(response.json).fold(
@@ -39,8 +39,10 @@ trait TraderKnownFactsHttpParser {
         case Failure(exception) =>
           logger.error(exception.getMessage, exception)
           Left(TraderKnownFactsParsingError(Seq(JsonValidationError(exception.getMessage))))
-        case Success(value) => value
+        case Success(value) => value.map(Some(_))
       }
+      case NO_CONTENT =>
+        Right(None)
       case _ =>
         logger.warn(s"[modelFromJsonHttpReads] Received unexpected status: ${response.status}")
         logger.debug(s"[modelFromJsonHttpReads] Error response body: ${response.body}")

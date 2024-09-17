@@ -34,11 +34,10 @@ class TraderKnownFactsHttpParserSpec extends TestBaseSpec with TraderKnownFactsF
     override val logger: LoggerLike = _logger
   }
 
-  ".modelFromJsonHttpReads" when {
+  ".modelFromJsonHttpReads" must {
 
-    s"an OK ($OK) response is received" must {
-
-      "return a Right" when {
+    "return a Right" when {
+      s"an OK ($OK) response is received" when {
 
         "it contains valid Json" in {
 
@@ -46,9 +45,21 @@ class TraderKnownFactsHttpParserSpec extends TestBaseSpec with TraderKnownFactsF
 
           val result = TestParser.modelFromJsonHttpReads.read("GET", "/foo/bar", response)
 
-          result shouldBe Right(testTraderKnownFactsModel)
+          result shouldBe Right(Some(testTraderKnownFactsModel))
         }
       }
+      s"a NO_CONTENT ($NO_CONTENT) response is received" when {
+
+        "it contains valid Json" in {
+
+          val response = HttpResponse(NO_CONTENT, json = Json.obj(), headers = Map.empty)
+
+          val result = TestParser.modelFromJsonHttpReads.read("GET", "/foo/bar", response)
+
+          result shouldBe Right(None)
+        }
+      }
+    }
 
       "return a Left" when {
 
@@ -68,19 +79,17 @@ class TraderKnownFactsHttpParserSpec extends TestBaseSpec with TraderKnownFactsF
 
           val response = HttpResponse(CONFLICT, body = "an error", headers = Map.empty)
 
-          withCaptureOfLoggingFrom(logger) {
-            logs =>
+          withCaptureOfLoggingFrom(logger) { logs =>
+            val result = TestParser.modelFromJsonHttpReads.read("GET", "/foo/bar", response)
 
-              val result = TestParser.modelFromJsonHttpReads.read("GET", "/foo/bar", response)
+            result shouldBe Left(UnexpectedDownstreamResponseError)
 
-              result shouldBe Left(UnexpectedDownstreamResponseError)
-
-              logs.exists(_.getMessage == "[TraderKnownFactsHttpParserSpec][modelFromJsonHttpReads] Received unexpected status: 409") shouldBe true
+            logs.exists(_.getMessage == "[TraderKnownFactsHttpParserSpec][modelFromJsonHttpReads] Received unexpected status: 409") shouldBe true
 
           }
 
         }
-      }
     }
   }
+
 }

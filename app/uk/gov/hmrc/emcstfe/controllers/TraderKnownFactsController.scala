@@ -29,8 +29,9 @@ class TraderKnownFactsController @Inject() (cc: ControllerComponents, service: T
 
   def getTraderKnownFacts(exciseRegistrationId: String): Action[AnyContent] = authorisedUserRequest(exciseRegistrationId) { implicit request =>
     service.getTraderKnownFacts(exciseRegistrationId).map {
-      case Left(value)  => InternalServerError(Json.toJson(value))
-      case Right(value) => Ok(Json.toJson(value))
+      case Left(value)        => InternalServerError(Json.toJson(value))
+      case Right(None)        => NoContent
+      case Right(Some(value)) => Ok(Json.toJson(value))
     }
   }
 

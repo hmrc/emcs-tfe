@@ -84,11 +84,21 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
           response.header("Content-Type") shouldBe Some("application/json")
           response.json shouldBe Json.parse(testTraderKnownFactsJson)
         }
+        "downstream returns a 204" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, emcsTfeReferenceDataUrl, downstreamQueryParams, Status.NO_CONTENT, Json.obj())
+          }
+
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.NO_CONTENT
+        }
+      }
         "return an error" when {
           "downstream call returns an unexpected HTTP response" in new Test {
             override def setupStubs(): StubMapping = {
               AuthStub.authorised()
-              DownstreamStub.onSuccess(DownstreamStub.GET, emcsTfeReferenceDataUrl, downstreamQueryParams, Status.NO_CONTENT, Json.obj())
+              DownstreamStub.onSuccess(DownstreamStub.GET, emcsTfeReferenceDataUrl, downstreamQueryParams, Status.INTERNAL_SERVER_ERROR, Json.obj())
             }
 
             val response: WSResponse = await(request().get())
@@ -98,7 +108,6 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
           }
         }
       }
-    }
   }
 
 }

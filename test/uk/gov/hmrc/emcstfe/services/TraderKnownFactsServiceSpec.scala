@@ -35,9 +35,9 @@ class TraderKnownFactsServiceSpec extends TestBaseSpec with TraderKnownFactsFixt
 
         MockTraderKnownFactsConnector
           .getTraderKnownFacts(testErn)
-          .returns(Future.successful(Right(testTraderKnownFactsModel)))
+          .returns(Future.successful(Right(Some(testTraderKnownFactsModel))))
 
-        await(service.getTraderKnownFacts(testErn)) shouldBe Right(testTraderKnownFactsModel)
+        await(service.getTraderKnownFacts(testErn)) shouldBe Right(Some(testTraderKnownFactsModel))
       }
     }
 

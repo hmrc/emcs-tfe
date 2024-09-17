@@ -35,14 +35,24 @@ class TraderKnownFactsControllerSpec extends TestBaseSpec with MockTraderKnownFa
 
   "GET /trader-known-facts" should {
     "return 200" when {
-      "service returns a Right" in {
+      "service returns a Right(Some(_))" in {
 
-        MockService.getTraderKnownFacts(testErn).returns(Future.successful(Right(testTraderKnownFactsModel)))
+        MockService.getTraderKnownFacts(testErn).returns(Future.successful(Right(Some(testTraderKnownFactsModel))))
 
         val result = controller.getTraderKnownFacts(testErn)(fakeRequest)
 
         status(result) shouldBe Status.OK
         contentAsJson(result) shouldBe Json.parse(testTraderKnownFactsJson)
+      }
+    }
+    "return 204" when {
+      "service returns a Right(None)" in {
+
+        MockService.getTraderKnownFacts(testErn).returns(Future.successful(Right(None)))
+
+        val result = controller.getTraderKnownFacts(testErn)(fakeRequest)
+
+        status(result) shouldBe Status.NO_CONTENT
       }
     }
     "return 500" when {

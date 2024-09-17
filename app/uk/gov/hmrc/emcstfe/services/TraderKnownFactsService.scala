@@ -27,6 +27,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class TraderKnownFactsService @Inject()(connector: TraderKnownFactsConnector) {
 
   def getTraderKnownFacts(ern: String)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, TraderKnownFacts]] =
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] =
     connector.getTraderKnownFacts(ern)
 }
