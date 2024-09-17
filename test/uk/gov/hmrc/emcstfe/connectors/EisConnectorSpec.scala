@@ -17,12 +17,10 @@
 package uk.gov.hmrc.emcstfe.connectors
 
 import org.scalatest.BeforeAndAfterEach
-import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.libs.json.JsonValidationError
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{FeatureSwitching, UseDownstreamStub}
 import uk.gov.hmrc.emcstfe.fixtures._
-import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.models.request._
@@ -38,10 +36,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EisConnectorSpec
     extends TestBaseSpec
-    with Status
-    with MimeTypes
-    with HeaderNames
-    with MockAppConfig
     with MockHttpClient
     with FeatureSwitching
     with BeforeAndAfterEach
