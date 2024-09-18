@@ -45,6 +45,10 @@ object ErrorResponse {
     val message = s"Error from Mongo with message: $msg"
   }
 
+  case class TraderKnownFactsParsingError(errors: Seq[JsonValidationError]) extends ErrorResponse {
+    val message = s"Errors parsing JSON, errors: $errors"
+  }
+
   case class EISJsonParsingError(errors: Seq[JsonValidationError]) extends ErrorResponse {
     val message = s"Errors parsing JSON, errors: $errors"
   }
@@ -79,16 +83,6 @@ object ErrorResponse {
 
   case class QueryParameterError(queryParams: Seq[(String, String)]) extends ErrorResponse {
     val message = s"Invalid query parameters provided. Query parameters: $queryParams"
-  }
-
-  case class InvalidLegacyRequestProvided(message: String) extends ErrorResponse
-
-  case class InvalidLegacyActionProvided(action: String) extends ErrorResponse {
-    val message = s"Unknown action requested for legacy: $action"
-  }
-
-  case object NoLegacyActionProvided extends ErrorResponse {
-    val message = s"no action found in the request"
   }
 
   case class TemplateDoesNotExist(templateId: String) extends ErrorResponse {

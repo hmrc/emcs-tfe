@@ -32,6 +32,9 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   def eisUrl: String = servicesConfig.baseUrl("eis")
 
+  def knownFactsCandEUrl(ern: String): String =
+    servicesConfig.baseUrl("emcs-tfe-reference-data") + s"/emcs-tfe-reference-data/oracle/trader-known-facts?exciseRegistrationId=$ern"
+
   def createMovementUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.createMovementUserAnswers.TTL"))
   def createMovementUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.createMovementUserAnswers.replaceIndexes")
 
