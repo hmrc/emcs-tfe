@@ -25,7 +25,12 @@ import javax.inject.Singleton
 @Singleton
 class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-  val switches: Seq[FeatureSwitch] = Seq(UseDownstreamStub, DefaultDraftMovementCorrelationId, EnablePreValidateViaETDS12)
+  val switches: Seq[FeatureSwitch] = Seq(
+    UseDownstreamStub,
+    DefaultDraftMovementCorrelationId,
+    EnablePreValidateViaETDS12,
+    EnableKnownFactsViaETDS18
+  )
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
@@ -48,4 +53,9 @@ case object DefaultDraftMovementCorrelationId extends FeatureSwitch {
 case object EnablePreValidateViaETDS12 extends FeatureSwitch {
   override val configName: String  = "features.enablePreValidateViaETDS12"
   override val displayName: String = "Enables pre-validation via the ETDS12 API"
+}
+
+case object EnableKnownFactsViaETDS18 extends FeatureSwitch {
+  override val configName: String  = "features.enableKnownFactsViaETDS18"
+  override val displayName: String = "Enables getting known facts via the ETDS18 API"
 }

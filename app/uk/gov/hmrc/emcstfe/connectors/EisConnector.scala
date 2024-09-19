@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.EisJsonHttpParser
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.{PreValidateETDS12Request, PreValidateRequest}
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisSubmissionRequest, TraderKnownFactsETDS18Request}
 import uk.gov.hmrc.emcstfe.models.response._
 import uk.gov.hmrc.emcstfe.models.response.getMessages.GetMessagesResponse
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementListResponse
@@ -119,5 +119,11 @@ class EisConnector @Inject()(val http: HttpClient,
                        (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[PreValidateTraderETDSResponse]): Future[Either[ErrorResponse, PreValidateTraderETDSResponse]] = {
     val url = appConfig.eisPreValidateTraderViaETDS12Url()
     prepareJsonAndSubmit(url, request, "preValidateTraderViaETDS12", appConfig.eisPrevalidateETDS12BearerToken)
+  }
+
+  def getTraderKnownFactsViaETDS18(request: TraderKnownFactsETDS18Request)
+                       (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[TraderKnownFacts]): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] = {
+    val url = appConfig.knownFactsEtdsUrl(request.exciseRegistrationNumber)
+    prepareGetRequestAndSubmit(url, request, "getKnownFactsViaETDS18", appConfig.eisTraderKnownFactsETDS18BearerToken).map(_.map(Some(_)))
   }
 }

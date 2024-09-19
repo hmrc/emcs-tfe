@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TraderKnownFactsConnector @Inject() (val http: HttpClient, appConfig: AppConfig) extends TraderKnownFactsHttpParser with Logging {
 
-  def getTraderKnownFacts(ern: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] =
+  def getTraderKnownFactsViaReferenceData(ern: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] =
     http.GET(appConfig.knownFactsCandEUrl(ern))(modelFromJsonHttpReads, hc, ec)
 
 }

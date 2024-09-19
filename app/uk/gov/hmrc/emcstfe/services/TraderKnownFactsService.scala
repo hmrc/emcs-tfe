@@ -16,7 +16,11 @@
 
 package uk.gov.hmrc.emcstfe.services
 
-import uk.gov.hmrc.emcstfe.connectors.TraderKnownFactsConnector
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.connectors.{EisConnector, TraderKnownFactsConnector}
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableKnownFactsViaETDS18, FeatureSwitching}
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.TraderKnownFactsETDS18Request
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, TraderKnownFacts}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -24,9 +28,18 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TraderKnownFactsService @Inject()(connector: TraderKnownFactsConnector) {
+class TraderKnownFactsService @Inject() (
+    traderKnownFactsConnector: TraderKnownFactsConnector,
+    eisConnector: EisConnector,
+    val config: AppConfig
+) extends FeatureSwitching {
 
-  def getTraderKnownFacts(ern: String)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] =
-    connector.getTraderKnownFacts(ern)
+  def getTraderKnownFacts(ern: String)(implicit request: UserRequest[_], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] = {
+    if (isEnabled(EnableKnownFactsViaETDS18)) {
+      eisConnector.getTraderKnownFactsViaETDS18(TraderKnownFactsETDS18Request(request))
+    } else {
+      traderKnownFactsConnector.getTraderKnownFactsViaReferenceData(ern)
+    }
+  }
+
 }

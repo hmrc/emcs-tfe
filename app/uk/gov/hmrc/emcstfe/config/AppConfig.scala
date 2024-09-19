@@ -35,6 +35,9 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def knownFactsCandEUrl(ern: String): String =
     servicesConfig.baseUrl("emcs-tfe-reference-data") + s"/emcs-tfe-reference-data/oracle/trader-known-facts?exciseRegistrationId=$ern"
 
+  def knownFactsEtdsUrl(ern: String): String =
+    eisBaseUrl + s"/trader/knownfacts/$ern"
+
   def createMovementUserAnswersTTL(): Duration           = Duration(configuration.get[String]("mongodb.createMovementUserAnswers.TTL"))
   def createMovementUserAnswersReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.createMovementUserAnswers.replaceIndexes")
 
@@ -82,6 +85,9 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
 
   def eisPrevalidateETDS12BearerToken: String =
     configuration.get[String]("eis.etds12.token")
+
+  def eisTraderKnownFactsETDS18BearerToken: String =
+    configuration.get[String]("eis.etds18.token")
 
   def eisGetMessagesUrl(): String =
     eisBaseUrl + "/emcs/messages/v1/messages"
