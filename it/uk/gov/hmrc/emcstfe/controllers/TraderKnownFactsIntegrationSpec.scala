@@ -21,25 +21,31 @@ import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
+import uk.gov.hmrc.emcstfe.config.AppConfig
+import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableKnownFactsViaETDS18, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.fixtures.TraderKnownFactsFixtures
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
-class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKnownFactsFixtures {
+class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKnownFactsFixtures with FeatureSwitching {
+
+  val config: AppConfig = app.injector.instanceOf[AppConfig]
 
   private trait Test {
     def setupStubs(): StubMapping
 
     def uri: String = s"/trader-known-facts"
 
-    def emcsTfeReferenceDataUrl: String = s"/emcs-tfe-reference-data/oracle/trader-known-facts"
+    def emcsTfeReferenceDataUrl: String = "/emcs-tfe-reference-data/oracle/trader-known-facts"
+    def etdsKnownFactsUrl: String = s"/trader/knownfacts/$testErn"
 
     def downstreamQueryParams: Map[String, String] = Map(
       "exciseRegistrationId" -> testErn
     )
 
-    def request(): WSRequest = {
+    def request(useEtds18API: Boolean): WSRequest = {
+      if (useEtds18API) enable(EnableKnownFactsViaETDS18) else disable(EnableKnownFactsViaETDS18)
       setupStubs()
       buildRequest(uri).withQueryStringParameters("exciseRegistrationId" -> testErn)
     }
@@ -54,7 +60,7 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
           AuthStub.unauthorised()
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = await(request(useEtds18API = true).get())
         response.status shouldBe FORBIDDEN
       }
     }
@@ -67,33 +73,35 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
             AuthStub.authorised("WrongERN")
           }
 
-          val response: WSResponse = await(request().get())
+          val response: WSResponse = await(request(useEtds18API = true).get())
           response.status shouldBe Status.FORBIDDEN
         }
       }
 
-      "return a success" when {
-        "all downstream calls are successful" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.GET, emcsTfeReferenceDataUrl, downstreamQueryParams, Status.OK, Json.parse(traderKnownFactsCandEJson))
-          }
+      "EnableKnownFactsViaETDS18 is disabled" should {
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.OK
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.parse(testTraderKnownFactsJson)
-        }
-        "downstream returns a 204" in new Test {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.GET, emcsTfeReferenceDataUrl, downstreamQueryParams, Status.NO_CONTENT, Json.obj())
-          }
+        "return a success" when {
+          "all downstream calls are successful" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, emcsTfeReferenceDataUrl, downstreamQueryParams, Status.OK, Json.parse(traderKnownFactsCandEJson))
+            }
 
-          val response: WSResponse = await(request().get())
-          response.status shouldBe Status.NO_CONTENT
+            val response: WSResponse = await(request(useEtds18API = false).get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.parse(testTraderKnownFactsJson)
+          }
+          "downstream returns a 204" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, emcsTfeReferenceDataUrl, downstreamQueryParams, Status.NO_CONTENT, Json.obj())
+            }
+
+            val response: WSResponse = await(request(useEtds18API = false).get())
+            response.status shouldBe Status.NO_CONTENT
+          }
         }
-      }
         "return an error" when {
           "downstream call returns an unexpected HTTP response" in new Test {
             override def setupStubs(): StubMapping = {
@@ -101,13 +109,44 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
               DownstreamStub.onSuccess(DownstreamStub.GET, emcsTfeReferenceDataUrl, downstreamQueryParams, Status.INTERNAL_SERVER_ERROR, Json.obj())
             }
 
-            val response: WSResponse = await(request().get())
+            val response: WSResponse = await(request(useEtds18API = false).get())
             response.status shouldBe Status.INTERNAL_SERVER_ERROR
             response.header("Content-Type") shouldBe Some("application/json")
             response.json shouldBe Json.toJson(UnexpectedDownstreamResponseError)
           }
         }
       }
+
+      "EnableKnownFactsViaETDS18 is enabled" should {
+
+        "return a success" when {
+          "all downstream calls are successful" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, etdsKnownFactsUrl, Status.OK, Json.parse(traderKnownFactsCandEJson))
+            }
+
+            val response: WSResponse = await(request(useEtds18API = true).get())
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.parse(testTraderKnownFactsJson)
+          }
+        }
+        "return an error" when {
+          "downstream call returns an unexpected HTTP response" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.GET, etdsKnownFactsUrl, Status.INTERNAL_SERVER_ERROR, Json.obj())
+            }
+
+            val response: WSResponse = await(request(useEtds18API = true).get())
+            response.status shouldBe Status.INTERNAL_SERVER_ERROR
+            response.header("Content-Type") shouldBe Some("application/json")
+            response.json shouldBe Json.toJson(EISInternalServerError("{}"))
+          }
+        }
+      }
+    }
   }
 
 }
