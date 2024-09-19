@@ -1837,7 +1837,6 @@ class EisConnectorSpec
             url = s"$baseUrl/trader/knownfacts/$testErn",
             headers = Seq(
               EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getTraderKnownFactsViaETDS18Request.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source        -> "TFE",
               EisHeaders.authorization -> "Bearer value-known-facts-etds18"
@@ -1846,7 +1845,7 @@ class EisConnectorSpec
           )
           .returns(Future.successful(Right(testTraderKnownFactsModel)))
 
-        await(connector.getTraderKnownFactsViaETDS18(getTraderKnownFactsViaETDS18Request)) shouldBe Right(Some(testTraderKnownFactsModel))
+        await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe Right(Some(testTraderKnownFactsModel))
       }
     }
 
@@ -1864,7 +1863,6 @@ class EisConnectorSpec
             url = s"$baseUrl/trader/knownfacts/$testErn",
             headers = Seq(
               EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getTraderKnownFactsViaETDS18Request.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source        -> "TFE",
               EisHeaders.authorization -> "Bearer value-known-facts-etds18"
@@ -1873,7 +1871,7 @@ class EisConnectorSpec
           )
           .returns(Future.successful(response))
 
-        await(connector.getTraderKnownFactsViaETDS18(getTraderKnownFactsViaETDS18Request)) shouldBe response
+        await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
       }
 
       "downstream call fails due to a 400 (Bad Request) response" in new Test {
@@ -1888,7 +1886,6 @@ class EisConnectorSpec
             url = s"$baseUrl/trader/knownfacts/$testErn",
             headers = Seq(
               EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getTraderKnownFactsViaETDS18Request.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source        -> "TFE",
               EisHeaders.authorization -> "Bearer value-known-facts-etds18"
@@ -1897,7 +1894,7 @@ class EisConnectorSpec
           )
           .returns(Future.successful(response))
 
-        await(connector.getTraderKnownFactsViaETDS18(getTraderKnownFactsViaETDS18Request)) shouldBe response
+        await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
       }
 
       "downstream call fails due to a 404 (Not Found) response" in new Test {
@@ -1912,7 +1909,6 @@ class EisConnectorSpec
             url = s"$baseUrl/trader/knownfacts/$testErn",
             headers = Seq(
               EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getTraderKnownFactsViaETDS18Request.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source        -> "TFE",
               EisHeaders.authorization -> "Bearer value-known-facts-etds18"
@@ -1921,7 +1917,7 @@ class EisConnectorSpec
           )
           .returns(Future.successful(response))
 
-        await(connector.getTraderKnownFactsViaETDS18(getTraderKnownFactsViaETDS18Request)) shouldBe response
+        await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
       }
 
       "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
@@ -1936,7 +1932,6 @@ class EisConnectorSpec
             url = s"$baseUrl/trader/knownfacts/$testErn",
             headers = Seq(
               EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getTraderKnownFactsViaETDS18Request.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source        -> "TFE",
               EisHeaders.authorization -> "Bearer value-known-facts-etds18"
@@ -1945,7 +1940,7 @@ class EisConnectorSpec
           )
           .returns(Future.successful(response))
 
-        await(connector.getTraderKnownFactsViaETDS18(getTraderKnownFactsViaETDS18Request)) shouldBe response
+        await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
       }
 
       "downstream call fails due to a 500 (ISE) response" in new Test {
@@ -1960,7 +1955,6 @@ class EisConnectorSpec
             url = s"$baseUrl/trader/knownfacts/$testErn",
             headers = Seq(
               EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getTraderKnownFactsViaETDS18Request.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source        -> "TFE",
               EisHeaders.authorization -> "Bearer value-known-facts-etds18"
@@ -1969,7 +1963,7 @@ class EisConnectorSpec
           )
           .returns(Future.successful(response))
 
-        await(connector.getTraderKnownFactsViaETDS18(getTraderKnownFactsViaETDS18Request)) shouldBe response
+        await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
       }
 
       "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
@@ -1984,7 +1978,6 @@ class EisConnectorSpec
             url = s"$baseUrl/trader/knownfacts/$testErn",
             headers = Seq(
               EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getTraderKnownFactsViaETDS18Request.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source        -> "TFE",
               EisHeaders.authorization -> "Bearer value-known-facts-etds18"
@@ -1993,7 +1986,7 @@ class EisConnectorSpec
           )
           .returns(Future.successful(response))
 
-        await(connector.getTraderKnownFactsViaETDS18(getTraderKnownFactsViaETDS18Request)) shouldBe response
+        await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
       }
 
       "downstream call is unsuccessful" in new Test {
@@ -2007,7 +2000,6 @@ class EisConnectorSpec
             url = s"$baseUrl/trader/knownfacts/$testErn",
             headers = Seq(
               EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getTraderKnownFactsViaETDS18Request.correlationUUID,
               EisHeaders.forwardedHost -> "MDTP",
               EisHeaders.source        -> "TFE",
               EisHeaders.authorization -> "Bearer value-known-facts-etds18"
@@ -2016,7 +2008,7 @@ class EisConnectorSpec
           )
           .returns(Future.successful(response))
 
-        await(connector.getTraderKnownFactsViaETDS18(getTraderKnownFactsViaETDS18Request)) shouldBe response
+        await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
       }
     }
   }

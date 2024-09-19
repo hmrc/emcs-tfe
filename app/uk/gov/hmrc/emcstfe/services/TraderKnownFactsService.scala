@@ -20,7 +20,6 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.{EisConnector, TraderKnownFactsConnector}
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableKnownFactsViaETDS18, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
-import uk.gov.hmrc.emcstfe.models.request.eis.TraderKnownFactsETDS18Request
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, TraderKnownFacts}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -36,7 +35,7 @@ class TraderKnownFactsService @Inject() (
 
   def getTraderKnownFacts(ern: String)(implicit request: UserRequest[_], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] = {
     if (isEnabled(EnableKnownFactsViaETDS18)) {
-      eisConnector.getTraderKnownFactsViaETDS18(TraderKnownFactsETDS18Request(request))
+      eisConnector.getTraderKnownFactsViaETDS18(ern)
     } else {
       traderKnownFactsConnector.getTraderKnownFactsViaReferenceData(ern)
     }

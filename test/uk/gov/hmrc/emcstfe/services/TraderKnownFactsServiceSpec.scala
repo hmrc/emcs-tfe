@@ -20,7 +20,6 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableKnownFactsViaETDS18, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.fixtures.TraderKnownFactsFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.{MockEisConnector, MockTraderKnownFactsConnector}
-import uk.gov.hmrc.emcstfe.models.request.eis.TraderKnownFactsETDS18Request
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
@@ -41,7 +40,7 @@ class TraderKnownFactsServiceSpec extends TestBaseSpec with TraderKnownFactsFixt
           enable(EnableKnownFactsViaETDS18)
 
           MockEisConnector
-            .getTraderKnownFactsViaETDS18(TraderKnownFactsETDS18Request(userRequest))
+            .getTraderKnownFactsViaETDS18(testErn)
             .returns(Future.successful(Right(Some(testTraderKnownFactsModel))))
 
           await(service.getTraderKnownFacts(testErn)) shouldBe Right(Some(testTraderKnownFactsModel))
@@ -53,7 +52,7 @@ class TraderKnownFactsServiceSpec extends TestBaseSpec with TraderKnownFactsFixt
           enable(EnableKnownFactsViaETDS18)
 
           MockEisConnector
-            .getTraderKnownFactsViaETDS18(TraderKnownFactsETDS18Request(userRequest))
+            .getTraderKnownFactsViaETDS18(testErn)
             .returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
           await(service.getTraderKnownFacts(testErn)) shouldBe Left(UnexpectedDownstreamResponseError)
