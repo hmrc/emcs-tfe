@@ -72,7 +72,7 @@ trait PreValidateFixtures extends BaseFixtures {
 
   val preValidateEtds12ApiRequestModel = PreValidateETDS12Request(
     exciseId = testErn,
-    entityGroup = Some("UK Record"),
+    entityGroup = None,
     products = Some(
       Seq(
         Product(exciseProductCode = "W200"),

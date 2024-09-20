@@ -37,7 +37,7 @@ class PreValidateTraderService @Inject() (eisConnector: EisConnector, val config
     if (isEnabled(EnablePreValidateViaETDS12)) {
       val request = PreValidateETDS12Request(
         preValidateTraderRequest.ern,
-        preValidateTraderRequest.entityGroup,
+        None,
         preValidateTraderRequest.productCodes.map(_.map(Product.apply))
       )
 
