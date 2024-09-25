@@ -100,21 +100,40 @@ class PreValidateIntegrationSpec
 
     }
 
-    "using the ETDS12 API" should {
+    "using the ETDS12 API" when {
 
-      "return a success" when {
-        "all downstream calls are successful" in new Test(useEtds12API = true) {
-          override def setupStubs(): StubMapping = {
-            AuthStub.authorised()
-            DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, preValidateEtds12ApiResponseAsJson)
+      "passing an entity group" should {
+        "return a success" when {
+          "all downstream calls are successful" in new Test(useEtds12API = true) {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, preValidateEtds12ApiResponseAsJson)
+            }
+
+            val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
+            response.status shouldBe Status.OK
+            response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
+            response.json shouldBe preValidateEtds12ApiResponseAsJson
           }
-
-          val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest)))
-          response.status shouldBe Status.OK
-          response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
-          response.json shouldBe preValidateEtds12ApiResponseAsJson
         }
       }
+
+      "not passing an entity group" should {
+        "return a success" when {
+          "all downstream calls are successful" in new Test(useEtds12API = true) {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+              DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Status.OK, preValidateEtds12ApiResponseAsJson)
+            }
+
+            val response: WSResponse = await(request().post(Json.toJson(preValidateTraderModelRequest.copy(entityGroup = None))))
+            response.status shouldBe Status.OK
+            response.header(HeaderNames.CONTENT_TYPE) shouldBe Some(MimeTypes.JSON)
+            response.json shouldBe preValidateEtds12ApiResponseAsJson
+          }
+        }
+      }
+
 
       "return an error" when {
         "downstream call returns unexpected JSON" in new Test(useEtds12API = true) {
