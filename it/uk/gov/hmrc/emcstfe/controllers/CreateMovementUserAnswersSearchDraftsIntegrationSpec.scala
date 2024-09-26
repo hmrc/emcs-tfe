@@ -136,6 +136,7 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
             val response: WSResponse = await(searchRequest.get())
 
             val foundDrafts = insertedDrafts
+              .filter(_.data.lrn.isDefined)
               .filter(_.ern == testErn)
               .filter(_.hasBeenSubmitted == false)
 
@@ -164,6 +165,7 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
             val response: WSResponse = await(searchRequest.get())
 
             val foundDrafts = insertedDrafts
+              .filter(_.data.lrn.isDefined)
               .filter(_.ern == testErn)
               .filter(_.hasBeenSubmitted == false)
 
@@ -192,6 +194,7 @@ class CreateMovementUserAnswersSearchDraftsIntegrationSpec extends IntegrationBa
             val response: WSResponse = await(searchRequest.get())
 
             val foundDrafts = insertedDrafts
+              .filter(_.data.lrn.isDefined)
               .filter(_.ern == testErn)
               .filter(_.hasBeenSubmitted == false)
 

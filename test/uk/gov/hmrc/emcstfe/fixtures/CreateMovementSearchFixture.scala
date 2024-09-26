@@ -46,7 +46,29 @@ trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFa
       submittedDraftId = Some(testDraftId)
     )
 
+  val draftWithNoLRN =
+    userAnswers(
+      draftId = UUID.randomUUID().toString,
+      data = Json.obj(
+        "consignee" -> Json.obj(
+          "businessName" -> "Foo-ABCD-123456",
+          "exciseRegistrationNumber" -> "ERNABCDEFGHIJ123456"
+        ),
+        "destination" -> Json.obj(
+          "destinationWarehouseExcise" -> "WarehouseABERN"
+        ),
+        "items" -> Json.obj(
+          "addedItems" -> Json.arr(
+            Json.obj("itemExciseProductCode" -> "T200"),
+            Json.obj("itemExciseProductCode" -> "B100")
+          )
+        )
+      ),
+      timestamp = Instant.now.truncatedTo(ChronoUnit.MILLIS).plus(600, ChronoUnit.SECONDS)
+    )
+
   val searchableDrafts = Seq(
+    draftWithNoLRN,
     userAnswers(
       draftId = UUID.randomUUID().toString,
       data = Json.obj(
