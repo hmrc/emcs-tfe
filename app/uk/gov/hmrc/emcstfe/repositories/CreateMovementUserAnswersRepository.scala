@@ -192,6 +192,10 @@ class CreateMovementUserAnswersRepositoryImpl @Inject()(mongoComponent: MongoCom
     val findFilter = {
       Filters.and(
         Seq(
+
+          //Must have an LRN - this is to prevent partially complete ones that were created from templates from being displayed
+          Some(Filters.exists(lrnField)),
+
           //Drafts for this ERN that are not submitted
           Some(Filters.equal(ernField, ern)),
           Some(Filters.equal(hasBeenSubmittedField, false)),
