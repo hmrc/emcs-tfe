@@ -23,7 +23,7 @@ import uk.gov.hmrc.emcstfe.models.common.DestinationType._
 import uk.gov.hmrc.emcstfe.models.common.MovementType._
 import uk.gov.hmrc.emcstfe.models.common.{DestinationType, MovementType}
 import uk.gov.hmrc.emcstfe.models.createMovement.SubmitCreateMovementModel
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest, Source}
 
 import java.util.Base64
 
@@ -85,4 +85,6 @@ case class SubmitCreateMovementRequest(body: SubmitCreateMovementModel, draftId:
       "messageType" -> s"IE$messageNumber",
       "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
     )
+
+  override val source: Source = Source.TFE
 }

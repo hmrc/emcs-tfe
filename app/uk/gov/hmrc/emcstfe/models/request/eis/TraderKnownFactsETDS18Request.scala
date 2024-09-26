@@ -18,9 +18,12 @@ package uk.gov.hmrc.emcstfe.models.request.eis
 
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 
-case class TraderKnownFactsETDS18Request (request: UserRequest[_]) extends EisConsumptionRequest {
+case class TraderKnownFactsETDS18Request(request: UserRequest[_]) extends EisConsumptionRequest {
   override def metricName: String = "get-trader-known-facts"
-  override def exciseRegistrationNumber: String = request.ern
+
+  override val exciseRegistrationNumber: String = request.ern
 
   override val queryParams: Seq[(String, String)] = Seq.empty
+
+  override val source: Source = Source.MDTP
 }

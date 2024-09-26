@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, Source}
 
 case class SetMessageAsLogicallyDeletedRequest(exciseRegistrationNumber: String, messageId: String) extends EisConsumptionRequest {
 
@@ -26,4 +26,6 @@ case class SetMessageAsLogicallyDeletedRequest(exciseRegistrationNumber: String,
     "exciseregistrationnumber" -> exciseRegistrationNumber,
     "uniquemessageid" -> messageId
   )
+
+  override val source: Source = Source.TFE
 }

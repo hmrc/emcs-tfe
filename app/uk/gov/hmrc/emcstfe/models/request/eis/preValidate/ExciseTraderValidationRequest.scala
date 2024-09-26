@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request.eis.preValidate
 
 import play.api.libs.json.{Format, JsValue, Json}
-import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisSubmissionRequest, Source}
 
 
 case class Product(exciseProductCode: String)
@@ -41,6 +41,8 @@ case class PreValidateRequest(exciseTraderValidationRequest: ExciseTraderValidat
   override def toJson: JsValue = Json.toJson(this)
 
   override def exciseRegistrationNumber: String = exciseTraderValidationRequest.exciseTraderRequest.exciseRegistrationNumber
+
+  override val source: Source = Source.TFE
 }
 
 case class PreValidateETDS12Request(exciseId: String, entityGroup: Option[String], products: Option[Seq[Product]]) extends EisSubmissionRequest {
@@ -52,6 +54,8 @@ case class PreValidateETDS12Request(exciseId: String, entityGroup: Option[String
   override def toJson: JsValue = Json.toJson(this)
 
   override def exciseRegistrationNumber: String = exciseId
+
+  override val source: Source = Source.MDTP
 }
 
 object Product {

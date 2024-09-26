@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, Source}
 
 case class GetMessageStatisticsRequest(exciseRegistrationNumber: String) extends EisConsumptionRequest {
 
@@ -25,4 +25,6 @@ case class GetMessageStatisticsRequest(exciseRegistrationNumber: String) extends
   override val queryParams: Seq[(String, String)] = Seq(
     "exciseregistrationnumber" -> exciseRegistrationNumber
   )
+
+  override val source: Source = Source.TFE
 }

@@ -39,7 +39,6 @@ case class GetMovementListSearchOptions(traderRole: Option[String] = None,
 
 object GetMovementListSearchOptions {
 
-  val DEFAULT_TRADER_ROLE: String = "Consignor and/or Consignee"
   val EIS_DEFAULT_TRADER_ROLE: String = "both"
   val DEFAULT_SORT_FIELD: String = "DateReceived"
   val EIS_DEFAULT_SORT_FIELD: String = "dateofdispatch"

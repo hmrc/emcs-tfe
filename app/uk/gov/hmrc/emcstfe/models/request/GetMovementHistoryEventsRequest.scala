@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, Source}
 
 case class GetMovementHistoryEventsRequest(exciseRegistrationNumber: String,
                                            arc: String) extends EisConsumptionRequest {
@@ -27,4 +27,6 @@ case class GetMovementHistoryEventsRequest(exciseRegistrationNumber: String,
     "exciseregistrationnumber" -> exciseRegistrationNumber,
     "arc" -> arc
   )
+
+  override val source: Source = Source.TFE
 }

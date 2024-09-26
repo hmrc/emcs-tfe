@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfe.models.request
 
 import uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions.{EIS_DEFAULT_SORT_FIELD, EIS_DEFAULT_START_POSITION, EIS_DEFAULT_TRADER_ROLE}
-import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, Source}
 
 case class GetMovementListRequest(exciseRegistrationNumber: String,
                                   searchOptions: GetMovementListSearchOptions) extends EisConsumptionRequest {
@@ -44,4 +44,6 @@ case class GetMovementListRequest(exciseRegistrationNumber: String,
     "undischargedmovements" -> searchOptions.undischargedMovements,
     "exciseproductcode" -> searchOptions.exciseProductCode
   ).collect { case (key, Some(value)) => key -> value }
+
+  override val source: Source = Source.TFE
 }

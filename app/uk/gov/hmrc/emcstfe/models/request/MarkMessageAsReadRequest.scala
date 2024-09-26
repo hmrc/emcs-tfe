@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, Source}
 
 case class MarkMessageAsReadRequest(exciseRegistrationNumber: String, messageId: String) extends EisConsumptionRequest {
 
   override def metricName: String = "markMessageAsRead"
 
   override val queryParams: Seq[(String, String)] = Seq.empty
+
+  override val source: Source = Source.TFE
 }
