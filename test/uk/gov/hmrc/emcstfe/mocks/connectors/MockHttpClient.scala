@@ -33,6 +33,14 @@ trait MockHttpClient extends MockFactory {
 
   object MockHttpClient extends Matchers {
 
+    private def filterOutHeaders(headers: Seq[(String, String)]): Seq[(String, String)] = {
+      val headersToFilter = Seq(
+        "datetime", // current timestamp at time of eisSubmissionHeaders function running, not worth comparing
+        "x-correlation-id" // random UUID, not worth comparing
+      )
+      headers.filterNot(header => headersToFilter.contains(header._1))
+    }
+
     def get[T](url: String,
                bearerToken: String,
                parameters: Seq[(String, String)] = Seq.empty,
@@ -43,7 +51,7 @@ trait MockHttpClient extends MockFactory {
           (actualUrl: String, actualParams: Seq[(String, String)], actualHeaders, _, hc, _) => {
             actualUrl shouldBe url
             actualParams shouldBe parameters
-            actualHeaders.filterNot(_._1 == "datetime") shouldBe headers.filterNot(_._1 == "datetime")
+            filterOutHeaders(actualHeaders) shouldBe filterOutHeaders(headers)
             bearerToken shouldBe hc.authorization.get.value
           }
         })

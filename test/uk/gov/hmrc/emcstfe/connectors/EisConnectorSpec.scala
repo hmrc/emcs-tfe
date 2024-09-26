@@ -24,7 +24,8 @@ import uk.gov.hmrc.emcstfe.fixtures._
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.mocks.services.MockMetricsService
 import uk.gov.hmrc.emcstfe.models.request._
-import uk.gov.hmrc.emcstfe.models.request.eis.EisHeaders
+import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.PreValidateETDS12Request
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisHeaders, TraderKnownFactsETDS18Request}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
@@ -52,6 +53,8 @@ class EisConnectorSpec
     with SetMessageAsLogicallyDeletedFixtures
     with GetMessageStatisticsFixtures
     with GetMovementHistoryEventsFixture
+    with TraderKnownFactsFixtures
+    with PreValidateFixtures
     with MockMetricsService {
 
   override def afterEach(): Unit = {
@@ -67,15 +70,14 @@ class EisConnectorSpec
 
     val connector = new EisConnector(mockHttpClient, config, mockMetricsService)
 
-    val baseUrl: String = "http://localhost:8308"
+    val baseUrl: String = config.eisBaseUrl
   }
 
   "EISConnector" when {
 
     "submit is called" should {
 
-
-      val submitReportOfReceiptRequest                          = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
+      val submitReportOfReceiptRequest = SubmitReportOfReceiptRequest(maxSubmitReportOfReceiptModel)
 
       "return a Right" when {
         "downstream call is successful" in new Test {
@@ -240,7 +242,6 @@ class EisConnectorSpec
 
           await(connector.submit[EISSubmissionSuccessResponse](submitReportOfReceiptRequest, "submitReportOfReceiptEISRequest")) shouldBe response
         }
-
 
         "downstream call fails due to a 500 (ISE) response" in new Test {
 
@@ -1518,11 +1519,11 @@ class EisConnectorSpec
         exciseProductCode = Some("6000")
       )
       val getMovementListRequest = GetMovementListRequest(testErn, searchOptions)
-      val url = "/emcs/movements/v1/movements"
+      val url                    = "/emcs/movements/v1/movements"
       val queryParameters = Seq(
         "exciseregistrationnumber" -> testErn,
         "traderrole"               -> "foo",
-        "sortfield"                 -> "bar",
+        "sortfield"                -> "bar",
         "sortorder"                -> "wizz",
         "startposition"            -> "10",
         "maxnotoreturn"            -> "99",
@@ -1545,18 +1546,20 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementListRequest.metricName)
           MockMetricsService.processWithTimer()
 
-          MockHttpClient.get(
-            url = s"$baseUrl$url",
-            parameters = queryParameters,
-            headers = Seq(
-              EisHeaders.dateTime        -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId   -> getMovementListRequest.correlationUUID,
-              EisHeaders.forwardedHost   -> "MDTP",
-              EisHeaders.source          -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          ).returns(Future.successful(Right(getMovementListResponse)))
+          MockHttpClient
+            .get(
+              url = s"$baseUrl$url",
+              parameters = queryParameters,
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementListRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(Right(getMovementListResponse)))
 
           await(connector.getMovementList(getMovementListRequest)) shouldBe Right(getMovementListResponse)
         }
@@ -1569,252 +1572,894 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementListRequest.metricName)
           MockMetricsService.processWithTimer()
 
-          MockHttpClient.get(
-            url = s"$baseUrl$url",
-            parameters = queryParameters,
-            headers = Seq(
-              EisHeaders.dateTime        -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId   -> getMovementListRequest.correlationUUID,
-              EisHeaders.forwardedHost   -> "MDTP",
-              EisHeaders.source          -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          ).returns(Future.successful(response))
+          MockHttpClient
+            .get(
+              url = s"$baseUrl$url",
+              parameters = queryParameters,
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementListRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(response))
 
           await(connector.getMovementList(getMovementListRequest)) shouldBe response
         }
       }
     }
-  }
 
-  "getMovementHistoryEvent is called" should {
+    "getMovementHistoryEvent is called" should {
 
-    val getMovementHistoryEventsRequest = GetMovementHistoryEventsRequest(testErn, testArc)
+      val getMovementHistoryEventsRequest = GetMovementHistoryEventsRequest(testErn, testArc)
 
-    "return a Right" when {
-      "downstream call is successful" in new Test {
+      "return a Right" when {
+        "downstream call is successful" in new Test {
 
-        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
-        MockMetricsService.processWithTimer()
+          MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+          MockMetricsService.processWithTimer()
 
-        MockHttpClient
-          .get(
-            url = s"$baseUrl/emcs/movements/v1/movement-history",
-            parameters = Seq(
-              "exciseregistrationnumber" -> testErn,
-              "arc" -> testArc
-            ),
-            headers = Seq(
-              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-              EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          )
-          .returns(Future.successful(Right(getMovementHistoryEventsResponseModel)))
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/emcs/movements/v1/movement-history",
+              parameters = Seq(
+                "exciseregistrationnumber" -> testErn,
+                "arc"                      -> testArc
+              ),
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(Right(getMovementHistoryEventsResponseModel)))
 
-        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe Right(getMovementHistoryEventsResponseModel)
+          await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe Right(getMovementHistoryEventsResponseModel)
+        }
+      }
+
+      "return a Left" when {
+
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/emcs/movements/v1/movement-history",
+              parameters = Seq(
+                "exciseregistrationnumber" -> testErn,
+                "arc"                      -> testArc
+              ),
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+          MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/emcs/movements/v1/movement-history",
+              parameters = Seq(
+                "exciseregistrationnumber" -> testErn,
+                "arc"                      -> testArc
+              ),
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+          MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/emcs/movements/v1/movement-history",
+              parameters = Seq(
+                "exciseregistrationnumber" -> testErn,
+                "arc"                      -> testArc
+              ),
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+          MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/emcs/movements/v1/movement-history",
+              parameters = Seq(
+                "exciseregistrationnumber" -> testErn,
+                "arc"                      -> testArc
+              ),
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 500 (ISE) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+          MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/emcs/movements/v1/movement-history",
+              parameters = Seq(
+                "exciseregistrationnumber" -> testErn,
+                "arc"                      -> testArc
+              ),
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/emcs/movements/v1/movement-history",
+              parameters = Seq(
+                "exciseregistrationnumber" -> testErn,
+                "arc"                      -> testArc
+              ),
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/emcs/movements/v1/movement-history",
+              parameters = Seq(
+                "exciseregistrationnumber" -> testErn,
+                "arc"                      -> testArc
+              ),
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.authorization -> "Bearer value-movements"
+              ),
+              bearerToken = "Bearer value-movements"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+        }
       }
     }
 
-    "return a Left" when {
+    "getTraderKnownFactsViaETDS18 is called" should {
 
-      "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+      val getTraderKnownFactsViaETDS18Request = TraderKnownFactsETDS18Request(userRequest)
 
-        val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+      "return a Right" when {
+        "downstream call is successful" in new Test {
 
-        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
-        MockMetricsService.processWithTimer()
+          MockMetricsService.requestTimer(getTraderKnownFactsViaETDS18Request.metricName)
+          MockMetricsService.processWithTimer()
 
-        MockHttpClient
-          .get(
-            url = s"$baseUrl/emcs/movements/v1/movement-history",
-            parameters = Seq(
-              "exciseregistrationnumber" -> testErn,
-              "arc" -> testArc
-            ),
-            headers = Seq(
-              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-              EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"),
-            bearerToken = "Bearer value-movements"
-          )
-          .returns(Future.successful(response))
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/trader/knownfacts/$testErn",
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+              ),
+              bearerToken = "Bearer value-known-facts-etds18"
+            )
+            .returns(Future.successful(Right(testTraderKnownFactsModel)))
 
-        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+          await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe Right(Some(testTraderKnownFactsModel))
+        }
       }
 
-      "downstream call fails due to a 400 (Bad Request) response" in new Test {
+      "return a Left" when {
 
-        val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
 
-        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
 
-        MockHttpClient
-          .get(
-            url = s"$baseUrl/emcs/movements/v1/movement-history",
-            parameters = Seq(
-              "exciseregistrationnumber" -> testErn,
-              "arc" -> testArc
-            ),
-            headers = Seq(
-              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-              EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          )
-          .returns(Future.successful(response))
+          MockMetricsService.requestTimer(getTraderKnownFactsViaETDS18Request.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
-      }
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/trader/knownfacts/$testErn",
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+              ),
+              bearerToken = "Bearer value-known-facts-etds18"
+            )
+            .returns(Future.successful(response))
 
-      "downstream call fails due to a 404 (Not Found) response" in new Test {
+          await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
+        }
 
-        val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
 
-        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
 
-        MockHttpClient
-          .get(
-            url = s"$baseUrl/emcs/movements/v1/movement-history",
-            parameters = Seq(
-              "exciseregistrationnumber" -> testErn,
-              "arc" -> testArc
-            ),
-            headers = Seq(
-              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-              EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          )
-          .returns(Future.successful(response))
+          MockMetricsService.requestTimer(getTraderKnownFactsViaETDS18Request.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
-      }
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/trader/knownfacts/$testErn",
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+              ),
+              bearerToken = "Bearer value-known-facts-etds18"
+            )
+            .returns(Future.successful(response))
 
-      "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+          await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
+        }
 
-        val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
 
-        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
 
-        MockHttpClient
-          .get(
-            url = s"$baseUrl/emcs/movements/v1/movement-history",
-            parameters = Seq(
-              "exciseregistrationnumber" -> testErn,
-              "arc" -> testArc
-            ),
-            headers = Seq(
-              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-              EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          )
-          .returns(Future.successful(response))
+          MockMetricsService.requestTimer(getTraderKnownFactsViaETDS18Request.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
-      }
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/trader/knownfacts/$testErn",
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+              ),
+              bearerToken = "Bearer value-known-facts-etds18"
+            )
+            .returns(Future.successful(response))
 
-      "downstream call fails due to a 500 (ISE) response" in new Test {
+          await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
+        }
 
-        val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
 
-        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
 
-        MockHttpClient
-          .get(
-            url = s"$baseUrl/emcs/movements/v1/movement-history",
-            parameters = Seq(
-              "exciseregistrationnumber" -> testErn,
-              "arc" -> testArc
-            ),
-            headers = Seq(
-              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-              EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          )
-          .returns(Future.successful(response))
+          MockMetricsService.requestTimer(getTraderKnownFactsViaETDS18Request.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
-      }
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/trader/knownfacts/$testErn",
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+              ),
+              bearerToken = "Bearer value-known-facts-etds18"
+            )
+            .returns(Future.successful(response))
 
-      "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+          await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
+        }
 
-        val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+        "downstream call fails due to a 500 (ISE) response" in new Test {
 
-        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
-        MockMetricsService.processWithTimer()
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
 
-        MockHttpClient
-          .get(
-            url = s"$baseUrl/emcs/movements/v1/movement-history",
-            parameters = Seq(
-              "exciseregistrationnumber" -> testErn,
-              "arc" -> testArc
-            ),
-            headers = Seq(
-              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-              EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          )
-          .returns(Future.successful(response))
+          MockMetricsService.requestTimer(getTraderKnownFactsViaETDS18Request.metricName)
+          MockMetricsService.processWithTimer()
 
-        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
-      }
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/trader/knownfacts/$testErn",
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+              ),
+              bearerToken = "Bearer value-known-facts-etds18"
+            )
+            .returns(Future.successful(response))
 
-      "downstream call is unsuccessful" in new Test {
-        val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+          await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
+        }
 
-        MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
-        MockMetricsService.processWithTimer()
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
 
-        MockHttpClient
-          .get(
-            url = s"$baseUrl/emcs/movements/v1/movement-history",
-            parameters = Seq(
-              "exciseregistrationnumber" -> testErn,
-              "arc" -> testArc
-            ),
-            headers = Seq(
-              EisHeaders.dateTime -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-              EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-              EisHeaders.forwardedHost -> "MDTP",
-              EisHeaders.source -> "TFE",
-              EisHeaders.authorization -> "Bearer value-movements"
-            ),
-            bearerToken = "Bearer value-movements"
-          )
-          .returns(Future.successful(response))
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
 
-        await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
+          MockMetricsService.requestTimer(getTraderKnownFactsViaETDS18Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/trader/knownfacts/$testErn",
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+              ),
+              bearerToken = "Bearer value-known-facts-etds18"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(getTraderKnownFactsViaETDS18Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .get(
+              url = s"$baseUrl/trader/knownfacts/$testErn",
+              headers = Seq(
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+              ),
+              bearerToken = "Bearer value-known-facts-etds18"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
+        }
       }
     }
+
+    "preValidateTraderViaETDS12 is called" should {
+
+      val preValidateTraderViaETDS12Request = PreValidateETDS12Request(userRequest.ern, None, None)
+
+      "return a Right" when {
+        "downstream call is successful" in new Test {
+
+          MockMetricsService.requestTimer(preValidateTraderViaETDS12Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/etds/traderprevalidation/v1",
+              body = preValidateTraderViaETDS12Request.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
+              ),
+              bearerToken = "Bearer value-prevalidate-etds12"
+            )
+            .returns(Future.successful(Right(preValidateEtds12ApiResponseModel)))
+
+          await(connector.preValidateTraderViaETDS12(preValidateTraderViaETDS12Request)) shouldBe Right(preValidateEtds12ApiResponseModel)
+        }
+      }
+
+      "return a Left" when {
+
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(preValidateTraderViaETDS12Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/etds/traderprevalidation/v1",
+              body = preValidateTraderViaETDS12Request.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
+              ),
+              bearerToken = "Bearer value-prevalidate-etds12"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTraderViaETDS12(preValidateTraderViaETDS12Request)) shouldBe response
+        }
+
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+          MockMetricsService.requestTimer(preValidateTraderViaETDS12Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/etds/traderprevalidation/v1",
+              body = preValidateTraderViaETDS12Request.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
+              ),
+              bearerToken = "Bearer value-prevalidate-etds12"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTraderViaETDS12(preValidateTraderViaETDS12Request)) shouldBe response
+        }
+
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+          MockMetricsService.requestTimer(preValidateTraderViaETDS12Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/etds/traderprevalidation/v1",
+              body = preValidateTraderViaETDS12Request.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
+              ),
+              bearerToken = "Bearer value-prevalidate-etds12"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTraderViaETDS12(preValidateTraderViaETDS12Request)) shouldBe response
+        }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+          MockMetricsService.requestTimer(preValidateTraderViaETDS12Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/etds/traderprevalidation/v1",
+              body = preValidateTraderViaETDS12Request.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
+              ),
+              bearerToken = "Bearer value-prevalidate-etds12"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTraderViaETDS12(preValidateTraderViaETDS12Request)) shouldBe response
+        }
+
+        "downstream call fails due to a 500 (ISE) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+          MockMetricsService.requestTimer(preValidateTraderViaETDS12Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/etds/traderprevalidation/v1",
+              body = preValidateTraderViaETDS12Request.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
+              ),
+              bearerToken = "Bearer value-prevalidate-etds12"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTraderViaETDS12(preValidateTraderViaETDS12Request)) shouldBe response
+        }
+
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(preValidateTraderViaETDS12Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/etds/traderprevalidation/v1",
+              body = preValidateTraderViaETDS12Request.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
+              ),
+              bearerToken = "Bearer value-prevalidate-etds12"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTraderViaETDS12(preValidateTraderViaETDS12Request)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(preValidateTraderViaETDS12Request.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/etds/traderprevalidation/v1",
+              body = preValidateTraderViaETDS12Request.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "MDTP",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
+              ),
+              bearerToken = "Bearer value-prevalidate-etds12"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTraderViaETDS12(preValidateTraderViaETDS12Request)) shouldBe response
+        }
+      }
+    }
+
+    "preValidateTrader is called" should {
+
+      val preValidateTraderRequest = preValidateEmc15bApiRequestModel
+
+      "return a Right" when {
+        "downstream call is successful" in new Test {
+
+          MockMetricsService.requestTimer(preValidateTraderRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/pre-validate-trader/v1",
+              body = preValidateTraderRequest.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate"
+              ),
+              bearerToken = "Bearer value-prevalidate"
+            )
+            .returns(Future.successful(Right(preValidateEtds12ApiResponseModel)))
+
+          await(connector.preValidateTrader(preValidateTraderRequest)) shouldBe Right(preValidateEtds12ApiResponseModel)
+        }
+      }
+
+      "return a Left" when {
+
+        "downstream call succeeds but the JSON response body can't be parsed" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonParsingError(Seq(JsonValidationError("'sample' field is wrong"))))
+
+          MockMetricsService.requestTimer(preValidateTraderRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/pre-validate-trader/v1",
+              body = preValidateTraderRequest.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate"
+              ),
+              bearerToken = "Bearer value-prevalidate"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTrader(preValidateTraderRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 400 (Bad Request) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISJsonSchemaMismatchError("JSON is wrong"))
+
+          MockMetricsService.requestTimer(preValidateTraderRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/pre-validate-trader/v1",
+              body = preValidateTraderRequest.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate"
+              ),
+              bearerToken = "Bearer value-prevalidate"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTrader(preValidateTraderRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 404 (Not Found) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISResourceNotFoundError("Url?"))
+
+          MockMetricsService.requestTimer(preValidateTraderRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/pre-validate-trader/v1",
+              body = preValidateTraderRequest.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate"
+              ),
+              bearerToken = "Bearer value-prevalidate"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTrader(preValidateTraderRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 422 (Unprocessable Entity) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISBusinessError("The request body was invalid"))
+
+          MockMetricsService.requestTimer(preValidateTraderRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/pre-validate-trader/v1",
+              body = preValidateTraderRequest.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate"
+              ),
+              bearerToken = "Bearer value-prevalidate"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTrader(preValidateTraderRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 500 (ISE) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISInternalServerError("Malformed JSON receieved"))
+
+          MockMetricsService.requestTimer(preValidateTraderRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/pre-validate-trader/v1",
+              body = preValidateTraderRequest.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate"
+              ),
+              bearerToken = "Bearer value-prevalidate"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTrader(preValidateTraderRequest)) shouldBe response
+        }
+
+        "downstream call fails due to a 503 (Service Unavailable) response" in new Test {
+
+          val response: Either[ErrorResponse, String] = Left(EISServiceUnavailableError("No servers running"))
+
+          MockMetricsService.requestTimer(preValidateTraderRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/pre-validate-trader/v1",
+              body = preValidateTraderRequest.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate"
+              ),
+              bearerToken = "Bearer value-prevalidate"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTrader(preValidateTraderRequest)) shouldBe response
+        }
+
+        "downstream call is unsuccessful" in new Test {
+          val response: Either[ErrorResponse, String] = Left(EISUnknownError("429 returned"))
+
+          MockMetricsService.requestTimer(preValidateTraderRequest.metricName)
+          MockMetricsService.processWithTimer()
+
+          MockHttpClient
+            .postJson(
+              url = s"$baseUrl/emcs/pre-validate-trader/v1",
+              body = preValidateTraderRequest.toJson,
+              headers = Seq(
+                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
+                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
+                EisHeaders.forwardedHost -> "MDTP",
+                EisHeaders.source        -> "TFE",
+                EisHeaders.contentType   -> "application/json",
+                EisHeaders.accept        -> "application/json",
+                EisHeaders.authorization -> "Bearer value-prevalidate"
+              ),
+              bearerToken = "Bearer value-prevalidate"
+            )
+            .returns(Future.successful(response))
+
+          await(connector.preValidateTrader(preValidateTraderRequest)) shouldBe response
+        }
+      }
+    }
+
   }
+
 }

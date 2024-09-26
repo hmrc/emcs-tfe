@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfe.models.request
+package uk.gov.hmrc.emcstfe.models.request.eis
 
-import uk.gov.hmrc.emcstfe.models.request.eis.Source
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 
-import java.time.{LocalDate, LocalTime, ZoneId}
-import java.util.UUID
+case class TraderKnownFactsETDS18Request(request: UserRequest[_]) extends EisConsumptionRequest {
+  override def metricName: String = "get-trader-known-facts"
 
-trait BaseRequest {
+  override val exciseRegistrationNumber: String = request.ern
 
-  def exciseRegistrationNumber: String
+  override val queryParams: Seq[(String, String)] = Seq.empty
 
-  val source: Source
-
-  val preparedDate: LocalDate = LocalDate.now(ZoneId.of("UTC"))
-  val preparedTime: LocalTime = LocalTime.now(ZoneId.of("UTC"))
-  val correlationUUID: String = UUID.randomUUID().toString
-  val messageUUID: String = UUID.randomUUID().toString
-
-  def metricName: String
-
+  override val source: Source = Source.MDTP
 }

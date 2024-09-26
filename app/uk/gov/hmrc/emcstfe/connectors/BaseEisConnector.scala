@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.connectors
 
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.emcstfe.config.AppConfig
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisHeaders, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisHeaders, EisSubmissionRequest, Source}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpReads}
@@ -41,21 +41,21 @@ trait BaseEisConnector extends Logging {
     .appendInstant(3)
     .toFormatter
 
-  private def eisSubmissionHeaders(correlationId: String, forwardedHost: String, token: String): Seq[(String, String)] = Seq(
+  private def eisSubmissionHeaders(correlationId: String, forwardedHost: String, token: String, source: Source): Seq[(String, String)] = Seq(
     EisHeaders.dateTime -> dateTimeFormatter.format(now),
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
-    EisHeaders.source -> "TFE",
+    EisHeaders.source -> source.toString,
     EisHeaders.contentType -> "application/json",
     EisHeaders.accept -> "application/json",
     EisHeaders.authorization -> bearer(token)
   )
 
-  private def eisConsumptionHeaders(correlationId: String, forwardedHost: String, token: String): Seq[(String, String)] = Seq(
+  private def eisConsumptionHeaders(correlationId: String, forwardedHost: String, token: String, source: Source): Seq[(String, String)] = Seq(
     EisHeaders.dateTime -> dateTimeFormatter.format(now),
     EisHeaders.correlationId -> correlationId,
     EisHeaders.forwardedHost -> forwardedHost,
-    EisHeaders.source -> "TFE",
+    EisHeaders.source -> source.toString,
     EisHeaders.authorization -> bearer(token)
   )
 
@@ -74,7 +74,7 @@ trait BaseEisConnector extends Logging {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[postJson] POST to $uri being made with body:\n\n$body")
       val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
-      http.POST[JsValue, Either[A, B]](uri, body, eisSubmissionHeaders(request.correlationUUID, forwardedHost, bearerToken))(implicitly, rds, newHC, ec)
+      http.POST[JsValue, Either[A, B]](uri, body, eisSubmissionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source))(implicitly, rds, newHC, ec)
     }
   }
 
@@ -84,7 +84,7 @@ trait BaseEisConnector extends Logging {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[get] GET to $uri being made with query params ${request.queryParams}")
       val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
-      http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken))(rds, newHC, ec)
+      http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source))(rds, newHC, ec)
     }
   }
 
@@ -94,7 +94,7 @@ trait BaseEisConnector extends Logging {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[putEmpty] PUT to $uri being made with empty body")
       val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
-      http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken))(rds, newHC, ec)
+      http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source))(rds, newHC, ec)
     }
   }
 
@@ -104,7 +104,7 @@ trait BaseEisConnector extends Logging {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[delete] DELETE to $uri being made")
       val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
-      http.DELETE[Either[A, B]](uri, eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken))(rds, newHC, ec)
+      http.DELETE[Either[A, B]](uri, eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source))(rds, newHC, ec)
     }
   }
 }

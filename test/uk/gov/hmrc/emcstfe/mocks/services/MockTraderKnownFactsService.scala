@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.emcstfe.mocks.services
 
-import org.scalamock.handlers.CallHandler3
+import org.scalamock.handlers.CallHandler4
 import org.scalamock.scalatest.MockFactory
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, TraderKnownFacts}
 import uk.gov.hmrc.emcstfe.services.TraderKnownFactsService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,10 +30,10 @@ trait MockTraderKnownFactsService extends MockFactory {
 
   object MockService {
 
-    def getTraderKnownFacts(ern: String): CallHandler3[String, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Option[TraderKnownFacts]]]] = {
+    def getTraderKnownFacts(ern: String): CallHandler4[String, UserRequest[_], HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Option[TraderKnownFacts]]]] = {
       (mockService
-        .getTraderKnownFacts(_: String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(ern, *, *)
+        .getTraderKnownFacts(_: String)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext))
+        .expects(ern, *, *, *)
     }
 
   }

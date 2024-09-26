@@ -20,6 +20,7 @@ import org.scalamock.handlers.{CallHandler4, CallHandler5}
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Reads
 import uk.gov.hmrc.emcstfe.connectors.EisConnector
+import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.request._
 import uk.gov.hmrc.emcstfe.models.request.eis.EisSubmissionRequest
 import uk.gov.hmrc.emcstfe.models.request.eis.preValidate.{PreValidateETDS12Request, PreValidateRequest}
@@ -92,6 +93,11 @@ trait MockEisConnector extends MockFactory {
     def preValidateTraderViaETDS12(request: PreValidateETDS12Request): CallHandler4[PreValidateETDS12Request, HeaderCarrier, ExecutionContext, Reads[PreValidateTraderETDSResponse], Future[Either[ErrorResponse, PreValidateTraderETDSResponse]]] = {
       (mockEisConnector.preValidateTraderViaETDS12(_: PreValidateETDS12Request)(_: HeaderCarrier, _: ExecutionContext, _: Reads[PreValidateTraderETDSResponse]))
         .expects(request, *, *, *)
+    }
+
+    def getTraderKnownFactsViaETDS18(ern: String): CallHandler5[String, UserRequest[_], HeaderCarrier, ExecutionContext, Reads[TraderKnownFacts], Future[Either[ErrorResponse, Option[TraderKnownFacts]]]] = {
+      (mockEisConnector.getTraderKnownFactsViaETDS18(_: String)(_: UserRequest[_], _: HeaderCarrier, _: ExecutionContext, _: Reads[TraderKnownFacts]))
+        .expects(ern, *, *, *, *)
     }
   }
 }

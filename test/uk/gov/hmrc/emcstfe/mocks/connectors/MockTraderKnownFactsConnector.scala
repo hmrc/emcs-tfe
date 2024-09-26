@@ -30,9 +30,9 @@ trait MockTraderKnownFactsConnector extends MockFactory {
 
   object MockTraderKnownFactsConnector {
 
-    def getTraderKnownFacts(ern: String): CallHandler3[String, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Option[TraderKnownFacts]]]] = {
+    def getTraderKnownFactsViaReferenceData(ern: String): CallHandler3[String, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Option[TraderKnownFacts]]]] = {
       (mockTraderKnownFactsConnector
-        .getTraderKnownFacts(_: String)(_: HeaderCarrier, _: ExecutionContext))
+        .getTraderKnownFactsViaReferenceData(_: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(ern, *, *)
     }
 

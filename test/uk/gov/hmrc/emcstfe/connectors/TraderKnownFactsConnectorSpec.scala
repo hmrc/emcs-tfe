@@ -44,14 +44,14 @@ class TraderKnownFactsConnectorSpec extends UnitSpec
 
   val connector = new TraderKnownFactsConnector(mockHttpClient, config)
 
-  "getTraderKnownFacts" should {
+  "getTraderKnownFactsViaReferenceData" should {
     "return Right[TraderKnownFacts]" when {
       "the http client response returns Right[TraderKnownFacts]" in {
         val ern = "1234567890"
 
         MockHttpClient.get(config.knownFactsCandEUrl(ern)).returns(Future.successful(Right(testTraderKnownFactsModel)))
 
-        val result = await(connector.getTraderKnownFacts(ern))
+        val result = await(connector.getTraderKnownFactsViaReferenceData(ern))
 
         result shouldBe Right(testTraderKnownFactsModel)
       }
@@ -63,7 +63,7 @@ class TraderKnownFactsConnectorSpec extends UnitSpec
 
         MockHttpClient.get(config.knownFactsCandEUrl(ern)).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
-        val result = await(connector.getTraderKnownFacts(ern))
+        val result = await(connector.getTraderKnownFactsViaReferenceData(ern))
 
         result shouldBe Left(UnexpectedDownstreamResponseError)
       }

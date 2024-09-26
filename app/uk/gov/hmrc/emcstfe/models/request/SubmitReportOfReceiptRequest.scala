@@ -22,7 +22,7 @@ import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.TaxWarehouse
 import uk.gov.hmrc.emcstfe.models.common.TraderModel
 import uk.gov.hmrc.emcstfe.models.reportOfReceipt.SubmitReportOfReceiptModel
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest, Source}
 
 import java.util.Base64
 
@@ -59,4 +59,6 @@ case class SubmitReportOfReceiptRequest(body: SubmitReportOfReceiptModel)
       "messageType" -> s"IE$messageNumber",
       "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
     )
+
+  override val source: Source = Source.TFE
 }

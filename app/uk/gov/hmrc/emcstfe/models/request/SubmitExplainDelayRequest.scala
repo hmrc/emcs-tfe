@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.explainDelay.SubmitExplainDelayModel
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest, Source}
 
 import java.util.Base64
 
@@ -51,4 +51,6 @@ case class SubmitExplainDelayRequest(body: SubmitExplainDelayModel)
       "messageType" -> s"IE$messageNumber",
       "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
     )
+
+  override val source: Source = Source.TFE
 }

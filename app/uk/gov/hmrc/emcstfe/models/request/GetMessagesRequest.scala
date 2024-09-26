@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, Source}
 
 case class GetMessagesRequest(exciseRegistrationNumber: String,
                               sortField: String,
@@ -42,6 +42,8 @@ case class GetMessagesRequest(exciseRegistrationNumber: String,
     "startposition" -> startPos.toString,
     "maxnotoreturn" -> maxNoToReturn.toString
   )
+
+  override val source: Source = Source.TFE
 }
 
 object GetMessagesRequest {

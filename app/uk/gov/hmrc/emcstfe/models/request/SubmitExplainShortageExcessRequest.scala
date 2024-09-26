@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.common.SubmitterType
 import uk.gov.hmrc.emcstfe.models.explainShortageExcess.SubmitExplainShortageExcessModel
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest, Source}
 
 import java.util.Base64
 
@@ -63,4 +63,6 @@ case class SubmitExplainShortageExcessRequest(body: SubmitExplainShortageExcessM
       "messageType" -> s"IE$messageNumber",
       "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
     )
+
+  override val source: Source = Source.TFE
 }

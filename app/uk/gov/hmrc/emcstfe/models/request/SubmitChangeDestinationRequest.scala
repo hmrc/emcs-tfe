@@ -21,7 +21,7 @@ import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{CertifiedConsignee, Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryCertifiedConsignee}
-import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest}
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest, Source}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 
 import java.util.Base64
@@ -71,4 +71,6 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, mo
       "messageType" -> s"IE$messageNumber",
       "message" -> Base64.getEncoder.encodeToString(eisXMLBody().getBytes)
     )
+
+  override val source: Source = Source.TFE
 }

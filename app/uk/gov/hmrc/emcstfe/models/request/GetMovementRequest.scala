@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.request
 
-import uk.gov.hmrc.emcstfe.models.request.eis.EisConsumptionRequest
+import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, Source}
 
 case class GetMovementRequest(exciseRegistrationNumber: String,
                               arc: String,
@@ -29,4 +29,6 @@ case class GetMovementRequest(exciseRegistrationNumber: String,
     Some("arc" -> arc),
     sequenceNumber.map(seq => "sequencenumber" -> seq.toString)
   ).flatten
+
+  override val source: Source = Source.TFE
 }
