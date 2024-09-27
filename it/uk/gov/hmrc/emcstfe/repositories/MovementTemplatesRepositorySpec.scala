@@ -103,13 +103,28 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
 
       "return Seq(templates)" when {
 
+        "return all when no pagination is specified" in {
+
+          insert(template.copy(templateId = "foo1", templateName = "foo 1")).futureValue
+          insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
+          insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
+
+          val result = repository.getList(testErn, None, None).futureValue
+
+          result shouldBe MovementTemplates(Seq(
+            template.copy(templateId = "foo1", templateName = "foo 1"),
+            template.copy(templateId = "foo2", templateName = "foo 2"),
+            template.copy(templateId = "foo3", templateName = "foo 3")
+          ), 3)
+        }
+
         "number of results is less than pageSize" in {
 
           insert(template.copy(templateId = "foo1", templateName = "foo 1")).futureValue
           insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
           insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
 
-          val result = repository.getList(testErn, 1, 3).futureValue
+          val result = repository.getList(testErn, Some(1), Some(3)).futureValue
 
           result shouldBe MovementTemplates(Seq(
             template.copy(templateId = "foo1", templateName = "foo 1"),
@@ -124,7 +139,7 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
           insert(template.copy(templateId = "foo2", templateName = "foo 2")).futureValue
           insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
 
-          val result = repository.getList(testErn, 1, 2).futureValue
+          val result = repository.getList(testErn, Some(1), Some(2)).futureValue
 
           result shouldBe MovementTemplates(Seq(
             template.copy(templateId = "foo1", templateName = "foo 1"),
@@ -138,7 +153,7 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
           insert(template.copy(templateId = "foo3", templateName = "foo 3")).futureValue
           insert(template.copy(templateId = "foo2", templateName = "boo 2")).futureValue
 
-          val result = repository.getList(testErn, 1, 3).futureValue
+          val result = repository.getList(testErn, Some(1), Some(3)).futureValue
 
           result shouldBe MovementTemplates(Seq(
             template.copy(templateId = "foo2", templateName = "boo 2"),
@@ -152,7 +167,7 @@ class MovementTemplatesRepositorySpec extends RepositoryBaseSpec[MovementTemplat
     "there are no templates for this ern" must {
 
       "return MovementTemplates(Seq(), 0)" in {
-        repository.getList(testErn, 1, 3).futureValue shouldBe MovementTemplates(Seq(), 0)
+        repository.getList(testErn, Some(1), Some(3)).futureValue shouldBe MovementTemplates(Seq(), 0)
       }
     }
   }

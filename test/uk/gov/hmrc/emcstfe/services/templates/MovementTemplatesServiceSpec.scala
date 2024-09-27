@@ -61,7 +61,7 @@ class MovementTemplatesServiceSpec extends TestBaseSpec
       "templates are successfully returned from Mongo" in new Test {
 
         MockMovementTemplatesRepository.getList(testErn).returns(Future.successful(MovementTemplates(Seq(template), 1)))
-        await(service.getList(testErn, 1, 1)) shouldBe Right(MovementTemplates(Seq(template), 1))
+        await(service.getList(testErn, Some(1), Some(1))) shouldBe Right(MovementTemplates(Seq(template), 1))
       }
     }
 
@@ -69,14 +69,14 @@ class MovementTemplatesServiceSpec extends TestBaseSpec
       "templates are not found in Mongo" in new Test {
 
         MockMovementTemplatesRepository.getList(testErn).returns(Future.successful(MovementTemplates(Seq(), 0)))
-        await(service.getList(testErn, 1, 1)) shouldBe Right(MovementTemplates(Seq(), 0))
+        await(service.getList(testErn, Some(1), Some(1))) shouldBe Right(MovementTemplates(Seq(), 0))
       }
     }
     "return a Left" when {
       "mongo error is returned" in new Test {
 
         MockMovementTemplatesRepository.getList(testErn).returns(Future.failed(new Exception("bang")))
-        await(service.getList(testErn, 1, 1)) shouldBe Left(MongoError("bang"))
+        await(service.getList(testErn, Some(1), Some(1))) shouldBe Left(MongoError("bang"))
       }
     }
   }

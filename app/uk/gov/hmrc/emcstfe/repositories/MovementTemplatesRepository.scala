@@ -38,7 +38,7 @@ trait MovementTemplatesRepository {
 
   def get(ern: String, templateId: String): Future[Option[MovementTemplate]]
 
-  def getList(ern: String, page: Int, pageSize: Int): Future[MovementTemplates]
+  def getList(ern: String, page: Option[Int], pageSize: Option[Int]): Future[MovementTemplates]
 
   def set(answers: MovementTemplate): Future[Boolean]
 
@@ -79,7 +79,10 @@ class MovementTemplatesRepositoryImpl @Inject() (mongoComponent: MongoComponent,
   def get(ern: String, templateId: String): Future[Option[MovementTemplate]] =
     collection.find(byTemplateId(ern, templateId)).headOption()
 
-  def getList(ern: String, page: Int, pageSize: Int): Future[MovementTemplates] = {
+  def getList(ern: String, page: Option[Int], pageSize: Option[Int]): Future[MovementTemplates] = {
+
+    val _page = page.getOrElse(1)
+    val _pageSize = pageSize.getOrElse(Int.MaxValue)
 
     val filterPipeline = Aggregates.filter(byErn(ern))
     val upperPipeline  = Aggregates.addFields(Field("templateNameUpper", BsonDocument("$toUpper" -> BsonDocument("$ifNull" -> Seq("$templateName", "")))))
@@ -91,7 +94,7 @@ class MovementTemplatesRepositoryImpl @Inject() (mongoComponent: MongoComponent,
       sortPipeline,
       Aggregates.facet(
         Facet("metadata", Aggregates.count("count")),
-        Facet("templates", Aggregates.skip((page - 1) * pageSize), Aggregates.limit(pageSize))
+        Facet("templates", Aggregates.skip((_page - 1) * _pageSize), Aggregates.limit(_pageSize))
       ),
       //This step takes the count from the metadata facet array, the ifNull is required in case no documents were found, in which case return 0
       Aggregates.addFields(

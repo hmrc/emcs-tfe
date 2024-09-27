@@ -62,7 +62,7 @@ class MovementTemplatesControllerSpec extends TestBaseSpec
 
         MockMovementTemplatesService.getList(testErn).returns(Future.successful(Right(MovementTemplates(Seq(template), 1))))
 
-        val result = controller.getList(testErn, 1, 1)(fakeRequest)
+        val result = controller.getList(testErn, Some(1), Some(1))(fakeRequest)
 
         status(result) shouldBe Status.OK
         contentAsJson(result) shouldBe Json.toJson(MovementTemplates(Seq(template), 1))
@@ -74,7 +74,7 @@ class MovementTemplatesControllerSpec extends TestBaseSpec
 
         MockMovementTemplatesService.getList(testErn).returns(Future.successful(Right(MovementTemplates(Seq(), 1))))
 
-        val result = controller.getList(testErn, 1, 1)(fakeRequest)
+        val result = controller.getList(testErn, Some(1), Some(1))(fakeRequest)
 
         status(result) shouldBe Status.NO_CONTENT
         contentAsString(result) shouldBe ""
@@ -86,7 +86,7 @@ class MovementTemplatesControllerSpec extends TestBaseSpec
 
         MockMovementTemplatesService.getList(testErn).returns(Future.successful(Left(MongoError("errMsg"))))
 
-        val result = controller.getList(testErn, 1, 1)(fakeRequest)
+        val result = controller.getList(testErn, Some(1), Some(1))(fakeRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.toJson(MongoError("errMsg"))

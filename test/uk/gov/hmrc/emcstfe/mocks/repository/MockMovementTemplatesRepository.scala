@@ -29,8 +29,8 @@ trait MockMovementTemplatesRepository extends MockFactory {
 
   object MockMovementTemplatesRepository {
 
-    def getList(ern: String): CallHandler3[String, Int, Int, Future[MovementTemplates]] =
-      (mockMovementTemplatesRepository.getList(_: String, _: Int, _: Int)).expects(ern, *, *)
+    def getList(ern: String): CallHandler3[String, Option[Int], Option[Int], Future[MovementTemplates]] =
+      (mockMovementTemplatesRepository.getList(_: String, _: Option[Int], _: Option[Int])).expects(ern, *, *)
 
     def get(ern: String, templateId: String): CallHandler2[String, String, Future[Option[MovementTemplate]]] =
       (mockMovementTemplatesRepository.get(_: String, _: String)).expects(ern, templateId)

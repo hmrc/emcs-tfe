@@ -105,7 +105,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
     "user is authorised" must {
 
       s"return $OK (OK)" when {
-        "data is retrieved from Mongo" in new Test {
+        "all data is retrieved from Mongo" in new Test {
 
           override def setupStubs(): StubMapping = {
             await(mongoRepo.set(template.copy(templateId = "foo1", templateName = "foo 1")))
@@ -113,7 +113,7 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
             AuthStub.authorised()
           }
 
-          val response: WSResponse = await(request(s"/templates/$testErn?page=1&pageSize=10").get())
+          val response: WSResponse = await(request(s"/templates/$testErn").get())
 
           response.status shouldBe OK
           response.header("Content-Type") shouldBe Some("application/json")
@@ -122,6 +122,27 @@ class MovementTemplatesIntegrationSpec extends IntegrationBaseSpec with GetMovem
             "templates" -> Json.arr(
               template.copy(templateId = "foo1", templateName = "foo 1"),
               template.copy(templateId = "foo2", templateName = "foo 2")
+            ),
+            "count" -> 2
+          )
+        }
+
+        "paginated data is retrieved from Mongo" in new Test {
+
+          override def setupStubs(): StubMapping = {
+            await(mongoRepo.set(template.copy(templateId = "foo1", templateName = "foo 1")))
+            await(mongoRepo.set(template.copy(templateId = "foo2", templateName = "foo 2")))
+            AuthStub.authorised()
+          }
+
+          val response: WSResponse = await(request(s"/templates/$testErn?page=1&pageSize=1").get())
+
+          response.status shouldBe OK
+          response.header("Content-Type") shouldBe Some("application/json")
+
+          response.json shouldBe Json.obj(
+            "templates" -> Json.arr(
+              template.copy(templateId = "foo1", templateName = "foo 1")
             ),
             "count" -> 2
           )
