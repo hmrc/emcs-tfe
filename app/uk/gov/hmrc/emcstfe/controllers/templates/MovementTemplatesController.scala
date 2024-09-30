@@ -41,9 +41,7 @@ class MovementTemplatesController @Inject()(cc: ControllerComponents,
       movementTemplatesService.getList(ern, page, pageSize) map {
         case Right(MovementTemplates(templates, _)) if templates.isEmpty => NoContent
         case Right(answers) => Ok(Json.toJson(answers))
-        case Left(mongoError) =>
-          println(mongoError.message)
-          InternalServerError(Json.toJson(mongoError))
+        case Left(mongoError) => InternalServerError(Json.toJson(mongoError))
       }
     }
 
