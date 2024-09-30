@@ -36,7 +36,7 @@ class MovementTemplatesController @Inject()(cc: ControllerComponents,
 
   implicit val movementTemplateFormat: OFormat[MovementTemplate] = MovementTemplate.responseFormat
 
-  def getList(ern: String, page: Int, pageSize: Int): Action[AnyContent] =
+  def getList(ern: String, page: Option[Int], pageSize: Option[Int]): Action[AnyContent] =
     authorisedUserRequest(ern) { _ =>
       movementTemplatesService.getList(ern, page, pageSize) map {
         case Right(MovementTemplates(templates, _)) if templates.isEmpty => NoContent

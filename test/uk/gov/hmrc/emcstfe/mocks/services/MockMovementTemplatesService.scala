@@ -30,8 +30,8 @@ trait MockMovementTemplatesService extends MockFactory  {
 
   object MockMovementTemplatesService {
 
-    def getList(ern: String): CallHandler4[String, Int, Int, ExecutionContext, Future[Either[ErrorResponse, MovementTemplates]]] =
-      (mockService.getList(_: String, _: Int, _: Int)(_: ExecutionContext)).expects(ern, *, *, *)
+    def getList(ern: String): CallHandler4[String, Option[Int], Option[Int], ExecutionContext, Future[Either[ErrorResponse, MovementTemplates]]] =
+      (mockService.getList(_: String, _: Option[Int], _: Option[Int])(_: ExecutionContext)).expects(ern, *, *, *)
 
     def get(ern: String, draftId: String): CallHandler3[String, String, ExecutionContext, Future[Either[ErrorResponse, Option[MovementTemplate]]]] =
       (mockService.get(_: String, _: String)(_: ExecutionContext)).expects(ern, draftId, *)

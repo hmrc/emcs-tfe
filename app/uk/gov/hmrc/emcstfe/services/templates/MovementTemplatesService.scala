@@ -31,7 +31,7 @@ class MovementTemplatesService @Inject()(templateRepo: MovementTemplatesReposito
                                          draftMovementRepo: CreateMovementUserAnswersRepository
                                         )(implicit uuidGenerator: UUIDGenerator, timeMachine: TimeMachine) extends Logging {
 
-  def getList(ern: String, page: Int, pageSize: Int)
+  def getList(ern: String, page: Option[Int], pageSize: Option[Int])
              (implicit ec: ExecutionContext): Future[Either[ErrorResponse, MovementTemplates]] =
     templateRepo.getList(ern, page, pageSize).map(Right(_)).recover(recovery)
 
