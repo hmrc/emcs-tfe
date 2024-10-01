@@ -20,7 +20,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.emcstfe.models.createMovement.submissionFailures.MovementSubmissionFailure
 import uk.gov.hmrc.emcstfe.models.response.rimValidation.RIMValidationError
-import uk.gov.hmrc.emcstfe.utils.{TimeMachine, UUIDGenerator}
+import uk.gov.hmrc.emcstfe.utils.{Sha256Util, TimeMachine, UUIDGenerator}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -34,9 +34,10 @@ final case class CreateMovementUserAnswers(ern: String,
                                            hasBeenSubmitted: Boolean,
                                            submittedDraftId: Option[String],
                                            createdFromTemplateId: Option[String] = None,
-                                           createdFromTemplateName: Option[String] = None)
+                                           createdFromTemplateName: Option[String] = None,
+                                           templateDataHash: Option[String] = None)
 
-object CreateMovementUserAnswers {
+object CreateMovementUserAnswers extends Sha256Util {
 
   val mongoReads: Reads[CreateMovementUserAnswers] = (
     (__ \ "ern").read[String] and
@@ -48,7 +49,8 @@ object CreateMovementUserAnswers {
       (__ \ "hasBeenSubmitted").read[Boolean] and
       (__ \ "submittedDraftId").readNullable[String] and
       (__ \ "createdFromTemplateId").readNullable[String] and
-      (__ \ "createdFromTemplateName").readNullable[String]
+      (__ \ "createdFromTemplateName").readNullable[String] and
+      (__ \ "templateDataHash").readNullable[String]
     )(CreateMovementUserAnswers.apply _)
 
   val mongoWrites: OWrites[CreateMovementUserAnswers] = (
@@ -61,7 +63,8 @@ object CreateMovementUserAnswers {
       (__ \ "hasBeenSubmitted").write[Boolean] and
       (__ \ "submittedDraftId").writeNullable[String] and
       (__ \ "createdFromTemplateId").writeNullable[String] and
-      (__ \ "createdFromTemplateName").writeNullable[String]
+      (__ \ "createdFromTemplateName").writeNullable[String] and
+      (__ \ "templateDataHash").writeNullable[String]
     )(unlift(CreateMovementUserAnswers.unapply))
 
   implicit val mongoFormat: OFormat[CreateMovementUserAnswers] = OFormat(mongoReads, mongoWrites)
@@ -80,7 +83,8 @@ object CreateMovementUserAnswers {
       hasBeenSubmitted = false,
       submittedDraftId = None,
       createdFromTemplateId = Some(template.templateId),
-      createdFromTemplateName = Some(template.templateName)
+      createdFromTemplateName = Some(template.templateName),
+      templateDataHash = Some(sha256Hash(template.data.toString()))
     )
 
 }
