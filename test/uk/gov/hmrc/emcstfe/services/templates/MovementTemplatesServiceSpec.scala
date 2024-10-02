@@ -19,10 +19,11 @@ package uk.gov.hmrc.emcstfe.services.templates
 import org.specs2.mock.Mockito.theStubbed
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementListFixture, MovementSubmissionFailureFixtures}
+import uk.gov.hmrc.emcstfe.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfe.mocks.repository.{MockCreateMovementUserAnswersRepository, MockMovementTemplatesRepository}
 import uk.gov.hmrc.emcstfe.mocks.utils.MockUUIDGenerator
 import uk.gov.hmrc.emcstfe.models.mongo.{CreateMovementUserAnswers, MovementTemplate, MovementTemplates}
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MongoError, TemplateDoesNotExist}
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{MongoError, TemplateDoesNotExist, TooManyTemplates}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 
@@ -35,16 +36,22 @@ class MovementTemplatesServiceSpec extends TestBaseSpec
   with MovementSubmissionFailureFixtures
   with MockUUIDGenerator
   with MockCreateMovementUserAnswersRepository
-  with MockMovementTemplatesRepository {
+  with MockMovementTemplatesRepository
+  with MockAppConfig {
 
   val instantNow = Instant.now().truncatedTo(ChronoUnit.MILLIS)
   implicit val timeMachine: TimeMachine = () => instantNow
+  val testMaxTemplates = 5
 
   trait Test {
+
+    MockedAppConfig.maxTemplates().returns(testMaxTemplates).anyNumberOfTimes()
+
     val service: MovementTemplatesService = new MovementTemplatesService(
       mockMovementTemplatesRepository,
       mockCreateMovementUserAnswersRepository,
-      )(mockUUIDGenerator, timeMachine)
+      mockAppConfig
+    )(mockUUIDGenerator, timeMachine)
   }
 
   val template: MovementTemplate =
@@ -106,19 +113,71 @@ class MovementTemplatesServiceSpec extends TestBaseSpec
     }
   }
 
-  ".set" should {
-    "return a Right(boolean)" when {
-      "template is successfully saved/updated in Mongo" in new Test {
+  ".set" when {
 
-        MockMovementTemplatesRepository.set(template).returns(Future.successful(true))
-        await(service.set(template)) shouldBe Right(template)
+    "all mongo calls are successful" when {
+
+      "being called for an existing template" should {
+
+        "update the template without checking the template limit" in new Test {
+          MockMovementTemplatesRepository.get(testErn, template.templateId).returns(Future.successful(Some(template)))
+          MockMovementTemplatesRepository.set(template).returns(Future.successful(true))
+          await(service.set(template)) shouldBe Right(template)
+        }
+      }
+
+      "being called for a template that doesn't exist" when {
+
+        "the maximum templates has NOT been reached" should {
+
+          "insert a new document into Mongo" in new Test {
+
+            MockMovementTemplatesRepository.get(testErn, template.templateId).returns(Future.successful(None))
+            MockMovementTemplatesRepository.getList(testErn).returns(Future.successful(MovementTemplates(Seq(), testMaxTemplates - 1)))
+            MockMovementTemplatesRepository.set(template).returns(Future.successful(true))
+            await(service.set(template)) shouldBe Right(template)
+          }
+        }
+
+        "the maximum templates has been reached" should {
+
+          "return a Left(TooManyTemplates)" in new Test {
+
+            MockMovementTemplatesRepository.get(testErn, template.templateId).returns(Future.successful(None))
+            MockMovementTemplatesRepository.getList(testErn).returns(Future.successful(MovementTemplates(Seq(), testMaxTemplates)))
+
+            await(service.set(template)) shouldBe Left(TooManyTemplates)
+          }
+        }
       }
     }
-    "return a Left" when {
-      "mongo error is returned" in new Test {
 
-        MockMovementTemplatesRepository.set(template).returns(Future.failed(new Exception("bang")))
-        await(service.set(template)) shouldBe Left(MongoError("bang"))
+    "mongo call fails" when {
+      "failure is from `get` call" should {
+        "return Left(MongoError)" in new Test {
+
+          MockMovementTemplatesRepository.get(template.ern, template.templateId).returns(Future.failed(new Exception("bang")))
+          await(service.set(template)) shouldBe Left(MongoError("bang"))
+        }
+      }
+
+      "failure is from `getList` call" should {
+        "return Left(MongoError)" in new Test {
+
+          MockMovementTemplatesRepository.get(template.ern, template.templateId).returns(Future.successful(None))
+          MockMovementTemplatesRepository.getList(template.ern).returns(Future.failed(new Exception("bang")))
+          await(service.set(template)) shouldBe Left(MongoError("bang"))
+        }
+      }
+
+      "failure is from `set` call" should {
+        "return Left(MongoError)" in new Test {
+
+          MockMovementTemplatesRepository.get(template.ern, template.templateId).returns(Future.successful(None))
+          MockMovementTemplatesRepository.getList(template.ern).returns(Future.successful(MovementTemplates(Seq(), testMaxTemplates - 1)))
+          MockMovementTemplatesRepository.set(template).returns(Future.failed(new Exception("bang")))
+          await(service.set(template)) shouldBe Left(MongoError("bang"))
+        }
       }
     }
   }

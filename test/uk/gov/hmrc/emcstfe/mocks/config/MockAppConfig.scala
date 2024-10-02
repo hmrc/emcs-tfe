@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.mocks.config
 
-import org.scalamock.handlers.CallHandler1
+import org.scalamock.handlers.{CallHandler0, CallHandler1}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.models.FeatureSwitch
@@ -29,5 +29,8 @@ trait MockAppConfig extends MockFactory {
       val featureSwitchName = feature.configName
       (mockAppConfig.getFeatureSwitchValue(_: String)).expects(featureSwitchName)
     }
+
+    def maxTemplates(): CallHandler0[Int] =
+      (mockAppConfig.maxTemplates _).expects()
   }
 }

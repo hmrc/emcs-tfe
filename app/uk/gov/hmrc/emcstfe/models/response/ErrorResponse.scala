@@ -88,4 +88,8 @@ object ErrorResponse {
   case class TemplateDoesNotExist(templateId: String) extends ErrorResponse {
     val message = s"No template exists with the templateId: $templateId"
   }
+
+  case object TooManyTemplates extends ErrorResponse {
+    val message = "Too many templates exist for this ERN"
+  }
 }
