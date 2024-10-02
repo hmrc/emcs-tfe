@@ -23,7 +23,7 @@ class Sha256UtilSpec extends TestBaseSpec with Sha256Util {
 
   ".sha256Hash" must {
 
-    "calculate the same has for the same input" in {
+    "calculate the same hash for the same input" in {
       val input = Json.obj("key" -> "value").toString()
       sha256Hash(input) shouldBe sha256Hash(input)
     }
