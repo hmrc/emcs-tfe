@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.emcstfe.services.templates
 
+import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.{CreateMovementUserAnswers, MovementTemplate, MovementTemplates}
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse
-import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.TemplateDoesNotExist
+import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.{TemplateDoesNotExist, TooManyTemplates}
 import uk.gov.hmrc.emcstfe.repositories.{CreateMovementUserAnswersRepository, MovementTemplatesRepository}
 import uk.gov.hmrc.emcstfe.services.recovery
 import uk.gov.hmrc.emcstfe.utils.{Logging, TimeMachine, UUIDGenerator}
@@ -28,7 +29,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class MovementTemplatesService @Inject()(templateRepo: MovementTemplatesRepository,
-                                         draftMovementRepo: CreateMovementUserAnswersRepository
+                                         draftMovementRepo: CreateMovementUserAnswersRepository,
+                                         appConfig: AppConfig
                                         )(implicit uuidGenerator: UUIDGenerator, timeMachine: TimeMachine) extends Logging {
 
   def getList(ern: String, page: Option[Int], pageSize: Option[Int])
@@ -40,8 +42,22 @@ class MovementTemplatesService @Inject()(templateRepo: MovementTemplatesReposito
     templateRepo.get(ern, templateId).map(Right(_)).recover(recovery)
 
   def set(answers: MovementTemplate)
-         (implicit ec: ExecutionContext): Future[Either[ErrorResponse, MovementTemplate]] =
-    templateRepo.set(answers).map(_ => Right(answers)).recover(recovery)
+         (implicit ec: ExecutionContext): Future[Either[ErrorResponse, MovementTemplate]] = {
+    templateRepo.get(answers.ern, answers.templateId).flatMap {
+      case Some(_) =>
+        //Update the existing template
+        templateRepo.set(answers).map(_ => Right(answers))
+      case None =>
+        //New template, check if max templates has been reached before inserting
+        templateRepo.getList(answers.ern, None, None).flatMap { templates =>
+          if(templates.count < appConfig.maxTemplates()) {
+            templateRepo.set(answers).map(_ => Right(answers))
+          } else {
+            Future.successful(Left(TooManyTemplates))
+          }
+        }
+    }.recover(recovery)
+  }
 
   def delete(ern: String, templateId: String)
             (implicit ec: ExecutionContext): Future[Either[ErrorResponse, Boolean]] =
