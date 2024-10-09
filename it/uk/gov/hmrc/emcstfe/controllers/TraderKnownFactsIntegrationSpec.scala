@@ -38,7 +38,7 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
     def uri: String = s"/trader-known-facts"
 
     def emcsTfeReferenceDataUrl: String = "/emcs-tfe-reference-data/oracle/trader-known-facts"
-    def etdsKnownFactsUrl: String = s"/trader/knownfacts/$testErn"
+    def etdsKnownFactsUrl: String = s"/etds/trader/knownfacts/$testErn"
 
     def downstreamQueryParams: Map[String, String] = Map(
       "exciseRegistrationId" -> testErn
