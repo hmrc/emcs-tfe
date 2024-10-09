@@ -1835,7 +1835,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .get(
-              url = s"$baseUrl/trader/knownfacts/$testErn",
+              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
               headers = Seq(
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
@@ -1861,7 +1861,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .get(
-              url = s"$baseUrl/trader/knownfacts/$testErn",
+              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
               headers = Seq(
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
@@ -1884,7 +1884,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .get(
-              url = s"$baseUrl/trader/knownfacts/$testErn",
+              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
               headers = Seq(
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
@@ -1907,7 +1907,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .get(
-              url = s"$baseUrl/trader/knownfacts/$testErn",
+              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
               headers = Seq(
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
@@ -1930,7 +1930,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .get(
-              url = s"$baseUrl/trader/knownfacts/$testErn",
+              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
               headers = Seq(
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
@@ -1953,7 +1953,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .get(
-              url = s"$baseUrl/trader/knownfacts/$testErn",
+              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
               headers = Seq(
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
@@ -1976,7 +1976,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .get(
-              url = s"$baseUrl/trader/knownfacts/$testErn",
+              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
               headers = Seq(
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
@@ -1998,7 +1998,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .get(
-              url = s"$baseUrl/trader/knownfacts/$testErn",
+              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
               headers = Seq(
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
