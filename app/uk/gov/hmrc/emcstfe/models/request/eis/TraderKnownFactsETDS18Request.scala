@@ -26,4 +26,10 @@ case class TraderKnownFactsETDS18Request(request: UserRequest[_]) extends EisCon
   override val queryParams: Seq[(String, String)] = Seq.empty
 
   override val source: Source = Source.MDTP
+
+  // ETDS18 requires an Accept header on top of the standard EIS headers
+  override val extraHeaders: Seq[(String, String)] = Seq(
+    EisHeaders.accept -> "application/json"
+  )
+
 }

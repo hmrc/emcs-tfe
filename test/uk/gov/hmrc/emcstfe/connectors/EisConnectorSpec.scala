@@ -1840,7 +1840,8 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-known-facts-etds18"
             )
@@ -1866,7 +1867,8 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-known-facts-etds18"
             )
@@ -1889,7 +1891,8 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-known-facts-etds18"
             )
@@ -1912,7 +1915,8 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-known-facts-etds18"
             )
@@ -1935,7 +1939,8 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-known-facts-etds18"
             )
@@ -1958,7 +1963,8 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-known-facts-etds18"
             )
@@ -1981,7 +1987,8 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-known-facts-etds18"
             )
@@ -2003,7 +2010,8 @@ class EisConnectorSpec
                 EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
                 EisHeaders.forwardedHost -> "MDTP",
                 EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18"
+                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
+                EisHeaders.accept        -> "application/json"
               ),
               bearerToken = "Bearer value-known-facts-etds18"
             )
