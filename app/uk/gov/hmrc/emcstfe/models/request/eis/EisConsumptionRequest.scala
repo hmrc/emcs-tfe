@@ -20,4 +20,6 @@ import uk.gov.hmrc.emcstfe.models.request.BaseRequest
 
 trait EisConsumptionRequest extends BaseRequest {
   val queryParams: Seq[(String, String)]
+
+  val extraHeaders: Seq[(String, String)] = Seq.empty
 }
