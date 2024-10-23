@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.mongodb.scala.model._
 import play.api.libs.json.Format
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.mongo.KnownFacts
+import uk.gov.hmrc.emcstfe.models.response.TraderKnownFacts
 import uk.gov.hmrc.emcstfe.repositories.KnownFactsRepository._
 import uk.gov.hmrc.emcstfe.utils.TimeMachine
 import uk.gov.hmrc.mongo.MongoComponent
@@ -37,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[KnownFactsRepositoryImpl])
 trait KnownFactsRepository {
   def get(ern: String): Future[Option[KnownFacts]]
-  def set(answers: KnownFacts): Future[Boolean]
+  def set(ern: String, traderKnownFacts: TraderKnownFacts): Future[Boolean]
 }
 
 @Singleton
@@ -58,16 +59,15 @@ class KnownFactsRepositoryImpl @Inject() (mongoComponent: MongoComponent, appCon
   def get(ern: String): Future[Option[KnownFacts]] =
     collection.find(byErn(ern)).headOption()
 
-  def set(knownFacts: KnownFacts): Future[Boolean] = {
+  def set(ern: String, traderKnownFacts: TraderKnownFacts): Future[Boolean] =
     collection
       .replaceOne(
-        filter = byErn(knownFacts.ern),
-        replacement = knownFacts copy (lastUpdated = time.instant()),
+        filter = byErn(ern),
+        replacement = KnownFacts(ern, traderKnownFacts, time.instant()),
         options = ReplaceOptions().upsert(true)
       )
       .toFuture()
       .map(_ => true)
-  }
 }
 
 object KnownFactsRepository {

@@ -32,8 +32,5 @@ object TraderKnownFacts {
       ((__ \ "postcode").read[String].map(Some(_)) or (__ \ "postCode").readNullable[String])
     )(TraderKnownFacts.apply _)
 
-  implicit val writes: OWrites[TraderKnownFacts] = Json.writes[TraderKnownFacts]
-
-  val format: OFormat[TraderKnownFacts] = OFormat(reads, writes)
-
+    implicit val writes: OWrites[TraderKnownFacts] = Json.writes[TraderKnownFacts]
 }

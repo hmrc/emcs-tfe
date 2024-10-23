@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class KnownFactsRepositorySpec extends RepositoryBaseSpec[KnownFacts] with BaseF
 
     "insert when no template exists and set the last updated time" in {
 
-      repository.set(knownFacts).futureValue
+      repository.set(testErn, testTraderKnownFactsModel).futureValue
 
       val expectedResult = knownFacts copy (lastUpdated = instantNow)
       val updatedRecord = repository.get(testErn).futureValue.get
@@ -63,7 +63,7 @@ class KnownFactsRepositorySpec extends RepositoryBaseSpec[KnownFacts] with BaseF
     "upsert when template already exists and update the last updated time" in {
 
       insert(knownFacts).futureValue
-      repository.set(knownFacts).futureValue
+      repository.set(testErn, testTraderKnownFactsModel).futureValue
 
       val expectedResult = knownFacts copy (lastUpdated = instantNow)
       val updatedRecord = repository.get(testErn).futureValue.value
