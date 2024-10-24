@@ -17,6 +17,7 @@
 package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import org.mongodb.scala.Document
 import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.Json
@@ -25,14 +26,17 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.featureswitch.core.config.{EnableKnownFactsViaETDS18, FeatureSwitching}
 import uk.gov.hmrc.emcstfe.fixtures.TraderKnownFactsFixtures
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
+import uk.gov.hmrc.emcstfe.repositories.KnownFactsRepositoryImpl
 import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 
 class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKnownFactsFixtures with FeatureSwitching {
 
   val config: AppConfig = app.injector.instanceOf[AppConfig]
+  lazy val knownFactsRepository = app.injector.instanceOf[KnownFactsRepositoryImpl]
 
   private trait Test {
+
     def setupStubs(): StubMapping
 
     def uri: String = s"/trader-known-facts"
@@ -50,6 +54,7 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
       buildRequest(uri).withQueryStringParameters("exciseRegistrationId" -> testErn)
     }
 
+    await(knownFactsRepository.collection.deleteMany(Document()).toFuture())
   }
 
   "Calling the get trader known facts endpoint" when {
@@ -126,7 +131,8 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
               DownstreamStub.onSuccess(DownstreamStub.GET, etdsKnownFactsUrl, Status.OK, Json.parse(traderKnownFactsCandEJson))
             }
 
-            val response: WSResponse = await(request(useEtds18API = true).get())
+            lazy val response: WSResponse = await(request(useEtds18API = true).get())
+
             response.status shouldBe Status.OK
             response.header("Content-Type") shouldBe Some("application/json")
             response.json shouldBe Json.parse(testTraderKnownFactsJson)
@@ -139,7 +145,8 @@ class TraderKnownFactsIntegrationSpec extends IntegrationBaseSpec with TraderKno
               DownstreamStub.onSuccess(DownstreamStub.GET, etdsKnownFactsUrl, Status.INTERNAL_SERVER_ERROR, Json.obj())
             }
 
-            val response: WSResponse = await(request(useEtds18API = true).get())
+            lazy val response: WSResponse = await(request(useEtds18API = true).get())
+
             response.status shouldBe Status.INTERNAL_SERVER_ERROR
             response.header("Content-Type") shouldBe Some("application/json")
             response.json shouldBe Json.toJson(EISInternalServerError("{}"))

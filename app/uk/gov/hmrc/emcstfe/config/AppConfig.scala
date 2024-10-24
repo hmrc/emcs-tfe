@@ -65,6 +65,9 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, configuration: Config
   def getMovementTTL(): Duration           = Duration(configuration.get[String]("mongodb.getMovement.TTL"))
   def getMovementReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.getMovement.replaceIndexes")
 
+  def knownFactsTTL(): Duration           = Duration(configuration.get[String]("mongodb.knownFacts.TTL"))
+  def knownFactsReplaceIndexes(): Boolean = configuration.get[Boolean]("mongodb.knownFacts.replaceIndexes")
+
   def getFeatureSwitchValue(feature: String): Boolean = configuration.get[Boolean](feature)
 
   def eisBaseUrl: String = if (isEnabled(UseDownstreamStub)) downstreamStubUrl else eisUrl
