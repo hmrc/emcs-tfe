@@ -9,7 +9,7 @@ lazy val microservice = Project("emcs-tfe", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    majorVersion := 0,
+    majorVersion := 1,
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     dependencyOverrides ++= AppDependencies.overrides,
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
