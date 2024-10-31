@@ -4,12 +4,12 @@ object AppDependencies {
 
   val playSuffix        = s"-play-30"
 
-  val boostrapVersion   =  "8.6.0"
+  val boostrapVersion   =  "9.5.0"
   val xtractVersion     =  "2.3.0"
-  val hmrcMongoVersion  =  "1.9.0"
+  val hmrcMongoVersion  =  "2.3.0"
   val scalamockVersion  =  "5.2.0"
-  val catsCoreVersion   =  "2.9.0"
-  val flexmarkVersion   =  "0.62.2"
+  val catsCoreVersion   =  "2.12.0"
+  val flexmarkVersion   =  "0.64.8"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"           %% s"bootstrap-backend$playSuffix"  % boostrapVersion,
