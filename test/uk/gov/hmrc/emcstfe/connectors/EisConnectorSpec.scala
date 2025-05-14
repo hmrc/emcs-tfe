@@ -29,7 +29,8 @@ import uk.gov.hmrc.emcstfe.models.request.eis.{EisHeaders, TraderKnownFactsETDS1
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfe.models.response.{EISSubmissionSuccessResponse, ErrorResponse}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.emcstfe.utils.RequestHelper
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -55,7 +56,8 @@ class EisConnectorSpec
     with GetMovementHistoryEventsFixture
     with TraderKnownFactsFixtures
     with PreValidateFixtures
-    with MockMetricsService {
+    with MockMetricsService
+    with RequestHelper {
 
   override def afterEach(): Unit = {
     disable(UseDownstreamStub)
@@ -88,17 +90,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(Right(eisSuccessResponse)))
 
@@ -118,17 +110,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -145,17 +127,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -172,17 +144,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -199,17 +161,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -226,17 +178,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -253,17 +195,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -280,17 +212,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -306,17 +228,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/digital-submit-new-message/v1",
-              body = submitReportOfReceiptRequest.toJson,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> submitReportOfReceiptRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-emcs08"
-              ),
-              bearerToken = "Bearer value-emcs08"
+              body = submitReportOfReceiptRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -328,6 +240,13 @@ class EisConnectorSpec
     "getMessages is called" should {
 
       val getMessagesRequest = GetMessagesRequest(testErn, "messagetype", "A", 3)
+      val parameters: Seq[(String, String)] = Seq(
+        "exciseregistrationnumber" -> testErn,
+        "sortfield"                -> "messagetype",
+        "sortorder"                -> "A",
+        "startposition"            -> "20",
+        "maxnotoreturn"            -> "10"
+      )
 
       import GetMessagesResponseFixtures._
 
@@ -337,25 +256,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessagesRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/messages"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/messages",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "sortfield"                -> "messagetype",
-                "sortorder"                -> "A",
-                "startposition"            -> "20",
-                "maxnotoreturn"            -> "10"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(Right(getMessagesResponseModel)))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe Right(getMessagesResponseModel)
@@ -371,25 +276,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessagesRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/messages"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/messages",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "sortfield"                -> "messagetype",
-                "sortorder"                -> "A",
-                "startposition"            -> "20",
-                "maxnotoreturn"            -> "10"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe response
@@ -402,25 +293,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessagesRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/messages"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/messages",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "sortfield"                -> "messagetype",
-                "sortorder"                -> "A",
-                "startposition"            -> "20",
-                "maxnotoreturn"            -> "10"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe response
@@ -433,25 +310,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessagesRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/messages"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/messages",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "sortfield"                -> "messagetype",
-                "sortorder"                -> "A",
-                "startposition"            -> "20",
-                "maxnotoreturn"            -> "10"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe response
@@ -464,25 +327,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessagesRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/messages"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/messages",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "sortfield"                -> "messagetype",
-                "sortorder"                -> "A",
-                "startposition"            -> "20",
-                "maxnotoreturn"            -> "10"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe response
@@ -495,25 +344,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessagesRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/messages"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/messages",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "sortfield"                -> "messagetype",
-                "sortorder"                -> "A",
-                "startposition"            -> "20",
-                "maxnotoreturn"            -> "10"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe response
@@ -526,25 +361,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessagesRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/messages"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/messages",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "sortfield"                -> "messagetype",
-                "sortorder"                -> "A",
-                "startposition"            -> "20",
-                "maxnotoreturn"            -> "10"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe response
@@ -556,25 +377,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessagesRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/messages"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/messages",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "sortfield"                -> "messagetype",
-                "sortorder"                -> "A",
-                "startposition"            -> "20",
-                "maxnotoreturn"            -> "10"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessagesRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessages(getMessagesRequest)) shouldBe response
@@ -585,6 +392,10 @@ class EisConnectorSpec
     "getSubmissionFailureMessage is called" should {
 
       val getSubmissionFailureMessageRequest = GetSubmissionFailureMessageRequest(testErn, testMessageId)
+      val parameters = Seq(
+        "exciseregistrationnumber" -> testErn,
+        "uniquemessageid"          -> testMessageId
+      )
 
       import GetSubmissionFailureMessageResponseFixtures._
 
@@ -594,22 +405,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/submission-failure-message"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "uniquemessageid"          -> testMessageId
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(Right(getSubmissionFailureMessageResponseModel)))
 
           await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe Right(getSubmissionFailureMessageResponseModel)
@@ -625,22 +425,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/submission-failure-message"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "uniquemessageid"          -> testMessageId
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
@@ -653,22 +442,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/submission-failure-message"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "uniquemessageid"          -> testMessageId
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
@@ -681,22 +459,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/submission-failure-message"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "uniquemessageid"          -> testMessageId
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
@@ -709,22 +476,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/submission-failure-message"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "uniquemessageid"          -> testMessageId
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
@@ -737,22 +493,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/submission-failure-message"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "uniquemessageid"          -> testMessageId
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
@@ -765,22 +510,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/submission-failure-message"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "uniquemessageid"          -> testMessageId
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
@@ -792,22 +526,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getSubmissionFailureMessageRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/submission-failure-message"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/submission-failure-message",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "uniquemessageid"          -> testMessageId
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getSubmissionFailureMessageRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getSubmissionFailureMessage(getSubmissionFailureMessageRequest)) shouldBe response
@@ -1025,17 +748,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .delete(
-              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .delete(s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId")
             .returns(Future.successful(Right(setMessageAsLogicallyDeletedResponseModel)))
 
           await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe Right(setMessageAsLogicallyDeletedResponseModel)
@@ -1052,17 +765,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .delete(
-              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .delete(s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId")
             .returns(Future.successful(response))
 
           await(connector.setMessageAsLogicallyDeleted(setMessageAsLogicallyDeletedRequest)) shouldBe response
@@ -1077,15 +780,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .delete(
-              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
+              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId"
             )
             .returns(Future.successful(response))
 
@@ -1101,15 +796,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .delete(
-              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
+              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId"
             )
             .returns(Future.successful(response))
 
@@ -1125,15 +812,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .delete(
-              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
+              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId"
             )
             .returns(Future.successful(response))
 
@@ -1149,15 +828,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .delete(
-              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
+              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId"
             )
             .returns(Future.successful(response))
 
@@ -1173,15 +844,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .delete(
-              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
+              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId"
             )
             .returns(Future.successful(response))
 
@@ -1196,15 +859,7 @@ class EisConnectorSpec
 
           MockHttpClient
             .delete(
-              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> setMessageAsLogicallyDeletedRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
+              url = s"$baseUrl/emcs/messages/v1/message?exciseregistrationnumber=$testErn&uniquemessageid=$testMessageId"
             )
             .returns(Future.successful(response))
 
@@ -1217,27 +872,21 @@ class EisConnectorSpec
 
       val getMessageStatisticsRequest = GetMessageStatisticsRequest(testErn)
 
+      val parameters = Seq(
+        "exciseregistrationnumber" -> testErn
+      )
+
       "return a Right" when {
         "downstream call is successful" in new Test {
 
           MockMetricsService.requestTimer(getMessageStatisticsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/message-statistics"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/message-statistics",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(Right(getMessageStatisticsResponseModel)))
 
           await(connector.getMessageStatistics(getMessageStatisticsRequest)) shouldBe Right(getMessageStatisticsResponseModel)
@@ -1253,21 +902,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessageStatisticsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/message-statistics"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/message-statistics",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessageStatistics(getMessageStatisticsRequest)) shouldBe response
@@ -1280,21 +919,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessageStatisticsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/message-statistics"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/message-statistics",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessageStatistics(getMessageStatisticsRequest)) shouldBe response
@@ -1307,21 +936,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessageStatisticsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/message-statistics"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/message-statistics",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessageStatistics(getMessageStatisticsRequest)) shouldBe response
@@ -1334,21 +953,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessageStatisticsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/message-statistics"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/message-statistics",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessageStatistics(getMessageStatisticsRequest)) shouldBe response
@@ -1361,21 +970,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessageStatisticsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/message-statistics"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/message-statistics",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessageStatistics(getMessageStatisticsRequest)) shouldBe response
@@ -1388,21 +987,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessageStatisticsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/message-statistics"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/message-statistics",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessageStatistics(getMessageStatisticsRequest)) shouldBe response
@@ -1414,21 +1003,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMessageStatisticsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/messages/v1/message-statistics"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/messages/v1/message-statistics",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMessageStatisticsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-messages"
-              ),
-              bearerToken = "Bearer value-messages"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMessageStatistics(getMessageStatisticsRequest)) shouldBe response
@@ -1438,29 +1017,23 @@ class EisConnectorSpec
 
     "getRawMovement is called" should {
       val getMovementRequest = GetMovementRequest(testErn, testArc, Some(1))
-      val url                = "/emcs/movements/v1/movement"
+
+      val parameters = Seq(
+        "exciseregistrationnumber" -> testErn,
+        "arc"                      -> testArc,
+        "sequencenumber"           -> "1"
+      )
+
       "return a right" when {
         "when downstream call is successful" in new Test {
           MockMetricsService.requestTimer(getMovementRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl$url",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc,
-                "sequencenumber"           -> "1"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(Right(getRawMovementResponse())))
 
           await(connector.getRawMovement(getMovementRequest)) shouldBe Right(getRawMovementResponse())
@@ -1474,23 +1047,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl$url",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc,
-                "sequencenumber"           -> "1"
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getRawMovement(getMovementRequest)) shouldBe response
@@ -1539,6 +1100,8 @@ class EisConnectorSpec
         "transportertradername"    -> "Trader 1",
         "undischargedmovements"    -> "Accepted",
         "exciseproductcode"        -> "6000"
+
+
       )
 
       "return a Right" when {
@@ -1546,19 +1109,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementListRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl$url"
+          val urlWithQuery: String = uri + makeQueryString(queryParameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl$url",
-              parameters = queryParameters,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementListRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(Right(getMovementListResponse)))
 
           await(connector.getMovementList(getMovementListRequest)) shouldBe Right(getMovementListResponse)
@@ -1572,19 +1127,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementListRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl$url"
+          val urlWithQuery: String = uri + makeQueryString(queryParameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl$url",
-              parameters = queryParameters,
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementListRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMovementList(getMovementListRequest)) shouldBe response
@@ -1596,28 +1143,22 @@ class EisConnectorSpec
 
       val getMovementHistoryEventsRequest = GetMovementHistoryEventsRequest(testErn, testArc)
 
+      val parameters = Seq(
+        "exciseregistrationnumber" -> testErn,
+        "arc"                      -> testArc
+      )
+
       "return a Right" when {
         "downstream call is successful" in new Test {
 
           MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement-history"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/movements/v1/movement-history",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(Right(getMovementHistoryEventsResponseModel)))
 
           await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe Right(getMovementHistoryEventsResponseModel)
@@ -1633,22 +1174,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement-history"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/movements/v1/movement-history",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
@@ -1661,22 +1191,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement-history"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/movements/v1/movement-history",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
@@ -1689,22 +1208,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement-history"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/movements/v1/movement-history",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
@@ -1717,22 +1225,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement-history"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/movements/v1/movement-history",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
@@ -1745,22 +1242,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement-history"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/movements/v1/movement-history",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
@@ -1773,22 +1259,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement-history"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/movements/v1/movement-history",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
@@ -1800,22 +1275,11 @@ class EisConnectorSpec
           MockMetricsService.requestTimer(getMovementHistoryEventsRequest.metricName)
           MockMetricsService.processWithTimer()
 
+          val uri = s"$baseUrl/emcs/movements/v1/movement-history"
+          val urlWithQuery: String = uri + makeQueryString(parameters)
+
           MockHttpClient
-            .get(
-              url = s"$baseUrl/emcs/movements/v1/movement-history",
-              parameters = Seq(
-                "exciseregistrationnumber" -> testErn,
-                "arc"                      -> testArc
-              ),
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.correlationId -> getMovementHistoryEventsRequest.correlationUUID,
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.authorization -> "Bearer value-movements"
-              ),
-              bearerToken = "Bearer value-movements"
-            )
+            .get(url"$urlWithQuery")
             .returns(Future.successful(response))
 
           await(connector.getMovementHistoryEvents(getMovementHistoryEventsRequest)) shouldBe response
@@ -1834,17 +1298,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .get(
-              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
-                EisHeaders.accept        -> "application/json"
-              ),
-              bearerToken = "Bearer value-known-facts-etds18"
-            )
+            .get(url"$baseUrl/etds/trader/knownfacts/$testErn")
             .returns(Future.successful(Right(testTraderKnownFactsModel)))
 
           await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe Right(Some(testTraderKnownFactsModel))
@@ -1861,17 +1315,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .get(
-              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
-                EisHeaders.accept        -> "application/json"
-              ),
-              bearerToken = "Bearer value-known-facts-etds18"
-            )
+            .get(url"$baseUrl/etds/trader/knownfacts/$testErn")
             .returns(Future.successful(response))
 
           await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
@@ -1885,17 +1329,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .get(
-              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
-                EisHeaders.accept        -> "application/json"
-              ),
-              bearerToken = "Bearer value-known-facts-etds18"
-            )
+            .get(url"$baseUrl/etds/trader/knownfacts/$testErn")
             .returns(Future.successful(response))
 
           await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
@@ -1909,17 +1343,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .get(
-              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
-                EisHeaders.accept        -> "application/json"
-              ),
-              bearerToken = "Bearer value-known-facts-etds18"
-            )
+            .get(url"$baseUrl/etds/trader/knownfacts/$testErn")
             .returns(Future.successful(response))
 
           await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
@@ -1933,17 +1357,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .get(
-              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
-                EisHeaders.accept        -> "application/json"
-              ),
-              bearerToken = "Bearer value-known-facts-etds18"
-            )
+            .get(url"$baseUrl/etds/trader/knownfacts/$testErn")
             .returns(Future.successful(response))
 
           await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
@@ -1957,17 +1371,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .get(
-              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
-                EisHeaders.accept        -> "application/json"
-              ),
-              bearerToken = "Bearer value-known-facts-etds18"
-            )
+            .get(url"$baseUrl/etds/trader/knownfacts/$testErn")
             .returns(Future.successful(response))
 
           await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
@@ -1981,17 +1385,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .get(
-              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
-                EisHeaders.accept        -> "application/json"
-              ),
-              bearerToken = "Bearer value-known-facts-etds18"
-            )
+            .get(url"$baseUrl/etds/trader/knownfacts/$testErn")
             .returns(Future.successful(response))
 
           await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
@@ -2004,17 +1398,7 @@ class EisConnectorSpec
           MockMetricsService.processWithTimer()
 
           MockHttpClient
-            .get(
-              url = s"$baseUrl/etds/trader/knownfacts/$testErn",
-              headers = Seq(
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.authorization -> "Bearer value-known-facts-etds18",
-                EisHeaders.accept        -> "application/json"
-              ),
-              bearerToken = "Bearer value-known-facts-etds18"
-            )
+            .get(url"$baseUrl/etds/trader/knownfacts/$testErn")
             .returns(Future.successful(response))
 
           await(connector.getTraderKnownFactsViaETDS18(testErn)) shouldBe response
@@ -2035,17 +1419,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/etds/traderprevalidation/v1",
-              body = preValidateTraderViaETDS12Request.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
-              ),
-              bearerToken = "Bearer value-prevalidate-etds12"
+              body = preValidateTraderViaETDS12Request.toJson
             )
             .returns(Future.successful(Right(preValidateEtds12ApiResponseModel)))
 
@@ -2065,17 +1439,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/etds/traderprevalidation/v1",
-              body = preValidateTraderViaETDS12Request.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
-              ),
-              bearerToken = "Bearer value-prevalidate-etds12"
+              body = preValidateTraderViaETDS12Request.toJson
             )
             .returns(Future.successful(response))
 
@@ -2092,17 +1456,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/etds/traderprevalidation/v1",
-              body = preValidateTraderViaETDS12Request.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
-              ),
-              bearerToken = "Bearer value-prevalidate-etds12"
+              body = preValidateTraderViaETDS12Request.toJson
             )
             .returns(Future.successful(response))
 
@@ -2119,17 +1473,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/etds/traderprevalidation/v1",
-              body = preValidateTraderViaETDS12Request.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
-              ),
-              bearerToken = "Bearer value-prevalidate-etds12"
+              body = preValidateTraderViaETDS12Request.toJson
             )
             .returns(Future.successful(response))
 
@@ -2146,17 +1490,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/etds/traderprevalidation/v1",
-              body = preValidateTraderViaETDS12Request.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
-              ),
-              bearerToken = "Bearer value-prevalidate-etds12"
+              body = preValidateTraderViaETDS12Request.toJson
             )
             .returns(Future.successful(response))
 
@@ -2173,17 +1507,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/etds/traderprevalidation/v1",
-              body = preValidateTraderViaETDS12Request.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
-              ),
-              bearerToken = "Bearer value-prevalidate-etds12"
+              body = preValidateTraderViaETDS12Request.toJson
             )
             .returns(Future.successful(response))
 
@@ -2200,17 +1524,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/etds/traderprevalidation/v1",
-              body = preValidateTraderViaETDS12Request.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
-              ),
-              bearerToken = "Bearer value-prevalidate-etds12"
+              body = preValidateTraderViaETDS12Request.toJson
             )
             .returns(Future.successful(response))
 
@@ -2226,17 +1540,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/etds/traderprevalidation/v1",
-              body = preValidateTraderViaETDS12Request.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderViaETDS12Request.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "MDTP",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate-etds12"
-              ),
-              bearerToken = "Bearer value-prevalidate-etds12"
+              body = preValidateTraderViaETDS12Request.toJson
             )
             .returns(Future.successful(response))
 
@@ -2258,17 +1562,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/pre-validate-trader/v1",
-              body = preValidateTraderRequest.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate"
-              ),
-              bearerToken = "Bearer value-prevalidate"
+              body = preValidateTraderRequest.toJson
             )
             .returns(Future.successful(Right(preValidateEtds12ApiResponseModel)))
 
@@ -2288,17 +1582,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/pre-validate-trader/v1",
-              body = preValidateTraderRequest.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate"
-              ),
-              bearerToken = "Bearer value-prevalidate"
+              body = preValidateTraderRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -2315,17 +1599,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/pre-validate-trader/v1",
-              body = preValidateTraderRequest.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate"
-              ),
-              bearerToken = "Bearer value-prevalidate"
+              body = preValidateTraderRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -2342,17 +1616,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/pre-validate-trader/v1",
-              body = preValidateTraderRequest.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate"
-              ),
-              bearerToken = "Bearer value-prevalidate"
+              body = preValidateTraderRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -2369,17 +1633,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/pre-validate-trader/v1",
-              body = preValidateTraderRequest.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate"
-              ),
-              bearerToken = "Bearer value-prevalidate"
+              body = preValidateTraderRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -2396,17 +1650,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/pre-validate-trader/v1",
-              body = preValidateTraderRequest.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate"
-              ),
-              bearerToken = "Bearer value-prevalidate"
+              body = preValidateTraderRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -2423,17 +1667,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/pre-validate-trader/v1",
-              body = preValidateTraderRequest.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate"
-              ),
-              bearerToken = "Bearer value-prevalidate"
+              body = preValidateTraderRequest.toJson
             )
             .returns(Future.successful(response))
 
@@ -2449,17 +1683,7 @@ class EisConnectorSpec
           MockHttpClient
             .postJson(
               url = s"$baseUrl/emcs/pre-validate-trader/v1",
-              body = preValidateTraderRequest.toJson,
-              headers = Seq(
-                EisHeaders.correlationId -> preValidateTraderRequest.correlationUUID,
-                EisHeaders.dateTime      -> s"${Instant.now.truncatedTo(ChronoUnit.MILLIS)}",
-                EisHeaders.forwardedHost -> "MDTP",
-                EisHeaders.source        -> "TFE",
-                EisHeaders.contentType   -> "application/json",
-                EisHeaders.accept        -> "application/json",
-                EisHeaders.authorization -> "Bearer value-prevalidate"
-              ),
-              bearerToken = "Bearer value-prevalidate"
+              body = preValidateTraderRequest.toJson
             )
             .returns(Future.successful(response))
 

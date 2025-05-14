@@ -25,6 +25,7 @@ import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import java.util.UUID
 import scala.util.Random
+import scala.language.implicitConversions
 
 trait CreateMovementSearchFixture extends BaseFixtures with MovementSubmissionFailureFixtures {
 

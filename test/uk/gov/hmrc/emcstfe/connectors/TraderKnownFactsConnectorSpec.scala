@@ -24,6 +24,7 @@ import uk.gov.hmrc.emcstfe.fixtures.TraderKnownFactsFixtures
 import uk.gov.hmrc.emcstfe.mocks.connectors.MockHttpClient
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse.UnexpectedDownstreamResponseError
 import uk.gov.hmrc.emcstfe.support.UnitSpec
+import uk.gov.hmrc.http.StringContextOps
 
 import scala.concurrent.Future
 
@@ -49,7 +50,7 @@ class TraderKnownFactsConnectorSpec extends UnitSpec
       "the http client response returns Right[TraderKnownFacts]" in {
         val ern = "1234567890"
 
-        MockHttpClient.get(config.knownFactsCandEUrl(ern)).returns(Future.successful(Right(testTraderKnownFactsModel)))
+        MockHttpClient.get(url"${config.knownFactsCandEUrl(ern)}", setHeader = false).returns(Future.successful(Right(testTraderKnownFactsModel)))
 
         val result = await(connector.getTraderKnownFactsViaReferenceData(ern))
 
@@ -61,7 +62,7 @@ class TraderKnownFactsConnectorSpec extends UnitSpec
       "the http client response returns Left[ErrorResponse]" in {
         val ern = "1234567890"
 
-        MockHttpClient.get(config.knownFactsCandEUrl(ern)).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
+        MockHttpClient.get(url"${config.knownFactsCandEUrl(ern)}", setHeader = false).returns(Future.successful(Left(UnexpectedDownstreamResponseError)))
 
         val result = await(connector.getTraderKnownFactsViaReferenceData(ern))
 

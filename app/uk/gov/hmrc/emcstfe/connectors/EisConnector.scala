@@ -31,12 +31,13 @@ import uk.gov.hmrc.emcstfe.models.response.getSubmissionFailureMessage.GetSubmis
 import uk.gov.hmrc.emcstfe.models.response.prevalidate.{PreValidateTraderApiResponse, PreValidateTraderETDSResponse}
 import uk.gov.hmrc.emcstfe.services.MetricsService
 import uk.gov.hmrc.emcstfe.utils.Logging
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class EisConnector @Inject() (val http: HttpClient, appConfig: AppConfig, override val metricsService: MetricsService) extends BaseEisConnector with EisJsonHttpParser with Logging {
+class EisConnector @Inject() (val http: HttpClientV2, appConfig: AppConfig, override val metricsService: MetricsService) extends BaseEisConnector with EisJsonHttpParser with Logging {
 
   private def prepareJsonAndSubmit[A](url: String, request: EisSubmissionRequest, callingMethod: String, bearerToken: String = appConfig.eisSubmitBearerToken)(implicit
       headerCarrier: HeaderCarrier,

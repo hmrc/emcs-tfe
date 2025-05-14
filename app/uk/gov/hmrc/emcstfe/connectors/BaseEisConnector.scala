@@ -16,18 +16,19 @@
 
 package uk.gov.hmrc.emcstfe.connectors
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisConsumptionRequest, EisHeaders, EisSubmissionRequest, Source}
 import uk.gov.hmrc.emcstfe.services.MetricsService
-import uk.gov.hmrc.emcstfe.utils.Logging
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpReads}
+import uk.gov.hmrc.emcstfe.utils.{RequestHelper, Logging}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpReads, StringContextOps}
 
 import java.time.Instant
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseEisConnector extends Logging {
+trait BaseEisConnector extends Logging with RequestHelper {
 
   def metricsService: MetricsService
 
@@ -68,43 +69,58 @@ trait BaseEisConnector extends Logging {
     hc.copy(authorization = Some(Authorization(bearer(bearerToken))))
   }
 
-  def postJson[A, B](http: HttpClient, uri: String, body: JsValue, request: EisSubmissionRequest, bearerToken: String)
+  def postJson[A, B](http: HttpClientV2, uri: String, body: JsValue, request: EisSubmissionRequest, bearerToken: String)
                     (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[postJson] POST to $uri being made with body:\n\n$body")
       val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
-      http.POST[JsValue, Either[A, B]](uri, body, eisSubmissionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source))(implicitly, rds, newHC, ec)
+      http
+        .post(url"$uri")(newHC)
+        .withBody(Json.toJson(body))
+        .setHeader(eisSubmissionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source): _*)
+        .execute[Either[A, B]]
     }
   }
 
-  def get[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest, bearerToken: String)
+  def get[A, B](http: HttpClientV2, uri: String, request: EisConsumptionRequest, bearerToken: String)
                (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[get] GET to $uri being made with query params ${request.queryParams}")
       val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
-      http.GET[Either[A, B]](uri, request.queryParams, eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source, request.extraHeaders))(rds, newHC, ec)
+      val urlWithQuery = uri + makeQueryString(request.queryParams)
+      http
+        .get(url"$urlWithQuery")(newHC)
+        .setHeader(eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source, request.extraHeaders): _*)
+        .execute[Either[A, B]]
     }
   }
 
-  def putEmpty[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest, bearerToken: String)
+  def putEmpty[A, B](http: HttpClientV2, uri: String, request: EisConsumptionRequest, bearerToken: String)
                (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[putEmpty] PUT to $uri being made with empty body")
       val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
-      http.PUTString[Either[A, B]](uri, "", eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source, request.extraHeaders))(rds, newHC, ec)
+      http
+        .put(url"$uri")(newHC)
+        .withBody(Json.toJson(""))
+        .setHeader(eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source, request.extraHeaders): _*)
+        .execute[Either[A, B]]
     }
   }
 
-  def delete[A, B](http: HttpClient, uri: String, request: EisConsumptionRequest, bearerToken: String)
+  def delete[A, B](http: HttpClientV2, uri: String, request: EisConsumptionRequest, bearerToken: String)
                (implicit ec: ExecutionContext, hc: HeaderCarrier, rds: HttpReads[Either[A, B]], appConfig: AppConfig): Future[Either[A, B]] = {
     withTimer(request.metricName) {
       val forwardedHost = appConfig.eisForwardedHost()
       logger.debug(s"[delete] DELETE to $uri being made")
       val newHC = headerCarrierWithBearerTokenOverride(hc, bearerToken)
-      http.DELETE[Either[A, B]](uri, eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source, request.extraHeaders))(rds, newHC, ec)
+      http
+        .delete(url"$uri")(newHC)
+        .setHeader(eisConsumptionHeaders(request.correlationUUID, forwardedHost, bearerToken, request.source, request.extraHeaders): _*)
+        .execute[Either[A, B]]
     }
   }
 }

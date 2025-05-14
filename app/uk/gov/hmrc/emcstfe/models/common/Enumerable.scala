@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfe.models.common
 
 import com.lucidchart.open.xtract.{ParseError, ParseFailure, ParseSuccess, XmlReader}
 import play.api.libs.json._
-
+import scala.language.implicitConversions
 import scala.xml.NodeSeq
 
 trait Enumerable[A] {
