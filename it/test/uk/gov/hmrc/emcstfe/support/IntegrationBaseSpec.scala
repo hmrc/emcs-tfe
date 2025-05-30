@@ -23,12 +23,10 @@ import play.api.http.Status.OK
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import play.api.{Application, Environment, Mode}
 import test.uk.gov.hmrc.emcstfe.stubs.DownstreamStub
 import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfe.support.UnitSpec
-import uk.gov.hmrc.http.StringContextOps
 
 trait IntegrationBaseSpec
   extends UnitSpec
@@ -39,8 +37,7 @@ trait IntegrationBaseSpec
     with OptionValues
     with BaseFixtures {
 
-  lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
-  lazy val client: HttpClientV2 = app.injector.instanceOf[HttpClientV2]
+  lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
   def servicesConfig: Map[String, _] = Map(
     "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
@@ -71,23 +68,10 @@ trait IntegrationBaseSpec
     stopWireMock()
   }
 
-  def buildRequest(path: String, extraHeaders: (String, String)*): WSRequest = wsClient
+  def buildRequest(path: String, extraHeaders: (String, String)*): WSRequest = client
     .url(s"http://localhost:$port/emcs-tfe$path")
     .withHttpHeaders(Seq(HeaderNames.AUTHORIZATION -> testAuthToken) ++ extraHeaders: _*)
     .withFollowRedirects(false)
-
-  def buildGetRequest(path: String, extraHeaders: (String, String)*): RequestBuilder = client
-    .get(url"http://localhost:$port/emcs-tfe$path")
-    .setHeader(Seq(HeaderNames.AUTHORIZATION -> testAuthToken) ++ extraHeaders: _*)
-
-  def buildPutRequest(path: String, body: JsValue, extraHeaders: (String, String)*): RequestBuilder = client
-    .put(url"http://localhost:$port/emcs-tfe$path")
-    .setHeader(Seq(HeaderNames.AUTHORIZATION -> testAuthToken) ++ extraHeaders: _*)
-    .withBody(body)
-
-  def buildDeleteRequest(path: String, extraHeaders: (String, String)*): RequestBuilder = client
-    .delete(url"http://localhost:$port/emcs-tfe$path")
-    .setHeader(Seq(HeaderNames.AUTHORIZATION -> testAuthToken) ++ extraHeaders: _*)
 
   def document(response: WSResponse): JsValue = Json.parse(response.body)
 }

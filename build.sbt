@@ -16,8 +16,7 @@ lazy val microservice = (project in file("."))
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
     scalacOptions ++= Seq(
-      "-feature",
-      "-Wconf:src=routes/.*:s",
+      "-Wconf:cat=deprecation:w,cat=feature:w,cat=optimizer:w,src=target/.*:s",
     ),
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetMovementListSearchOptions",
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSearchOptions",
