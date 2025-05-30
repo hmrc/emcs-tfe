@@ -23,8 +23,7 @@ lazy val microservice = (project in file("."))
     routesImport += "uk.gov.hmrc.emcstfe.models.request.GetDraftMovementSortField",
     routesImport += "uk.gov.hmrc.emcstfe.models.common.SortOrdering",
     routesImport += "uk.gov.hmrc.emcstfe.models.common.DestinationType",
-    Runtime / unmanagedClasspath += baseDirectory.value / "resources",
-    resolvers += Resolver.jcenterRepo
+    Runtime / unmanagedClasspath += baseDirectory.value / "resources"
   )
   .settings(CodeCoverageSettings.settings *)
 

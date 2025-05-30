@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.uk.gov.hmrc.emcstfe.repositories
+package uk.gov.hmrc.emcstfe.repositories
 
 import org.mongodb.scala.Document
 import play.api.libs.json.Json

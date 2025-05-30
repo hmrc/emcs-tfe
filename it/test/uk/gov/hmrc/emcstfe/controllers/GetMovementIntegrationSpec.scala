@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.uk.gov.hmrc.emcstfe.controllers
+package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.mongodb.scala.bson.BsonDocument
@@ -22,8 +22,8 @@ import play.api.http.Status
 import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Injecting
-import test.uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
-import test.uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
+import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
+import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import uk.gov.hmrc.emcstfe.fixtures.GetMovementFixture
 import uk.gov.hmrc.emcstfe.models.mongo.GetMovementMongoResponse
 import uk.gov.hmrc.emcstfe.repositories.GetMovementRepositoryImpl

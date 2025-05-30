@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package test.uk.gov.hmrc.emcstfe.controllers
+package uk.gov.hmrc.emcstfe.controllers
 
 import org.mongodb.scala.bson.BsonDocument
 import play.api.http.Status
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
-import test.uk.gov.hmrc.emcstfe.stubs.AuthStub
-import test.uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
+import uk.gov.hmrc.emcstfe.stubs.AuthStub
+import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import uk.gov.hmrc.emcstfe.fixtures.CreateMovementSearchFixture
 import uk.gov.hmrc.emcstfe.models.common.Ascending
 import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, TaxWarehouse}

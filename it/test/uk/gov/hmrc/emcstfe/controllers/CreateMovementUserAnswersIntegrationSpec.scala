@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.uk.gov.hmrc.emcstfe.controllers
+package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.mockito.Mockito.when
@@ -27,8 +27,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
-import test.uk.gov.hmrc.emcstfe.stubs.AuthStub
-import test.uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
+import uk.gov.hmrc.emcstfe.stubs.AuthStub
+import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.models.mongo.CreateMovementUserAnswers
 import uk.gov.hmrc.emcstfe.repositories.CreateMovementUserAnswersRepositoryImpl

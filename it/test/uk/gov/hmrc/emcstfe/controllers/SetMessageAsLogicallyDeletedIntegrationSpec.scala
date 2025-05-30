@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package test.uk.gov.hmrc.emcstfe.controllers
+package uk.gov.hmrc.emcstfe.controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
-import test.uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
-import test.uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
+import uk.gov.hmrc.emcstfe.stubs.{AuthStub, DownstreamStub}
+import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import uk.gov.hmrc.emcstfe.fixtures.SetMessageAsLogicallyDeletedFixtures
 import uk.gov.hmrc.emcstfe.models.response.ErrorResponse._
 

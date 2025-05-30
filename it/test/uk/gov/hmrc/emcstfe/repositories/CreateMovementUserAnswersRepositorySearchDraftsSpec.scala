@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.uk.gov.hmrc.emcstfe.repositories
+package uk.gov.hmrc.emcstfe.repositories
 
 import uk.gov.hmrc.emcstfe.fixtures.{CreateMovementSearchFixture, MovementSubmissionFailureFixtures}
 import uk.gov.hmrc.emcstfe.models.common.Ascending

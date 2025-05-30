@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package test.uk.gov.hmrc.emcstfe.repositories
+package uk.gov.hmrc.emcstfe.repositories
 
-import test.uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
+import uk.gov.hmrc.emcstfe.support.IntegrationBaseSpec
 import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.uk.gov.hmrc.emcstfe.support
+package uk.gov.hmrc.emcstfe.support
 
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
@@ -24,7 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
-import test.uk.gov.hmrc.emcstfe.stubs.DownstreamStub
+import uk.gov.hmrc.emcstfe.stubs.DownstreamStub
 import uk.gov.hmrc.emcstfe.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfe.support.UnitSpec
 
