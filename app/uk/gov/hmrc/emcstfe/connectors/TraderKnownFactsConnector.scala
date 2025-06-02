@@ -21,13 +21,17 @@ import uk.gov.hmrc.emcstfe.config.AppConfig
 import uk.gov.hmrc.emcstfe.connectors.httpParsers.TraderKnownFactsHttpParser
 import uk.gov.hmrc.emcstfe.models.response.{ErrorResponse, TraderKnownFacts}
 import uk.gov.hmrc.emcstfe.utils.Logging
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TraderKnownFactsConnector @Inject() (val http: HttpClient, appConfig: AppConfig) extends TraderKnownFactsHttpParser with Logging {
+class TraderKnownFactsConnector @Inject() (val http: HttpClientV2, appConfig: AppConfig) extends TraderKnownFactsHttpParser with Logging {
 
-  def getTraderKnownFactsViaReferenceData(ern: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] =
-    http.GET(appConfig.knownFactsCandEUrl(ern))(modelFromJsonHttpReads, hc, ec)
+  def getTraderKnownFactsViaReferenceData(ern: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Option[TraderKnownFacts]]] = {
+    http
+      .get(url"${appConfig.knownFactsCandEUrl(ern)}")
+      .execute[Either[ErrorResponse, Option[TraderKnownFacts]]](modelFromJsonHttpReads, ec)
+  }
 
 }
