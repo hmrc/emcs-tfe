@@ -45,7 +45,15 @@ class EisConnector @Inject() (val http: HttpClientV2, appConfig: AppConfig, over
       jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
     logger.debug(s"[$callingMethod] Sending body: ${request.toJson}")
-    postJson(http, url, request.toJson, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
+
+    val response = postJson(http, url, request.toJson, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
+
+    response.foreach(_.left.foreach { err =>
+      logger.error(s"[$callingMethod] Error sending to EIS with correlation ID ${request.correlationUUID}")
+      logger.debug(s"[$callingMethod] Error detail: ${err.message}")
+    })
+
+    response
   }
 
   private def prepareGetRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String, bearerToken: String)(implicit
@@ -53,7 +61,15 @@ class EisConnector @Inject() (val http: HttpClientV2, appConfig: AppConfig, over
       ec: ExecutionContext,
       jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
-    get(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
+
+    val response = get(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
+
+    response.foreach(_.left.foreach { err =>
+      logger.error(s"[$callingMethod] Error sending to EIS with correlation ID ${request.correlationUUID}")
+      logger.debug(s"[$callingMethod] Error detail: ${err.message}")
+    })
+
+    response
   }
 
   private def prepareEmptyPutRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String, bearerToken: String)(implicit
@@ -61,7 +77,15 @@ class EisConnector @Inject() (val http: HttpClientV2, appConfig: AppConfig, over
       ec: ExecutionContext,
       jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
-    putEmpty(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
+
+    val response = putEmpty(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
+
+    response.foreach(_.left.foreach { err =>
+      logger.error(s"[$callingMethod] Error sending to EIS with correlation ID ${request.correlationUUID}")
+      logger.debug(s"[$callingMethod] Error detail: ${err.message}")
+    })
+
+    response
   }
 
   private def prepareDeleteRequestAndSubmit[A](url: String, request: EisConsumptionRequest, callingMethod: String, bearerToken: String)(implicit
@@ -69,7 +93,15 @@ class EisConnector @Inject() (val http: HttpClientV2, appConfig: AppConfig, over
       ec: ExecutionContext,
       jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] = {
     logger.debug(s"[$callingMethod] Sending to URL: $url")
-    delete(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
+
+    val response = delete(http, url, request, bearerToken)(ec, headerCarrier, modelFromJsonHttpReads, appConfig)
+
+    response.foreach(_.left.foreach { err =>
+      logger.error(s"[$callingMethod] Error sending to EIS with correlation ID ${request.correlationUUID}")
+      logger.debug(s"[$callingMethod] Error detail: ${err.message}")
+    })
+
+    response
   }
 
   def submit[A](request: EisSubmissionRequest, callingMethod: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, jsonReads: Reads[A]): Future[Either[ErrorResponse, A]] =
