@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.emcstfe.config.Constants
 import uk.gov.hmrc.emcstfe.models.auth.UserRequest
 import uk.gov.hmrc.emcstfe.models.changeDestination.SubmitChangeDestinationModel
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{CertifiedConsignee, Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryCertifiedConsignee}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{CertifiedConsignee, Export, RegisteredConsignee, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryCertifiedConsignee, TemporaryRegisteredConsignee}
 import uk.gov.hmrc.emcstfe.models.request.eis.{EisMessage, EisSubmissionRequest, Source}
 import uk.gov.hmrc.emcstfe.models.response.getMovement.GetMovementResponse
 
@@ -47,6 +47,9 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, mo
         // I want to keep the consignee the same and change the place of destination
         // so we need to use the country code from the existing consignee of the movement
         countryCode(movement.consigneeTrader.flatMap(_.traderExciseNumber))
+      case RegisteredConsignee | TemporaryRegisteredConsignee =>
+        //Route to the EU member state of the new registered consignee (e.g., FR -> NDEA.FR)
+         countryCode(body.destinationChanged.newConsigneeTrader.flatMap(_.traderExciseNumber))
       case ReturnToThePlaceOfDispatchOfTheConsignor =>
         arcCountryCode
       case _ => Constants.GB

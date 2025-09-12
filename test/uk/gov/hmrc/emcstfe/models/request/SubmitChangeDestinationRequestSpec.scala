@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfe.models.request
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures, TraderModelFixtures}
 import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, UnknownDestination}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, RegisteredConsignee, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryRegisteredConsignee, UnknownDestination}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
 
 import java.util.Base64
@@ -106,6 +106,36 @@ class SubmitChangeDestinationRequestSpec extends TestBaseSpec with SubmitChangeD
 
           val request = SubmitChangeDestinationRequest(model.copy(destinationChanged = model.destinationChanged.copy(destinationTypeCode = Export, deliveryPlaceCustomsOffice = None)), getMovementResponse())
           request.messageRecipient shouldBe "NDEA.GB"
+        }
+      }
+
+      "destination type is RegisteredConsignee" should {
+        "use the newConsigneeTrader ERN to set the EU recipient" in {
+          val modelWithRC = model.copy(
+            destinationChanged = model.destinationChanged.copy(
+              destinationTypeCode = RegisteredConsignee,
+              newConsigneeTrader = Some(model.destinationChanged.newConsigneeTrader.get.copy(
+                traderExciseNumber = Some("FR00987654321")
+              )),
+              deliveryPlaceTrader = None
+            )
+          )
+          val request = SubmitChangeDestinationRequest(modelWithRC, getMovementResponse())
+          request.messageRecipient shouldBe "NDEA.FR"
+        }
+      }
+
+      "destination type is TemporaryRegisteredConsignee" should {
+        "use newConsigneeTrader ERN for recipient" in {
+          val m = model.copy(destinationChanged = model.destinationChanged.copy(
+            destinationTypeCode = TemporaryRegisteredConsignee,
+            newConsigneeTrader = Some(model.destinationChanged.newConsigneeTrader.get.copy(
+              traderExciseNumber = Some("DEA234567890")
+            )),
+            deliveryPlaceTrader = None
+          ))
+          val request = SubmitChangeDestinationRequest(m, getMovementResponse())
+          request.messageRecipient shouldBe "NDEA.DE"
         }
       }
 
