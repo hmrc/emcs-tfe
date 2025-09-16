@@ -48,8 +48,7 @@ case class SubmitChangeDestinationRequest(body: SubmitChangeDestinationModel, mo
         // so we need to use the country code from the existing consignee of the movement
         countryCode(movement.consigneeTrader.flatMap(_.traderExciseNumber))
       case RegisteredConsignee | TemporaryRegisteredConsignee =>
-        //Route to the EU member state of the new registered consignee (e.g., FR -> NDEA.FR)
-         countryCode(body.destinationChanged.newConsigneeTrader.flatMap(_.traderExciseNumber))
+        countryCode(body.destinationChanged.newConsigneeTrader.flatMap(_.traderExciseNumber))
       case ReturnToThePlaceOfDispatchOfTheConsignor =>
         arcCountryCode
       case _ => Constants.GB
