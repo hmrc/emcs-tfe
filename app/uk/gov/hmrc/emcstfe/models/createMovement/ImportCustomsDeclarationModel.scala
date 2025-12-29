@@ -22,12 +22,12 @@ import uk.gov.hmrc.emcstfe.models.common.XmlBaseModel
 
 import scala.xml.Elem
 
-case class ImportSadModel(importSadNumber: String) extends XmlBaseModel {
-  def toXml(implicit request: UserRequest[_]): Elem = <urn:ImportSad>
-    <urn:ImportSadNumber>{importSadNumber}</urn:ImportSadNumber>
-  </urn:ImportSad>
+case class ImportCustomsDeclarationModel(importCustomsDeclarationNumber: String) extends XmlBaseModel {
+  def toXml(implicit request: UserRequest[_]): Elem = <urn:ImportCustomsDeclaration>
+    <urn:ImportCustomsDeclarationNumber>{importCustomsDeclarationNumber}</urn:ImportCustomsDeclarationNumber>
+  </urn:ImportCustomsDeclaration>
 }
 
-object ImportSadModel {
-  implicit val fmt: OFormat[ImportSadModel] = Json.format
+object ImportCustomsDeclarationModel {
+  implicit val fmt: OFormat[ImportCustomsDeclarationModel] = Json.format
 }

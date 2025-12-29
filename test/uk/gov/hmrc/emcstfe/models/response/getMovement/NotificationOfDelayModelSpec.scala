@@ -64,7 +64,7 @@ class NotificationOfDelayModelSpec extends TestBaseSpec with GetMovementFixture 
       lazy val responseBodyWithoutNotificationType: String =
         s"""
            |<mov:eventHistory>
-           |  <ie837:IE837 xmlns:ie837="ie837:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.13">
+           |  <ie837:IE837 xmlns:ie837="ie837:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE837:V3.23">
            |     <ie837:Header>
            |        <urn:MessageSender>NDEA.GB</urn:MessageSender>
            |        <urn:MessageRecipient>NDEA.GB</urn:MessageRecipient>

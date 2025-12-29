@@ -97,7 +97,7 @@ class SubmitReportOfReceiptRequestSpec extends TestBaseSpec with SubmitReportOfR
 
       val expectedRequest = {
         wrapInControlDoc(
-          <urn:IE818 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.13">
+          <urn:IE818 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.23" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE818:V3.23">
             <urn:Header>
               <urn1:MessageSender>
                 {request.messageSender}

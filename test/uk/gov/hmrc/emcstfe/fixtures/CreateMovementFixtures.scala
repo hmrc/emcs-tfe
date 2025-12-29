@@ -351,20 +351,20 @@ trait CreateMovementFixtures extends BaseFixtures
     )
   }
 
-  object ImportSadFixtures {
-    lazy val importSadModel: ImportSadModel = ImportSadModel(
-      importSadNumber = "number"
+  object ImportCustomsDeclarationFixtures {
+    lazy val importCustomsDeclarationModel: ImportCustomsDeclarationModel = ImportCustomsDeclarationModel(
+      importCustomsDeclarationNumber = "number"
     )
-    lazy val importSadXml: Elem = <urn:ImportSad>
-      <urn:ImportSadNumber>number</urn:ImportSadNumber>
-    </urn:ImportSad>
-    lazy val importSadJson: JsObject = Json.obj(
-      "importSadNumber" -> "number"
+    lazy val importCustomsDeclarationXml: Elem = <urn:ImportCustomsDeclaration>
+      <urn:ImportCustomsDeclarationNumber>number</urn:ImportCustomsDeclarationNumber>
+    </urn:ImportCustomsDeclaration>
+    lazy val importCustomsDeclarationJson: JsObject = Json.obj(
+      "importCustomsDeclarationNumber" -> "number"
     )
   }
 
   object EadEsadDraftFixtures {
-    import ImportSadFixtures._
+    import ImportCustomsDeclarationFixtures._
     lazy val eadEsadDraftModelMax: EadEsadDraftModel = EadEsadDraftModel(
       localReferenceNumber = "lrn",
       invoiceNumber = "number",
@@ -372,7 +372,7 @@ trait CreateMovementFixtures extends BaseFixtures
       originTypeCode = OriginType.TaxWarehouse,
       dateOfDispatch = "date",
       timeOfDispatch = Some("time"),
-      importSad = Some(Seq(importSadModel, importSadModel))
+      importCustomsDeclaration = Some(Seq(importCustomsDeclarationModel, importCustomsDeclarationModel))
     )
     lazy val eadEsadDraftModelMin: EadEsadDraftModel = EadEsadDraftModel(
       localReferenceNumber = "lrn",
@@ -381,7 +381,7 @@ trait CreateMovementFixtures extends BaseFixtures
       originTypeCode = OriginType.DutyPaid,
       dateOfDispatch = "date",
       timeOfDispatch = None,
-      importSad = None
+      importCustomsDeclaration = None
     )
     lazy val eadEsadDraftXmlMax: Elem = <urn:EadEsadDraft>
       <urn:LocalReferenceNumber>lrn</urn:LocalReferenceNumber>
@@ -390,8 +390,8 @@ trait CreateMovementFixtures extends BaseFixtures
       <urn:OriginTypeCode>{OriginType.TaxWarehouse.toString}</urn:OriginTypeCode>
       <urn:DateOfDispatch>date</urn:DateOfDispatch>
       <urn:TimeOfDispatch>time</urn:TimeOfDispatch>
-      {importSadXml}
-      {importSadXml}
+      {importCustomsDeclarationXml}
+      {importCustomsDeclarationXml}
     </urn:EadEsadDraft>
     lazy val eadEsadDraftXmlMin: Elem = <urn:EadEsadDraft>
       <urn:LocalReferenceNumber>lrn</urn:LocalReferenceNumber>
@@ -406,7 +406,7 @@ trait CreateMovementFixtures extends BaseFixtures
       "originTypeCode" -> OriginType.TaxWarehouse.toString,
       "dateOfDispatch" -> "date",
       "timeOfDispatch" -> "time",
-      "importSad" -> Json.arr(importSadJson, importSadJson)
+      "importCustomsDeclaration" -> Json.arr(importCustomsDeclarationJson, importCustomsDeclarationJson)
     )
     lazy val eadEsadDraftJsonMin: JsObject = Json.obj(
       "localReferenceNumber" -> "lrn",

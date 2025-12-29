@@ -29,7 +29,7 @@ trait EisMessage extends XmlWriterUtils {
                                         messageNumber: Int,
                                         messageSender: String,
                                         messageRecipient: String)(implicit request: UserRequest[_]): String = {
-    val schemaVersion = "V3.13"
+    val schemaVersion = "V3.23"
     trimWhitespaceFromXml(controlDocument(
       XML.loadString(
         s"""<urn:IE$messageNumber xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE$messageNumber:$schemaVersion" xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:$schemaVersion">
