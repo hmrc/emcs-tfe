@@ -934,7 +934,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       dateOfDispatch = "2008-11-20",
       timeOfDispatch = Some("10:00:00"),
       upstreamArc = None,
-      importSadNumber = None
+      importCustomsDeclarationNumber = None
     ),
     headerEadEsad = HeaderEadEsadModel(
       sequenceNumber = 1,
@@ -1652,12 +1652,12 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
        |              <body:DateOfDispatch>EadEsadDateOfDispatch</body:DateOfDispatch>
        |              <body:TimeOfDispatch>EadEsadTimeOfDispatch</body:TimeOfDispatch>
        |              <body:UpstreamArc>EadEsadUpstreamArc</body:UpstreamArc>
-       |              <body:ImportSad>
-       |                <body:ImportSadNumber>ImportSadNumber1</body:ImportSadNumber>
-       |              </body:ImportSad>
-       |              <body:ImportSad>
-       |                <body:ImportSadNumber>ImportSadNumber2</body:ImportSadNumber>
-       |              </body:ImportSad>
+       |              <body:ImportCustomsDeclaration>
+       |                <body:ImportCustomsDeclarationNumber>ImportCustomsDeclarationNumber1</body:ImportCustomsDeclarationNumber>
+       |              </body:ImportCustomsDeclaration>
+       |              <body:ImportCustomsDeclaration>
+       |                <body:ImportCustomsDeclarationNumber>ImportCustomsDeclarationNumber2</body:ImportCustomsDeclarationNumber>
+       |              </body:ImportCustomsDeclaration>
        |            </body:EadEsad>
        |            <body:HeaderEadEsad>
        |              <body:SequenceNumber>$sequenceNumber</body:SequenceNumber>
@@ -2469,7 +2469,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       dateOfDispatch = "EadEsadDateOfDispatch",
       timeOfDispatch = Some("EadEsadTimeOfDispatch"),
       upstreamArc = Some("EadEsadUpstreamArc"),
-      importSadNumber = Some(Seq("ImportSadNumber1", "ImportSadNumber2"))
+      importCustomsDeclarationNumber = Some(Seq("ImportCustomsDeclarationNumber1", "ImportCustomsDeclarationNumber2"))
     ),
     headerEadEsad = HeaderEadEsadModel(
       sequenceNumber = 1,
@@ -2922,7 +2922,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
       "dateOfDispatch"       -> "EadEsadDateOfDispatch",
       "timeOfDispatch"       -> "EadEsadTimeOfDispatch",
       "upstreamArc"          -> "EadEsadUpstreamArc",
-      "importSadNumber"      -> Json.arr("ImportSadNumber1", "ImportSadNumber2")
+      "importCustomsDeclarationNumber"      -> Json.arr("ImportCustomsDeclarationNumber1", "ImportCustomsDeclarationNumber2")
     ),
     "headerEadEsad" -> Json.obj(
       "sequenceNumber"                -> 1,

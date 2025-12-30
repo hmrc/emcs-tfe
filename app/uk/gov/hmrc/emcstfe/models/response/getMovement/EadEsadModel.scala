@@ -31,7 +31,7 @@ case class EadEsadModel(
                          dateOfDispatch: String,
                          timeOfDispatch: Option[String],
                          upstreamArc: Option[String],
-                         importSadNumber: Option[Seq[String]]
+                         importCustomsDeclarationNumber: Option[Seq[String]]
                        )
 
 object EadEsadModel extends XmlReaderUtils {
@@ -43,7 +43,7 @@ object EadEsadModel extends XmlReaderUtils {
     (__ \\ "DateOfDispatch").read[String],
     (__ \\ "TimeOfDispatch").read[Option[String]],
     (__ \\ "UpstreamArc").read[Option[String]],
-    (__ \\ "ImportSad" \\ "ImportSadNumber").read[Seq[String]](strictReadSeq).seqToOptionSeq
+    (__ \\ "ImportCustomsDeclaration" \\ "ImportCustomsDeclarationNumber").read[Seq[String]](strictReadSeq).seqToOptionSeq
   ).mapN(EadEsadModel.apply)
 
   implicit val fmt: OFormat[EadEsadModel] = Json.format

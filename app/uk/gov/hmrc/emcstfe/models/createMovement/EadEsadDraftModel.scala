@@ -29,7 +29,7 @@ case class EadEsadDraftModel(
                               originTypeCode: OriginType,
                               dateOfDispatch: String,
                               timeOfDispatch: Option[String],
-                              importSad: Option[Seq[ImportSadModel]]
+                              importCustomsDeclaration: Option[Seq[ImportCustomsDeclarationModel]]
                             ) extends XmlBaseModel with XmlWriterUtils {
   def toXml(implicit request: UserRequest[_]): Elem = <urn:EadEsadDraft>
     <urn:LocalReferenceNumber>{localReferenceNumber}</urn:LocalReferenceNumber>
@@ -38,7 +38,7 @@ case class EadEsadDraftModel(
     <urn:OriginTypeCode>{originTypeCode.toString}</urn:OriginTypeCode>
     <urn:DateOfDispatch>{dateOfDispatch}</urn:DateOfDispatch>
     {timeOfDispatch.mapNodeSeq(value => <urn:TimeOfDispatch>{value}</urn:TimeOfDispatch>)}
-    {importSad.mapNodeSeq(_.map(_.toXml))}
+    {importCustomsDeclaration.mapNodeSeq(_.map(_.toXml))}
   </urn:EadEsadDraft>
 }
 

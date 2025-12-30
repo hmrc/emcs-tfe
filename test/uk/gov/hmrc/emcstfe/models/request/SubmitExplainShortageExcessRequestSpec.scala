@@ -113,7 +113,7 @@ class SubmitExplainShortageExcessRequestSpec extends TestBaseSpec with SubmitExp
       implicit val request = SubmitExplainShortageExcessRequest(submitExplainShortageExcessModelMax(Consignor))
 
       val expectedRequest = wrapInControlDoc(
-        <urn:IE871 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.13" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.13">
+        <urn:IE871 xmlns:urn1="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:TMS:V3.23" xmlns:urn="urn:publicid:-:EC:DGTAXUD:EMCS:PHASE4:IE871:V3.23">
           <urn:Header>
             <urn1:MessageSender>
               {request.messageSender}
