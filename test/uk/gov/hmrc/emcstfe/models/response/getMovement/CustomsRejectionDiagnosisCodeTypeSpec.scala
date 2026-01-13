@@ -29,6 +29,7 @@ class CustomsRejectionDiagnosisCodeTypeSpec extends TestBaseSpec {
         CustomsRejectionDiagnosisCodeType.WeightMismatch.toString shouldBe "4"
         CustomsRejectionDiagnosisCodeType.DestinationTypeIsNotExport.toString shouldBe "5"
         CustomsRejectionDiagnosisCodeType.CommodityCodesDoNotMatch.toString shouldBe "6"
+        CustomsRejectionDiagnosisCodeType.WeightAndCommodityCodesDoNotMatch.toString shouldBe "7"
     }
   }
 }

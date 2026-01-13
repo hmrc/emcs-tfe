@@ -35,7 +35,9 @@ object CustomsRejectionDiagnosisCodeType extends Enumerable.Implicits {
 
   case object CommodityCodesDoNotMatch extends WithName("6") with CustomsRejectionDiagnosisCodeType
 
-  val values: Seq[CustomsRejectionDiagnosisCodeType] = Seq(UnknownArc, BodyRecordUniqueReferenceDoesNotExist, NoGoodsItemInDeclaration, WeightMismatch, DestinationTypeIsNotExport, CommodityCodesDoNotMatch)
+  case object WeightAndCommodityCodesDoNotMatch extends WithName("7") with CustomsRejectionDiagnosisCodeType
+
+  val values: Seq[CustomsRejectionDiagnosisCodeType] = Seq(UnknownArc, BodyRecordUniqueReferenceDoesNotExist, NoGoodsItemInDeclaration, WeightMismatch, DestinationTypeIsNotExport, CommodityCodesDoNotMatch, WeightAndCommodityCodesDoNotMatch)
 
   implicit val enumerable: Enumerable[CustomsRejectionDiagnosisCodeType] = Enumerable(values.map(v => v.toString -> v): _*)
 }
