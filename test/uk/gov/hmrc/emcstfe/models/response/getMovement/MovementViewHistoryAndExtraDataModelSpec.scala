@@ -165,7 +165,8 @@ class MovementViewHistoryAndExtraDataModelSpec extends TestBaseSpec with GetMove
                 )),
               vatNumber = None,
               eoriNumber = Some("GB00000578901")
-            )
+            ),
+            exportDeclarationAcceptanceOrGoodsReleasedForExport = Some("1")
           )
         ),
         notificationOfDelay = Some(Seq(

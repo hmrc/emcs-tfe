@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfe.models.response.getMovement
 
-import cats.implicits.catsSyntaxTuple6Semigroupal
+import cats.implicits.catsSyntaxTuple7Semigroupal
 import com.lucidchart.open.xtract.{XPath, XmlReader, __}
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.emcstfe.models.common.{ConsigneeTrader, TraderModel}
@@ -30,8 +30,9 @@ case class NotificationOfAcceptedExportModel(
                                    referenceNumberOfSenderCustomsOffice: String,
                                    identificationOfSenderCustomsOfficer: String,
                                    documentReferenceNumber: String,
-                                   consigneeTrader: TraderModel
-                                 )
+                                   consigneeTrader: TraderModel,
+                                   exportDeclarationAcceptanceOrGoodsReleasedForExport: Option[String]
+                                            )
 
 object NotificationOfAcceptedExportModel {
   implicit val format: Format[NotificationOfAcceptedExportModel] = Json.format[NotificationOfAcceptedExportModel]
@@ -48,13 +49,16 @@ object NotificationOfAcceptedExportModel {
 
   private lazy val consigneeTrader: XPath = __ \\ "ConsigneeTrader"
 
+  private lazy val exportDeclarationAcceptanceOrGoodsReleasedForExport: XPath = __ \\ "ExportDeclarationAcceptanceRelease" \ "ExportDeclarationAcceptanceOrGoodsReleasedForExport"
+
   implicit lazy val xmlReads: XmlReader[NotificationOfAcceptedExportModel] = (
     customsOfficeNumber.read[String],
     dateOfAcceptance.read[LocalDate],
     referenceNumberOfSenderCustomsOffice.read[String],
     identificationOfSenderCustomsOfficer.read[String],
     documentReferenceNumber.read[String],
-    consigneeTrader.read[TraderModel](TraderModel.xmlReads(ConsigneeTrader))
+    consigneeTrader.read[TraderModel](TraderModel.xmlReads(ConsigneeTrader)),
+    exportDeclarationAcceptanceOrGoodsReleasedForExport.read[Option[String]]
   ).mapN(NotificationOfAcceptedExportModel.apply)
 
 }
