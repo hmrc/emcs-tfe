@@ -855,7 +855,6 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <ie829:ExciseMovementEad>
             |              <ie829:AdministrativeReferenceCode>18GB00000000000232361</ie829:AdministrativeReferenceCode>
             |              <ie829:SequenceNumber>1</ie829:SequenceNumber>
-            |              <ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>1</ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>
             |            </ie829:ExciseMovementEad>
             |            <ie829:ExportPlaceCustomsOffice>
             |              <ie829:ReferenceNumber>GB000383</ie829:ReferenceNumber>
@@ -866,6 +865,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |              <ie829:DateOfAcceptance>2024-02-05</ie829:DateOfAcceptance>
             |              <ie829:DateOfRelease>2024-02-06</ie829:DateOfRelease>
             |              <ie829:DocumentReferenceNumber>645564546</ie829:DocumentReferenceNumber>
+            |              <ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>1</ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>
             |            </ie829:ExportDeclarationAcceptanceRelease>
             |          </ie829:NotificationOfAcceptedExport>
             |        </ie829:Body>
@@ -1530,7 +1530,6 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |            <ie829:ExciseMovementEad>
             |              <ie829:AdministrativeReferenceCode>18GB00000000000232361</ie829:AdministrativeReferenceCode>
             |              <ie829:SequenceNumber>1</ie829:SequenceNumber>
-            |              <ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>1</ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>
             |            </ie829:ExciseMovementEad>
             |            <ie829:ExportPlaceCustomsOffice>
             |              <ie829:ReferenceNumber>GB000383</ie829:ReferenceNumber>
@@ -1541,6 +1540,7 @@ class GetMovementResponseSpec extends TestBaseSpec with GetMovementFixture {
             |              <ie829:DateOfAcceptance>2024-02-05</ie829:DateOfAcceptance>
             |              <ie829:DateOfRelease>2024-02-06</ie829:DateOfRelease>
             |              <ie829:DocumentReferenceNumber>645564546</ie829:DocumentReferenceNumber>
+            |              <ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>1</ie829:ExportDeclarationAcceptanceOrGoodsReleasedForExport>
             |            </ie829:ExportDeclarationAcceptanceRelease>
             |          </ie829:NotificationOfAcceptedExport>
             |        </ie829:Body>
