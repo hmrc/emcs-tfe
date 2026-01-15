@@ -1455,7 +1455,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           "city"     -> "Bradford"
         ),
         "eoriNumber" -> "GB00000578901"
-      )
+      ),
+      "exportDeclarationAcceptanceOrGoodsReleasedForExport" -> "1"
     ),
     "notificationOfDelay" -> Json.arr(
       Json.obj(fields =
@@ -3177,7 +3178,8 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           "city"     -> "Bradford"
         ),
         "eoriNumber" -> "GB00000578901"
-      )
+      ),
+      "exportDeclarationAcceptanceOrGoodsReleasedForExport" -> "1"
     ),
     "notificationOfDelay" -> Json.arr(
       Json.obj(fields =
