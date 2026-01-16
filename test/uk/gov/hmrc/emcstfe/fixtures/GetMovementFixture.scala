@@ -1153,7 +1153,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           referenceNumberOfSenderCustomsOffice = "GB000101",
           identificationOfSenderCustomsOfficer = "John Doe",
           documentReferenceNumber = "645564546",
-          consigneeTrader = TraderModel(
+          consigneeTrader = Some(TraderModel(
             traderExciseNumber = Some("BE345345345"),
             traderName = Some("PEAR Supermarket"),
             address = Some(
@@ -1165,7 +1165,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
               )),
             vatNumber = None,
             eoriNumber = Some("GB00000578901")
-          ),
+          )),
           exportDeclarationAcceptanceOrGoodsReleasedForExport = Some("1")
         )
       ),
@@ -2734,7 +2734,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
           referenceNumberOfSenderCustomsOffice = "GB000101",
           identificationOfSenderCustomsOfficer = "John Doe",
           documentReferenceNumber = "645564546",
-          consigneeTrader = TraderModel(
+          consigneeTrader = Some(TraderModel(
             traderExciseNumber = Some("BE345345345"),
             traderName = Some("PEAR Supermarket"),
             address = Some(
@@ -2746,7 +2746,7 @@ trait GetMovementFixture extends BaseFixtures with TraderModelFixtures {
               )),
             vatNumber = None,
             eoriNumber = Some("GB00000578901")
-          ),
+          )),
           exportDeclarationAcceptanceOrGoodsReleasedForExport = Some("1")
         )
       ),

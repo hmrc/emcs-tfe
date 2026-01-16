@@ -30,7 +30,7 @@ case class NotificationOfAcceptedExportModel(
                                    referenceNumberOfSenderCustomsOffice: String,
                                    identificationOfSenderCustomsOfficer: String,
                                    documentReferenceNumber: String,
-                                   consigneeTrader: TraderModel,
+                                   consigneeTrader: Option[TraderModel],
                                    exportDeclarationAcceptanceOrGoodsReleasedForExport: Option[String]
                                             )
 
@@ -51,13 +51,18 @@ object NotificationOfAcceptedExportModel {
 
   private lazy val exportDeclarationAcceptanceOrGoodsReleasedForExport: XPath = __ \\ "ExportDeclarationAcceptanceRelease" \ "ExportDeclarationAcceptanceOrGoodsReleasedForExport"
 
+  def emptyTraderModelToOptionTraderModel(reader: XmlReader[TraderModel]): XmlReader[Option[TraderModel]] = reader.map {
+    case traderModel if traderModel.isEmpty => None
+    case populatedTraderModel => Some(populatedTraderModel)
+  }
+
   implicit lazy val xmlReads: XmlReader[NotificationOfAcceptedExportModel] = (
     customsOfficeNumber.read[String],
     dateOfAcceptance.read[LocalDate],
     referenceNumberOfSenderCustomsOffice.read[String],
     identificationOfSenderCustomsOfficer.read[String],
     documentReferenceNumber.read[String],
-    consigneeTrader.read[TraderModel](TraderModel.xmlReads(ConsigneeTrader)),
+    consigneeTrader.read[Option[TraderModel]](emptyTraderModelToOptionTraderModel(TraderModel.xmlReads(ConsigneeTrader))),
     exportDeclarationAcceptanceOrGoodsReleasedForExport.read[Option[String]]
   ).mapN(NotificationOfAcceptedExportModel.apply)
 
