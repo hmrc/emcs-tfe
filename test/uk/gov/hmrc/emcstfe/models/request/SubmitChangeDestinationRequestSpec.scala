@@ -19,9 +19,8 @@ package uk.gov.hmrc.emcstfe.models.request
 import play.api.libs.json.Json
 import uk.gov.hmrc.emcstfe.fixtures.{GetMovementFixture, SubmitChangeDestinationFixtures, TraderModelFixtures}
 import uk.gov.hmrc.emcstfe.models.common.ConsigneeTrader
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, RegisteredConsignee, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryRegisteredConsignee, UnknownDestination}
+import uk.gov.hmrc.emcstfe.models.common.DestinationType.{Export, DirectDelivery, RegisteredConsignee, ReturnToThePlaceOfDispatchOfTheConsignor, TaxWarehouse, TemporaryRegisteredConsignee, UnknownDestination}
 import uk.gov.hmrc.emcstfe.support.TestBaseSpec
-import uk.gov.hmrc.emcstfe.models.common.DestinationType.DirectDelivery
 
 import java.util.Base64
 import scala.xml.Utility.trim
