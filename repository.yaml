@@ -4,3 +4,4 @@ type: service
 test-repositories:
   - emcs-tfe-journey-tests
   - emcs-tfe-contract-tests
+serviceNowMapping: SNSVC0021014
